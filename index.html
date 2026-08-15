@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f212e">
+  <title>VIEWPOINT - Mines, Chicken, Crash & Color Trading</title>
+  <!-- Google Fonts: Inter and Outfit for sleek casino typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mines.css">
+  <link rel="stylesheet" href="css/chicken.css">
+  <link rel="stylesheet" href="css/crash.css">
+  <link rel="stylesheet" href="css/colortrading.css">
+  <link rel="stylesheet" href="css/stocktrading.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar (2-Tier Sleek Header) -->
+  <header class="navbar">
+    <!-- Top Row: Logo & Brand + Auth / Profile + Refer Button -->
+    <div class="nav-top-row">
+      <div class="nav-brand">
+        <div class="brand-logo-icon">
+          <svg viewBox="0 0 24 24">
+            <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" fill="none" stroke="#0f212e" stroke-width="2.5"/>
+            <circle cx="12" cy="12" r="4" fill="#0f212e"/>
+          </svg>
+        </div>
+        <div class="brand-name">VIEW<span>POINT</span></div>
+      </div>
+
+      <div class="nav-top-actions">
+        <!-- Refer & Earn Button -->
+        <button id="btnOpenRefer" class="btn-refer-nav" onclick="window.app && window.app.openReferModal()">
+          <span>🎁 Refer & Earn</span>
+        </button>
+
+        <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
+        <div id="authLoggedOutBox" class="auth-buttons-group">
+          <button id="btnOpenLogin" class="btn-auth-login" onclick="window.app && window.app.openAuthModal('login')">
+            <span>🔑 Login</span>
+          </button>
+          <button id="btnOpenSignup" class="btn-auth-signup" onclick="window.app && window.app.openAuthModal('signup')">
+            <span>✨ Sign Up</span>
+          </button>
+        </div>
+
+        <div id="authLoggedInBox" class="user-profile-badge" style="display: none;">
+          <span class="user-avatar-icon">👤</span>
+          <span id="displayUsername" class="display-username">VIP Player</span>
+          <button id="btnLogout" class="btn-logout-mini" title="Logout" onclick="window.app && window.app.logoutUser()">
+            <span>Logout</span>
+          </button>
+        </div>
+
+        <!-- Provably Fair Verifier Icon -->
+        <button id="btnProvablyFair" class="btn-icon-nav" title="Provably Fair Verifier">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Row: Balance + Deposit + Withdraw + Support -->
+    <div class="nav-bottom-row">
+      <!-- Balance Display -->
+      <div class="wallet-badge">
+        <div class="wallet-info">
+          <span class="wallet-label">Balance</span>
+          <div class="wallet-amount">
+            <span class="currency-symbol" id="currencySymbol">₹</span>
+            <span id="walletBalance">1,000.00</span>
+          </div>
+        </div>
+        <button id="btnResetWallet" class="btn-reset-wallet" title="Reset Demo Balance" onclick="window.app && window.app.resetWallet()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+          +1k
+        </button>
+      </div>
+
+      <!-- Deposit Button -->
+      <button id="btnOpenDeposit" class="btn-deposit-upi" title="Add Money via UPI / QR Code" onclick="window.app && window.app.openDepositModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Deposit</span>
+      </button>
+
+      <!-- Withdrawal Button -->
+      <button id="btnOpenWithdraw" class="btn-withdraw-nav" title="Withdraw Funds to UPI / Bank" onclick="window.app && window.app.openWithdrawModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <span>Withdraw</span>
+      </button>
+      
+      <!-- 24/7 Live Support Bot Button -->
+      <button id="btnLiveSupport" class="btn-nav-action" title="24/7 Live Support Bot" onclick="window.app && window.app.openSupportModal()">
+        <span>🎧 Support</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Multi-Page Navigation Bar (Page 1 vs Page 2) -->
+  <div class="page-nav-container">
+    <div class="page-nav-bar">
+      <button id="btnNavPage1" class="btn-page-pill active" onclick="window.app && window.app.switchMainPage(1)">
+        <span>🎲 Page 1: Classic Casino Lobby</span>
+      </button>
+      <button id="btnNavPage2" class="btn-page-pill" onclick="window.app && window.app.switchMainPage(2)">
+        <span>🎡 Page 2: Arcade & VIP Rewards</span>
+        <span class="hot-pill">HOT 🔥</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Page 1: Classic Casino Lobby (5 Core Games) -->
+  <main id="mainPage1" class="main-layout page-section active">
+    
+    <!-- Top Game Selector Header -->
+    <div class="game-tabs-wrapper">
+      <div class="game-tabs">
+        <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.app && window.app.switchGame('mines')">
+          <span>💣 Mines</span>
+        </button>
+        <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.app && window.app.switchGame('chicken')">
+          <span>🍗 Chicken</span>
+        </button>
+        <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.app && window.app.switchGame('crash')">
+          <span>🚀 Crash</span>
+        </button>
+        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.app && window.app.switchGame('colortrading')">
+          <span>🎨 Win Go</span>
+        </button>
+        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.app && window.app.switchGame('stock')">
+          <span>📈 Stock</span>
+          <span class="tab-badge" style="background: #3b82f6; color: #fff;">Binary</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Game Box -->
+    <div class="game-arena">
+      
+      <!-- Left Betting Controls Sidebar -->
+      <section class="controls-panel">
+        
+        <!-- Game Difficulty Mode Selector (Easy / Medium / Hard) -->
+        <div class="control-group">
+          <div class="control-header">
+            <label class="control-label">Difficulty Mode</label>
+            <span class="control-helper" id="difficultyLabelHelper">Balanced Mode</span>
+          </div>
+          <div class="difficulty-modes-row">
+            <button id="btnDiffEasy" class="btn-diff-mode" data-diff="easy">
+              <span>🟢 Easy</span>
+              <small>Low Risk</small>
+            </button>
+            <button id="btnDiffMed" class="btn-diff-mode active" data-diff="medium">
+              <span>🟡 Medium</span>
+              <small>Balanced</small>
+            </button>
+            <button id="btnDiffHard" class="btn-diff-mode" data-diff="hard">
+              <span>🔴 Hard</span>
+              <small>High Win</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bet Amount Input Group -->
+        <div class="control-group">
+          <div class="control-header">
+            <label class="control-label">Bet Amount</label>
+            <span class="control-helper">INR (₹)</span>
+          </div>
+          <div class="input-with-actions">
+            <span class="input-currency-prefix" id="inputCurrencyPrefix">₹</span>
+            <input type="number" id="betAmountInput" class="bet-input-field" value="10.00" min="0.10" step="1.00">
+            <div class="bet-quick-actions">
+              <button id="btnHalfBet" class="btn-quick-bet">½</button>
+              <button id="btnDoubleBet" class="btn-quick-bet">2X</button>
+              <button id="btnMaxBet" class="btn-quick-bet">MAX</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mines Difficulty Selector (Visible on Mines Tab) -->
+        <div id="minesSelectGroup" class="control-group">
+          <div class="control-header">
+            <label class="control-label">Mines Count</label>
+            <span class="control-helper">1 - 24 Mines</span>
+          </div>
+          <div class="custom-select-wrapper">
+            <select id="minesCountSelect" class="custom-select">
+              <option value="1">1 Mine (Safe: 24)</option>
+              <option value="2">2 Mines (Safe: 23)</option>
+              <option value="3" selected>3 Mines (Safe: 22)</option>
+              <option value="4">4 Mines (Safe: 21)</option>
+              <option value="5">5 Mines (Safe: 20)</option>
+              <option value="7">7 Mines (Safe: 18)</option>
+              <option value="10">10 Mines (Safe: 15)</option>
+              <option value="15">15 Mines (Safe: 10)</option>
+              <option value="20">20 Mines (Safe: 5)</option>
+              <option value="24">24 Mines (Safe: 1)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Bones Difficulty Selector (Visible on Chicken Tab) -->
+        <div id="chickenSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Bones Count</label>
+            <span class="control-helper">1 - 24 Bones</span>
+          </div>
+          <div class="custom-select-wrapper">
+            <select id="bonesCountSelect" class="custom-select">
+              <option value="1">1 Bone (Chickens: 24)</option>
+              <option value="2">2 Bones (Chickens: 23)</option>
+              <option value="3">3 Bones (Chickens: 22)</option>
+              <option value="4">4 Bones (Chickens: 21)</option>
+              <option value="5" selected>5 Bones (Chickens: 20)</option>
+              <option value="8">8 Bones (Chickens: 17)</option>
+              <option value="10">10 Bones (Chickens: 15)</option>
+              <option value="15">15 Bones (Chickens: 10)</option>
+              <option value="20">20 Bones (Chickens: 5)</option>
+              <option value="24">24 Bones (Chickens: 1)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Crash Auto Cashout Selector (Visible on Crash Tab) -->
+        <div id="crashSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Auto Cashout</label>
+            <span class="control-helper">Target Multiplier</span>
+          </div>
+          <div class="input-with-actions">
+            <input type="number" id="crashAutoCashoutInput" class="bet-input-field" value="2.00" min="1.01" step="0.10" style="padding-left: 14px;">
+            <div class="bet-quick-actions">
+              <button class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='1.50'">1.5x</button>
+              <button class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='2.00'">2x</button>
+              <button class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='5.00'">5x</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color Trading Contract Chips (Visible on Color Trading Tab) -->
+        <div id="colorTradingSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Quick Bet Amount</label>
+            <span class="control-helper">Tiranga Win Go</span>
+          </div>
+          <div class="deposit-quick-chips">
+            <button class="chip-btn active" onclick="document.getElementById('betAmountInput').value='10'">₹10</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='50'">₹50</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='100'">₹100</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='500'">₹500</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='1000'">₹1000</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='5000'">₹5000</button>
+          </div>
+        </div>
+
+        <!-- Stock Trading Expiry Selector (Visible on Stock Tab) -->
+        <div id="stockSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Trade Expiry</label>
+            <span class="control-helper">Binary Option</span>
+          </div>
+          <div class="deposit-quick-chips">
+            <button class="chip-btn active" id="btnExpiry30s">30s</button>
+            <button class="chip-btn" id="btnExpiry60s">60s</button>
+            <button class="chip-btn" id="btnExpiry2m">2m</button>
+          </div>
+        </div>
+
+        <!-- Multiplier Preview Card (For Mines & Chicken) -->
+        <div id="multiplierPreviewCard" class="multiplier-preview-card">
+          <div class="preview-row">
+            <span id="previewStepLabel" class="preview-title">Next Diamond Multiplier</span>
+            <span id="previewMultiplier" class="preview-val-multiplier">1.13x</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-title">Potential Profit</span>
+            <span id="previewProfit" class="preview-val-profit">+₹11.30</span>
+          </div>
+        </div>
+
+        <!-- Main Action Buttons (Mines, Chicken, Crash) -->
+        <div class="action-button-area" id="mainActionArea">
+          <button id="btnActionBet" class="btn-stake-primary btn-bet" onclick="window.app && window.app.handleBetClick()">
+            <span>BET</span>
+          </button>
+          
+          <button id="btnActionCashout" class="btn-stake-primary btn-cashout" style="display: none;" onclick="window.app && window.app.handleCashoutClick()">
+            <span>CASHOUT</span>
+            <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- Right Main Game Board -->
+      <section class="game-stage">
+        
+        <!-- Multiplier Streak Step Bar (Mines/Chicken) -->
+        <div id="multStreakContainer" class="multiplier-bar-container">
+          <div class="mult-stat">
+            <span class="mult-stat-label">Current</span>
+            <span id="multCurrentVal" class="mult-stat-value highlight">1.00x</span>
+          </div>
+          <div id="multProgressBadges" class="mult-progress-badges">
+            <!-- Progress badges dynamically injected here -->
+          </div>
+          <div class="mult-stat" style="text-align: right;">
+            <span class="mult-stat-label">Next Step</span>
+            <span id="multNextVal" class="mult-stat-value">1.13x</span>
+          </div>
+        </div>
+
+        <!-- Game 1: Mines Grid (5x5 25 Tiles) -->
+        <div id="minesView" class="game-view active">
+          <div id="minesGrid" class="mines-grid">
+            <div class="mine-tile" data-index="0"></div>
+            <div class="mine-tile" data-index="1"></div>
+            <div class="mine-tile" data-index="2"></div>
+            <div class="mine-tile" data-index="3"></div>
+            <div class="mine-tile" data-index="4"></div>
+            <div class="mine-tile" data-index="5"></div>
+            <div class="mine-tile" data-index="6"></div>
+            <div class="mine-tile" data-index="7"></div>
+            <div class="mine-tile" data-index="8"></div>
+            <div class="mine-tile" data-index="9"></div>
+            <div class="mine-tile" data-index="10"></div>
+            <div class="mine-tile" data-index="11"></div>
+            <div class="mine-tile" data-index="12"></div>
+            <div class="mine-tile" data-index="13"></div>
+            <div class="mine-tile" data-index="14"></div>
+            <div class="mine-tile" data-index="15"></div>
+            <div class="mine-tile" data-index="16"></div>
+            <div class="mine-tile" data-index="17"></div>
+            <div class="mine-tile" data-index="18"></div>
+            <div class="mine-tile" data-index="19"></div>
+            <div class="mine-tile" data-index="20"></div>
+            <div class="mine-tile" data-index="21"></div>
+            <div class="mine-tile" data-index="22"></div>
+            <div class="mine-tile" data-index="23"></div>
+            <div class="mine-tile" data-index="24"></div>
+          </div>
+        </div>
+
+        <!-- Game 2: Chicken Grid (5x5 25 Silver Cloches) -->
+        <div id="chickenView" class="game-view">
+          <div id="chickenGrid" class="chicken-grid">
+            <div class="dish-card" data-index="0"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="1"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="2"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="3"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="4"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="5"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="6"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="7"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="8"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="9"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="10"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="11"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="12"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="13"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="14"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="15"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="16"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="17"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="18"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="19"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="20"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="21"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="22"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="23"><div class="dish-lid"></div><div class="dish-content"></div></div>
+            <div class="dish-card" data-index="24"><div class="dish-lid"></div><div class="dish-content"></div></div>
+          </div>
+        </div>
+
+        <!-- Game 3: Crash (Aviator / Rocket) View -->
+        <div id="crashView" class="game-view crash-view">
+          <div class="crash-history-bar" id="crashHistoryBar">
+            <!-- Crash multiplier pills -->
+          </div>
+          <div class="crash-canvas-wrapper">
+            <canvas id="crashCanvas"></canvas>
+            <div class="crash-multiplier-overlay">
+              <div id="crashMultiplierText" class="crash-big-multiplier">1.00x</div>
+              <div id="crashStatusTag" class="crash-status-tag">FLIGHT READY</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 4: Tiranga Color Trading (Win Go) View -->
+        <div id="colortradingView" class="game-view colortrading-view">
+          <!-- Tiranga Intervals -->
+          <div class="tiranga-modes-row">
+            <button class="tiranga-mode-btn active" data-duration="30">
+              <span>Win Go 30s</span>
+              <span style="font-size:10px; color:#10b981;">⚡ Fast</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="60">
+              <span>Win Go 1Min</span>
+              <span style="font-size:10px; opacity:0.8;">Popular</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="180">
+              <span>Win Go 3Min</span>
+              <span style="font-size:10px; opacity:0.8;">Standard</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="300">
+              <span>Win Go 5Min</span>
+              <span style="font-size:10px; opacity:0.8;">Classic</span>
+            </button>
+          </div>
+
+          <!-- Win Go Period & Timer Header -->
+          <div class="trading-header-card">
+            <div class="trading-period-badge">
+              <span class="trading-period-label">Period ID</span>
+              <span id="tradingPeriodId" class="trading-period-id">202608150001</span>
+            </div>
+            <div class="trading-timer-box">
+              <span class="trading-timer-label">Time Remaining</span>
+              <div class="trading-timer-digits">
+                <span class="time-digit-pill">0</span>
+                <span class="time-digit-pill">0</span>
+                <span style="font-size:20px; font-weight:800; color:#fff; align-self:center;">:</span>
+                <span id="timerDigit1" class="time-digit-pill">3</span>
+                <span id="timerDigit2" class="time-digit-pill">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Bet Buttons -->
+          <div class="color-bet-buttons-row">
+            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green">
+              <span>🟢 Join Green</span>
+              <span class="payout-tag">2x (1.5x on 5)</span>
+            </button>
+            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet">
+              <span>🟣 Join Violet</span>
+              <span class="payout-tag">4.5x (on 0, 5)</span>
+            </button>
+            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red">
+              <span>🔴 Join Red</span>
+              <span class="payout-tag">2x (1.5x on 0)</span>
+            </button>
+          </div>
+
+          <!-- Numbers 0-9 Keypad Matrix (3 Lines) -->
+          <div class="numbers-bet-grid">
+            <!-- Line 1: 1, 2, 3 -->
+            <button class="btn-number-bet num-green" data-number="1">1 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="2">2 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="3">3 <span class="num-payout">9x</span></button>
+            
+            <!-- Line 2: 4, 5, 6 -->
+            <button class="btn-number-bet num-red" data-number="4">4 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-violet-green" data-number="5">5 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="6">6 <span class="num-payout">9x</span></button>
+            
+            <!-- Line 3: 7, 8, 9 -->
+            <button class="btn-number-bet num-green" data-number="7">7 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="8">8 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="9">9 <span class="num-payout">9x</span></button>
+
+            <!-- Line 4: 0 (Violet/Red) -->
+            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0">0 <span class="num-payout">9x Jackpot (Violet/Red)</span></button>
+          </div>
+
+          <!-- Big / Small Buttons -->
+          <div class="big-small-row">
+            <button id="btnBetBig" class="btn-big-bet" data-choice="big">
+              <span>🟡 Big (5 - 9)</span>
+              <span class="payout-tag">2x Payout</span>
+            </button>
+            <button id="btnBetSmall" class="btn-small-bet" data-choice="small">
+              <span>🔵 Small (0 - 4)</span>
+              <span class="payout-tag">2x Payout</span>
+            </button>
+          </div>
+
+          <!-- Active Bets In Round -->
+          <div id="tradingActiveBetsSlip" class="trading-active-bets" style="display: none;">
+            <strong>Your Active Bets This Round:</strong>
+            <div id="activeBetsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+          </div>
+
+          <!-- Recent Trend Balls -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes & Trends:</span>
+            <div class="trend-balls-row" id="trendBallsRow"></div>
+          </div>
+        </div>
+
+        <!-- Game 5: Stock Market Live Candlestick Trading View -->
+        <div id="stockView" class="game-view stocktrading-view">
+          <div class="stock-market-header">
+            <div class="stock-asset-info">
+              <select id="stockAssetSelect" class="stock-asset-select">
+                <option value="BTC/INR">BTC / INR (Bitcoin)</option>
+                <option value="ETH/INR">ETH / INR (Ethereum)</option>
+                <option value="NIFTY 50">NIFTY 50 (Index)</option>
+                <option value="GOLD/INR">GOLD / INR (Commodity)</option>
+              </select>
+              <div class="stock-live-price-box">
+                <div id="stockLivePrice" class="stock-live-price">₹7,845,000.00</div>
+                <div id="stockChangeTag" class="stock-change-tag">+0.42% Today</div>
+              </div>
+            </div>
+            <div class="stock-chart-overlay">
+              <div class="live-indicator-dot"></div>
+              <span>LIVE OTC FEED</span>
+            </div>
+          </div>
+
+          <!-- Candlestick Chart Canvas -->
+          <div class="stock-chart-container">
+            <canvas id="stockCanvas"></canvas>
+          </div>
+
+          <!-- Up / Down (Call / Put) Buttons -->
+          <div class="stock-action-buttons-row">
+            <button id="btnStockCall" class="btn-stock-trade btn-stock-call">
+              <span>🟢 CALL / UP ⬆</span>
+              <span class="trade-payout-label">+90% Profit (1.90x)</span>
+            </button>
+            <button id="btnStockPut" class="btn-stock-trade btn-stock-put">
+              <span>🔴 PUT / DOWN ⬇</span>
+              <span class="trade-payout-label">+90% Profit (1.90x)</span>
+            </button>
+          </div>
+
+          <!-- Active Open Positions -->
+          <div id="stockActiveTradesCard" class="stock-active-trades-card" style="display: none;">
+            <strong style="font-size: 13px; color: var(--text-secondary);">Your Open Trades:</strong>
+            <div id="stockActiveTradesList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+          </div>
+        </div>
+
+        <!-- Result Toast Popup -->
+        <div id="roundResultToast" class="round-result-toast">
+          <div id="toastMultiplier" class="toast-multiplier">2.45x</div>
+          <div id="toastPayout" class="toast-payout">+₹24.50</div>
+          <div id="toastTagline" class="toast-tagline">CASHOUT SUCCESSFUL! 💰</div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Bottom Live Community Wins & Personal Bet History Section -->
+    <section class="bottom-section">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="community-history-tabs">
+          <button id="tabCommunityWins" class="tab-history-pill active">
+            <span class="pulse-dot" style="background:#00e701;"></span>
+            <span>🔥 Live Community Wins</span>
+          </button>
+          <button id="tabMyBets" class="tab-history-pill">
+            <span>👤 My Bets History</span>
+          </button>
+        </div>
+
+        <div style="font-size:12px; font-weight:700; color:var(--text-muted);">
+          <span>● Live Feed Active</span>
+        </div>
+      </div>
+
+      <!-- Live Community Winners Stream Table View -->
+      <div id="viewCommunityWins" class="history-table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Player</th>
+              <th>Bet Amount</th>
+              <th>Multiplier</th>
+              <th>Payout</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="communityBetsTableBody">
+            <!-- Dynamically injected live stream -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Personal My Bets Table View -->
+      <div id="viewMyBets" class="history-table-container" style="display: none;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Bet Amount</th>
+              <th>Multiplier</th>
+              <th>Payout</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Personal history dynamically injected -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Floating Live Win Toast (Bottom-Left) -->
+    <div id="liveWinFloatingToast" class="live-win-floating-toast">
+      <div class="win-toast-icon">⚡</div>
+      <div class="win-toast-info">
+        <span id="winToastUser" class="win-toast-user">Aman_VIP***</span>
+        <span id="winToastPayout" class="win-toast-payout">+₹14,250.00 on Crash (5.70x)</span>
+      </div>
+    </div>
+
+    <!-- Fixed Bottom-Right Corner Quick Action Dock (1cm Size): Online + Rating + Insta + Settings -->
+    <div class="bottom-corner-dock">
+      <!-- 1cm Mini Live Online Counter -->
+      <div class="btn-corner-pill online" title="Live Players Online">
+        <div class="status-dot live"></div>
+        <span id="liveOnlineUsersCounter">5.4k</span>
+      </div>
+
+      <!-- Rating Button -->
+      <button id="btnOpenRating" class="btn-corner-pill rating" title="Rate Us & Reviews" onclick="window.app && window.app.openRatingModal()">
+        <span>⭐ 4.2</span>
+      </button>
+
+      <!-- Instagram Button (Compact) -->
+      <a href="https://instagram.com/goowinminer_bot" target="_blank" class="btn-corner-pill insta" title="Official Instagram @goowinminer_bot">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="6" stroke="#ffffff" stroke-width="2.2"/>
+          <circle cx="12" cy="12" r="4.5" stroke="#ffffff" stroke-width="2.2"/>
+          <circle cx="17.5" cy="6.5" r="1.2" fill="#ffffff"/>
+        </svg>
+        <span>Insta</span>
+      </a>
+
+      <!-- Admin & UPI Settings Button -->
+      <button id="btnOpenAdmin" class="btn-corner-pill settings" title="Admin & Settings" onclick="window.app && window.app.openAdminModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Admin ⚙️</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Page 2: Arcade & VIP Rewards Lounge -->
+  <main id="mainPage2" class="main-layout page-section" style="display: none;">
+    <div class="arcade-grid-layout">
+      
+      <!-- Card 1: 🎯 Limbo Game -->
+      <div class="arcade-card limbo-card">
+        <div class="arcade-card-header">
+          <div class="card-header-title">
+            <span class="card-emoji">🎯</span>
+            <div>
+              <h3>Limbo Turbo</h3>
+              <span class="card-subtitle">Target Multiplier Up to 1,000x</span>
+            </div>
+          </div>
+          <span class="badge-tag-hot">HOT 🔥</span>
+        </div>
+
+        <div class="limbo-arena">
+          <div id="limboMultiplierDisplay" class="limbo-big-multiplier">1.00x</div>
+          <div id="limboResultTag" class="limbo-result-tag">TARGET READY</div>
+        </div>
+
+        <div class="limbo-controls-grid">
+          <div class="limbo-field">
+            <label class="control-label">Bet Amount:</label>
+            <input type="number" id="limboBetAmountInput" class="custom-select" value="20" min="5" max="10000" step="5">
+          </div>
+          <div class="limbo-field">
+            <label class="control-label">Target Multiplier:</label>
+            <input type="number" id="limboTargetMultiplierInput" class="custom-select" value="2.00" min="1.01" max="1000" step="0.10" oninput="window.app && window.app.updateLimboProb()">
+          </div>
+        </div>
+
+        <div class="limbo-prob-row">
+          <span>Win Chance: <strong id="limboWinChance" style="color:#00e5ff;">49.50%</strong></span>
+          <span>Payout on Win: <strong id="limboProfitDisplay" style="color:#00e701;">+₹40.00</strong></span>
+        </div>
+
+        <button id="btnRollLimbo" class="btn-stake-primary btn-bet" style="margin-top:10px;" onclick="window.app && window.app.rollLimbo()">
+          <span>🎯 ROLL TARGET</span>
+        </button>
+      </div>
+
+      <!-- Card 2: 🎡 Daily Lucky Fortune Wheel -->
+      <div class="arcade-card wheel-card">
+        <div class="arcade-card-header">
+          <div class="card-header-title">
+            <span class="card-emoji">🎡</span>
+            <div>
+              <h3>Daily Fortune Wheel</h3>
+              <span class="card-subtitle">Spin Free Every Day & Win Real Cash</span>
+            </div>
+          </div>
+          <span class="badge-tag-free">FREE SPIN 🎁</span>
+        </div>
+
+        <div class="wheel-canvas-wrapper">
+          <canvas id="wheelCanvas" width="280" height="280"></canvas>
+          <div class="wheel-pointer-arrow">▼</div>
+        </div>
+
+        <div style="text-align: center; margin-top: 8px;">
+          <div id="wheelStatusText" style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+            Daily Free Spin Available! Win up to ₹500.00
+          </div>
+          <button id="btnSpinWheel" class="btn-spin-wheel" onclick="window.app && window.app.spinLuckyWheel()">
+            <span>🎡 SPIN LUCKY WHEEL</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: 🏆 VIP Club & Rakeback Lounge -->
+      <div class="arcade-card vip-card">
+        <div class="arcade-card-header">
+          <div class="card-header-title">
+            <span class="card-emoji">🏆</span>
+            <div>
+              <h3>VIP Lounge & Rakeback</h3>
+              <span class="card-subtitle">Weekly Cash Rewards & Daily Bonuses</span>
+            </div>
+          </div>
+          <span class="badge-tag-gold">TIER: GOLD ★</span>
+        </div>
+
+        <div class="vip-status-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:12px; color:var(--text-secondary);">VIP Level Progress:</span>
+            <strong style="color:#f59e0b; font-size:13px;">Level 4 (Gold Elite)</strong>
+          </div>
+          <div style="width:100%; height:7px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+            <div style="width:72%; height:100%; background:linear-gradient(90deg, #f59e0b, #00e701);"></div>
+          </div>
+        </div>
+
+        <div class="vip-perks-grid">
+          <div class="vip-perk-item">
+            <span class="perk-icon">💰</span>
+            <div class="perk-info">
+              <strong>Unclaimed Rakeback</strong>
+              <span id="rakebackAmount" style="color:#00e701; font-weight:800;">₹420.00</span>
+            </div>
+            <button class="btn-claim-mini" onclick="window.app && window.app.claimRakeback()">Claim</button>
+          </div>
+
+          <div class="vip-perk-item">
+            <span class="perk-icon">🎁</span>
+            <div class="perk-info">
+              <strong>Daily Login Reward</strong>
+              <span style="color:#00e5ff; font-weight:800;">₹50.00</span>
+            </div>
+            <button class="btn-claim-mini" onclick="window.app && window.app.claimDailyReward()">Claim</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Auth Modal: Login / Register / Guest Access -->
+  <div id="modalAuth" class="modal-backdrop">
+    <div class="modal-card modal-auth-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🔐</span>
+          <h3 id="authModalTitle" class="modal-title">Member Login</h3>
+        </div>
+        <button id="btnCloseAuthModal" class="modal-close-btn" onclick="window.app && window.app.closeAuthModal()">&times;</button>
+      </div>
+
+      <!-- Auth Mode Tabs -->
+      <div class="deposit-tabs-row" style="margin-bottom: 14px;">
+        <button id="tabAuthLogin" class="dep-tab-btn active" onclick="window.app && window.app.switchAuthTab('login')">🔑 Login</button>
+        <button id="tabAuthSignup" class="dep-tab-btn" onclick="window.app && window.app.switchAuthTab('signup')">✨ Sign Up</button>
+      </div>
+
+      <!-- Form View -->
+      <div id="authFormView">
+        <label class="control-label">Username or Mobile Number:</label>
+        <input type="text" id="authUsernameInput" class="custom-select" placeholder="e.g. Rahul_VIP / 9876543210" style="margin-bottom: 10px;">
+
+        <label class="control-label">Password:</label>
+        <input type="password" id="authPasswordInput" class="custom-select" placeholder="••••••••" style="margin-bottom: 12px;">
+
+        <button id="btnSubmitAuth" class="btn-action-primary" style="height: 46px; width: 100%; margin-bottom: 10px;" onclick="window.app && window.app.submitAuthForm()">
+          <span id="btnSubmitAuthText">Login to VIEWPOINT</span>
+        </button>
+
+        <div style="text-align: center; margin: 10px 0; color: var(--text-muted); font-size: 12px;">— OR —</div>
+
+        <button type="button" class="btn-guest-login" onclick="window.app && window.app.handleGuestLogin()">
+          <span>⚡ Instant 1-Click Guest Play</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refer & Earn Modal -->
+  <div id="modalRefer" class="modal-backdrop">
+    <div class="modal-card modal-refer-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🎁</span>
+          <h3 class="modal-title">Refer Friends & Earn Real Cash</h3>
+        </div>
+        <button id="btnCloseReferModal" class="modal-close-btn" onclick="window.app && window.app.closeReferModal()">&times;</button>
+      </div>
+
+      <div class="refer-hero-banner">
+        <strong style="color: #00e701; font-size: 15px; display:block;">Earn ₹50 Instant Per Friend + 2% Lifetime Commission</strong>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+          Share your referral link with friends. Whenever they join and deposit, you earn immediate withdrawable cash!
+        </p>
+      </div>
+
+      <!-- Referral Link & Code Box -->
+      <label class="control-label">Your Unique Referral Link:</label>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <input type="text" id="referralLinkInput" class="custom-select" value="https://viewpoint.games/?ref=VP7821" readonly style="font-family: monospace; font-size: 13px;">
+        <button id="btnCopyReferLink" class="btn-action-primary" style="white-space: nowrap; padding: 0 14px;" onclick="window.app && window.app.copyReferralLink()">
+          <span>📋 Copy</span>
+        </button>
+      </div>
+
+      <!-- Referral Stats Cards -->
+      <div class="refer-stats-grid">
+        <div class="refer-stat-card">
+          <span class="stat-label">Total Friends Invited</span>
+          <strong id="referTotalInvites" style="font-size: 18px; color: #00e5ff;">14</strong>
+        </div>
+        <div class="refer-stat-card">
+          <span class="stat-label">Total Earned</span>
+          <strong id="referTotalEarned" style="font-size: 18px; color: #00e701;">₹1,450.00</strong>
+        </div>
+        <div class="refer-stat-card">
+          <span class="stat-label">Unclaimed Bonus</span>
+          <strong id="referUnclaimedBonus" style="font-size: 18px; color: #f59e0b;">₹350.00</strong>
+        </div>
+      </div>
+
+      <button id="btnClaimReferBonus" class="btn-action-withdraw" style="margin-top: 14px; height: 46px;" onclick="window.app && window.app.claimReferralBonus()">
+        <span>💰 Claim ₹350.00 to Game Wallet</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Provably Fair Modal -->
+  <div id="modalProvablyFair" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-title-row">
+        <h3 class="modal-title">🛡️ Provably Fair Verification</h3>
+        <button id="btnCloseFairModal" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Stake games use SHA-256 hash algorithms to guarantee that every tile and mine placement is 100% predetermined and unchangeable before each round starts.</p>
+        
+        <label class="control-label">Active Server Seed (SHA-256 Hash):</label>
+        <div id="serverSeedHash" class="seed-box">Loading...</div>
+
+        <label class="control-label">Client Seed (Customizable):</label>
+        <input type="text" id="clientSeedInput" class="custom-select" style="font-family: monospace;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="control-label">Nonce: <strong id="nonceVal" style="color: #fff;">1</strong></span>
+          <button id="btnRotateSeed" class="btn-reset-wallet">🔄 Rotate Server Seed</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPI Deposit Modal -->
+  <div id="modalDepositUpi" class="modal-backdrop">
+    <div class="modal-card modal-deposit-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge">⚡</div>
+          <h3 class="modal-title">Add Funds via UPI / QR Code</h3>
+        </div>
+        <button id="btnCloseDepositModal" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="deposit-nav-tabs">
+        <button id="tabDepositForm" class="dep-tab-btn active">💸 Deposit Online</button>
+        <button id="tabDepositHistory" class="dep-tab-btn">📜 Deposit History</button>
+      </div>
+
+      <!-- Deposit Online View -->
+      <div id="viewDepositForm" class="deposit-tab-view active">
+        <!-- Step 1: Quick Amount Selector (Min ₹200 to ₹50,000) -->
+        <div class="deposit-section">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="control-label">1. Select Deposit Amount:</label>
+            <span style="font-size:11px; font-weight:700; color:var(--accent-green);">Min: ₹200 | Max: ₹50,000</span>
+          </div>
+          <div class="deposit-quick-chips">
+            <button class="chip-btn active" data-amount="200">₹200</button>
+            <button class="chip-btn" data-amount="500">₹500</button>
+            <button class="chip-btn" data-amount="1000">₹1,000</button>
+            <button class="chip-btn" data-amount="2000">₹2,000</button>
+            <button class="chip-btn" data-amount="5000">₹5,000</button>
+            <button class="chip-btn" data-amount="10000">₹10,000</button>
+            <button class="chip-btn" data-amount="50000">₹50,000</button>
+          </div>
+          <div class="custom-amount-row">
+            <span class="curr-prefix" id="depCurrPrefix">₹</span>
+            <input type="number" id="depositAmountInput" class="custom-select dep-input" value="200" min="200" max="50000" step="50">
+          </div>
+        </div>
+
+        <!-- Step 2: UPI Details & Dynamic QR Code -->
+        <div class="deposit-section qr-payment-box">
+          <div class="qr-code-wrapper">
+            <img id="upiQrCodeImg" class="upi-qr-image" src="" alt="Scan UPI QR Code">
+            <div class="qr-overlay-brand">
+              <span id="qrAmountTag">₹200</span>
+            </div>
+          </div>
+
+          <div class="qr-instructions">
+            <div class="merchant-info-row">
+              <span class="merchant-label">Merchant / Payee:</span>
+              <strong id="displayPayeeName" class="merchant-val">VIEWPOINT Games</strong>
+            </div>
+
+            <div class="merchant-info-row">
+              <span class="merchant-label">UPI ID:</span>
+              <div class="upi-id-copy-row" onclick="window.app && window.app.copyUpiId()" title="Click to copy UPI ID" style="cursor: pointer;">
+                <code id="displayUpiId" class="upi-id-code">adrenox1@axl</code>
+                <button type="button" id="btnCopyUpiId" class="btn-copy-upi" title="Copy UPI ID" onclick="event.stopPropagation(); window.app && window.app.copyUpiId()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span id="copyBtnText">Copy</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- UPI App Fast Links for Mobile -->
+            <div class="upi-apps-row">
+              <a id="linkGPay" class="btn-upi-app gpay-btn" href="#" target="_blank">GPay</a>
+              <a id="linkPhonePe" class="btn-upi-app phonepe-btn" href="#" target="_blank">PhonePe</a>
+              <a id="linkPaytm" class="btn-upi-app paytm-btn" href="#" target="_blank">Paytm</a>
+              <a id="linkAnyUpi" class="btn-upi-app anyupi-btn" href="#" target="_blank">Any UPI</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: UTR / Reference No Verification -->
+        <div class="deposit-section">
+          <label class="control-label">2. Enter 12-Digit UTR / Transaction ID (from your UPI app):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423589123456" maxlength="16" style="font-family: monospace; font-size: 15px;">
+            <button type="button" id="btnSubmitDeposit" class="btn-action-primary" style="white-space: nowrap; padding: 0 18px; cursor: pointer;" onclick="window.app && window.app.submitDepositUtr()">
+              <span>Submit UTR</span>
+            </button>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
+            After completing payment in your UPI app, copy the 12-digit UTR / Reference ID and submit here. Funds will be credited instantly.
+          </p>
+        </div>
+      </div>
+
+      <!-- Deposit History View -->
+      <div id="viewDepositHistory" class="deposit-tab-view">
+        <div class="history-table-container dep-history-table">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Amount</th>
+                <th>UTR / Ref ID</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="depositHistoryTableBody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature-Packed Withdrawal Modal -->
+  <div id="modalWithdraw" class="modal-backdrop">
+    <div class="modal-card modal-withdraw-card" style="max-width: 580px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="deposit-icon-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; font-size: 20px;">💸</div>
+          <div>
+            <h3 class="modal-title" style="font-size: 18px;">Withdraw Earnings</h3>
+            <span style="font-size: 11px; color: #00e701; font-weight: 700;">🔒 256-Bit SSL Verified Fast Payout Gateway</span>
+          </div>
+        </div>
+        <button id="btnCloseWithdrawModal" class="modal-close-btn">&times;</button>
+      </div>
+
+      <!-- Withdrawal Tabs -->
+      <div class="deposit-tabs-row">
+        <button id="tabWithdrawForm" class="dep-tab-btn active">⚡ Request Payout</button>
+        <button id="tabWithdrawHistory" class="dep-tab-btn">📜 Payout History & Receipts</button>
+      </div>
+
+      <!-- Tab 1: Withdrawal Form -->
+      <div id="viewWithdrawForm" class="deposit-tab-view active">
+        
+        <!-- Balance & Daily Limit Status Bar -->
+        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 12px 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 12px; color: var(--text-secondary);">Withdrawable Main Balance:</span>
+            <strong id="withdrawAvailableBal" style="font-size: 17px; color: #00e701; font-family: var(--font-display);">₹1,000.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
+            <span>Daily Limit Remaining:</span>
+            <span id="withdrawDailyRemainingText" style="color: #00e5ff; font-weight: 700;">₹1,00,000.00 / ₹1,00,000.00</span>
+          </div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+            <div id="withdrawLimitProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #00e701, #00e5ff);"></div>
+          </div>
+        </div>
+
+        <!-- Payout Method Selector -->
+        <label class="control-label">1. Choose Payout Channel:</label>
+        <div class="withdraw-methods-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+          <button type="button" class="withdraw-method-btn active" id="btnMethodUpi" data-method="UPI">
+            <span style="font-size: 18px;">⚡</span>
+            <div style="text-align: left;">
+              <strong style="display:block; font-size:12px;">Instant UPI</strong>
+              <span style="font-size:10px; color:#00e701;">5-15 Mins</span>
+            </div>
+          </button>
+          <button type="button" class="withdraw-method-btn" id="btnMethodBank" data-method="BANK">
+            <span style="font-size: 18px;">🏦</span>
+            <div style="text-align: left;">
+              <strong style="display:block; font-size:12px;">Bank IMPS</strong>
+              <span style="font-size:10px; color:#00e5ff;">15-30 Mins</span>
+            </div>
+          </button>
+          <button type="button" class="withdraw-method-btn" id="btnMethodCrypto" data-method="CRYPTO">
+            <span style="font-size: 18px;">🪙</span>
+            <div style="text-align: left;">
+              <strong style="display:block; font-size:12px;">USDT TRC20</strong>
+              <span style="font-size:10px; color:#f59e0b;">Automated</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Amount Input -->
+        <label class="control-label">2. Enter Withdrawal Amount (Min ₹300 to ₹50,000):</label>
+        <div class="deposit-amount-row" style="margin-bottom: 8px;">
+          <span class="currency-prefix">₹</span>
+          <input type="number" id="withdrawAmountInput" class="custom-select dep-input" value="500" min="300" max="50000" step="50">
+        </div>
+
+        <!-- Quick Amount Selection Chips -->
+        <div class="deposit-quick-chips" style="margin-bottom: 14px;">
+          <button type="button" class="chip-btn" data-amount="500">₹500</button>
+          <button type="button" class="chip-btn" data-amount="1000">₹1,000</button>
+          <button type="button" class="chip-btn" data-amount="2500">₹2,500</button>
+          <button type="button" class="chip-btn" data-amount="5000">₹5,000</button>
+          <button type="button" class="chip-btn" id="btnWithdrawMax">Max All</button>
+        </div>
+
+        <!-- Channel Specific Inputs: 1. UPI Mode -->
+        <div id="channelUpiFields">
+          <label class="control-label">3. Receiver UPI ID (GPay / PhonePe / Paytm / BHIM):</label>
+          <input type="text" id="withdrawUpiInput" class="custom-select dep-input" placeholder="e.g. yourname@okhdfcbank, 9876543210@paytm" style="font-family: monospace; font-size: 14px; margin-bottom: 8px;">
+          
+          <label class="control-label">4. Account Holder Name:</label>
+          <input type="text" id="withdrawNameInput" class="custom-select dep-input" placeholder="e.g. Rahul Sharma" style="margin-bottom: 10px;">
+        </div>
+
+        <!-- Channel Specific Inputs: 2. Bank IMPS Mode -->
+        <div id="channelBankFields" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+            <div>
+              <label class="control-label">Bank Account Number:</label>
+              <input type="text" id="withdrawBankAccInput" class="custom-select dep-input" placeholder="e.g. 50100234567890" style="font-family: monospace;">
+            </div>
+            <div>
+              <label class="control-label">IFSC Code (11 Digits):</label>
+              <input type="text" id="withdrawBankIfscInput" class="custom-select dep-input" placeholder="e.g. HDFC0000123" style="text-transform: uppercase; font-family: monospace;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="control-label">Bank Name:</label>
+              <input type="text" id="withdrawBankNameInput" class="custom-select dep-input" placeholder="e.g. HDFC Bank, SBI">
+            </div>
+            <div>
+              <label class="control-label">Account Holder Name:</label>
+              <input type="text" id="withdrawBankHolderInput" class="custom-select dep-input" placeholder="e.g. Rahul Sharma">
+            </div>
+          </div>
+        </div>
+
+        <!-- Channel Specific Inputs: 3. Crypto USDT Mode -->
+        <div id="channelCryptoFields" style="display: none;">
+          <label class="control-label">3. Receiver USDT TRC-20 Wallet Address:</label>
+          <input type="text" id="withdrawCryptoAddress" class="custom-select dep-input" placeholder="e.g. TXyz... (Tron TRC-20 network)" style="font-family: monospace; font-size: 13px; margin-bottom: 8px;">
+          <div style="font-size: 11px; color: #f59e0b; margin-bottom: 10px;">
+            ⚠️ Only TRC-20 USDT is supported. Sending to wrong address cannot be reversed.
+          </div>
+        </div>
+
+        <!-- Live Payout & Fee Calculation Breakdown Card -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 12px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-secondary);">
+            <span>Gross Withdrawal Amount:</span>
+            <span id="calcGrossAmount" style="color: #fff; font-weight:700;">₹500.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-secondary);">
+            <span>Platform Service Fee (8%):</span>
+            <span id="calcPlatformFee" style="color: #f59e0b; font-weight:700;">-₹40.00 (8%)</span>
+          </div>
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #fff; font-size: 13px; display:block;">Net Payout To Receive:</strong>
+              <span style="font-size: 10px; color: var(--text-muted);">Amount credited directly to your UPI/Bank</span>
+            </div>
+            <strong id="calcNetAmount" style="color: #00e701; font-size: 17px; font-family: var(--font-display);">₹460.00</strong>
+          </div>
+        </div>
+
+        <!-- Save Account Checkbox -->
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 14px;">
+          <input type="checkbox" id="chkSaveWithdrawDetails" style="width:16px; height:16px; cursor:pointer;" checked>
+          <label for="chkSaveWithdrawDetails" style="font-size:12px; color: var(--text-secondary); cursor:pointer;">
+            💾 Save these account details for future instant 1-click payouts
+          </label>
+        </div>
+
+        <!-- Done / Submit Withdrawal Action Button -->
+        <button type="button" id="btnSubmitWithdraw" class="btn-action-withdraw" style="height: 50px; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; width: 100%; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.45); border-radius: 10px;" onclick="window.app && window.app.submitWithdrawRequest()">
+          <span style="font-size: 18px;">✅</span>
+          <span>DONE & CONFIRM WITHDRAWAL</span>
+        </button>
+
+        <!-- Guarantee Note & Direct Telegram Contact -->
+        <div style="margin-top: 12px; padding: 10px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+            ⚡ Average payout dispatch time: <strong>5 - 15 minutes</strong>.<br>
+            Any emergency or payout query?
+          </div>
+          <a href="https://t.me/VIEWPOINT78" target="_blank" class="btn-insta-follow" style="background: #0088cc; color: #fff; padding: 5px 10px; font-size: 11px;">
+            Telegram @VIEWPOINT78 ↗
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Tab 2: Withdrawal History -->
+      <div id="viewWithdrawHistory" class="deposit-tab-view">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Channel</th>
+              <th>Amount</th>
+              <th>Receiver Info</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="withdrawHistoryTableBody">
+            <!-- Dynamically rendered -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 24/7 Live Support Bot Modal -->
+  <div id="modalLiveSupport" class="modal-backdrop">
+    <div class="modal-card chat-bot-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: rgba(0, 229, 255, 0.2); color: #00e5ff;">🤖</div>
+          <div>
+            <h3 class="modal-title" style="font-size: 16px;">VIEWPOINT Live Support Bot</h3>
+            <span style="font-size: 11px; color: #00e701; font-weight: 700;">● Online 24/7 (Instant Help)</span>
+          </div>
+        </div>
+        <button id="btnCloseSupportModal" class="modal-close-btn">&times;</button>
+      </div>
+
+      <!-- Chat Messages Scroll Area -->
+      <div id="chatMessagesContainer" class="chat-messages-container">
+        <div class="chat-msg bot">
+          <div class="chat-bubble">
+            Namaste! 👋 Main VIEWPOINT 24/7 Live Support Bot hoon. Main aapki kya madad kar sakta hoon?
+          </div>
+          <span class="chat-time">Just now</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Question Chips -->
+      <div class="chat-quick-actions">
+        <button class="chip-chat-quick" data-query="check_deposit">🔍 Check My Deposit Status</button>
+        <button class="chip-chat-quick" data-query="how_to_add">💳 How to Add Money</button>
+        <button class="chip-chat-quick" data-query="game_rules">📜 Game Rules & Tips</button>
+        <button class="chip-chat-quick" data-query="human_agent">👨‍💼 Contact Admin</button>
+      </div>
+
+      <!-- Chat Input Field -->
+      <div class="chat-input-row">
+        <input type="text" id="chatInputField" class="chat-input-field" placeholder="Apna sawaal yahan likhein...">
+        <button id="btnSendChat" class="btn-send-chat">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating & Reviews Modal -->
+  <div id="modalRating" class="modal-backdrop">
+    <div class="modal-card rating-card">
+      <div class="modal-title-row">
+        <h3 class="modal-title">⭐ Rate Your Experience</h3>
+        <button id="btnCloseRatingModal" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-secondary);">
+          VIEWPOINT platform kaisa laga? Apni rating aur feedback dein:
+        </p>
+
+        <!-- Star Rating Buttons -->
+        <div class="rating-stars-row" id="starRatingRow">
+          <button class="star-rating-btn active" data-rating="1">★</button>
+          <button class="star-rating-btn active" data-rating="2">★</button>
+          <button class="star-rating-btn active" data-rating="3">★</button>
+          <button class="star-rating-btn active" data-rating="4">★</button>
+          <button class="star-rating-btn active" data-rating="5">★</button>
+        </div>
+        <div id="ratingTextFeedback" style="font-weight: 800; color: #fbbf24; font-size: 15px; margin-bottom: 12px;">5.0 / 5.0 - Excellent & Super Fast!</div>
+
+        <textarea id="ratingCommentInput" class="custom-select" rows="3" placeholder="Apna review likhein (e.g. Best Color Trading and Crash game!)..."></textarea>
+
+        <button id="btnSubmitRating" class="btn-action-primary" style="margin-top: 12px; height: 44px;">
+          <span>Submit Review</span>
+        </button>
+
+        <!-- Community Live Stats Box -->
+        <div class="community-rating-box">
+          <div>
+            <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">4.2 / 5.0 ⭐</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Overall Rating</div>
+          </div>
+          <div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e701;">14,850+</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Verified Reviews</div>
+          </div>
+          <div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e5ff;">99.8%</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Positive Satisfaction</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin / UPI & Deposit Approval Settings Modal -->
+  <div id="modalUpiSettings" class="modal-backdrop">
+    <div class="modal-card admin-modal-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: rgba(20, 117, 225, 0.2); color: #1475e1;">⚙️</div>
+          <h3 class="modal-title">Admin Management & Deposit Approval</h3>
+        </div>
+        <button id="btnCloseAdminModal" class="modal-close-btn">&times;</button>
+      </div>
+
+      <!-- Admin Navigation Tabs -->
+      <div class="admin-nav-tabs">
+        <button id="tabAdminPending" class="admin-tab-btn active">
+          <span>⚡ Deposits</span>
+          <span id="adminPendingBadge" class="admin-badge-count">0</span>
+        </button>
+        <button id="tabAdminWithdraw" class="admin-tab-btn">
+          <span>💸 Withdrawals</span>
+          <span id="adminWithdrawBadge" class="admin-badge-count" style="background:#f59e0b;">0</span>
+        </button>
+        <button id="tabAdminUpi" class="admin-tab-btn">
+          <span>💳 UPI Config</span>
+        </button>
+        <button id="tabAdminTelegram" class="admin-tab-btn">
+          <span>🤖 Telegram</span>
+        </button>
+      </div>
+
+      <!-- View 1: Pending Deposits Live Approval Queue -->
+      <div id="viewAdminPending" class="admin-tab-view active">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:13px; font-weight:700; color:var(--text-secondary);">Live Player Deposit Requests:</span>
+          <span style="font-size:11px; color:var(--accent-green);">● Real-time Sync</span>
+        </div>
+        <div id="adminPendingListContainer">
+          <!-- Dynamically populated pending deposit requests -->
+        </div>
+      </div>
+
+      <!-- View 2: Pending Withdrawals Approval Queue -->
+      <div id="viewAdminWithdraw" class="admin-tab-view">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:13px; font-weight:700; color:var(--text-secondary);">Live Withdrawal Payout Requests:</span>
+          <span style="font-size:11px; color:#f59e0b;">● Pending Payouts</span>
+        </div>
+        <div id="adminWithdrawListContainer">
+          <!-- Dynamically populated withdrawal requests with Paid/Reject buttons -->
+        </div>
+      </div>
+
+      <!-- View 3: UPI Account Settings -->
+      <div id="viewAdminUpi" class="admin-tab-view">
+        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+          Set your receiver **UPI ID** and **Payee Name** here so when players scan the QR code, payments go directly to your bank account.
+        </p>
+
+        <label class="control-label">Your UPI ID (Receiver):</label>
+        <input type="text" id="settingUpiIdInput" class="custom-select" placeholder="e.g. adrenox1@axl, 9876543210@paytm" style="font-family: monospace; font-size: 15px;">
+
+        <label class="control-label">Payee / Account Name:</label>
+        <input type="text" id="settingPayeeNameInput" class="custom-select" placeholder="e.g. VIEWPOINT Games / Your Name">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label class="control-label">Currency Symbol:</label>
+            <select id="settingCurrencySelect" class="custom-select">
+              <option value="₹">₹ INR (Rupees)</option>
+              <option value="$">$ USD (Dollars)</option>
+            </select>
+          </div>
+          <div>
+            <label class="control-label">Min Deposit Amount:</label>
+            <input type="number" id="settingMinDepositInput" class="custom-select" value="200">
+          </div>
+        </div>
+
+        <button id="btnSaveUpiSettings" class="btn-action-primary" style="margin-top: 14px; height: 46px;">
+          <span>💾 Save & Apply UPI Settings</span>
+        </button>
+      </div>
+
+      <!-- View 4: Telegram Bot Alerts Setup -->
+      <div id="viewAdminTelegram" class="admin-tab-view">
+        <div style="background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: var(--border-radius-md); padding: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase;">Configured Admin Handle</div>
+            <strong style="color: #ffffff; font-size: 15px;">@VIEWPOINT78</strong>
+          </div>
+          <a href="https://t.me/VIEWPOINT78" target="_blank" class="btn-insta-follow" style="background: #0088cc; color: #fff;">Open Telegram ↗</a>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+          Whenever a player deposits funds or requests a withdrawal, you will receive an **instant real-time Telegram notification**!
+        </p>
+
+        <label class="control-label">Telegram Bot Token (From @BotFather):</label>
+        <input type="text" id="settingTgBotToken" class="custom-select" placeholder="e.g. 7123456789:AAHk...-w9x...">
+
+        <label class="control-label">Your Telegram Chat ID (From @userinfobot):</label>
+        <input type="text" id="settingTgChatId" class="custom-select" placeholder="e.g. 1234567890">
+
+        <div style="display:flex; align-items:center; gap:8px; margin: 12px 0;">
+          <input type="checkbox" id="settingTgEnabled" style="width:18px; height:18px; cursor:pointer;" checked>
+          <label for="settingTgEnabled" style="font-size:13px; font-weight:700; color:#fff; cursor:pointer;">Enable Instant Telegram Deposit & Payout Alerts</label>
+        </div>
+
+        <button id="btnSaveTelegramSettings" class="btn-action-primary" style="height: 46px;">
+          <span>🔔 Save Telegram Alert Settings</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/audio.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="js/provablyFair.js"></script>
+  <script src="js/mines.js"></script>
+  <script src="js/chicken.js"></script>
+  <script src="js/crash.js"></script>
+  <script src="js/colortrading.js"></script>
+  <script src="js/stocktrading.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

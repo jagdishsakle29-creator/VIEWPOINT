@@ -1,0 +1,159 @@
+/* ===================================================
+   CHICKEN GAME SPECIFIC STYLING & ANIMATIONS
+   (Mystake / Stake Platter Dish Cloche Uncover)
+   =================================================== */
+
+.chicken-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+@media (max-width: 500px) {
+  .chicken-grid {
+    gap: 8px;
+  }
+}
+
+/* Individual Dish Plate Container */
+.dish-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 0 #14232d, 0 8px 16px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, box-shadow 0.2s;
+  overflow: visible;
+  user-select: none;
+  aspect-ratio: 1 / 1;
+}
+
+/* Silver rim around plate */
+.dish-card::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+.dish-card:hover:not(.revealed):not(.disabled) {
+  background: var(--bg-hover);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 0 #14232d, 0 12px 20px rgba(0, 0, 0, 0.55), 0 0 15px rgba(245, 158, 11, 0.2);
+}
+
+.dish-card:active:not(.revealed):not(.disabled) {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 0 #14232d, 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.dish-card.disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+/* Cloche Dish Lid (Cover) */
+.dish-lid {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #475569 50%, #1e293b 100%);
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.3), inset 0 -4px 8px rgba(0, 0, 0, 0.6);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+  z-index: 2;
+}
+
+/* Top knob on cloche lid */
+.dish-lid::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 30% 30%, #ffffff, #94a3b8);
+  border-radius: 50%;
+  border: 1px solid #475569;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Revealed dish state */
+.dish-card.revealed .dish-lid,
+.dish-card.opened .dish-lid {
+  transform: translateY(-36px) scale(0.3) rotate(20deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Dish Platter Content Under Lid */
+.dish-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* Roasted Chicken Drumstick */
+.chicken-drumstick-wrapper {
+  width: 70%;
+  height: 70%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: chicken-bounce 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.8));
+}
+
+.chicken-svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes chicken-bounce {
+  0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+  65% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Bone Result */
+.bone-wrapper {
+  width: 65%;
+  height: 65%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bone-shake 0.4s ease forwards;
+  filter: drop-shadow(0 0 10px rgba(148, 163, 184, 0.5));
+}
+
+.bone-svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes bone-shake {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+  75% { transform: scale(1) rotate(-8deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Dimmed remaining dishes */
+.dish-card.auto-revealed,
+.dish-card.auto-opened {
+  opacity: 0.55;
+  filter: grayscale(0.2);
+}

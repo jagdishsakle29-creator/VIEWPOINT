@@ -1,0 +1,326 @@
+/* ===================================================
+   TIRANGA COLOR TRADING (WIN GO) GAME STYLES
+   =================================================== */
+
+.colortrading-view {
+  display: none;
+  width: 100%;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.colortrading-view.active {
+  display: flex;
+}
+
+/* Tiranga Mode Tabs (30s, 1Min, 3Min, 5Min) */
+.tiranga-modes-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.tiranga-mode-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 10px 6px;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.tiranga-mode-btn.active {
+  background: linear-gradient(135deg, #1475e1 0%, #00e5ff 100%);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(20, 117, 225, 0.4);
+}
+
+.trading-header-card {
+  background: linear-gradient(135deg, #1a2c38 0%, #15242f 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+}
+
+.trading-period-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trading-period-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.trading-period-id {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 900;
+  color: #00e5ff;
+}
+
+.trading-timer-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.trading-timer-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.trading-timer-digits {
+  display: flex;
+  gap: 4px;
+}
+
+.time-digit-pill {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 6px;
+  min-width: 26px;
+  text-align: center;
+}
+
+.time-digit-pill.hurry {
+  color: #fe2c55;
+  border-color: #fe2c55;
+  box-shadow: 0 0 10px rgba(254, 44, 85, 0.4);
+  animation: pulseHurry 0.6s infinite alternate;
+}
+
+@keyframes pulseHurry {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+/* 3 Primary Colors */
+.color-bet-buttons-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-color-bet {
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 12px 8px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: transform 0.15s ease;
+}
+
+.btn-color-bet:hover { transform: translateY(-2px); }
+.btn-color-bet:active { transform: translateY(1px); }
+
+.btn-green-bet {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.btn-violet-bet {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+
+.btn-red-bet {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+}
+
+.payout-tag {
+  font-size: 11px;
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+/* Numbers 0-9 Keypad Matrix (3 Columns) */
+.numbers-bet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.btn-number-bet {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius-md);
+  padding: 12px 6px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-number-bet:hover { 
+  transform: translateY(-2px) scale(1.02); 
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+.btn-number-bet:active { transform: translateY(1px); }
+
+.btn-number-0 {
+  grid-column: span 3;
+  padding: 12px 6px;
+}
+
+.num-payout {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.num-red { background: #ef4444; }
+.num-green { background: #10b981; }
+.num-violet-red { background: linear-gradient(135deg, #8b5cf6 50%, #ef4444 50%); }
+.num-violet-green { background: linear-gradient(135deg, #8b5cf6 50%, #10b981 50%); }
+
+/* Big / Small */
+.big-small-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-big-bet {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 12px 10px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn-small-bet {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 12px 10px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Trends & History */
+.trend-balls-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 0;
+}
+
+.trend-ball {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.trading-active-bets {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.active-bet-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-tertiary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .trading-header-card {
+    padding: 10px 12px;
+  }
+
+  .timer-digit {
+    width: 28px;
+    height: 36px;
+    font-size: 20px;
+  }
+
+  .number-buttons-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .ball-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .color-choice-btn {
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+}
+
