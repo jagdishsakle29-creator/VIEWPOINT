@@ -2983,7 +2983,8 @@ class AppController {
       if (!container) return;
       container.innerHTML = '';
 
-      for (let i = 1; i <= this.chicken.totalLanes; i++) {
+      // Lane 25 at the top, Lane 1 at the bottom near starting curb
+      for (let i = this.chicken.totalLanes; i >= 1; i--) {
         const mult = multipliers[i] || (1.0 + (i * 0.25));
         const lane = document.createElement('div');
         lane.className = 'road-lane';
@@ -2992,7 +2993,7 @@ class AppController {
         lane.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px; z-index:2;">
             <span class="lane-number">LANE ${i}</span>
-            <div class="lane-hen-slot" id="${prefix}henSlot_${i}" style="width:38px; height:38px; display:flex; align-items:center; justify-content:center;"></div>
+            <div class="lane-hen-slot" id="${prefix}henSlot_${i}" style="width:42px; height:42px; display:flex; align-items:center; justify-content:center;"></div>
           </div>
           <div class="lane-badge">${mult.toFixed(2)}x</div>
         `;
@@ -3095,15 +3096,28 @@ class AppController {
 
     const henSvg = `
       <div class="hen-character hopping">
-        <svg viewBox="0 0 36 36" width="36" height="36">
-          <circle cx="18" cy="22" r="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
-          <path d="M12 11 Q14 6 16 10 Q18 5 20 10 Q22 7 24 12 Z" fill="#ff3366"/>
-          <circle cx="18" cy="14" r="7" fill="#ffffff"/>
-          <polygon points="23,14 29,16 23,18" fill="#f59e0b"/>
-          <circle cx="20" cy="13" r="1.5" fill="#0f172a"/>
-          <path d="M9 22 Q6 17 12 18 Q10 24 16 25 Z" fill="#f1f5f9"/>
-          <ellipse cx="22" cy="19" rx="1.5" ry="2.5" fill="#ff3366"/>
-          <path d="M14 33 L14 30 M14 33 L12 34 M14 33 L16 34 M22 33 L22 30 M22 33 L20 34 M22 33 L24 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+        <svg viewBox="0 0 48 48" width="42" height="42">
+          <!-- Golden VIP Crown -->
+          <polygon points="17,6 21,11 25,5 29,11 33,6 31,14 19,14" fill="#ffb703" stroke="#d97706" stroke-width="1"/>
+          <!-- Red Comb -->
+          <path d="M16 14 Q19 8 22 13 Q25 7 28 13 Q31 9 34 16 Z" fill="#ff3366"/>
+          <!-- Hen Body Plump 3D -->
+          <ellipse cx="24" cy="30" rx="14" ry="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+          <ellipse cx="24" cy="32" rx="11" ry="8" fill="#f8fafc" opacity="0.9"/>
+          <!-- Wing -->
+          <path d="M12 28 Q18 24 22 30 Q16 38 12 30 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+          <path d="M14 29 Q17 26 20 30" stroke="#d97706" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Head -->
+          <circle cx="28" cy="18" r="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+          <!-- Eye -->
+          <circle cx="31" cy="16" r="3.2" fill="#0f172a"/>
+          <circle cx="32" cy="15" r="1.2" fill="#ffffff"/>
+          <!-- Beak -->
+          <polygon points="34,17 44,20 34,23" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+          <!-- Wattle -->
+          <ellipse cx="33" cy="24" rx="2.5" ry="4" fill="#ff3366"/>
+          <!-- Legs -->
+          <path d="M20 41 L20 45 M20 45 L17 46 M20 45 L23 46 M28 41 L28 45 M28 45 L25 46 M28 45 L31 46" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
       </div>
     `;
@@ -3965,25 +3979,7 @@ if (typeof document !== 'undefined') {
   }
 }
 
-// Disable double tap zoom & pinch gesture on mobile devices
-if (typeof document !== 'undefined' && document.addEventListener) {
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function (event) {
-    const now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-      if (event.target && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA' || event.target.tagName === 'SELECT')) {
-        // Allow normal input tap
-      } else {
-        event.preventDefault();
-      }
-    }
-    lastTouchEnd = now;
-  }, { passive: false });
 
-  document.addEventListener('gesturestart', function(e) {
-    e.preventDefault();
-  }, { passive: false });
-}
 
 
 

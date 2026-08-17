@@ -31,7 +31,7 @@
   overflow-y: auto;
   padding: 16px 14px;
   display: flex;
-  flex-direction: column-reverse; /* Bottom to Top progression */
+  flex-direction: column; /* Finish Line (top), Lanes 25->1, Starting Curb (bottom) */
   gap: 10px;
   scrollbar-width: thin;
   scrollbar-color: var(--accent-green) #090e17;
