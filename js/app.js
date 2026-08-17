@@ -2735,16 +2735,16 @@ class AppController {
     [this.dom.tabMines, this.dom.tabChicken, this.dom.tabCrash, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
     [this.dom.minesView, this.dom.chickenView, this.dom.crashView, this.dom.colortradingView, this.dom.stockView].forEach(v => v && v.classList.remove('active'));
 
-    // Reset control groups
-    this.dom.minesSelectGroup.style.display = 'none';
-    this.dom.chickenSelectGroup.style.display = 'none';
-    this.dom.crashSelectGroup.style.display = 'none';
-    this.dom.colorTradingSelectGroup.style.display = 'none';
-    this.dom.stockSelectGroup.style.display = 'none';
+    // Reset control groups safely
+    if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'none';
+    if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'none';
+    if (this.dom.crashSelectGroup) this.dom.crashSelectGroup.style.display = 'none';
+    if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'none';
+    if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'none';
 
-    this.dom.multiplierPreviewCard.style.display = 'none';
-    this.dom.multStreakContainer.style.display = 'none';
-    this.dom.mainActionArea.style.display = 'flex';
+    if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'none';
+    if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
+    if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
     // Auto Play Toggle visibility: Enabled ONLY on Mines, Chicken, Crash (Disabled on Color Trading & Stock)
     if (gameType === 'colortrading' || gameType === 'stock') {
@@ -2762,26 +2762,26 @@ class AppController {
     }
 
     if (gameType === 'mines') {
-      this.dom.tabMines.classList.add('active');
-      this.dom.minesView.classList.add('active');
-      this.dom.minesSelectGroup.style.display = 'flex';
-      this.dom.multiplierPreviewCard.style.display = 'flex';
-      this.dom.multStreakContainer.style.display = 'flex';
+      if (this.dom.tabMines) this.dom.tabMines.classList.add('active');
+      if (this.dom.minesView) this.dom.minesView.classList.add('active');
+      if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'flex';
+      if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
+      if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
       this.activeInstance = this.mines;
-      this.dom.previewStepLabel.innerText = "Next Diamond Multiplier";
+      if (this.dom.previewStepLabel) this.dom.previewStepLabel.innerText = "Next Diamond Multiplier";
       this.resetGridUI();
       if (this.mines) {
-        this.mines.setMineCount(parseInt(this.dom.minesCountSelect.value) || 3);
+        this.mines.setMineCount(parseInt(this.dom.minesCountSelect ? this.dom.minesCountSelect.value : 3) || 3);
         this.mines.updateNextMultiplierPreview();
       }
     } else if (gameType === 'chicken') {
-      this.dom.tabChicken.classList.add('active');
-      this.dom.chickenView.classList.add('active');
-      this.dom.chickenSelectGroup.style.display = 'flex';
-      this.dom.multiplierPreviewCard.style.display = 'flex';
-      this.dom.multStreakContainer.style.display = 'flex';
+      if (this.dom.tabChicken) this.dom.tabChicken.classList.add('active');
+      if (this.dom.chickenView) this.dom.chickenView.classList.add('active');
+      if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'flex';
+      if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
+      if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
       this.activeInstance = this.chicken;
-      this.dom.previewStepLabel.innerText = "Next Lane Multiplier";
+      if (this.dom.previewStepLabel) this.dom.previewStepLabel.innerText = "Next Lane Multiplier";
       this.resetGridUI();
       if (this.chicken) {
         this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
@@ -2789,35 +2789,35 @@ class AppController {
         this.chicken.updateNextMultiplierPreview();
       }
     } else if (gameType === 'crash') {
-      this.dom.tabCrash.classList.add('active');
-      this.dom.crashView.classList.add('active');
-      this.dom.crashSelectGroup.style.display = 'flex';
-      this.dom.mainActionArea.style.display = 'flex';
+      if (this.dom.tabCrash) this.dom.tabCrash.classList.add('active');
+      if (this.dom.crashView) this.dom.crashView.classList.add('active');
+      if (this.dom.crashSelectGroup) this.dom.crashSelectGroup.style.display = 'flex';
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.crash;
-      this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
-      this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
-      this.dom.btnActionCashout.style.display = 'none';
-      this.dom.betAmountInput.disabled = false;
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
       if (this.crash) {
         this.crash.resizeCanvas();
         this.crash.renderIdle();
         this.renderCrashHistory();
       }
     } else if (gameType === 'colortrading') {
-      this.dom.tabColorTrading.classList.add('active');
-      this.dom.colortradingView.classList.add('active');
-      this.dom.colorTradingSelectGroup.style.display = 'flex';
-      this.dom.mainActionArea.style.display = 'none';
+      if (this.dom.tabColorTrading) this.dom.tabColorTrading.classList.add('active');
+      if (this.dom.colortradingView) this.dom.colortradingView.classList.add('active');
+      if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'flex';
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       this.activeInstance = this.colortrading;
       if (this.colortrading) {
         this.renderTrendBalls(this.colortrading.history);
         this.renderActiveBetsSlip(this.colortrading.activeBets || []);
       }
     } else if (gameType === 'stock') {
-      this.dom.tabStock.classList.add('active');
-      this.dom.stockView.classList.add('active');
-      this.dom.stockSelectGroup.style.display = 'flex';
-      this.dom.mainActionArea.style.display = 'none';
+      if (this.dom.tabStock) this.dom.tabStock.classList.add('active');
+      if (this.dom.stockView) this.dom.stockView.classList.add('active');
+      if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'flex';
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       this.activeInstance = this.stock;
       if (this.stock) {
         this.stock.resizeCanvas();
@@ -2826,11 +2826,11 @@ class AppController {
     }
 
     if (this.betMode === 'auto' && gameType !== 'colortrading' && gameType !== 'stock') {
-      this.dom.btnActionBet.style.display = 'none';
-      this.dom.btnActionAutoStart.style.display = 'flex';
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
     } else if (gameType !== 'colortrading' && gameType !== 'stock') {
-      this.dom.btnActionBet.style.display = 'flex';
-      this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
     }
 
     const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
