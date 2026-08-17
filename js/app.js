@@ -630,15 +630,19 @@ class AppController {
     }
 
     // UPI Deposit Modal Open/Close
-    this.dom.btnOpenDeposit.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      this.syncUpiUI();
-      this.dom.modalDepositUpi.classList.add('open');
-    });
+    if (this.dom.btnOpenDeposit) {
+      this.dom.btnOpenDeposit.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.syncUpiUI();
+        if (this.dom.modalDepositUpi) this.dom.modalDepositUpi.classList.add('open');
+      });
+    }
 
-    this.dom.btnCloseDepositModal.addEventListener('click', () => {
-      this.dom.modalDepositUpi.classList.remove('open');
-    });
+    if (this.dom.btnCloseDepositModal) {
+      this.dom.btnCloseDepositModal.addEventListener('click', () => {
+        if (this.dom.modalDepositUpi) this.dom.modalDepositUpi.classList.remove('open');
+      });
+    }
 
     // Copy UPI ID Button Listener
     if (this.dom.btnCopyUpiId) {
@@ -652,13 +656,13 @@ class AppController {
     if (this.dom.btnLiveSupport) {
       this.dom.btnLiveSupport.addEventListener('click', () => {
         window.soundEngine.playClick();
-        this.dom.modalLiveSupport.classList.add('open');
+        if (this.dom.modalLiveSupport) this.dom.modalLiveSupport.classList.add('open');
       });
     }
 
     if (this.dom.btnCloseSupportModal) {
       this.dom.btnCloseSupportModal.addEventListener('click', () => {
-        this.dom.modalLiveSupport.classList.remove('open');
+        if (this.dom.modalLiveSupport) this.dom.modalLiveSupport.classList.remove('open');
       });
     }
 
@@ -686,13 +690,13 @@ class AppController {
     if (this.dom.btnOpenRating) {
       this.dom.btnOpenRating.addEventListener('click', () => {
         window.soundEngine.playClick();
-        this.dom.modalRating.classList.add('open');
+        if (this.dom.modalRating) this.dom.modalRating.classList.add('open');
       });
     }
 
     if (this.dom.btnCloseRatingModal) {
       this.dom.btnCloseRatingModal.addEventListener('click', () => {
-        this.dom.modalRating.classList.remove('open');
+        if (this.dom.modalRating) this.dom.modalRating.classList.remove('open');
       });
     }
 
@@ -713,7 +717,7 @@ class AppController {
             4: '4.0 / 5.0 - Very Good & Fast!',
             5: '5.0 / 5.0 - Excellent & Super Fast!'
           };
-          this.dom.ratingTextFeedback.innerText = labels[r];
+          if (this.dom.ratingTextFeedback) this.dom.ratingTextFeedback.innerText = labels[r];
         });
       });
     }
@@ -721,22 +725,26 @@ class AppController {
     if (this.dom.btnSubmitRating) {
       this.dom.btnSubmitRating.addEventListener('click', () => {
         window.soundEngine.playClick();
-        this.dom.modalRating.classList.remove('open');
+        if (this.dom.modalRating) this.dom.modalRating.classList.remove('open');
         this.showNotification("🎉 Thank you for your 5-star rating and review!", "success");
       });
     }
 
     // Admin Settings Modal
-    this.dom.btnOpenAdmin.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      this.syncAdminSettingsUI();
-      this.renderAdminPendingDeposits();
-      this.dom.modalUpiSettings.classList.add('open');
-    });
+    if (this.dom.btnOpenAdmin) {
+      this.dom.btnOpenAdmin.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.syncAdminSettingsUI();
+        this.renderAdminPendingDeposits();
+        if (this.dom.modalUpiSettings) this.dom.modalUpiSettings.classList.add('open');
+      });
+    }
 
-    this.dom.btnCloseAdminModal.addEventListener('click', () => {
-      this.dom.modalUpiSettings.classList.remove('open');
-    });
+    if (this.dom.btnCloseAdminModal) {
+      this.dom.btnCloseAdminModal.addEventListener('click', () => {
+        if (this.dom.modalUpiSettings) this.dom.modalUpiSettings.classList.remove('open');
+      });
+    }
 
     // Admin Tabs Switcher
     if (this.dom.tabAdminPending && this.dom.tabAdminWithdraw && this.dom.tabAdminUpi && this.dom.tabAdminTelegram) {
@@ -745,7 +753,7 @@ class AppController {
         [this.dom.tabAdminPending, this.dom.tabAdminWithdraw, this.dom.tabAdminUpi, this.dom.tabAdminTelegram].forEach(t => t && t.classList.remove('active'));
         [this.dom.viewAdminPending, this.dom.viewAdminWithdraw, this.dom.viewAdminUpi, this.dom.viewAdminTelegram].forEach(v => v && v.classList.remove('active'));
         this.dom.tabAdminPending.classList.add('active');
-        this.dom.viewAdminPending.classList.add('active');
+        if (this.dom.viewAdminPending) this.dom.viewAdminPending.classList.add('active');
         this.renderAdminPendingDeposits();
       });
 
@@ -754,7 +762,7 @@ class AppController {
         [this.dom.tabAdminPending, this.dom.tabAdminWithdraw, this.dom.tabAdminUpi, this.dom.tabAdminTelegram].forEach(t => t && t.classList.remove('active'));
         [this.dom.viewAdminPending, this.dom.viewAdminWithdraw, this.dom.viewAdminUpi, this.dom.viewAdminTelegram].forEach(v => v && v.classList.remove('active'));
         this.dom.tabAdminWithdraw.classList.add('active');
-        this.dom.viewAdminWithdraw.classList.add('active');
+        if (this.dom.viewAdminWithdraw) this.dom.viewAdminWithdraw.classList.add('active');
         this.renderAdminWithdrawList();
       });
 
@@ -763,7 +771,7 @@ class AppController {
         [this.dom.tabAdminPending, this.dom.tabAdminWithdraw, this.dom.tabAdminUpi, this.dom.tabAdminTelegram].forEach(t => t && t.classList.remove('active'));
         [this.dom.viewAdminPending, this.dom.viewAdminWithdraw, this.dom.viewAdminUpi, this.dom.viewAdminTelegram].forEach(v => v && v.classList.remove('active'));
         this.dom.tabAdminUpi.classList.add('active');
-        this.dom.viewAdminUpi.classList.add('active');
+        if (this.dom.viewAdminUpi) this.dom.viewAdminUpi.classList.add('active');
       });
 
       this.dom.tabAdminTelegram.addEventListener('click', () => {
@@ -771,29 +779,31 @@ class AppController {
         [this.dom.tabAdminPending, this.dom.tabAdminWithdraw, this.dom.tabAdminUpi, this.dom.tabAdminTelegram].forEach(t => t && t.classList.remove('active'));
         [this.dom.viewAdminPending, this.dom.viewAdminWithdraw, this.dom.viewAdminUpi, this.dom.viewAdminTelegram].forEach(v => v && v.classList.remove('active'));
         this.dom.tabAdminTelegram.classList.add('active');
-        this.dom.viewAdminTelegram.classList.add('active');
+        if (this.dom.viewAdminTelegram) this.dom.viewAdminTelegram.classList.add('active');
       });
     }
 
     // Save UPI Settings
-    this.dom.btnSaveUpiSettings.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      const upiId = this.dom.settingUpiIdInput.value.trim();
-      const payeeName = this.dom.settingPayeeNameInput.value.trim() || 'VIEWPOINT Games';
-      const currency = this.dom.settingCurrencySelect.value;
-      const minDeposit = parseFloat(this.dom.settingMinDepositInput.value) || 200;
+    if (this.dom.btnSaveUpiSettings) {
+      this.dom.btnSaveUpiSettings.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        const upiId = this.dom.settingUpiIdInput.value.trim();
+        const payeeName = this.dom.settingPayeeNameInput.value.trim() || 'VIEWPOINT Games';
+        const currency = this.dom.settingCurrencySelect.value;
+        const minDeposit = parseFloat(this.dom.settingMinDepositInput.value) || 200;
 
-      if (!upiId) {
-        this.showNotification("Please enter a valid UPI ID!", "error");
-        return;
-      }
+        if (!upiId) {
+          this.showNotification("Please enter a valid UPI ID!", "error");
+          return;
+        }
 
-      window.wallet.saveUpiSettings({ upiId, payeeName, minDeposit });
-      window.wallet.setCurrency(currency);
-      this.syncUpiUI();
-      this.dom.modalUpiSettings.classList.remove('open');
-      this.showNotification("✅ UPI Account settings saved successfully!", "success");
-    });
+        window.wallet.saveUpiSettings({ upiId, payeeName, minDeposit });
+        window.wallet.setCurrency(currency);
+        this.syncUpiUI();
+        if (this.dom.modalUpiSettings) this.dom.modalUpiSettings.classList.remove('open');
+        this.showNotification("✅ UPI Account settings saved successfully!", "success");
+      });
+    }
 
     // Save Telegram Settings
     if (this.dom.btnSaveTelegramSettings) {
@@ -809,20 +819,22 @@ class AppController {
     }
 
     // Deposit Tabs
-    this.dom.tabDepositForm.addEventListener('click', () => {
-      this.dom.tabDepositForm.classList.add('active');
-      this.dom.tabDepositHistory.classList.remove('active');
-      this.dom.viewDepositForm.classList.add('active');
-      this.dom.viewDepositHistory.classList.remove('active');
-    });
+    if (this.dom.tabDepositForm && this.dom.tabDepositHistory) {
+      this.dom.tabDepositForm.addEventListener('click', () => {
+        this.dom.tabDepositForm.classList.add('active');
+        this.dom.tabDepositHistory.classList.remove('active');
+        if (this.dom.viewDepositForm) this.dom.viewDepositForm.classList.add('active');
+        if (this.dom.viewDepositHistory) this.dom.viewDepositHistory.classList.remove('active');
+      });
 
-    this.dom.tabDepositHistory.addEventListener('click', () => {
-      this.dom.tabDepositHistory.classList.add('active');
-      this.dom.tabDepositForm.classList.remove('active');
-      this.dom.viewDepositHistory.classList.add('active');
-      this.dom.viewDepositForm.classList.remove('active');
-      this.renderDepositHistoryTable();
-    });
+      this.dom.tabDepositHistory.addEventListener('click', () => {
+        this.dom.tabDepositHistory.classList.add('active');
+        this.dom.tabDepositForm.classList.remove('active');
+        if (this.dom.viewDepositHistory) this.dom.viewDepositHistory.classList.add('active');
+        if (this.dom.viewDepositForm) this.dom.viewDepositForm.classList.remove('active');
+        this.renderDepositHistoryTable();
+      });
+    }
 
     // Withdrawal Modal & Tabs
     if (this.dom.btnOpenWithdraw) {
@@ -830,7 +842,7 @@ class AppController {
     }
     if (this.dom.btnCloseWithdrawModal) {
       this.dom.btnCloseWithdrawModal.addEventListener('click', () => {
-        this.dom.modalWithdraw.classList.remove('open');
+        if (this.dom.modalWithdraw) this.dom.modalWithdraw.classList.remove('open');
       });
     }
 
@@ -838,33 +850,37 @@ class AppController {
       this.dom.tabWithdrawForm.addEventListener('click', () => {
         this.dom.tabWithdrawForm.classList.add('active');
         this.dom.tabWithdrawHistory.classList.remove('active');
-        this.dom.viewWithdrawForm.classList.add('active');
-        this.dom.viewWithdrawHistory.classList.remove('active');
+        if (this.dom.viewWithdrawForm) this.dom.viewWithdrawForm.classList.add('active');
+        if (this.dom.viewWithdrawHistory) this.dom.viewWithdrawHistory.classList.remove('active');
       });
 
       this.dom.tabWithdrawHistory.addEventListener('click', () => {
         this.dom.tabWithdrawHistory.classList.add('active');
         this.dom.tabWithdrawForm.classList.remove('active');
-        this.dom.viewWithdrawHistory.classList.add('active');
-        this.dom.viewWithdrawForm.classList.remove('active');
+        if (this.dom.viewWithdrawHistory) this.dom.viewWithdrawHistory.classList.add('active');
+        if (this.dom.viewWithdrawForm) this.dom.viewWithdrawForm.classList.remove('active');
         this.renderWithdrawHistoryTable();
       });
     }
 
     // Quick Chip Amount Click (Deposit)
-    this.dom.depositQuickChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        window.soundEngine.playClick();
-        this.dom.depositQuickChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        this.dom.depositAmountInput.value = chip.dataset.amount;
+    if (this.dom.depositQuickChips) {
+      this.dom.depositQuickChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          window.soundEngine.playClick();
+          this.dom.depositQuickChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          this.dom.depositAmountInput.value = chip.dataset.amount;
+          this.updateUpiQr();
+        });
+      });
+    }
+
+    if (this.dom.depositAmountInput) {
+      this.dom.depositAmountInput.addEventListener('input', () => {
         this.updateUpiQr();
       });
-    });
-
-    this.dom.depositAmountInput.addEventListener('input', () => {
-      this.updateUpiQr();
-    });
+    }
 
     if (this.dom.btnSubmitDeposit) {
       this.dom.btnSubmitDeposit.addEventListener('click', () => {
@@ -925,32 +941,40 @@ class AppController {
     }
 
     // Provably Fair Modal
-    this.dom.btnProvablyFair.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      this.syncProvablyFairUI();
-      this.dom.modalProvablyFair.classList.add('open');
-    });
+    if (this.dom.btnProvablyFair) {
+      this.dom.btnProvablyFair.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        this.syncProvablyFairUI();
+        if (this.dom.modalProvablyFair) this.dom.modalProvablyFair.classList.add('open');
+      });
+    }
 
-    this.dom.btnCloseFairModal.addEventListener('click', () => {
-      this.dom.modalProvablyFair.classList.remove('open');
-    });
+    if (this.dom.btnCloseFairModal) {
+      this.dom.btnCloseFairModal.addEventListener('click', () => {
+        if (this.dom.modalProvablyFair) this.dom.modalProvablyFair.classList.remove('open');
+      });
+    }
 
-    this.dom.btnRotateSeed.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      window.provablyFair.rotateServerSeed();
-      this.syncProvablyFairUI();
-      this.showNotification("Server Seed rotated & hashed!", "success");
-    });
+    if (this.dom.btnRotateSeed) {
+      this.dom.btnRotateSeed.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        window.provablyFair.rotateServerSeed();
+        this.syncProvablyFairUI();
+        this.showNotification("Server Seed rotated & hashed!", "success");
+      });
+    }
 
-    this.dom.clientSeedInput.addEventListener('change', () => {
-      window.provablyFair.setClientSeed(this.dom.clientSeedInput.value);
-    });
+    if (this.dom.clientSeedInput) {
+      this.dom.clientSeedInput.addEventListener('change', () => {
+        window.provablyFair.setClientSeed(this.dom.clientSeedInput.value);
+      });
+    }
 
     // Difficulty Mode Selector (Easy / Medium / Hard)
     if (this.dom.btnDiffEasy) {
       this.dom.btnDiffEasy.addEventListener('click', () => this.setDifficulty('easy'));
-      this.dom.btnDiffMed.addEventListener('click', () => this.setDifficulty('medium'));
-      this.dom.btnDiffHard.addEventListener('click', () => this.setDifficulty('hard'));
+      if (this.dom.btnDiffMed) this.dom.btnDiffMed.addEventListener('click', () => this.setDifficulty('medium'));
+      if (this.dom.btnDiffHard) this.dom.btnDiffHard.addEventListener('click', () => this.setDifficulty('hard'));
     }
 
     // Community Live Wins vs Personal Bets Tab Switcher
@@ -959,82 +983,94 @@ class AppController {
         window.soundEngine.playClick();
         this.dom.tabCommunityWins.classList.add('active');
         this.dom.tabMyBets.classList.remove('active');
-        this.dom.viewCommunityWins.style.display = 'block';
-        this.dom.viewMyBets.style.display = 'none';
+        if (this.dom.viewCommunityWins) this.dom.viewCommunityWins.style.display = 'block';
+        if (this.dom.viewMyBets) this.dom.viewMyBets.style.display = 'none';
       });
 
       this.dom.tabMyBets.addEventListener('click', () => {
         window.soundEngine.playClick();
         this.dom.tabMyBets.classList.add('active');
         this.dom.tabCommunityWins.classList.remove('active');
-        this.dom.viewMyBets.style.display = 'block';
-        this.dom.viewCommunityWins.style.display = 'none';
+        if (this.dom.viewMyBets) this.dom.viewMyBets.style.display = 'block';
+        if (this.dom.viewCommunityWins) this.dom.viewCommunityWins.style.display = 'none';
         this.renderHistoryTable();
       });
     }
 
     // Game Tabs
-    this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
-    this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
-    this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
-    this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
+    if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
+    if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
+    if (this.dom.tabCrash) this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
+    if (this.dom.tabColorTrading) this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
     if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
 
     // Default active game is Chicken Road Highway
     this.switchGame('chicken');
 
     // Bet Amount Input
-    this.dom.betAmountInput.addEventListener('input', () => {
-      const val = parseFloat(this.dom.betAmountInput.value) || 0;
-      if (this.activeInstance && this.activeInstance.setBetAmount) {
-        this.activeInstance.setBetAmount(val);
-        if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
-      }
-    });
+    if (this.dom.betAmountInput) {
+      this.dom.betAmountInput.addEventListener('input', () => {
+        const val = parseFloat(this.dom.betAmountInput.value) || 0;
+        if (this.activeInstance && this.activeInstance.setBetAmount) {
+          this.activeInstance.setBetAmount(val);
+          if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
+        }
+      });
+    }
 
     // Quick Bet Buttons
-    this.dom.btnHalfBet.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      let val = (parseFloat(this.dom.betAmountInput.value) || 10) / 2;
-      val = Math.max(0.1, Math.round(val * 100) / 100);
-      this.dom.betAmountInput.value = val.toFixed(2);
-      if (this.activeInstance && this.activeInstance.setBetAmount) {
-        this.activeInstance.setBetAmount(val);
-        if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
-      }
-    });
+    if (this.dom.btnHalfBet) {
+      this.dom.btnHalfBet.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        let val = (parseFloat(this.dom.betAmountInput.value) || 10) / 2;
+        val = Math.max(0.1, Math.round(val * 100) / 100);
+        this.dom.betAmountInput.value = val.toFixed(2);
+        if (this.activeInstance && this.activeInstance.setBetAmount) {
+          this.activeInstance.setBetAmount(val);
+          if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
+        }
+      });
+    }
 
-    this.dom.btnDoubleBet.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      let val = (parseFloat(this.dom.betAmountInput.value) || 10) * 2;
-      val = Math.min(window.wallet.balance, Math.round(val * 100) / 100);
-      this.dom.betAmountInput.value = val.toFixed(2);
-      if (this.activeInstance && this.activeInstance.setBetAmount) {
-        this.activeInstance.setBetAmount(val);
-        if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
-      }
-    });
+    if (this.dom.btnDoubleBet) {
+      this.dom.btnDoubleBet.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        let val = (parseFloat(this.dom.betAmountInput.value) || 10) * 2;
+        val = Math.min(window.wallet.balance, Math.round(val * 100) / 100);
+        this.dom.betAmountInput.value = val.toFixed(2);
+        if (this.activeInstance && this.activeInstance.setBetAmount) {
+          this.activeInstance.setBetAmount(val);
+          if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
+        }
+      });
+    }
 
-    this.dom.btnMaxBet.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      const val = Math.floor(window.wallet.balance * 100) / 100;
-      this.dom.betAmountInput.value = val.toFixed(2);
-      if (this.activeInstance && this.activeInstance.setBetAmount) {
-        this.activeInstance.setBetAmount(val);
-        if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
-      }
-    });
+    if (this.dom.btnMaxBet) {
+      this.dom.btnMaxBet.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        const val = Math.floor(window.wallet.balance * 100) / 100;
+        this.dom.betAmountInput.value = val.toFixed(2);
+        if (this.activeInstance && this.activeInstance.setBetAmount) {
+          this.activeInstance.setBetAmount(val);
+          if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
+        }
+      });
+    }
 
     // Mines / Bones Select
-    this.dom.minesCountSelect.addEventListener('change', () => {
-      window.soundEngine.playClick();
-      this.mines.setMineCount(this.dom.minesCountSelect.value);
-    });
+    if (this.dom.minesCountSelect) {
+      this.dom.minesCountSelect.addEventListener('change', () => {
+        window.soundEngine.playClick();
+        this.mines.setMineCount(this.dom.minesCountSelect.value);
+      });
+    }
 
-    this.dom.bonesCountSelect.addEventListener('change', () => {
-      window.soundEngine.playClick();
-      this.chicken.setBoneCount(this.dom.bonesCountSelect.value);
-    });
+    if (this.dom.bonesCountSelect) {
+      this.dom.bonesCountSelect.addEventListener('change', () => {
+        window.soundEngine.playClick();
+        this.chicken.setBoneCount(this.dom.bonesCountSelect.value);
+      });
+    }
 
     if (this.dom.crashAutoCashoutInput) {
       this.dom.crashAutoCashoutInput.addEventListener('input', () => {
@@ -1043,28 +1079,31 @@ class AppController {
     }
 
     // Action Bet Button
-    this.dom.btnActionBet.addEventListener('click', () => {
-      this.hideToast();
-      if (this.currentGame === 'crash') {
-        this.crash.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
-        this.crash.setAutoCashout(parseFloat(this.dom.crashAutoCashoutInput.value) || 2.0);
-        this.crash.startGame();
-      } else {
-        this.activeInstance.startGame();
-      }
-    });
+    if (this.dom.btnActionBet) {
+      this.dom.btnActionBet.addEventListener('click', () => {
+        this.hideToast();
+        if (this.currentGame === 'crash') {
+          this.crash.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
+          this.crash.setAutoCashout(parseFloat(this.dom.crashAutoCashoutInput.value) || 2.0);
+          this.crash.startGame();
+        } else {
+          this.activeInstance.startGame();
+        }
+      });
+    }
 
     // Action Cashout Button
-    this.dom.btnActionCashout.addEventListener('click', () => {
-      if (this.currentGame === 'crash') {
-        this.crash.cashOut();
-      } else {
-        this.activeInstance.cashOut();
-      }
-    });
+    if (this.dom.btnActionCashout) {
+      this.dom.btnActionCashout.addEventListener('click', () => {
+        if (this.currentGame === 'crash') {
+          this.crash.cashOut();
+        } else {
+          this.activeInstance.cashOut();
+        }
+      });
+    }
 
     // Tiranga Interval Buttons
-    this.dom.tirangaModeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         window.soundEngine.playClick();
         this.dom.tirangaModeBtns.forEach(b => b.classList.remove('active'));
@@ -1124,16 +1163,16 @@ class AppController {
     }
 
     // Stock Expiry Buttons
-    if (this.dom.btnExpiry30s) {
+    if (this.dom.btnExpiry30s || this.dom.btnExpiry60s || this.dom.btnExpiry2m) {
       const setExp = (btn, sec) => {
         window.soundEngine.playClick();
         [this.dom.btnExpiry30s, this.dom.btnExpiry60s, this.dom.btnExpiry2m].forEach(b => b && b.classList.remove('active'));
-        btn.classList.add('active');
+        if (btn) btn.classList.add('active');
         this.stockDurationSec = sec;
       };
-      this.dom.btnExpiry30s.addEventListener('click', () => setExp(this.dom.btnExpiry30s, 30));
-      this.dom.btnExpiry60s.addEventListener('click', () => setExp(this.dom.btnExpiry60s, 60));
-      this.dom.btnExpiry2m.addEventListener('click', () => setExp(this.dom.btnExpiry2m, 120));
+      if (this.dom.btnExpiry30s) this.dom.btnExpiry30s.addEventListener('click', () => setExp(this.dom.btnExpiry30s, 30));
+      if (this.dom.btnExpiry60s) this.dom.btnExpiry60s.addEventListener('click', () => setExp(this.dom.btnExpiry60s, 60));
+      if (this.dom.btnExpiry2m) this.dom.btnExpiry2m.addEventListener('click', () => setExp(this.dom.btnExpiry2m, 120));
     }
 
     // Stock Call & Put Actions
