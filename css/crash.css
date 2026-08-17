@@ -1,5 +1,5 @@
 /* ===================================================
-   CRASH (AVIATOR / ROCKET) GAME STYLES
+   CRASH (AVIATOR / ROCKET) - ULTRA PREMIUM CYBER STYLES
    =================================================== */
 
 .crash-view {
@@ -17,11 +17,11 @@
   position: relative;
   width: 100%;
   height: 440px;
-  background: radial-gradient(circle at 10% 90%, #152736 0%, #0d1b26 100%);
+  background: radial-gradient(circle at 50% 100%, #152238 0%, #090e18 100%);
   border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 #crashCanvas {
@@ -44,27 +44,27 @@
 
 .crash-big-multiplier {
   font-family: var(--font-display);
-  font-size: 64px;
+  font-size: 68px;
   font-weight: 900;
   color: #ffffff;
-  text-shadow: 0 0 30px rgba(0, 231, 1, 0.6), 0 4px 12px rgba(0,0,0,0.8);
-  letter-spacing: -1px;
+  text-shadow: 0 0 35px rgba(0, 245, 155, 0.7), 0 4px 16px rgba(0,0,0,0.9);
+  letter-spacing: -1.5px;
   transition: color 0.1s ease;
 }
 
 .crash-big-multiplier.crashed {
-  color: #fe2c55;
-  text-shadow: 0 0 30px rgba(254, 44, 85, 0.8), 0 4px 12px rgba(0,0,0,0.8);
+  color: #ff3366;
+  text-shadow: 0 0 35px rgba(255, 51, 102, 0.85), 0 4px 16px rgba(0,0,0,0.9);
   animation: crashShake 0.4s ease;
 }
 
 .crash-status-tag {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   color: var(--text-secondary);
-  margin-top: -6px;
+  margin-top: -4px;
 }
 
 @keyframes crashShake {
@@ -79,7 +79,7 @@
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 8px 0;
+  padding: 10px 0;
   scrollbar-width: none;
 }
 
@@ -88,58 +88,42 @@
 }
 
 .crash-hist-pill {
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: var(--border-radius-sm);
   font-size: 12px;
   font-weight: 800;
   font-family: var(--font-display);
   white-space: nowrap;
   animation: fadeInPill 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .crash-hist-pill.low {
-  background: rgba(254, 44, 85, 0.15);
-  color: #fe2c55;
-  border: 1px solid rgba(254, 44, 85, 0.3);
+  background: rgba(255, 51, 102, 0.15);
+  color: #ff3366;
+  border-color: rgba(255, 51, 102, 0.3);
 }
 
-.crash-hist-pill.med {
-  background: rgba(20, 117, 225, 0.15);
-  color: #00e5ff;
-  border: 1px solid rgba(0, 229, 255, 0.3);
+.crash-hist-pill.medium {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+  border-color: rgba(0, 240, 255, 0.3);
 }
 
 .crash-hist-pill.high {
-  background: rgba(0, 231, 1, 0.15);
-  color: #00e701;
-  border: 1px solid rgba(0, 231, 1, 0.3);
-  box-shadow: 0 0 10px rgba(0, 231, 1, 0.2);
+  background: rgba(0, 245, 155, 0.15);
+  color: #00f59b;
+  border-color: rgba(0, 245, 155, 0.3);
+}
+
+.crash-hist-pill.mega {
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.3), rgba(157, 78, 221, 0.3));
+  color: #ffb703;
+  border-color: #ffb703;
+  box-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
 }
 
 @keyframes fadeInPill {
   from { opacity: 0; transform: scale(0.8); }
   to { opacity: 1; transform: scale(1); }
 }
-
-.crash-controls-extra {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-@media (max-width: 768px) {
-  .crash-canvas-wrapper {
-    height: 250px;
-  }
-
-  .crash-big-multiplier {
-    font-size: 40px;
-  }
-
-  .crash-status-tag {
-    font-size: 11px;
-    padding: 3px 10px;
-  }
-}
-

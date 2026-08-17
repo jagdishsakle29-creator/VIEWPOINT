@@ -28,12 +28,33 @@ class CasinoAudioEngine {
     }
   }
 
+  triggerHaptic(type = 'light') {
+    try {
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+        const hf = window.Telegram.WebApp.HapticFeedback;
+        if (type === 'light' || type === 'medium' || type === 'heavy' || type === 'rigid' || type === 'soft') {
+          hf.impactOccurred(type);
+        } else if (type === 'success' || type === 'warning' || type === 'error') {
+          hf.notificationOccurred(type);
+        } else if (type === 'selection') {
+          hf.selectionChanged();
+        }
+      } else if (navigator.vibrate) {
+        if (type === 'light') navigator.vibrate(15);
+        else if (type === 'medium') navigator.vibrate(30);
+        else if (type === 'heavy' || type === 'error') navigator.vibrate([40, 30, 60]);
+        else if (type === 'success') navigator.vibrate([20, 20, 35]);
+      }
+    } catch(e) {}
+  }
+
   toggleSound(enabled) {
     this.enabled = enabled;
     return this.enabled;
   }
 
   playClick() {
+    this.triggerHaptic('light');
     if (!this.enabled || !this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -56,6 +77,7 @@ class CasinoAudioEngine {
   }
 
   playBet() {
+    this.triggerHaptic('medium');
     if (!this.enabled || !this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -78,6 +100,7 @@ class CasinoAudioEngine {
   }
 
   playDeposit() {
+    this.triggerHaptic('success');
     if (!this.enabled || !this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -98,6 +121,7 @@ class CasinoAudioEngine {
   }
 
   playGem(streak = 1) {
+    this.triggerHaptic(streak >= 5 ? 'success' : 'light');
     if (!this.enabled || !this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
@@ -127,7 +151,57 @@ class CasinoAudioEngine {
     } catch(e) {}
   }
 
+  playChickenHop() {
+    this.triggerHaptic('light');
+    if (!this.enabled) return;
+    this.init();
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(680, this.ctx.currentTime + 0.08);
+
+      gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.1);
+    } catch(e) {}
+  }
+
+  playCarHorn() {
+    this.triggerHaptic('heavy');
+    if (!this.enabled) return;
+    this.init();
+    try {
+      [340, 420].forEach(freq => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.35);
+      });
+    } catch(e) {}
+  }
+
+  playCarCrash() {
+    this.triggerHaptic('error');
+    this.playCarHorn();
+    this.playBomb();
+  }
+
   playChicken(streak = 1) {
+    this.triggerHaptic(streak >= 5 ? 'success' : 'light');
     if (!this.enabled) return;
     this.init();
     try {
@@ -151,6 +225,7 @@ class CasinoAudioEngine {
   }
 
   playBomb() {
+    this.triggerHaptic('error');
     if (!this.enabled) return;
     this.init();
     try {

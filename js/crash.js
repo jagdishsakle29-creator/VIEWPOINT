@@ -74,21 +74,48 @@ class CrashGame {
     return Math.max(1.01, Math.min(120.0, result));
   }
 
-  startGame() {
+  async startGame() {
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
       return false;
     }
 
-    window.wallet.deduct(this.betAmount);
-    window.soundEngine.playBet();
-
     this.isPlaying = true;
     this.isCrashed = false;
     this.hasCashedOut = false;
     this.currentMultiplier = 1.00;
     this.crashPoint = this.generateCrashPoint();
+
+    // Call server to deduct bet & retrieve verified crash point
+    try {
+      const telegramId = window.wallet.activeTelegramId || '78912345';
+      const apiBase = window.wallet.apiBaseUrl;
+      const res = await fetch(`${apiBase}/api/game/crash/bet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: telegramId,
+          bet_amount: this.betAmount
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          if (data.crash_point) this.crashPoint = data.crash_point;
+          if (data.balance !== undefined) window.wallet.setServerBalance(data.balance);
+        } else {
+          window.wallet.deduct(this.betAmount);
+        }
+      } else {
+        window.wallet.deduct(this.betAmount);
+      }
+    } catch (e) {
+      window.wallet.deduct(this.betAmount);
+    }
+
+    window.soundEngine.playBet();
     this.startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     this.particles = [];
 
@@ -103,12 +130,39 @@ class CrashGame {
     return true;
   }
 
-  cashOut() {
+  async cashOut() {
     if (!this.isPlaying || this.isCrashed || this.hasCashedOut) return;
 
     this.hasCashedOut = true;
-    const payout = this.betAmount * this.currentMultiplier;
-    window.wallet.addWin(payout);
+    const payout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
+
+    try {
+      const telegramId = window.wallet.activeTelegramId || '78912345';
+      const apiBase = window.wallet.apiBaseUrl;
+      const res = await fetch(`${apiBase}/api/game/crash/cashout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: telegramId,
+          bet_amount: this.betAmount,
+          multiplier: this.currentMultiplier
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.balance !== undefined) {
+          window.wallet.setServerBalance(data.balance);
+        } else {
+          window.wallet.addWin(payout);
+        }
+      } else {
+        window.wallet.addWin(payout);
+      }
+    } catch (e) {
+      window.wallet.addWin(payout);
+    }
+
     window.soundEngine.playGem(4);
 
     window.wallet.recordBet({

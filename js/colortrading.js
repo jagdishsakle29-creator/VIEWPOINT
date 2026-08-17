@@ -1,18 +1,36 @@
 /**
- * VIEWPOINT - Color Trading (Win Go 30s) Game Engine
+ * VIEWPOINT - Color Trading (Win Go 30s) Game Engine - Server Synced & Validated
  * Features: Live 30s period timer, Colors (Red/Green/Violet), Numbers 0-9, Big/Small.
  */
 class ColorTradingGame {
   constructor(uiCallbacks) {
     this.ui = uiCallbacks;
-    this.periodDuration = 30; // seconds per round
+    this.periodDuration = 30;
     this.timeLeft = this.periodDuration;
     this.periodId = this.generatePeriodId();
-    this.activeBets = []; // [{ type: 'color'|'number'|'size', choice, amount }]
+    this.activeBets = [];
     this.history = this.generateInitialHistory();
     this.timerInterval = null;
 
+    this.syncWithServer();
     this.startTimer();
+  }
+
+  async syncWithServer() {
+    try {
+      const apiBase = window.wallet ? window.wallet.apiBaseUrl : 'http://localhost:8000';
+      const res = await fetch(`${apiBase}/api/game/color/current`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          if (data.period_id) this.periodId = data.period_id;
+          if (data.time_left !== undefined) this.timeLeft = data.time_left;
+          if (data.history && data.history.length > 0) this.history = data.history;
+        }
+      }
+    } catch (e) {
+      // Offline fallback
+    }
   }
 
   generatePeriodId() {
@@ -57,6 +75,7 @@ class ColorTradingGame {
         this.settleRound();
         this.timeLeft = this.periodDuration;
         this.periodId = this.generatePeriodId();
+        this.syncWithServer();
       }
 
       if (this.ui && this.ui.onTimerTick) {
@@ -69,7 +88,7 @@ class ColorTradingGame {
     }, 1000);
   }
 
-  placeBet(type, choice, amount) {
+  async placeBet(type, choice, amount) {
     amount = parseFloat(amount);
     if (isNaN(amount) || amount <= 0) return { success: false, msg: "Invalid amount" };
 
@@ -81,7 +100,34 @@ class ColorTradingGame {
       return { success: false, msg: "Insufficient wallet balance!" };
     }
 
-    window.wallet.deduct(amount);
+    // Call server to place and validate bet
+    try {
+      const telegramId = window.wallet.activeTelegramId || '78912345';
+      const apiBase = window.wallet.apiBaseUrl;
+      const res = await fetch(`${apiBase}/api/game/color/bet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: telegramId,
+          choice: String(choice),
+          amount: amount
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          if (data.balance !== undefined) window.wallet.setServerBalance(data.balance);
+        } else {
+          window.wallet.deduct(amount);
+        }
+      } else {
+        window.wallet.deduct(amount);
+      }
+    } catch (e) {
+      window.wallet.deduct(amount);
+    }
+
     window.soundEngine.playBet();
 
     const bet = {
@@ -102,7 +148,6 @@ class ColorTradingGame {
   }
 
   settleRound() {
-    // Generate fair winning number 0-9
     const winningNum = Math.floor(Math.random() * 10);
     const result = this.formatResult(winningNum);
     this.history.unshift(result);
@@ -111,7 +156,6 @@ class ColorTradingGame {
     let totalWin = 0;
     const settledBets = [];
 
-    // Settle each active bet
     this.activeBets.forEach(bet => {
       let multiplier = 0;
       let won = false;

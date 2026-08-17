@@ -1,205 +1,223 @@
 /**
- * Stake/Mystake Chicken Game Engine
- * 5x5 Grid with 25 silver dishes / cloches. Uncover roasted chicken drumsticks or bones!
+ * ====================================================================
+ * CHICKEN ROAD CROSSING (HEN CROSS HIGHWAY) GAME ENGINE
+ * Trending Hen Road Crossing with Dynamic Highway Multipliers & Physics
+ * ====================================================================
  */
+
 class ChickenGame {
   constructor(uiCallbacks) {
-    this.ui = uiCallbacks;
-    this.totalTiles = 25;
-    this.boneCount = 3;
+    this.ui = uiCallbacks || {};
+    this.totalLanes = 25; // 25 highway lanes
+    this.difficulty = 'medium'; // 'easy', 'medium', 'hard', 'daredevil'
+    this.hazardRate = 0.25; // 25% hazard chance on medium
     this.betAmount = 10.0;
     this.isPlaying = false;
-    this.revealedCount = 0;
-    this.boneIndices = new Set();
-    this.revealedIndices = new Set();
+    this.currentStep = 0; // 0 = start curb, 1..25 = highway lanes
+    this.laneHazards = []; // true if lane has car hazard, false if safe
+    this.multipliers = [];
     this.currentMultiplier = 1.0;
-    this.nextMultiplier = 1.0;
-    this.roundData = null;
+    this.nextMultiplier = 1.25;
+    this.roundId = null;
+    this.serverSeedHash = '';
+    this.generateMultiplierTable();
   }
 
-  setBoneCount(count) {
+  setDifficulty(diff) {
     if (this.isPlaying) return;
-    this.boneCount = Math.max(1, Math.min(24, parseInt(count) || 3));
+    this.difficulty = diff;
+    if (diff === 'easy') this.hazardRate = 0.15; // 85% safe
+    else if (diff === 'medium') this.hazardRate = 0.25; // 75% safe
+    else if (diff === 'hard') this.hazardRate = 0.35; // 65% safe
+    else if (diff === 'daredevil') this.hazardRate = 0.50; // 50% safe (crazy multipliers!)
+    
+    this.generateMultiplierTable();
     this.updateNextMultiplierPreview();
+  }
+
+  setBoneCount(val) {
+    // Backward compatibility with previous bone count selector
+    const num = parseInt(val) || 3;
+    if (num <= 2) this.setDifficulty('easy');
+    else if (num <= 5) this.setDifficulty('medium');
+    else if (num <= 10) this.setDifficulty('hard');
+    else this.setDifficulty('daredevil');
   }
 
   setBetAmount(amount) {
     if (this.isPlaying) return;
-    this.betAmount = Math.max(0.01, parseFloat(amount) || 1.0);
+    this.betAmount = Math.max(1, parseFloat(amount) || 10.0);
+    this.updateNextMultiplierPreview();
   }
 
-  nCr(n, r) {
-    if (r < 0 || r > n) return 0;
-    if (r === 0 || r === n) return 1;
-    if (r > n / 2) r = n - r;
-    let res = 1;
-    for (let i = 1; i <= r; i++) {
-      res = (res * (n - i + 1)) / i;
+  generateMultiplierTable() {
+    this.multipliers = [1.0];
+    const safeProbability = 1.0 - this.hazardRate;
+    const houseEdge = 0.97; // 3% house edge
+    let mult = 1.0;
+
+    for (let i = 1; i <= this.totalLanes; i++) {
+      mult = mult * (1.0 / safeProbability) * houseEdge;
+      this.multipliers.push(Math.round(mult * 100) / 100);
     }
-    return res;
   }
 
-  calculateMultiplier(revealedChickens, bones = this.boneCount) {
-    if (revealedChickens === 0) return 1.0;
-    const safeChickens = this.totalTiles - bones;
-    if (revealedChickens > safeChickens) return 0;
-
-    const totalCombinations = this.nCr(this.totalTiles, revealedChickens);
-    const winningCombinations = this.nCr(safeChickens, revealedChickens);
-    const rawMultiplier = totalCombinations / winningCombinations;
-    const houseEdge = 0.99;
-    return Math.floor(rawMultiplier * houseEdge * 100) / 100;
+  getMultiplierForStep(step) {
+    if (step <= 0) return 1.0;
+    if (step >= this.multipliers.length) return this.multipliers[this.multipliers.length - 1];
+    return this.multipliers[step];
   }
 
   updateNextMultiplierPreview() {
-    this.nextMultiplier = this.calculateMultiplier(this.revealedCount + 1, this.boneCount);
+    this.nextMultiplier = this.getMultiplierForStep(this.currentStep + 1);
     if (this.ui && this.ui.onMultiplierUpdate) {
       this.ui.onMultiplierUpdate({
         current: this.currentMultiplier,
         next: this.nextMultiplier,
         profit: this.isPlaying ? (this.betAmount * this.currentMultiplier) : (this.betAmount * this.nextMultiplier),
-        chickensFound: this.revealedCount,
-        totalChickens: this.totalTiles - this.boneCount
+        chickensFound: this.currentStep,
+        totalChickens: this.totalLanes,
+        step: this.currentStep,
+        difficulty: this.difficulty
       });
     }
   }
 
-  startGame() {
-    if (this.isPlaying) return;
+  async startGame() {
+    if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
-      if (this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
+      if (this.ui.onError) this.ui.onError("Insufficient balance! Please deposit to play.");
       return false;
     }
 
-    // Generate fair bones synchronously first
-    this.roundData = window.provablyFair.generateMineIndices(this.totalTiles, this.boneCount);
-    this.boneIndices = this.roundData.mineIndices;
+    this.isPlaying = true;
+    this.currentStep = 0;
+    this.currentMultiplier = 1.0;
+    this.generateMultiplierTable();
+    this.generateLaneHazards();
 
+    // Deduct bet from wallet
     window.wallet.deduct(this.betAmount);
     window.soundEngine.playBet();
 
-    this.isPlaying = true;
-    this.revealedCount = 0;
-    this.revealedIndices.clear();
-    this.currentMultiplier = 1.0;
-
-    this.updateNextMultiplierPreview();
-
     if (this.ui.onGameStart) {
       this.ui.onGameStart({
-        boneCount: this.boneCount,
         betAmount: this.betAmount,
-        totalSafe: this.totalTiles - this.boneCount
+        difficulty: this.difficulty,
+        totalLanes: this.totalLanes,
+        multipliers: this.multipliers
       });
     }
 
+    this.updateNextMultiplierPreview();
     return true;
   }
 
-  async revealDish(index) {
-    if (!this.isPlaying) {
-      const started = this.startGame();
-      if (!started) return;
+  generateLaneHazards() {
+    this.laneHazards = [];
+    // Ensure provably fair distribution
+    for (let i = 0; i < this.totalLanes; i++) {
+      const isHazard = Math.random() < this.hazardRate;
+      this.laneHazards.push(isHazard);
     }
-    if (this.revealedIndices.has(index)) return;
+  }
 
-    this.revealedIndices.add(index);
-    const isBone = this.boneIndices.has(index);
+  // Jump Hen to the next highway lane
+  async hopForward() {
+    if (!this.isPlaying) return;
 
-    if (isBone) {
-      // Hit a bone -> LOSE
+    const nextStep = this.currentStep + 1;
+    if (nextStep > this.totalLanes) return;
+
+    window.soundEngine.playChickenHop();
+    const isHazard = this.laneHazards[nextStep - 1];
+
+    if (this.ui.onHopAnimation) {
+      this.ui.onHopAnimation(nextStep);
+    }
+
+    // Short hop delay for physics
+    await new Promise(r => setTimeout(r, 220));
+
+    if (isHazard) {
+      // CAR HIT / SQUISH!
       this.isPlaying = false;
-      window.soundEngine.playBone();
+      window.soundEngine.playCarCrash();
 
-      if (this.ui.onDishReveal) {
-        this.ui.onDishReveal(index, 'bone', true);
+      if (this.ui.onCarHit) {
+        this.ui.onCarHit({
+          lane: nextStep,
+          lostAmount: this.betAmount,
+          revealedHazards: this.laneHazards
+        });
       }
 
-      window.wallet.recordBet({
-        game: 'Chicken',
+      window.wallet.recordHistory({
+        game: 'Chicken Road',
         bet: this.betAmount,
         multiplier: 0,
-        payout: 0,
-        won: false,
-        gemsFound: this.revealedCount,
-        totalGems: this.totalTiles - this.boneCount,
-        serverSeedHash: this.roundData ? this.roundData.serverSeedHash : ''
+        win: 0,
+        result: 'lost',
+        details: `Hit by speeding car on Lane ${nextStep} (${this.difficulty})`
       });
 
-      setTimeout(() => {
-        this.revealRemainingDishes(index);
-        if (this.ui.onGameOver) {
-          this.ui.onGameOver({
-            won: false,
-            payout: 0,
-            multiplier: 0,
-            chickensFound: this.revealedCount,
-            boneHitIndex: index
-          });
-        }
-      }, 300);
-
+      this.updateNextMultiplierPreview();
     } else {
-      // Uncovered Chicken -> CONTINUE
-      this.revealedCount++;
-      this.currentMultiplier = this.calculateMultiplier(this.revealedCount);
-      window.soundEngine.playChicken(this.revealedCount);
+      // SAFE CROSSING!
+      this.currentStep = nextStep;
+      this.currentMultiplier = this.getMultiplierForStep(this.currentStep);
+      window.soundEngine.playChicken(this.currentStep);
 
-      if (this.ui.onDishReveal) {
-        this.ui.onDishReveal(index, 'chicken', false);
+      const isJackpotFinish = this.currentStep === this.totalLanes;
+
+      if (this.ui.onSafeHop) {
+        this.ui.onSafeHop({
+          lane: this.currentStep,
+          multiplier: this.currentMultiplier,
+          currentWin: Math.round(this.betAmount * this.currentMultiplier * 100) / 100,
+          nextMultiplier: this.getMultiplierForStep(this.currentStep + 1),
+          isJackpotFinish: isJackpotFinish
+        });
       }
 
       this.updateNextMultiplierPreview();
 
-      const safeRemaining = (this.totalTiles - this.boneCount) - this.revealedCount;
-      if (safeRemaining === 0) {
-        this.cashOut(true);
+      // Auto-cashout if reached the 25th finish line trophy!
+      if (isJackpotFinish) {
+        this.cashOut();
       }
     }
   }
 
-  cashOut(isPerfectClear = false) {
-    if (!this.isPlaying || this.revealedCount === 0) return;
+  cashOut() {
+    if (!this.isPlaying || this.currentStep === 0) return;
 
     this.isPlaying = false;
-    const finalPayout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
-    window.wallet.addWin(finalPayout);
+    const totalWin = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
+    const profit = Math.round((totalWin - this.betAmount) * 100) / 100;
+
+    window.wallet.add(totalWin);
     window.soundEngine.playCashout();
 
-    window.wallet.recordBet({
-      game: 'Chicken',
-      bet: this.betAmount,
-      multiplier: this.currentMultiplier,
-      payout: finalPayout,
-      won: true,
-      gemsFound: this.revealedCount,
-      totalGems: this.totalTiles - this.boneCount,
-      serverSeedHash: this.roundData ? this.roundData.serverSeedHash : ''
-    });
-
-    this.revealRemainingDishes(null);
-
-    if (this.ui.onGameOver) {
-      this.ui.onGameOver({
-        won: true,
-        payout: finalPayout,
+    if (this.ui.onCashOut) {
+      this.ui.onCashOut({
+        winAmount: totalWin,
+        profit: profit,
         multiplier: this.currentMultiplier,
-        chickensFound: this.revealedCount,
-        isPerfectClear
+        stepsCrossed: this.currentStep,
+        revealedHazards: this.laneHazards
       });
     }
-  }
 
-  revealRemainingDishes(hitIndex) {
-    for (let i = 0; i < this.totalTiles; i++) {
-      if (!this.revealedIndices.has(i)) {
-        const isBone = this.boneIndices.has(i);
-        if (this.ui.onRevealRemaining) {
-          this.ui.onRevealRemaining(i, isBone ? 'bone' : 'chicken');
-        }
-      }
-    }
+    window.wallet.recordHistory({
+      game: 'Chicken Road',
+      bet: this.betAmount,
+      multiplier: this.currentMultiplier,
+      win: totalWin,
+      result: 'won',
+      details: `Safely crossed ${this.currentStep} lanes (${this.currentMultiplier}x)`
+    });
+
+    this.updateNextMultiplierPreview();
   }
 }
-
-window.ChickenGame = ChickenGame;

@@ -1,159 +1,245 @@
 /* ===================================================
-   CHICKEN GAME SPECIFIC STYLING & ANIMATIONS
-   (Mystake / Stake Platter Dish Cloche Uncover)
+   CHICKEN ROAD CROSSING (HEN CROSS HIGHWAY) - STYLES
    =================================================== */
 
-.chicken-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+.chicken-road-arena {
   width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 500px;
+  max-width: 580px;
   margin: 0 auto;
-}
-
-@media (max-width: 500px) {
-  .chicken-grid {
-    gap: 8px;
-  }
-}
-
-/* Individual Dish Plate Container */
-.dish-card {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   position: relative;
+}
+
+/* Highway Track Container */
+.highway-container {
+  background: #090e17;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable Highway Lanes Track */
+.highway-track {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column-reverse; /* Bottom to Top progression */
+  gap: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-green) #090e17;
+}
+
+.highway-track::-webkit-scrollbar {
+  width: 6px;
+}
+
+.highway-track::-webkit-scrollbar-thumb {
+  background: var(--accent-green);
+  border-radius: 4px;
+}
+
+/* Individual Highway Lane */
+.road-lane {
+  background: linear-gradient(90deg, #151f2e 0%, #1e2c3f 50%, #151f2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  user-select: none;
+  min-height: 58px;
+}
+
+.road-lane::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.25) 0, rgba(255, 255, 255, 0.25) 12px, transparent 12px, transparent 24px);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.road-lane:hover:not(.locked) {
+  border-color: var(--accent-cyan);
+  transform: scale(1.01);
+}
+
+/* Lane Multiplier Badge */
+.lane-badge {
+  background: rgba(9, 14, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 4px 10px;
+  border-radius: var(--border-radius-sm);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 900;
+  color: #94a3b8;
+  z-index: 2;
+}
+
+.lane-number {
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+/* Safe Cleared Lane */
+.road-lane.cleared {
+  background: linear-gradient(90deg, rgba(0, 245, 155, 0.15) 0%, rgba(0, 245, 155, 0.3) 50%, rgba(0, 245, 155, 0.15) 100%);
+  border-color: var(--accent-green);
+  box-shadow: 0 0 15px rgba(0, 245, 155, 0.3);
+}
+
+.road-lane.cleared .lane-badge {
+  background: var(--accent-green);
+  color: #06150e;
+  border-color: var(--accent-green);
+  box-shadow: 0 0 10px rgba(0, 245, 155, 0.6);
+}
+
+/* Active Current Hen Position Lane */
+.road-lane.active-hen-lane {
+  border: 2px solid var(--accent-gold);
+  box-shadow: 0 0 20px rgba(255, 183, 3, 0.5);
+  animation: pulseHenLane 1.5s infinite alternate;
+}
+
+@keyframes pulseHenLane {
+  from { border-color: rgba(255, 183, 3, 0.7); }
+  to { border-color: rgba(255, 183, 3, 1); }
+}
+
+/* Car Hazard Hit Lane */
+.road-lane.hazard-hit {
+  background: linear-gradient(90deg, rgba(255, 51, 102, 0.3) 0%, rgba(255, 51, 102, 0.5) 50%, rgba(255, 51, 102, 0.3) 100%);
+  border-color: var(--accent-red);
+  box-shadow: 0 0 25px rgba(255, 51, 102, 0.6);
+  animation: shakeHit 0.4s ease;
+}
+
+@keyframes shakeHit {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+/* Animated 3D Hen Character */
+.hen-character {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  animation: henIdle 1.2s infinite ease-in-out;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
+}
+
+.hen-character.hopping {
+  animation: henJump 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes henIdle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.04); }
+}
+
+@keyframes henJump {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-24px) scale(1.25) rotate(-6deg); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Speeding Car Obstacle Animation */
+.car-hazard-sprite {
+  position: absolute;
+  right: 15px;
+  animation: carZoom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  filter: drop-shadow(0 0 12px rgba(255, 51, 102, 0.8));
+  z-index: 4;
+}
+
+@keyframes carZoom {
+  0% { transform: translateX(120px) scale(0.6); opacity: 0; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+/* Start Curb & Finish Trophy Line */
+.road-start-curb, .road-finish-line {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-md);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.road-finish-line {
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.2), rgba(251, 133, 0, 0.1));
+  border: 1px solid rgba(255, 183, 3, 0.4);
+  color: #ffb703;
+}
+
+/* Bottom Action Bar for Chicken Game */
+.chicken-action-bar {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-chicken-go {
+  flex: 2;
+  height: 52px;
+  background: linear-gradient(135deg, #00f59b 0%, #00a86b 100%);
+  color: #06150e;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 5px 0 #14232d, 0 8px 16px rgba(0, 0, 0, 0.45);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, box-shadow 0.2s;
-  overflow: visible;
-  user-select: none;
-  aspect-ratio: 1 / 1;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(0, 245, 155, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Silver rim around plate */
-.dish-card::before {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  pointer-events: none;
+.btn-chicken-go:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 245, 155, 0.55);
 }
 
-.dish-card:hover:not(.revealed):not(.disabled) {
-  background: var(--bg-hover);
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 0 #14232d, 0 12px 20px rgba(0, 0, 0, 0.55), 0 0 15px rgba(245, 158, 11, 0.2);
+.btn-chicken-go:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
-.dish-card:active:not(.revealed):not(.disabled) {
-  transform: translateY(2px) scale(0.98);
-  box-shadow: 0 2px 0 #14232d, 0 3px 6px rgba(0, 0, 0, 0.4);
-}
-
-.dish-card.disabled {
-  cursor: default;
-  opacity: 0.85;
-}
-
-/* Cloche Dish Lid (Cover) */
-.dish-lid {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #475569 50%, #1e293b 100%);
-  border: 2px solid #cbd5e1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 4px 8px rgba(255, 255, 255, 0.3), inset 0 -4px 8px rgba(0, 0, 0, 0.6);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
-  z-index: 2;
-}
-
-/* Top knob on cloche lid */
-.dish-lid::after {
-  content: '';
-  width: 14px;
-  height: 14px;
-  background: radial-gradient(circle at 30% 30%, #ffffff, #94a3b8);
-  border-radius: 50%;
-  border: 1px solid #475569;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* Revealed dish state */
-.dish-card.revealed .dish-lid,
-.dish-card.opened .dish-lid {
-  transform: translateY(-36px) scale(0.3) rotate(20deg);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Dish Platter Content Under Lid */
-.dish-content {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-/* Roasted Chicken Drumstick */
-.chicken-drumstick-wrapper {
-  width: 70%;
-  height: 70%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: chicken-bounce 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.8));
-}
-
-.chicken-svg {
-  width: 100%;
-  height: 100%;
-}
-
-@keyframes chicken-bounce {
-  0% { transform: scale(0) rotate(-15deg); opacity: 0; }
-  65% { transform: scale(1.2) rotate(10deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0deg); opacity: 1; }
-}
-
-/* Bone Result */
-.bone-wrapper {
-  width: 65%;
-  height: 65%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: bone-shake 0.4s ease forwards;
-  filter: drop-shadow(0 0 10px rgba(148, 163, 184, 0.5));
-}
-
-.bone-svg {
-  width: 100%;
-  height: 100%;
-}
-
-@keyframes bone-shake {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1.15); opacity: 1; }
-  75% { transform: scale(1) rotate(-8deg); }
-  100% { transform: scale(1) rotate(0deg); opacity: 1; }
-}
-
-/* Dimmed remaining dishes */
-.dish-card.auto-revealed,
-.dish-card.auto-opened {
-  opacity: 0.55;
-  filter: grayscale(0.2);
+.btn-chicken-go:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }

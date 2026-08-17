@@ -119,7 +119,7 @@ class StockTradingGame {
     }, 200);
   }
 
-  placeTrade(direction, amount, durationSec = 30) {
+  async placeTrade(direction, amount, durationSec = 30) {
     amount = parseFloat(amount);
     if (isNaN(amount) || amount <= 0) return { success: false, msg: "Invalid amount" };
 
@@ -127,7 +127,34 @@ class StockTradingGame {
       return { success: false, msg: "Insufficient balance for this trade!" };
     }
 
-    window.wallet.deduct(amount);
+    try {
+      const telegramId = window.wallet.activeTelegramId || '78912345';
+      const apiBase = window.wallet.apiBaseUrl;
+      const res = await fetch(`${apiBase}/api/game/stock/bet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: telegramId,
+          direction: direction.toLowerCase(),
+          amount: amount,
+          entry_price: this.currentPrice
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.balance !== undefined) {
+          window.wallet.setServerBalance(data.balance);
+        } else {
+          window.wallet.deduct(amount);
+        }
+      } else {
+        window.wallet.deduct(amount);
+      }
+    } catch (e) {
+      window.wallet.deduct(amount);
+    }
+
     window.soundEngine.playBet();
 
     const trade = {

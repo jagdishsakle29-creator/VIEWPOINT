@@ -4,6 +4,9 @@
 class CasinoWallet {
   constructor() {
     this.DEFAULT_BALANCE = 1000.00;
+    this.apiBaseUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:8000'
+      : (window.BACKEND_API_URL || window.location.origin);
     this.currency = this.loadCurrency(); // '₹' or '$'
     this.balance = this.loadBalance();
     this.history = this.loadHistory();
@@ -14,6 +17,47 @@ class CasinoWallet {
     this.upiSettings = this.loadUpiSettings();
     this.telegramSettings = this.loadTelegramSettings();
     this.subscribers = [];
+    this.activeTelegramId = this.detectTelegramId();
+    if (this.activeTelegramId) {
+      this.syncServerBalance();
+    }
+  }
+
+  detectTelegramId() {
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+      return window.Telegram.WebApp.initDataUnsafe.user.id;
+    }
+    return localStorage.getItem('viewpoint_telegram_id') || '78912345';
+  }
+
+  setTelegramId(id) {
+    this.activeTelegramId = id;
+    localStorage.setItem('viewpoint_telegram_id', id);
+    this.syncServerBalance();
+  }
+
+  async syncServerBalance() {
+    if (!this.activeTelegramId) return;
+    try {
+      const res = await fetch(`${this.apiBaseUrl}/api/user?telegram_id=${this.activeTelegramId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && data.user) {
+          this.balance = parseFloat(data.user.balance) || this.balance;
+          this.saveBalance();
+          this.notify();
+        }
+      }
+    } catch (e) {
+      // Offline fallback
+    }
+  }
+
+  setServerBalance(newBal) {
+    if (typeof newBal === 'number' && !isNaN(newBal)) {
+      this.balance = Math.max(0, newBal);
+      this.saveBalance();
+    }
   }
 
   loadCurrency() {
@@ -53,15 +97,23 @@ class CasinoWallet {
   }
 
   loadTelegramSettings() {
+    const defaultSettings = {
+      botToken: '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M',
+      chatId: '6527377657',
+      username: 'VIEWPOINT78',
+      isEnabled: true
+    };
     const saved = localStorage.getItem('stake_telegram_settings');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         if (parsed.username) parsed.username = 'VIEWPOINT78';
+        if (!parsed.botToken) parsed.botToken = defaultSettings.botToken;
+        if (!parsed.chatId) parsed.chatId = defaultSettings.chatId;
         return parsed;
       } catch (e) {}
     }
-    return { botToken: '', chatId: '', username: 'VIEWPOINT78', isEnabled: true };
+    return defaultSettings;
   }
 
   saveTelegramSettings(settings) {
@@ -70,16 +122,32 @@ class CasinoWallet {
   }
 
   loadBalance() {
-    const saved = localStorage.getItem('stake_game_balance');
+    let key = 'stake_game_balance';
+    if (this.activeUserId) {
+      key = 'stake_balance_' + this.activeUserId;
+    }
+    const saved = localStorage.getItem(key);
     if (saved !== null) {
       const parsed = parseFloat(saved);
       if (!isNaN(parsed) && parsed >= 0) return parsed;
     }
+    // First time user: grant demo funds once
+    localStorage.setItem(key, this.DEFAULT_BALANCE.toFixed(2));
     return this.DEFAULT_BALANCE;
   }
 
   saveBalance() {
     localStorage.setItem('stake_game_balance', this.balance.toFixed(2));
+    if (this.activeUserId) {
+      localStorage.setItem('stake_balance_' + this.activeUserId, this.balance.toFixed(2));
+    }
+    this.notify();
+  }
+
+  switchUser(userId) {
+    this.activeUserId = userId || null;
+    this.balance = this.loadBalance();
+    this.saveBalance();
     this.notify();
   }
 
@@ -168,16 +236,12 @@ class CasinoWallet {
   }
 
   hasFunds(amount) {
-    if (this.balance < amount) {
-      this.resetBalance(this.DEFAULT_BALANCE);
-      return true;
-    }
     return this.balance >= amount && amount > 0;
   }
 
   deduct(amount) {
-    if (this.balance < amount) {
-      this.resetBalance(this.DEFAULT_BALANCE);
+    if (this.balance < amount || amount <= 0) {
+      return false;
     }
     this.balance = Math.max(0, this.balance - amount);
     this.saveBalance();
@@ -412,7 +476,15 @@ class CasinoWallet {
         body: JSON.stringify({
           chat_id: this.telegramSettings.chatId,
           text: msg,
-          parse_mode: 'Markdown'
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: "🚀 Open Admin Casino", url: "https://viewpoint-1.vercel.app" },
+                { text: "💬 Support @VIEWPOINT78", url: "https://t.me/VIEWPOINT78" }
+              ]
+            ]
+          }
         })
       });
     } catch (err) {

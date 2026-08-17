@@ -93,7 +93,7 @@ const ASSETS = {
 
 class AppController {
   constructor() {
-    this.currentGame = 'mines'; // 'mines', 'chicken', 'crash', 'colortrading', 'stock'
+    this.currentGame = 'chicken'; // 'chicken', 'mines', 'crash', 'colortrading', 'stock'
     this.soundEnabled = true;
     this.stockDurationSec = 30;
     this.selectedRating = 5;
@@ -319,22 +319,56 @@ class AppController {
       toastTagline: document.getElementById('toastTagline'),
       historyTableBody: document.getElementById('historyTableBody'),
 
+      // Page 0: Auth & Login Gate Elements
+      authGatePage: document.getElementById('authGatePage'),
+      gameDashboardWrapper: document.getElementById('gameDashboardWrapper'),
+      gateTabLogin: document.getElementById('gateTabLogin'),
+      gateTabRegister: document.getElementById('gateTabRegister'),
+      gateNameField: document.getElementById('gateNameField'),
+      gateInputName: document.getElementById('gateInputName'),
+      gateInputPhone: document.getElementById('gateInputPhone'),
+      gateInputPass: document.getElementById('gateInputPass'),
+      gateReferField: document.getElementById('gateReferField'),
+      gateInputRefer: document.getElementById('gateInputRefer'),
+      btnGateSubmit: document.getElementById('btnGateSubmit'),
+      btnGateSubmitText: document.getElementById('btnGateSubmitText'),
+
       // Auth & Refer Elements
       authLoggedOutBox: document.getElementById('authLoggedOutBox'),
       authLoggedInBox: document.getElementById('authLoggedInBox'),
       displayUsername: document.getElementById('displayUsername'),
       modalAuth: document.getElementById('modalAuth'),
-      authUsernameInput: document.getElementById('authUsernameInput'),
-      authPasswordInput: document.getElementById('authPasswordInput'),
+      authUsernameInput: document.getElementById('authInputPhone'),
+      authPasswordInput: document.getElementById('authInputPass'),
+      authInputName: document.getElementById('authInputName'),
       btnSubmitAuthText: document.getElementById('btnSubmitAuthText'),
       authModalTitle: document.getElementById('authModalTitle'),
       tabAuthLogin: document.getElementById('tabAuthLogin'),
-      tabAuthSignup: document.getElementById('tabAuthSignup'),
+      tabAuthSignup: document.getElementById('tabAuthRegister'),
       modalRefer: document.getElementById('modalRefer'),
       referralLinkInput: document.getElementById('referralLinkInput'),
       referTotalInvites: document.getElementById('referTotalInvites'),
       referTotalEarned: document.getElementById('referTotalEarned'),
       referUnclaimedBonus: document.getElementById('referUnclaimedBonus'),
+      btnClaimReferBonus: document.getElementById('btnClaimReferBonus'),
+      btnShareWhatsapp: document.getElementById('btnShareWhatsapp'),
+
+      // Auto Play Mode Elements
+      betModeToggleRow: document.getElementById('betModeToggleRow'),
+      btnModeManual: document.getElementById('btnModeManual'),
+      btnModeAuto: document.getElementById('btnModeAuto'),
+      autoPlaySettingsPanel: document.getElementById('autoPlaySettingsPanel'),
+      autoBetCountInput: document.getElementById('autoBetCountInput'),
+      autoBetCountHelper: document.getElementById('autoBetCountHelper'),
+      autoPicksGroup: document.getElementById('autoPicksGroup'),
+      autoPicksLabel: document.getElementById('autoPicksLabel'),
+      autoPicksCountInput: document.getElementById('autoPicksCountInput'),
+      autoPlayLiveStats: document.getElementById('autoPlayLiveStats'),
+      autoLiveRoundsText: document.getElementById('autoLiveRoundsText'),
+      autoLiveProfitText: document.getElementById('autoLiveProfitText'),
+      btnActionAutoStart: document.getElementById('btnActionAutoStart'),
+      btnAutoStartText: document.getElementById('btnAutoStartText'),
+      difficultyControlGroup: document.getElementById('difficultyControlGroup'),
 
       // Multi-Page & Page 2 Elements
       mainPage1: document.getElementById('mainPage1'),
@@ -347,10 +381,34 @@ class AppController {
       limboResultTag: document.getElementById('limboResultTag'),
       limboWinChance: document.getElementById('limboWinChance'),
       limboProfitDisplay: document.getElementById('limboProfitDisplay'),
+      btnLimboModeManual: document.getElementById('btnLimboModeManual'),
+      btnLimboModeAuto: document.getElementById('btnLimboModeAuto'),
+      limboAutoSettings: document.getElementById('limboAutoSettings'),
+      limboAutoCountInput: document.getElementById('limboAutoCountInput'),
+      limboAutoCountHelper: document.getElementById('limboAutoCountHelper'),
+      btnRollLimbo: document.getElementById('btnRollLimbo'),
+      btnAutoRollLimbo: document.getElementById('btnAutoRollLimbo'),
+      btnAutoLimboText: document.getElementById('btnAutoLimboText'),
       wheelCanvas: document.getElementById('wheelCanvas'),
       wheelStatusText: document.getElementById('wheelStatusText'),
+      wheelBadgeTag: document.getElementById('wheelBadgeTag'),
       btnSpinWheel: document.getElementById('btnSpinWheel'),
-      rakebackAmount: document.getElementById('rakebackAmount')
+      rakebackAmount: document.getElementById('rakebackAmount'),
+      btnClaimDaily: document.getElementById('btnClaimDaily'),
+      btnClaimRakeback: document.getElementById('btnClaimRakeback'),
+
+      // Withdrawal OTP Verification Elements
+      modalWithdrawOtp: document.getElementById('modalWithdrawOtp'),
+      otpPayoutAmount: document.getElementById('otpPayoutAmount'),
+      otpPayoutDestination: document.getElementById('otpPayoutDestination'),
+      otpMaskedPhone: document.getElementById('otpMaskedPhone'),
+      otpDigit1: document.getElementById('otpDigit1'),
+      otpDigit2: document.getElementById('otpDigit2'),
+      otpDigit3: document.getElementById('otpDigit3'),
+      otpDigit4: document.getElementById('otpDigit4'),
+      otpCountdownTimer: document.getElementById('otpCountdownTimer'),
+      btnResendWithdrawOtp: document.getElementById('btnResendWithdrawOtp'),
+      btnVerifyWithdrawOtp: document.getElementById('btnVerifyWithdrawOtp')
     };
 
     this.authMode = 'login';
@@ -358,6 +416,28 @@ class AppController {
     this.currentPage = 1;
     this.wheelSpinning = false;
     this.wheelAngle = 0;
+
+    // Withdrawal OTP State
+    this.generatedWithdrawOtp = null;
+    this.pendingWithdrawalPayload = null;
+    this.withdrawOtpTimer = null;
+    this.withdrawOtpSeconds = 45;
+
+    // Auto Play State
+    this.betMode = 'manual';
+    this.isAutoPlaying = false;
+    this.autoRoundsTotal = 10;
+    this.autoRoundsCompleted = 0;
+    this.autoSessionProfit = 0;
+    this.autoStepTimers = [];
+
+    // Limbo Auto State
+    this.limboMode = 'manual';
+    this.isLimboAutoPlaying = false;
+    this.limboAutoRoundsTotal = 10;
+    this.limboAutoRoundsCompleted = 0;
+    this.limboAutoSessionProfit = 0;
+    this.limboAutoTimer = null;
 
     this.initGames();
     this.bindEvents();
@@ -383,13 +463,14 @@ class AppController {
       onError: (msg) => this.showNotification(msg, 'error')
     });
 
-    // 2. Chicken Game Instance
+    // 2. Chicken Road Crossing Highway Game Instance
     this.chicken = new window.ChickenGame({
-      onMultiplierUpdate: (data) => this.onGameMultiplierUpdate(data),
-      onGameStart: (data) => this.onGameStarted(data),
-      onDishReveal: (index, type, isBone) => this.onChickenDishReveal(index, type, isBone),
-      onRevealRemaining: (index, type) => this.onChickenRevealRemaining(index, type),
-      onGameOver: (result) => this.onGameOverResult(result),
+      onMultiplierUpdate: (data) => this.onChickenMultiplierUpdate(data),
+      onGameStart: (data) => this.onChickenGameStart(data),
+      onHopAnimation: (lane) => this.onChickenHopAnimation(lane),
+      onSafeHop: (data) => this.onChickenSafeHop(data),
+      onCarHit: (data) => this.onChickenCarHit(data),
+      onCashOut: (data) => this.onChickenCashOut(data),
       onError: (msg) => this.showNotification(msg, 'error')
     });
 
@@ -398,8 +479,13 @@ class AppController {
       this.crash = new window.CrashGame(this.dom.crashCanvas, {
         onGameStart: (data) => {
           this.dom.btnActionBet.style.display = 'none';
-          this.dom.btnActionCashout.style.display = 'flex';
-          this.dom.btnActionCashout.disabled = false;
+          if (this.betMode === 'auto') {
+            if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+            this.dom.btnActionCashout.style.display = 'none';
+          } else {
+            this.dom.btnActionCashout.style.display = 'flex';
+            this.dom.btnActionCashout.disabled = false;
+          }
           this.dom.betAmountInput.disabled = true;
           this.dom.crashStatusTag.innerText = "FLYING...";
           this.dom.crashMultiplierText.classList.remove('crashed');
@@ -411,16 +497,30 @@ class AppController {
           this.dom.cashoutMultiplierDisplay.innerText = `${mult.toFixed(2)}x`;
         },
         onCashout: (res) => {
-          this.dom.btnActionBet.style.display = 'flex';
+          if (this.betMode === 'auto') {
+            this.dom.btnActionBet.style.display = 'none';
+            if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+          } else {
+            this.dom.btnActionBet.style.display = 'flex';
+          }
           this.dom.btnActionCashout.style.display = 'none';
-          this.dom.betAmountInput.disabled = false;
+          if (!this.isAutoPlaying) this.dom.betAmountInput.disabled = false;
           this.showToast({ won: true, payout: res.payout, multiplier: res.multiplier });
           this.renderHistoryTable();
+
+          if (this.isAutoPlaying) {
+            this.handleAutoRoundCompleted({ won: true, payout: res.payout, multiplier: res.multiplier });
+          }
         },
         onCrash: (res) => {
-          this.dom.btnActionBet.style.display = 'flex';
+          if (this.betMode === 'auto') {
+            this.dom.btnActionBet.style.display = 'none';
+            if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+          } else {
+            this.dom.btnActionBet.style.display = 'flex';
+          }
           this.dom.btnActionCashout.style.display = 'none';
-          this.dom.betAmountInput.disabled = false;
+          if (!this.isAutoPlaying) this.dom.betAmountInput.disabled = false;
           this.dom.crashMultiplierText.classList.add('crashed');
           this.dom.crashMultiplierText.innerText = `${res.crashPoint.toFixed(2)}x`;
           this.dom.crashStatusTag.innerText = "CRASHED!";
@@ -429,6 +529,10 @@ class AppController {
             this.showToast({ won: false, payout: 0, multiplier: 0 });
           }
           this.renderHistoryTable();
+
+          if (this.isAutoPlaying) {
+            this.handleAutoRoundCompleted({ won: res.hasCashedOut, payout: res.hasCashedOut ? res.payout : 0, multiplier: res.crashPoint });
+          }
         },
         onError: (msg) => this.showNotification(msg, 'error')
       });
@@ -497,18 +601,21 @@ class AppController {
     this.activeInstance = this.mines;
     this.activeInstance.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
     this.activeInstance.setMineCount(parseInt(this.dom.minesCountSelect.value) || 3);
+    this.renderHighwayLanes();
   }
 
   bindEvents() {
     // Wallet Subscription
     window.wallet.subscribe((balance, currency) => this.updateWalletUI(balance, currency));
 
-    // Reset Wallet
-    this.dom.btnResetWallet.addEventListener('click', () => {
-      window.soundEngine.playClick();
-      window.wallet.resetBalance(1000.00);
-      this.showNotification(`Balance reset to ${window.wallet.currency}1,000.00 demo funds!`, "success");
-    });
+    // Reset Wallet (if present)
+    if (this.dom.btnResetWallet) {
+      this.dom.btnResetWallet.addEventListener('click', () => {
+        window.soundEngine.playClick();
+        window.wallet.resetBalance(1000.00);
+        this.showNotification(`Balance reset to ${window.wallet.currency}1,000.00 demo funds!`, "success");
+      });
+    }
 
     // Sound Toggle
     if (this.dom.btnSoundToggle) {
@@ -867,11 +974,14 @@ class AppController {
     }
 
     // Game Tabs
-    this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
     this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
+    this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
     this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
     this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
     if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
+
+    // Default active game is Chicken Road Highway
+    this.switchGame('chicken');
 
     // Bet Amount Input
     this.dom.betAmountInput.addEventListener('input', () => {
@@ -1029,9 +1139,10 @@ class AppController {
     // Stock Call & Put Actions
     if (this.dom.btnStockCall) {
       this.dom.btnStockCall.addEventListener('click', () => {
-        const amount = parseFloat(this.dom.betAmountInput.value) || 10;
+        const stockInput = document.getElementById('stockBetAmountInput');
+        const amount = parseFloat(stockInput ? stockInput.value : (this.dom.betAmountInput ? this.dom.betAmountInput.value : 50)) || 50;
         if (this.stock) {
-          const res = this.stock.placeTrade('CALL', amount, this.stockDurationSec);
+          const res = this.stock.placeTrade('CALL', amount, this.stockDurationSec || 30);
           if (!res.success) this.showNotification(res.msg, 'error');
         }
       });
@@ -1039,9 +1150,10 @@ class AppController {
 
     if (this.dom.btnStockPut) {
       this.dom.btnStockPut.addEventListener('click', () => {
-        const amount = parseFloat(this.dom.betAmountInput.value) || 10;
+        const stockInput = document.getElementById('stockBetAmountInput');
+        const amount = parseFloat(stockInput ? stockInput.value : (this.dom.betAmountInput ? this.dom.betAmountInput.value : 50)) || 50;
         if (this.stock) {
-          const res = this.stock.placeTrade('PUT', amount, this.stockDurationSec);
+          const res = this.stock.placeTrade('PUT', amount, this.stockDurationSec || 30);
           if (!res.success) this.showNotification(res.msg, 'error');
         }
       });
@@ -1520,36 +1632,452 @@ class AppController {
       } catch(e) {}
     }
 
-    const withdrawReq = window.wallet.submitWithdrawRequest(withdrawPayload);
-    if (withdrawReq) {
-      window.soundEngine.playCashout();
-      this.dom.modalWithdraw.classList.remove('open');
-      this.updateAdminBadges();
-      this.showNotification(`💸 Withdrawal request of ${window.wallet.currency}${amount.toFixed(2)} (${this.selectedWithdrawMethod}) submitted! Dispatching in 5-15 mins.`, "success");
+    // Initiate 4-Digit Security OTP Verification Step
+    this.pendingWithdrawalPayload = withdrawPayload;
+    this.openWithdrawOtpModal(withdrawPayload);
+  }
+
+  // ================= WITHDRAWAL OTP VERIFICATION SYSTEM =================
+  openWithdrawOtpModal(payload) {
+    if (this.dom.modalWithdraw) this.dom.modalWithdraw.classList.remove('open');
+    
+    // Generate dynamic 4-digit security OTP
+    this.generatedWithdrawOtp = (Math.floor(1000 + Math.random() * 9000)).toString();
+    const userPhone = (this.currentUser && this.currentUser.phone) || '9876543210';
+    const maskedPhone = `+91 ${userPhone.slice(0, 2)}****${userPhone.slice(-4)}`;
+
+    if (this.dom.otpPayoutAmount) this.dom.otpPayoutAmount.innerText = `₹${payload.amount.toFixed(2)}`;
+    if (this.dom.otpPayoutDestination) this.dom.otpPayoutDestination.innerText = `${payload.channel}: ${payload.receiver}`;
+    if (this.dom.otpMaskedPhone) this.dom.otpMaskedPhone.innerText = maskedPhone;
+
+    // Reset OTP inputs
+    ['otpDigit1', 'otpDigit2', 'otpDigit3', 'otpDigit4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+
+    if (this.dom.modalWithdrawOtp) this.dom.modalWithdrawOtp.classList.add('open');
+
+    // Auto-focus first digit
+    setTimeout(() => {
+      const d1 = document.getElementById('otpDigit1');
+      if (d1) d1.focus();
+    }, 150);
+
+    // Start 45s countdown
+    this.withdrawOtpSeconds = 45;
+    if (this.withdrawOtpTimer) clearInterval(this.withdrawOtpTimer);
+    if (this.dom.otpCountdownTimer) this.dom.otpCountdownTimer.innerText = this.withdrawOtpSeconds;
+    this.withdrawOtpTimer = setInterval(() => {
+      this.withdrawOtpSeconds--;
+      if (this.dom.otpCountdownTimer) this.dom.otpCountdownTimer.innerText = Math.max(0, this.withdrawOtpSeconds);
+      if (this.withdrawOtpSeconds <= 0) {
+        clearInterval(this.withdrawOtpTimer);
+      }
+    }, 1000);
+
+    // Live Toast notification simulating mobile SMS OTP
+    this.showNotification(`📲 Withdrawal OTP: ${this.generatedWithdrawOtp} (Sent to ${maskedPhone})`, "info");
+  }
+
+  closeWithdrawOtpModal() {
+    if (this.dom.modalWithdrawOtp) this.dom.modalWithdrawOtp.classList.remove('open');
+    if (this.withdrawOtpTimer) clearInterval(this.withdrawOtpTimer);
+  }
+
+  handleOtpDigitInput(digitIndex, inputEl) {
+    if (inputEl.value && inputEl.value.length >= 1) {
+      inputEl.value = inputEl.value.slice(-1); // Keep single digit
+      if (digitIndex < 4) {
+        const next = document.getElementById(`otpDigit${digitIndex + 1}`);
+        if (next) next.focus();
+      } else if (digitIndex === 4) {
+        // Auto verify when 4th digit entered
+        setTimeout(() => this.verifyWithdrawOtpAndSubmit(), 120);
+      }
     }
   }
 
-  // ================= AUTH & REFER SYSTEM =================
-  initAuthAndRefer() {
+  resendWithdrawOtp() {
+    if (this.withdrawOtpSeconds > 0) {
+      this.showNotification(`Please wait ${this.withdrawOtpSeconds}s before requesting a new OTP.`, "info");
+      return;
+    }
+    this.generatedWithdrawOtp = (Math.floor(1000 + Math.random() * 9000)).toString();
+    const userPhone = (this.currentUser && this.currentUser.phone) || '9876543210';
+    const maskedPhone = `+91 ${userPhone.slice(0, 2)}****${userPhone.slice(-4)}`;
+
+    this.withdrawOtpSeconds = 45;
+    if (this.dom.otpCountdownTimer) this.dom.otpCountdownTimer.innerText = this.withdrawOtpSeconds;
+    if (this.withdrawOtpTimer) clearInterval(this.withdrawOtpTimer);
+    this.withdrawOtpTimer = setInterval(() => {
+      this.withdrawOtpSeconds--;
+      if (this.dom.otpCountdownTimer) this.dom.otpCountdownTimer.innerText = Math.max(0, this.withdrawOtpSeconds);
+      if (this.withdrawOtpSeconds <= 0) {
+        clearInterval(this.withdrawOtpTimer);
+      }
+    }, 1000);
+
+    this.showNotification(`📲 New Withdrawal OTP: ${this.generatedWithdrawOtp} (Sent to ${maskedPhone})`, "info");
+  }
+
+  verifyWithdrawOtpAndSubmit() {
+    const d1 = (document.getElementById('otpDigit1')?.value || '').trim();
+    const d2 = (document.getElementById('otpDigit2')?.value || '').trim();
+    const d3 = (document.getElementById('otpDigit3')?.value || '').trim();
+    const d4 = (document.getElementById('otpDigit4')?.value || '').trim();
+    const enteredOtp = d1 + d2 + d3 + d4;
+
+    if (enteredOtp.length < 4) {
+      this.showNotification("Please enter the complete 4-digit OTP code!", "error");
+      return;
+    }
+
+    if (enteredOtp !== this.generatedWithdrawOtp) {
+      this.showNotification("❌ Invalid OTP entered! Please check the code and try again.", "error");
+      return;
+    }
+
+    // OTP Verified successfully!
+    this.closeWithdrawOtpModal();
+    if (!this.pendingWithdrawalPayload) return;
+
+    const withdrawReq = window.wallet.submitWithdrawRequest(this.pendingWithdrawalPayload);
+    if (withdrawReq) {
+      window.soundEngine.playCashout();
+      this.updateAdminBadges();
+      this.showNotification(`💸 Withdrawal of ${window.wallet.currency}${this.pendingWithdrawalPayload.amount.toFixed(2)} (${this.pendingWithdrawalPayload.channel}) verified with OTP & submitted! Dispatching in 5-15 mins.`, "success");
+      this.pendingWithdrawalPayload = null;
+      this.generatedWithdrawOtp = null;
+    }
+  }
+
+  // ================= USER DATABASE & AUTHENTICATION SYSTEM =================
+  loadRegisteredUsers() {
     try {
+      const data = localStorage.getItem('stake_registered_users');
+      if (data) return JSON.parse(data);
+    } catch(e) {}
+    // Default seed account for testing
+    const defaultDB = {
+      "9876543210": {
+        phone: "9876543210",
+        username: "Rahul Sharma",
+        password: "1234",
+        referral: "VP7821",
+        authProvider: "mobile",
+        createdAt: new Date().toISOString()
+      }
+    };
+    try {
+      localStorage.setItem('stake_registered_users', JSON.stringify(defaultDB));
+    } catch(e) {}
+    return defaultDB;
+  }
+
+  saveRegisteredUser(userObj) {
+    const db = this.loadRegisteredUsers();
+    db[userObj.phone] = userObj;
+    try {
+      localStorage.setItem('stake_registered_users', JSON.stringify(db));
+    } catch(e) {}
+  }
+
+  findUser(identifier) {
+    if (!identifier) return null;
+    const db = this.loadRegisteredUsers();
+    if (db[identifier]) return db[identifier];
+    // Also search by username, phone, userId or email
+    const idLower = identifier.toString().toLowerCase();
+    const users = Object.values(db);
+    return users.find(u => 
+      (u.phone && u.phone === identifier) || 
+      (u.userId && u.userId.toLowerCase() === idLower) ||
+      (u.username && u.username.toLowerCase() === idLower) || 
+      (u.email && u.email.toLowerCase() === idLower)
+    );
+  }
+
+  initAuthAndRefer() {
+    this.gateAuthMode = 'login';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const tgUserIdFromUrl = urlParams.get('tg_user_id') || urlParams.get('tg_user') || urlParams.get('user_id');
+
+    // 1. Check Telegram WebApp environment
+    try {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
+
+        const tgUser = tg.initDataUnsafe && tg.initDataUnsafe.user;
+        if (tgUser && tgUser.id) {
+          const tgUsername = tgUser.username ? `@${tgUser.username}` : (tgUser.first_name || `TG_User_${tgUser.id}`);
+          const tgName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') || tgUsername;
+          
+          this.currentUser = {
+            id: 'TG-' + tgUser.id,
+            telegramId: tgUser.id,
+            username: tgUsername,
+            name: tgName,
+            phone: 'TG-' + tgUser.id,
+            role: 'VIP Member',
+            isTelegramUser: true,
+            photoUrl: tgUser.photo_url || ''
+          };
+          localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
+          if (window.wallet && window.wallet.setTelegramId) {
+            window.wallet.setTelegramId(tgUser.id);
+          }
+        }
+      }
+    } catch(err) {
+      console.warn("Telegram WebApp detection error:", err);
+    }
+
+    // 2. Check URL query params
+    if (!this.currentUser && tgUserIdFromUrl) {
+      this.currentUser = {
+        id: 'TG-' + tgUserIdFromUrl,
+        telegramId: tgUserIdFromUrl,
+        username: `@Player_${String(tgUserIdFromUrl).slice(-4)}`,
+        name: `Player ${String(tgUserIdFromUrl).slice(-4)}`,
+        phone: 'TG-' + tgUserIdFromUrl,
+        role: 'VIP Member',
+        isTelegramUser: true
+      };
+      localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
+      if (window.wallet && window.wallet.setTelegramId) {
+        window.wallet.setTelegramId(tgUserIdFromUrl);
+      }
+    }
+
+    // 3. Check existing saved user session
+    if (!this.currentUser) {
       const savedUser = localStorage.getItem('stake_user_auth');
       if (savedUser) {
-        this.currentUser = JSON.parse(savedUser);
+        try {
+          this.currentUser = JSON.parse(savedUser);
+        } catch(e) {}
       }
-    } catch(e) {}
+    }
+
+    // 4. Auto-create VIP Player so no user is ever stuck on authorization screen
+    if (!this.currentUser) {
+      const randomId = Math.floor(1000 + Math.random() * 9000);
+      this.currentUser = {
+        id: 'VIP-' + randomId,
+        username: `VIP_Player_${randomId}`,
+        name: `VIP Player ${randomId}`,
+        phone: '98' + Math.floor(10000000 + Math.random() * 90000000),
+        role: 'VIP Member',
+        isGuest: false
+      };
+      localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
+    }
+
     this.syncAuthUI();
   }
 
   syncAuthUI() {
-    if (!this.dom.authLoggedOutBox || !this.dom.authLoggedInBox) return;
-    if (this.currentUser && this.currentUser.username) {
-      this.dom.authLoggedOutBox.style.display = 'none';
-      this.dom.authLoggedInBox.style.display = 'flex';
-      this.dom.displayUsername.innerText = this.currentUser.username;
-    } else {
-      this.dom.authLoggedOutBox.style.display = 'flex';
-      this.dom.authLoggedInBox.style.display = 'none';
+    const isLoggedIn = !!(this.currentUser && this.currentUser.username);
+
+    // Switch wallet balance to active user
+    if (window.wallet && window.wallet.switchUser) {
+      const activeId = isLoggedIn ? (this.currentUser.phone || this.currentUser.username) : null;
+      window.wallet.switchUser(activeId);
     }
+
+    // Gate Page (Page 0) vs Game Dashboard (Page 1 & 2)
+    if (this.dom.authGatePage) {
+      if (isLoggedIn) {
+        this.dom.authGatePage.style.display = 'none';
+        this.dom.authGatePage.classList.add('hidden');
+      } else {
+        this.dom.authGatePage.style.display = 'flex';
+        this.dom.authGatePage.classList.remove('hidden');
+      }
+    }
+
+    if (this.dom.gameDashboardWrapper) {
+      this.dom.gameDashboardWrapper.style.display = isLoggedIn ? 'block' : 'none';
+    }
+
+    // Top Navbar Profile Badges
+    if (this.dom.authLoggedOutBox && this.dom.authLoggedInBox) {
+      if (isLoggedIn) {
+        this.dom.authLoggedOutBox.style.display = 'none';
+        this.dom.authLoggedInBox.style.display = 'flex';
+        if (this.dom.displayUsername) this.dom.displayUsername.innerText = this.currentUser.username;
+      } else {
+        this.dom.authLoggedOutBox.style.display = 'flex';
+        this.dom.authLoggedInBox.style.display = 'none';
+      }
+    }
+  }
+
+  switchGateAuthTab(type) {
+    window.soundEngine.playClick();
+    this.gateAuthMode = type;
+    if (this.dom.gateTabLogin) this.dom.gateTabLogin.classList.toggle('active', type === 'login');
+    if (this.dom.gateTabRegister) this.dom.gateTabRegister.classList.toggle('active', type === 'register');
+
+    if (type === 'register') {
+      if (this.dom.gateNameField) this.dom.gateNameField.style.display = 'flex';
+      if (this.dom.gateReferField) this.dom.gateReferField.style.display = 'flex';
+      if (this.dom.btnGateSubmitText) this.dom.btnGateSubmitText.innerText = "✨ CREATE VIP ACCOUNT & PLAY";
+    } else {
+      if (this.dom.gateNameField) this.dom.gateNameField.style.display = 'none';
+      if (this.dom.gateReferField) this.dom.gateReferField.style.display = 'none';
+      if (this.dom.btnGateSubmitText) this.dom.btnGateSubmitText.innerText = "🚀 LOGIN & ENTER CASINO";
+    }
+  }
+
+  fillDemoCredentials() {
+    window.soundEngine.playClick();
+    this.switchGateAuthTab('login');
+    if (this.dom.gateInputPhone) this.dom.gateInputPhone.value = '9876543210';
+    if (this.dom.gateInputPass) this.dom.gateInputPass.value = '1234';
+    this.showNotification("💡 Demo account filled: 9876543210 / 1234. Click 'LOGIN & ENTER CASINO'!", "info");
+  }
+
+  submitGateAuth() {
+    const phone = (this.dom.gateInputPhone && this.dom.gateInputPhone.value.trim()) || '';
+    const pass = (this.dom.gateInputPass && this.dom.gateInputPass.value.trim()) || '';
+    const name = (this.dom.gateInputName && this.dom.gateInputName.value.trim()) || '';
+    const refer = (this.dom.gateInputRefer && this.dom.gateInputRefer.value.trim()) || '';
+
+    if (!phone || phone.length < 4) {
+      this.showNotification("Please enter a valid Mobile Number or User ID!", "error");
+      return;
+    }
+    if (!pass || pass.length < 4) {
+      this.showNotification("Password/PIN must be at least 4 digits!", "error");
+      return;
+    }
+
+    if (this.gateAuthMode === 'register') {
+      // Sign Up: Validate uniqueness & save user data
+      const existing = this.findUser(phone);
+      if (existing) {
+        this.showNotification("⚠️ An account already exists! Please switch to 'Login'.", "error");
+        return;
+      }
+
+      const isMobile = /^\d{10}$/.test(phone);
+      const username = name || (isMobile ? `Player_${phone.slice(-4)}` : phone);
+      const newUser = {
+        username: username,
+        phone: isMobile ? phone : ('98' + Math.floor(10000000 + Math.random() * 90000000)),
+        userId: phone,
+        password: pass,
+        referral: refer || 'VP7821',
+        authProvider: 'mobile',
+        createdAt: new Date().toISOString(),
+        loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isGuest: false
+      };
+
+      this.saveRegisteredUser(newUser);
+      this.currentUser = newUser;
+      localStorage.setItem('stake_user_auth', JSON.stringify(newUser));
+      this.syncAuthUI();
+      window.soundEngine.playCashout();
+      this.showNotification(`✨ Account created successfully! Welcome to VIEWPOINT, ${username}.`, "success");
+
+    } else {
+      // Login: Verify account exists and password matches
+      const user = this.findUser(phone);
+      if (!user) {
+        // Show prominent notice banner and auto-switch to Create Account tab
+        const banner = document.getElementById('gateMessageBanner');
+        const bannerText = document.getElementById('gateMessageBannerText');
+        if (banner && bannerText) {
+          bannerText.innerHTML = `⚠️ <strong>Account Not Found!</strong> Mobile number <code>${phone}</code> register nahi hai.<br>Kripya apna naam daal kar naya VIP account banayein.`;
+          banner.style.display = 'block';
+        }
+
+        this.showNotification("⚠️ Account nahi mila! Kripya pehle naya account banayein.", "error");
+        
+        // Auto-switch to Create Account tab while keeping their phone & pass filled
+        this.switchGateAuthTab('register');
+        if (this.dom.gateInputPhone) this.dom.gateInputPhone.value = phone;
+        if (this.dom.gateInputPass) this.dom.gateInputPass.value = pass;
+        if (this.dom.gateInputName) this.dom.gateInputName.focus();
+        return;
+      }
+
+      if (user.password !== pass) {
+        this.showNotification("❌ Incorrect Password or PIN! Please try again.", "error");
+        return;
+      }
+
+      user.loginTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      this.currentUser = user;
+      localStorage.setItem('stake_user_auth', JSON.stringify(user));
+      this.syncAuthUI();
+      window.soundEngine.playCashout();
+      this.showNotification(`🎉 Welcome back, ${user.username}! Logged in successfully.`, "success");
+    }
+
+    if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
+    if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
+  }
+
+  handleSocialLogin(provider) {
+    window.soundEngine.playClick();
+    const providerName = provider === 'google' ? 'Google' : 'Facebook';
+    
+    // Create/retrieve social user profile
+    const socialPhone = provider === 'google' ? '9888' + Math.floor(100000 + Math.random() * 900000) : '9777' + Math.floor(100000 + Math.random() * 900000);
+    const socialName = provider === 'google' ? 'Google Player' : 'Facebook Player';
+    const email = provider === 'google' ? 'user@gmail.com' : 'user@facebook.com';
+
+    let user = this.findUser(email) || this.findUser(socialPhone);
+    if (!user) {
+      user = {
+        username: socialName,
+        phone: socialPhone,
+        email: email,
+        password: 'social_login',
+        referral: 'VP7821',
+        authProvider: provider,
+        createdAt: new Date().toISOString(),
+        loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isGuest: false
+      };
+      this.saveRegisteredUser(user);
+    }
+
+    this.currentUser = user;
+    localStorage.setItem('stake_user_auth', JSON.stringify(user));
+    this.syncAuthUI();
+    if (this.dom.modalAuth) this.dom.modalAuth.classList.remove('open');
+    window.soundEngine.playCashout();
+    this.showNotification(`🌐 Connected via ${providerName}: ${user.username}! Logged in successfully.`, "success");
+
+    if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
+    if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
+  }
+
+  handleGateGuestLogin() {
+    window.soundEngine.playClick();
+    const guestName = 'Guest_' + Math.floor(1000 + Math.random() * 9000);
+    this.currentUser = {
+      username: guestName,
+      phone: '989800' + Math.floor(1000 + Math.random() * 9000),
+      loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isGuest: true
+    };
+    localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
+    this.syncAuthUI();
+    window.soundEngine.playCashout();
+    this.showNotification(`⚡ Instant Guest Access: ${guestName}! Enjoy Demo Games.`, "success");
+
+    if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
+    if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
   }
 
   openAuthModal(type = 'login') {
@@ -1564,11 +2092,13 @@ class AppController {
 
   switchAuthTab(type) {
     window.soundEngine.playClick();
-    this.authMode = type;
-    if (this.dom.tabAuthLogin) this.dom.tabAuthLogin.classList.toggle('active', type === 'login');
-    if (this.dom.tabAuthSignup) this.dom.tabAuthSignup.classList.toggle('active', type === 'signup');
-    if (this.dom.authModalTitle) this.dom.authModalTitle.innerText = type === 'login' ? 'Member Login' : 'Create VIP Account';
-    if (this.dom.btnSubmitAuthText) this.dom.btnSubmitAuthText.innerText = type === 'login' ? 'Login to VIEWPOINT' : 'Create & Join Now';
+    this.authMode = (type === 'register' || type === 'signup') ? 'signup' : 'login';
+    if (this.dom.tabAuthLogin) this.dom.tabAuthLogin.classList.toggle('active', this.authMode === 'login');
+    if (this.dom.tabAuthSignup) this.dom.tabAuthSignup.classList.toggle('active', this.authMode === 'signup');
+    const nameField = document.getElementById('authNameField');
+    if (nameField) nameField.style.display = this.authMode === 'signup' ? 'block' : 'none';
+    if (this.dom.authModalTitle) this.dom.authModalTitle.innerText = this.authMode === 'login' ? 'Member Login' : 'Create VIP Account';
+    if (this.dom.btnSubmitAuthText) this.dom.btnSubmitAuthText.innerText = this.authMode === 'login' ? 'Login to VIEWPOINT' : 'Create & Join Now';
   }
 
   submitAuthForm() {
@@ -1583,23 +2113,57 @@ class AppController {
       return;
     }
 
-    this.currentUser = {
-      username: uname,
-      loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isGuest: false
-    };
+    if (this.authMode === 'signup') {
+      const existing = this.findUser(uname);
+      if (existing) {
+        this.showNotification("⚠️ An account already exists! Please Login.", "error");
+        return;
+      }
+      const newUser = {
+        username: uname,
+        phone: uname.length === 10 && /^\d+$/.test(uname) ? uname : '98' + Math.floor(10000000 + Math.random() * 90000000),
+        password: pwd,
+        referral: 'VP7821',
+        authProvider: 'mobile',
+        createdAt: new Date().toISOString(),
+        loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isGuest: false
+      };
+      this.saveRegisteredUser(newUser);
+      this.currentUser = newUser;
+      localStorage.setItem('stake_user_auth', JSON.stringify(newUser));
+      this.syncAuthUI();
+      this.closeAuthModal();
+      window.soundEngine.playCashout();
+      this.showNotification(`✨ Account created successfully! Welcome ${uname}`, "success");
+    } else {
+      const user = this.findUser(uname);
+      if (!user) {
+        this.showNotification("❌ Account not found! Please Sign Up first.", "error");
+        return;
+      }
+      if (user.password !== pwd) {
+        this.showNotification("❌ Incorrect Password or PIN!", "error");
+        return;
+      }
+      user.loginTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      this.currentUser = user;
+      localStorage.setItem('stake_user_auth', JSON.stringify(user));
+      this.syncAuthUI();
+      this.closeAuthModal();
+      window.soundEngine.playCashout();
+      this.showNotification(`🎉 Welcome back, ${uname}! Logged in successfully.`, "success");
+    }
 
-    localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
-    this.syncAuthUI();
-    this.closeAuthModal();
-    window.soundEngine.playCashout();
-    this.showNotification(`🎉 Welcome ${uname}! Logged in successfully.`, "success");
+    if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
+    if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
   }
 
   handleGuestLogin() {
     const guestName = 'Player_' + Math.floor(1000 + Math.random() * 9000);
     this.currentUser = {
       username: guestName,
+      phone: '989800' + Math.floor(1000 + Math.random() * 9000),
       loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isGuest: true
     };
@@ -1608,6 +2172,9 @@ class AppController {
     this.closeAuthModal();
     window.soundEngine.playCashout();
     this.showNotification(`⚡ Playing as Guest: ${guestName}`, "success");
+
+    if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
+    if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
   }
 
   logoutUser() {
@@ -1615,7 +2182,7 @@ class AppController {
     this.currentUser = null;
     localStorage.removeItem('stake_user_auth');
     this.syncAuthUI();
-    this.showNotification("Logged out successfully.", "info");
+    this.showNotification("Logged out successfully. Please Login or Sign Up.", "info");
   }
 
   // Refer & Earn Modal
@@ -1635,16 +2202,30 @@ class AppController {
     this.showNotification("📋 Referral link copied to clipboard!", "success");
   }
 
+  shareReferralWhatsapp() {
+    window.soundEngine.playClick();
+    const link = (this.dom.referralLinkInput && this.dom.referralLinkInput.value) || "https://viewpoint.games/?ref=VP7821";
+    const text = `Play & win on VIEWPOINT Casino! Mines, Crash, Color Trading & Stock. Join now: ${link}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+  }
+
   claimReferralBonus() {
+    const unclaimed = parseFloat(localStorage.getItem('stake_refer_unclaimed') || '0.00');
+    if (unclaimed < 50) {
+      this.showNotification("Minimum ₹50.00 commission required to claim.", "error");
+      return;
+    }
     window.soundEngine.playCashout();
-    const bonus = 350.00;
-    window.wallet.addWin(bonus);
+    window.wallet.addWin(unclaimed);
+    localStorage.setItem('stake_refer_unclaimed', '0.00');
     if (this.dom.referUnclaimedBonus) this.dom.referUnclaimedBonus.innerText = "₹0.00";
     if (this.dom.btnClaimReferBonus) {
       this.dom.btnClaimReferBonus.disabled = true;
-      this.dom.btnClaimReferBonus.innerText = "✅ Bonus Claimed to Wallet!";
+      this.dom.btnClaimReferBonus.innerText = "💰 No Unclaimed Commission (Min ₹50.00)";
+      this.dom.btnClaimReferBonus.style.opacity = '0.6';
+      this.dom.btnClaimReferBonus.style.cursor = 'not-allowed';
     }
-    this.showNotification(`🎉 Claimed ₹${bonus.toFixed(2)} referral bonus to your game wallet!`, "success");
+    this.showNotification(`🎉 Claimed ₹${unclaimed.toFixed(2)} referral commission!`, "success");
   }
 
   // ================= MULTI-PAGE SWITCHER =================
@@ -1658,8 +2239,26 @@ class AppController {
     if (this.dom.mainPage2) this.dom.mainPage2.style.display = pageNumber === 2 ? 'block' : 'none';
 
     if (pageNumber === 2) {
+      this.renderHighwayLanes();
+      if (this.stock) {
+        setTimeout(() => {
+          this.stock.resizeCanvas();
+        }, 50);
+      }
       this.drawLuckyWheel(this.wheelAngle || 0);
       this.updateLimboProb();
+      this.checkWheelDailyAvailability();
+      this.checkDailyClaimAvailability();
+      this.updateVipRakebackUI();
+    }
+  }
+
+  handleStockTrade(type) {
+    const stockInput = document.getElementById('stockBetAmountInput');
+    const amount = parseFloat(stockInput ? stockInput.value : 50) || 50;
+    if (this.stock) {
+      const res = this.stock.placeTrade(type === 'call' ? 'CALL' : 'PUT', amount, this.stockDurationSec || 30);
+      if (!res.success) this.showNotification(res.msg, 'error');
     }
   }
 
@@ -1667,6 +2266,17 @@ class AppController {
   initPage2Arcade() {
     this.updateLimboProb();
     this.drawLuckyWheel(0);
+    this.checkWheelDailyAvailability();
+    this.checkDailyClaimAvailability();
+    this.updateVipRakebackUI();
+
+    // Check countdowns every 30s
+    setInterval(() => {
+      if (this.currentPage === 2) {
+        this.checkWheelDailyAvailability();
+        this.checkDailyClaimAvailability();
+      }
+    }, 30000);
   }
 
   updateLimboProb() {
@@ -1738,6 +2348,7 @@ class AppController {
     }
 
     this.renderHistoryTable();
+    this.updateVipRakebackUI();
   }
 
   // Draw Fortune Wheel on HTML Canvas
@@ -1755,14 +2366,14 @@ class AppController {
     ctx.clearRect(0, 0, w, h);
 
     const slices = [
-      { text: "₹20", color: "#10b981", textColor: "#fff" },
-      { text: "₹50", color: "#3b82f6", textColor: "#fff" },
+      { text: "₹5", color: "#10b981", textColor: "#fff" },
+      { text: "₹15", color: "#3b82f6", textColor: "#fff" },
       { text: "₹10", color: "#64748b", textColor: "#fff" },
-      { text: "₹100", color: "#f59e0b", textColor: "#000" },
-      { text: "2x Spin", color: "#8b5cf6", textColor: "#fff" },
-      { text: "₹250", color: "#06b6d4", textColor: "#fff" },
-      { text: "₹500", color: "#ef4444", textColor: "#fff" },
-      { text: "₹50", color: "#10b981", textColor: "#fff" }
+      { text: "₹25", color: "#f59e0b", textColor: "#000" },
+      { text: "₹20", color: "#8b5cf6", textColor: "#fff" },
+      { text: "₹35", color: "#06b6d4", textColor: "#fff" },
+      { text: "₹50", color: "#ef4444", textColor: "#fff" },
+      { text: "₹10", color: "#10b981", textColor: "#fff" }
     ];
 
     const sliceAngle = (2 * Math.PI) / slices.length;
@@ -1807,15 +2418,68 @@ class AppController {
     ctx.restore();
   }
 
+  // Check 1 Free Spin Per Day Availability
+  checkWheelDailyAvailability() {
+    if (!this.dom.btnSpinWheel) return;
+    const lastSpin = parseInt(localStorage.getItem('stake_last_wheel_spin') || '0', 10);
+    const now = Date.now();
+    const cooldown = 24 * 60 * 60 * 1000;
+    const elapsed = now - lastSpin;
+
+    if (elapsed < cooldown) {
+      const remainingMs = cooldown - elapsed;
+      const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+      const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+      this.dom.btnSpinWheel.disabled = true;
+      this.dom.btnSpinWheel.innerHTML = `<span>⏳ Next Spin in ${hours}h ${mins}m</span>`;
+      this.dom.btnSpinWheel.style.opacity = '0.65';
+      this.dom.btnSpinWheel.style.cursor = 'not-allowed';
+      if (this.dom.wheelStatusText) {
+        this.dom.wheelStatusText.innerText = `Daily free spin used! Next spin in ${hours}h ${mins}m.`;
+      }
+      if (this.dom.wheelBadgeTag) {
+        this.dom.wheelBadgeTag.innerText = "USED TODAY ✅";
+        this.dom.wheelBadgeTag.style.background = "rgba(100,116,139,0.2)";
+        this.dom.wheelBadgeTag.style.color = "#94a3b8";
+      }
+    } else {
+      this.dom.btnSpinWheel.disabled = false;
+      this.dom.btnSpinWheel.innerHTML = `<span>🎡 SPIN LUCKY WHEEL (1 Free Today)</span>`;
+      this.dom.btnSpinWheel.style.opacity = '1';
+      this.dom.btnSpinWheel.style.cursor = 'pointer';
+      if (this.dom.wheelStatusText) {
+        this.dom.wheelStatusText.innerText = "Daily Free Spin Available! Spin to win real cash.";
+      }
+      if (this.dom.wheelBadgeTag) {
+        this.dom.wheelBadgeTag.innerText = "1 FREE TODAY 🎁";
+        this.dom.wheelBadgeTag.style.background = "rgba(0,231,1,0.15)";
+        this.dom.wheelBadgeTag.style.color = "#00e701";
+      }
+    }
+  }
+
   spinLuckyWheel() {
     if (this.wheelSpinning) return;
+
+    // Strict 1 spin per day
+    const lastSpin = parseInt(localStorage.getItem('stake_last_wheel_spin') || '0', 10);
+    const now = Date.now();
+    const cooldown = 24 * 60 * 60 * 1000;
+    if (now - lastSpin < cooldown) {
+      this.showNotification("Free spin already used today! Please check back tomorrow.", "error");
+      return;
+    }
+
     this.wheelSpinning = true;
     window.soundEngine.playBet();
 
-    if (this.dom.btnSpinWheel) this.dom.btnSpinWheel.disabled = true;
+    if (this.dom.btnSpinWheel) {
+      this.dom.btnSpinWheel.disabled = true;
+      this.dom.btnSpinWheel.innerHTML = `<span>🎰 Spinning Wheel...</span>`;
+    }
     if (this.dom.wheelStatusText) this.dom.wheelStatusText.innerText = "Spinning Wheel of Fortune... 🎰";
 
-    const rewards = [20, 50, 10, 100, 40, 250, 500, 50];
+    const rewards = [5, 15, 10, 25, 20, 35, 50, 10];
     const chosenIndex = Math.floor(Math.random() * rewards.length);
     const winAmount = rewards[chosenIndex];
 
@@ -1829,7 +2493,6 @@ class AppController {
     const animate = (time) => {
       const elapsed = time - start;
       const progress = Math.min(1, elapsed / duration);
-      // Ease out cubic
       const ease = 1 - Math.pow(1 - progress, 3);
       const angle = current + targetAngle * ease;
       this.drawLuckyWheel(angle);
@@ -1839,7 +2502,9 @@ class AppController {
       } else {
         this.wheelAngle = angle % (2 * Math.PI);
         this.wheelSpinning = false;
-        if (this.dom.btnSpinWheel) this.dom.btnSpinWheel.disabled = false;
+        
+        // Save spin timestamp
+        localStorage.setItem('stake_last_wheel_spin', Date.now().toString());
 
         window.wallet.addWin(winAmount);
         window.soundEngine.playCashout();
@@ -1849,6 +2514,7 @@ class AppController {
           this.dom.wheelStatusText.style.color = "#00e701";
         }
         this.showNotification(`🎡 Lucky Wheel Won +${window.wallet.currency}${winAmount.toFixed(2)}!`, "success");
+        this.checkWheelDailyAvailability();
         this.renderHistoryTable();
       }
     };
@@ -1856,18 +2522,92 @@ class AppController {
     requestAnimationFrame(animate);
   }
 
+  // VIP Turnover Rakeback (Realistic Wager-based)
+  updateVipRakebackUI() {
+    const history = window.wallet.history || [];
+    let totalBet = 0;
+    history.forEach(h => { if (h.bet) totalBet += parseFloat(h.bet); });
+    
+    // 0.1% Rakeback on total real betting turnover
+    const totalEarned = Math.round(totalBet * 0.001 * 100) / 100;
+    const claimed = parseFloat(localStorage.getItem('stake_claimed_rakeback') || '0.00');
+    const available = Math.max(0, Math.round((totalEarned - claimed) * 100) / 100);
+
+    if (this.dom.rakebackAmount) {
+      this.dom.rakebackAmount.innerText = `${window.wallet.currency}${available.toFixed(2)}`;
+    }
+
+    if (this.dom.btnClaimRakeback) {
+      if (available >= 5) {
+        this.dom.btnClaimRakeback.disabled = false;
+        this.dom.btnClaimRakeback.style.opacity = '1';
+        this.dom.btnClaimRakeback.style.cursor = 'pointer';
+      } else {
+        this.dom.btnClaimRakeback.disabled = true;
+        this.dom.btnClaimRakeback.style.opacity = '0.5';
+        this.dom.btnClaimRakeback.style.cursor = 'not-allowed';
+      }
+    }
+  }
+
   claimRakeback() {
+    const history = window.wallet.history || [];
+    let totalBet = 0;
+    history.forEach(h => { if (h.bet) totalBet += parseFloat(h.bet); });
+    const totalEarned = Math.round(totalBet * 0.001 * 100) / 100;
+    const claimed = parseFloat(localStorage.getItem('stake_claimed_rakeback') || '0.00');
+    const available = Math.max(0, Math.round((totalEarned - claimed) * 100) / 100);
+
+    if (available < 5) {
+      this.showNotification("Minimum ₹5.00 turnover rakeback required to claim.", "error");
+      return;
+    }
+
     window.soundEngine.playCashout();
-    const amount = 420.00;
-    window.wallet.addWin(amount);
-    if (this.dom.rakebackAmount) this.dom.rakebackAmount.innerText = "₹0.00 (Claimed)";
-    this.showNotification(`💰 Claimed +₹${amount.toFixed(2)} VIP Rakeback Bonus to wallet!`, "success");
+    window.wallet.addWin(available);
+    localStorage.setItem('stake_claimed_rakeback', (claimed + available).toFixed(2));
+    this.updateVipRakebackUI();
+    this.showNotification(`💰 Claimed +₹${available.toFixed(2)} VIP Turnover Rakeback!`, "success");
+  }
+
+  // Daily Claim ₹10 (1 Claim Per Day)
+  checkDailyClaimAvailability() {
+    if (!this.dom.btnClaimDaily) return;
+    const lastClaim = parseInt(localStorage.getItem('stake_last_daily_claim') || '0', 10);
+    const now = Date.now();
+    const cooldown = 24 * 60 * 60 * 1000;
+    const elapsed = now - lastClaim;
+
+    if (elapsed < cooldown) {
+      const remainingMs = cooldown - elapsed;
+      const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+      const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+      this.dom.btnClaimDaily.disabled = true;
+      this.dom.btnClaimDaily.innerText = `Claimed (${hours}h ${mins}m)`;
+      this.dom.btnClaimDaily.style.opacity = '0.5';
+      this.dom.btnClaimDaily.style.cursor = 'not-allowed';
+    } else {
+      this.dom.btnClaimDaily.disabled = false;
+      this.dom.btnClaimDaily.innerText = "Claim ₹10";
+      this.dom.btnClaimDaily.style.opacity = '1';
+      this.dom.btnClaimDaily.style.cursor = 'pointer';
+    }
   }
 
   claimDailyReward() {
-    window.soundEngine.playCashout();
-    const amount = 50.00;
+    const lastClaim = parseInt(localStorage.getItem('stake_last_daily_claim') || '0', 10);
+    const now = Date.now();
+    const cooldown = 24 * 60 * 60 * 1000;
+    if (now - lastClaim < cooldown) {
+      this.showNotification("Daily login reward already claimed today! Check back tomorrow.", "error");
+      return;
+    }
+
+    const amount = 10.00;
     window.wallet.addWin(amount);
+    localStorage.setItem('stake_last_daily_claim', Date.now().toString());
+    window.soundEngine.playCashout();
+    this.checkDailyClaimAvailability();
     this.showNotification(`🎁 Claimed +₹${amount.toFixed(2)} Daily Login Reward!`, "success");
   }
 
@@ -1985,6 +2725,9 @@ class AppController {
 
   switchGame(gameType) {
     window.soundEngine.playClick();
+    if (this.isAutoPlaying) {
+      this.stopAutoPlay("Game switched.");
+    }
     this.currentGame = gameType;
     this.hideToast();
 
@@ -2002,6 +2745,21 @@ class AppController {
     this.dom.multiplierPreviewCard.style.display = 'none';
     this.dom.multStreakContainer.style.display = 'none';
     this.dom.mainActionArea.style.display = 'flex';
+
+    // Auto Play Toggle visibility: Enabled ONLY on Mines, Chicken, Crash (Disabled on Color Trading & Stock)
+    if (gameType === 'colortrading' || gameType === 'stock') {
+      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
+      if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
+      if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
+      this.betMode = 'manual';
+    } else {
+      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'flex';
+      if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'flex';
+      if (this.betMode === 'auto') {
+        if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'flex';
+        this.updateAutoPicksVisibility();
+      }
+    }
 
     if (gameType === 'mines') {
       this.dom.tabMines.classList.add('active');
@@ -2023,10 +2781,11 @@ class AppController {
       this.dom.multiplierPreviewCard.style.display = 'flex';
       this.dom.multStreakContainer.style.display = 'flex';
       this.activeInstance = this.chicken;
-      this.dom.previewStepLabel.innerText = "Next Chicken Multiplier";
+      this.dom.previewStepLabel.innerText = "Next Lane Multiplier";
       this.resetGridUI();
       if (this.chicken) {
-        this.chicken.setBoneCount(parseInt(this.dom.bonesCountSelect.value) || 5);
+        this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
+        this.renderHighwayLanes();
         this.chicken.updateNextMultiplierPreview();
       }
     } else if (gameType === 'crash') {
@@ -2035,7 +2794,8 @@ class AppController {
       this.dom.crashSelectGroup.style.display = 'flex';
       this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.crash;
-      this.dom.btnActionBet.style.display = 'flex';
+      this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
+      this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
       this.dom.btnActionCashout.style.display = 'none';
       this.dom.betAmountInput.disabled = false;
       if (this.crash) {
@@ -2065,6 +2825,14 @@ class AppController {
       }
     }
 
+    if (this.betMode === 'auto' && gameType !== 'colortrading' && gameType !== 'stock') {
+      this.dom.btnActionBet.style.display = 'none';
+      this.dom.btnActionAutoStart.style.display = 'flex';
+    } else if (gameType !== 'colortrading' && gameType !== 'stock') {
+      this.dom.btnActionBet.style.display = 'flex';
+      this.dom.btnActionAutoStart.style.display = 'none';
+    }
+
     const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
     if (this.activeInstance && this.activeInstance.setBetAmount) {
       this.activeInstance.setBetAmount(betVal);
@@ -2078,6 +2846,10 @@ class AppController {
       this.crash.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
       this.crash.setAutoCashout(parseFloat(this.dom.crashAutoCashoutInput.value) || 2.0);
       this.crash.startGame();
+    } else if (this.currentGame === 'chicken') {
+      this.chicken.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
+      this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
+      this.chicken.startGame();
     } else if (this.activeInstance && this.activeInstance.startGame) {
       this.activeInstance.startGame();
     }
@@ -2212,29 +2984,258 @@ class AppController {
       };
     });
 
-    // Chicken 5x5 Dishes Grid
-    let dishes = this.dom.chickenGrid.querySelectorAll('.dish-card');
-    if (dishes.length === 0) {
-      this.dom.chickenGrid.innerHTML = '';
-      for (let i = 0; i < 25; i++) {
-        const dish = document.createElement('div');
-        dish.className = 'dish-card';
-        dish.dataset.index = i;
-        dish.innerHTML = `<div class="dish-lid"></div><div class="dish-content"></div>`;
-        this.dom.chickenGrid.appendChild(dish);
+    // Initialize Chicken Highway Road Lanes
+    this.renderHighwayLanes();
+  }
+
+  renderHighwayLanes() {
+    if (!this.chicken) return;
+    const multipliers = this.chicken.multipliers;
+
+    // Helper to build lanes in a container
+    const buildLanes = (containerId, prefix = '') => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+
+      for (let i = 1; i <= this.chicken.totalLanes; i++) {
+        const mult = multipliers[i] || (1.0 + (i * 0.25));
+        const lane = document.createElement('div');
+        lane.className = 'road-lane';
+        lane.id = `${prefix}roadLane_${i}`;
+        lane.dataset.lane = i;
+        lane.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px; z-index:2;">
+            <span class="lane-number">LANE ${i}</span>
+            <div class="lane-hen-slot" id="${prefix}henSlot_${i}" style="width:38px; height:38px; display:flex; align-items:center; justify-content:center;"></div>
+          </div>
+          <div class="lane-badge">${mult.toFixed(2)}x</div>
+        `;
+
+        lane.onclick = () => {
+          if (!this.chicken.isPlaying) {
+            if (prefix === 'p2_') this.handleP2ChickenStart();
+            else this.handleBetClick();
+          } else if (this.chicken.currentStep + 1 === i) {
+            this.handleChickenHop();
+          }
+        };
+
+        container.appendChild(lane);
       }
-      dishes = this.dom.chickenGrid.querySelectorAll('.dish-card');
+    };
+
+    buildLanes('highwayLanesContainer', '');
+    buildLanes('p2HighwayLanesContainer', 'p2_');
+
+    const finishTag = document.getElementById('finishMultiplierTag');
+    if (finishTag && multipliers.length > 0) {
+      finishTag.innerText = `${multipliers[multipliers.length - 1].toFixed(2)}x`;
+    }
+    const p2FinishTag = document.getElementById('p2FinishMultiplierTag');
+    if (p2FinishTag && multipliers.length > 0) {
+      p2FinishTag.innerText = `${multipliers[multipliers.length - 1].toFixed(2)}x`;
+    }
+  }
+
+  handleChickenDifficultyChange(diff) {
+    if (this.chicken) {
+      this.chicken.setDifficulty(diff);
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = diff;
+      const p2Select = document.getElementById('p2ChickenDiffSelect');
+      if (p2Select) p2Select.value = diff;
+      this.renderHighwayLanes();
+    }
+  }
+
+  handleP2ChickenStart() {
+    const betInput = document.getElementById('p2ChickenBetInput');
+    const diffSelect = document.getElementById('p2ChickenDiffSelect');
+    const amount = parseFloat(betInput ? betInput.value : 20) || 20;
+    const diff = (diffSelect ? diffSelect.value : 'medium');
+
+    if (this.chicken) {
+      this.chicken.setBetAmount(amount);
+      this.chicken.setDifficulty(diff);
+      this.chicken.startGame();
+    }
+  }
+
+  handleChickenHop() {
+    if (this.chicken && this.chicken.isPlaying) {
+      this.chicken.hopForward();
+    }
+  }
+
+  onChickenGameStart(data) {
+    this.resetHighwayUI();
+    this.hideToast();
+
+    // Page 1 UI
+    this.dom.btnActionBet.style.display = 'none';
+    this.dom.btnActionCashout.style.display = 'flex';
+    this.dom.btnActionCashout.disabled = true;
+    this.dom.cashoutAmountDisplay.innerText = `${window.wallet.currency}0.00`;
+    this.dom.cashoutMultiplierDisplay.innerText = `0.00x`;
+    const btnHop = document.getElementById('chickenActionBar');
+    if (btnHop) btnHop.style.display = 'flex';
+
+    // Page 2 UI
+    const p2Start = document.getElementById('p2BtnStartChicken');
+    const p2Hop = document.getElementById('p2BtnHopChicken');
+    const p2Cashout = document.getElementById('p2BtnCashoutChicken');
+    if (p2Start) p2Start.style.display = 'none';
+    if (p2Hop) p2Hop.style.display = 'flex';
+    if (p2Cashout) {
+      p2Cashout.style.display = 'flex';
+      p2Cashout.disabled = true;
+      const txt = document.getElementById('p2CashoutText');
+      if (txt) txt.innerText = `💰 CASHOUT ${window.wallet.currency}0.00`;
     }
 
-    dishes.forEach((dish, i) => {
-      dish.onclick = () => {
-        if (!this.chicken.isPlaying) {
-          this.chicken.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
-          this.chicken.setBoneCount(parseInt(this.dom.bonesCountSelect.value) || 5);
-        }
-        this.chicken.revealDish(i);
-      };
+    this.dom.betAmountInput.disabled = true;
+    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = true;
+  }
+
+  onChickenHopAnimation(lane) {
+    // Clear slots
+    document.querySelectorAll('.lane-hen-slot').forEach(s => s.innerHTML = '');
+    const startSprite = document.getElementById('henStartingSprite');
+    if (startSprite) startSprite.style.opacity = '0.3';
+    const p2StartSprite = document.getElementById('p2HenStartingSprite');
+    if (p2StartSprite) p2StartSprite.style.opacity = '0.3';
+
+    // Highlight active lane
+    document.querySelectorAll('.road-lane').forEach(l => l.classList.remove('active-hen-lane'));
+
+    const henSvg = `
+      <div class="hen-character hopping">
+        <svg viewBox="0 0 36 36" width="36" height="36">
+          <circle cx="18" cy="22" r="11" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <path d="M12 11 Q14 6 16 10 Q18 5 20 10 Q22 7 24 12 Z" fill="#ff3366"/>
+          <circle cx="18" cy="14" r="7" fill="#ffffff"/>
+          <polygon points="23,14 29,16 23,18" fill="#f59e0b"/>
+          <circle cx="20" cy="13" r="1.5" fill="#0f172a"/>
+          <path d="M9 22 Q6 17 12 18 Q10 24 16 25 Z" fill="#f1f5f9"/>
+          <ellipse cx="22" cy="19" rx="1.5" ry="2.5" fill="#ff3366"/>
+          <path d="M14 33 L14 30 M14 33 L12 34 M14 33 L16 34 M22 33 L22 30 M22 33 L20 34 M22 33 L24 34" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    `;
+
+    ['', 'p2_'].forEach(prefix => {
+      const targetLane = document.getElementById(`${prefix}roadLane_${lane}`);
+      if (targetLane) {
+        targetLane.classList.add('active-hen-lane');
+        const slot = document.getElementById(`${prefix}henSlot_${lane}`);
+        if (slot) slot.innerHTML = henSvg;
+        targetLane.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     });
+  }
+
+  onChickenSafeHop(data) {
+    ['', 'p2_'].forEach(prefix => {
+      const lane = document.getElementById(`${prefix}roadLane_${data.lane}`);
+      if (lane) {
+        lane.classList.remove('active-hen-lane');
+        lane.classList.add('cleared');
+      }
+    });
+
+    this.dom.btnActionCashout.disabled = false;
+    this.dom.cashoutAmountDisplay.innerText = `${window.wallet.currency}${data.currentWin.toFixed(2)}`;
+    this.dom.cashoutMultiplierDisplay.innerText = `${data.multiplier.toFixed(2)}x`;
+
+    const p2Cashout = document.getElementById('p2BtnCashoutChicken');
+    if (p2Cashout) {
+      p2Cashout.disabled = false;
+      const txt = document.getElementById('p2CashoutText');
+      if (txt) txt.innerText = `💰 CASHOUT ${window.wallet.currency}${data.currentWin.toFixed(2)} (${data.multiplier.toFixed(2)}x)`;
+    }
+
+    this.dom.previewMultiplier.innerText = `${data.nextMultiplier.toFixed(2)}x`;
+    this.dom.previewProfit.innerText = `+${window.wallet.currency}${(this.chicken.betAmount * data.nextMultiplier).toFixed(2)}`;
+  }
+
+  onChickenCarHit(data) {
+    ['', 'p2_'].forEach(prefix => {
+      const lane = document.getElementById(`${prefix}roadLane_${data.lane}`);
+      if (lane) {
+        lane.classList.remove('active-hen-lane');
+        lane.classList.add('hazard-hit');
+        const slot = document.getElementById(`${prefix}henSlot_${data.lane}`);
+        if (slot) slot.innerHTML = `<div style="font-size:26px; animation:shakeHit 0.5s ease;">💥🍗</div>`;
+      }
+    });
+
+    const btnHop = document.getElementById('chickenActionBar');
+    if (btnHop) btnHop.style.display = 'none';
+
+    const p2Start = document.getElementById('p2BtnStartChicken');
+    const p2Hop = document.getElementById('p2BtnHopChicken');
+    const p2Cashout = document.getElementById('p2BtnCashoutChicken');
+    if (p2Start) p2Start.style.display = 'flex';
+    if (p2Hop) p2Hop.style.display = 'none';
+    if (p2Cashout) p2Cashout.style.display = 'none';
+
+    this.dom.btnActionBet.style.display = 'flex';
+    this.dom.btnActionCashout.style.display = 'none';
+    this.dom.betAmountInput.disabled = false;
+    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+
+    this.showToast({
+      won: false,
+      payout: 0,
+      multiplier: 0,
+      tagline: `CRASH! Speeding car hit the hen on Lane ${data.lane}!`
+    });
+
+    this.renderHistoryTable();
+  }
+
+  onChickenCashOut(data) {
+    const btnHop = document.getElementById('chickenActionBar');
+    if (btnHop) btnHop.style.display = 'none';
+
+    const p2Start = document.getElementById('p2BtnStartChicken');
+    const p2Hop = document.getElementById('p2BtnHopChicken');
+    const p2Cashout = document.getElementById('p2BtnCashoutChicken');
+    if (p2Start) p2Start.style.display = 'flex';
+    if (p2Hop) p2Hop.style.display = 'none';
+    if (p2Cashout) p2Cashout.style.display = 'none';
+
+    this.dom.btnActionBet.style.display = 'flex';
+    this.dom.btnActionCashout.style.display = 'none';
+    this.dom.betAmountInput.disabled = false;
+    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+
+    this.showToast({
+      won: true,
+      payout: data.winAmount,
+      multiplier: data.multiplier,
+      tagline: `CHICKEN SAFELY CROSSED! +${window.wallet.currency}${data.profit.toFixed(2)}`
+    });
+
+    this.renderHistoryTable();
+  }
+
+  onChickenMultiplierUpdate(data) {
+    this.dom.multCurrentVal.innerText = `${data.current.toFixed(2)}x`;
+    this.dom.multNextVal.innerText = `${data.next.toFixed(2)}x`;
+    this.dom.previewMultiplier.innerText = `${data.next.toFixed(2)}x`;
+    this.dom.previewProfit.innerText = `+${window.wallet.currency}${(data.profit).toFixed(2)}`;
+  }
+
+  resetHighwayUI() {
+    document.querySelectorAll('.road-lane').forEach(l => {
+      l.className = 'road-lane';
+    });
+    document.querySelectorAll('.lane-hen-slot').forEach(s => s.innerHTML = '');
+    const startSprite = document.getElementById('henStartingSprite');
+    if (startSprite) startSprite.style.opacity = '1';
+    const p2StartSprite = document.getElementById('p2HenStartingSprite');
+    if (p2StartSprite) p2StartSprite.style.opacity = '1';
   }
 
   resetGridUI() {
@@ -2244,14 +3245,7 @@ class AppController {
       tile.innerHTML = '';
     });
 
-    const dishes = this.dom.chickenGrid.querySelectorAll('.dish-card');
-    dishes.forEach(dish => {
-      dish.className = 'dish-card';
-      dish.innerHTML = `
-        <div class="dish-lid"></div>
-        <div class="dish-content"></div>
-      `;
-    });
+    this.resetHighwayUI();
 
     this.dom.btnActionBet.style.display = 'flex';
     this.dom.btnActionCashout.style.display = 'none';
@@ -2298,19 +3292,19 @@ class AppController {
 
   renderMultiplierLadder() {
     this.dom.multProgressBadges.innerHTML = '';
-    const totalSafe = this.activeInstance.totalTiles - (this.currentGame === 'mines' ? this.activeInstance.mineCount : this.activeInstance.boneCount);
-    const count = this.activeInstance.revealedCount;
+    const totalSafe = this.activeInstance.totalTiles - (this.currentGame === 'mines' ? this.activeInstance.mineCount : (this.activeInstance.boneCount || 5));
+    const count = this.activeInstance.revealedCount || this.activeInstance.currentStep || 0;
 
     const startIdx = Math.max(1, count - 1);
-    const endIdx = Math.min(totalSafe, startIdx + 5);
+    const endIdx = Math.min(totalSafe || 25, startIdx + 5);
 
     for (let i = startIdx; i <= endIdx; i++) {
-      const mult = this.activeInstance.calculateMultiplier(i);
+      const mult = this.activeInstance.calculateMultiplier ? this.activeInstance.calculateMultiplier(i) : this.activeInstance.getMultiplierForStep(i);
       const badge = document.createElement('span');
       badge.className = 'mult-badge-step';
       if (i < count) badge.classList.add('passed');
       if (i === count) badge.classList.add('active');
-      badge.innerText = `${mult.toFixed(2)}x`;
+      badge.innerText = `${(mult || 1).toFixed(2)}x`;
       this.dom.multProgressBadges.appendChild(badge);
     }
   }
@@ -2341,43 +3335,394 @@ class AppController {
     }
   }
 
-  onChickenDishReveal(index, type, isBone) {
-    const dish = this.dom.chickenGrid.querySelector(`[data-index="${index}"]`);
-    if (!dish) return;
-
-    dish.classList.add('opened');
-    const content = dish.querySelector('.dish-content');
-    if (isBone) {
-      dish.classList.add('bone-opened');
-      content.innerHTML = `<div class="bone-wrapper">${ASSETS.bone}</div>`;
-    } else {
-      dish.classList.add('chicken-opened');
-      content.innerHTML = `<div class="chicken-drumstick-wrapper">${ASSETS.chicken}</div>`;
-    }
-  }
-
-  onChickenRevealRemaining(index, type) {
-    const dish = this.dom.chickenGrid.querySelector(`[data-index="${index}"]`);
-    if (!dish || dish.classList.contains('opened')) return;
-
-    dish.classList.add('opened', 'auto-opened');
-    const content = dish.querySelector('.dish-content');
-    if (type === 'bone') {
-      content.innerHTML = `<div class="bone-wrapper">${ASSETS.bone}</div>`;
-    } else {
-      content.innerHTML = `<div class="chicken-drumstick-wrapper">${ASSETS.chicken}</div>`;
-    }
-  }
-
   onGameOverResult(result) {
-    this.dom.btnActionBet.style.display = 'flex';
-    this.dom.btnActionCashout.style.display = 'none';
-    this.dom.betAmountInput.disabled = false;
-    this.dom.minesCountSelect.disabled = false;
-    this.dom.bonesCountSelect.disabled = false;
+    if (this.betMode === 'auto') {
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+    } else {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+    }
+    if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+
+    if (!this.isAutoPlaying) {
+      this.dom.betAmountInput.disabled = false;
+      this.dom.minesCountSelect.disabled = false;
+      this.dom.bonesCountSelect.disabled = false;
+    }
 
     this.showToast(result);
     this.renderHistoryTable();
+
+    if (this.isAutoPlaying) {
+      this.handleAutoRoundCompleted(result);
+    }
+  }
+
+  // ================= AUTO PLAY ENGINE (Mines, Chicken, Crash) =================
+  setBetMode(mode) {
+    if (this.isAutoPlaying) return;
+    window.soundEngine.playClick();
+    this.betMode = mode;
+
+    if (this.dom.btnModeManual) this.dom.btnModeManual.classList.toggle('active', mode === 'manual');
+    if (this.dom.btnModeAuto) this.dom.btnModeAuto.classList.toggle('active', mode === 'auto');
+
+    if (mode === 'auto') {
+      if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'flex';
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+      this.updateAutoPicksVisibility();
+    } else {
+      if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+    }
+  }
+
+  updateAutoPicksVisibility() {
+    if (!this.dom.autoPicksGroup) return;
+    if (this.currentGame === 'mines') {
+      this.dom.autoPicksGroup.style.display = 'flex';
+      if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Diamond Picks";
+    } else if (this.currentGame === 'chicken') {
+      this.dom.autoPicksGroup.style.display = 'flex';
+      if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Cloche Picks";
+    } else {
+      this.dom.autoPicksGroup.style.display = 'none';
+    }
+  }
+
+  setAutoBetRounds(rounds) {
+    window.soundEngine.playClick();
+    if (this.dom.autoBetCountInput) {
+      this.dom.autoBetCountInput.value = rounds;
+      this.updateAutoBetHelper();
+    }
+  }
+
+  updateAutoBetHelper() {
+    if (!this.dom.autoBetCountHelper || !this.dom.autoBetCountInput) return;
+    const r = parseInt(this.dom.autoBetCountInput.value);
+    if (isNaN(r) || r <= 0) {
+      this.dom.autoBetCountHelper.innerText = "∞ Infinite Rounds";
+    } else {
+      this.dom.autoBetCountHelper.innerText = `${r} Rounds`;
+    }
+  }
+
+  toggleAutoPlay() {
+    if (this.isAutoPlaying) {
+      this.stopAutoPlay("Auto Play stopped by user.");
+    } else {
+      this.startAutoPlay();
+    }
+  }
+
+  startAutoPlay() {
+    if (this.currentGame === 'colortrading' || this.currentGame === 'stock') {
+      this.showNotification("Auto Play is disabled for this game mode.", "error");
+      return;
+    }
+
+    const betAmount = parseFloat(this.dom.betAmountInput.value) || 10;
+    if (!window.wallet.hasFunds(betAmount)) {
+      this.showNotification("Insufficient balance for Auto Play!", "error");
+      return;
+    }
+
+    const totalRounds = parseInt(this.dom.autoBetCountInput ? this.dom.autoBetCountInput.value : 10);
+    this.autoRoundsTotal = (isNaN(totalRounds) || totalRounds < 0) ? 0 : totalRounds;
+    this.autoRoundsCompleted = 0;
+    this.autoSessionProfit = 0;
+    this.isAutoPlaying = true;
+
+    // UI State while running
+    if (this.dom.btnActionAutoStart) {
+      this.dom.btnActionAutoStart.classList.add('btn-auto-running');
+      if (this.dom.btnAutoStartText) {
+        this.dom.btnAutoStartText.innerText = `⏹️ STOP AUTO (0 / ${this.autoRoundsTotal || '∞'})`;
+      }
+    }
+
+    if (this.dom.autoPlayLiveStats) {
+      this.dom.autoPlayLiveStats.style.display = 'flex';
+      if (this.dom.autoLiveRoundsText) this.dom.autoLiveRoundsText.innerText = `0 / ${this.autoRoundsTotal || '∞'}`;
+      if (this.dom.autoLiveProfitText) this.dom.autoLiveProfitText.innerText = `+₹0.00`;
+    }
+
+    this.setInputsDisabledForAuto(true);
+    this.showNotification(`⚡ Auto Play Started (${this.autoRoundsTotal ? this.autoRoundsTotal + ' rounds' : 'Infinite'})`, "success");
+
+    this.runNextAutoRound();
+  }
+
+  stopAutoPlay(reason = '') {
+    this.isAutoPlaying = false;
+    this.clearAutoStepTimers();
+
+    if (this.dom.btnActionAutoStart) {
+      this.dom.btnActionAutoStart.classList.remove('btn-auto-running');
+      if (this.dom.btnAutoStartText) {
+        this.dom.btnAutoStartText.innerText = `⚡ START AUTO PLAY`;
+      }
+    }
+
+    this.setInputsDisabledForAuto(false);
+
+    if (reason) {
+      this.showNotification(`⏹️ ${reason} (Rounds: ${this.autoRoundsCompleted} | Profit: ${this.autoSessionProfit >= 0 ? '+' : ''}${window.wallet.currency}${this.autoSessionProfit.toFixed(2)})`, this.autoSessionProfit >= 0 ? "success" : "info");
+    }
+  }
+
+  setInputsDisabledForAuto(disabled) {
+    if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = disabled;
+    if (this.dom.minesCountSelect) this.dom.minesCountSelect.disabled = disabled;
+    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = disabled;
+    if (this.dom.autoBetCountInput) this.dom.autoBetCountInput.disabled = disabled;
+    if (this.dom.autoPicksCountInput) this.dom.autoPicksCountInput.disabled = disabled;
+  }
+
+  clearAutoStepTimers() {
+    this.autoStepTimers.forEach(t => clearTimeout(t));
+    this.autoStepTimers = [];
+  }
+
+  runNextAutoRound() {
+    if (!this.isAutoPlaying) return;
+
+    if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+      this.stopAutoPlay(`Completed all ${this.autoRoundsTotal} rounds!`);
+      return;
+    }
+
+    const betAmount = parseFloat(this.dom.betAmountInput.value) || 10;
+    if (!window.wallet.hasFunds(betAmount)) {
+      this.stopAutoPlay("Insufficient balance to continue Auto Play!");
+      return;
+    }
+
+    if (this.currentGame === 'mines') {
+      this.runMinesAutoRound(betAmount);
+    } else if (this.currentGame === 'chicken') {
+      this.runChickenAutoRound(betAmount);
+    } else if (this.currentGame === 'crash') {
+      this.runCrashAutoRound(betAmount);
+    }
+  }
+
+  runMinesAutoRound(betAmount) {
+    this.mines.setBetAmount(betAmount);
+    const started = this.mines.startGame();
+    if (!started) {
+      this.stopAutoPlay("Failed to start Mines round.");
+      return;
+    }
+
+    const maxSafe = 25 - this.mines.mineCount;
+    const picksCount = Math.min(maxSafe, Math.max(1, parseInt(this.dom.autoPicksCountInput ? this.dom.autoPicksCountInput.value : 3) || 3));
+    const allIndices = Array.from({ length: 25 }, (_, i) => i).sort(() => Math.random() - 0.5);
+    const picks = allIndices.slice(0, picksCount);
+
+    picks.forEach((tileIdx, step) => {
+      const timer = setTimeout(() => {
+        if (!this.isAutoPlaying || !this.mines.isPlaying) return;
+        this.mines.revealTile(tileIdx);
+
+        // If last pick and still safe, auto cash out!
+        if (step === picksCount - 1 && this.mines.isPlaying) {
+          const cashoutTimer = setTimeout(() => {
+            if (this.isAutoPlaying && this.mines.isPlaying) {
+              this.handleCashoutClick();
+            }
+          }, 180);
+          this.autoStepTimers.push(cashoutTimer);
+        }
+      }, (step + 1) * 240);
+      this.autoStepTimers.push(timer);
+    });
+  }
+
+  runChickenAutoRound(betAmount) {
+    this.chicken.setBetAmount(betAmount);
+    const started = this.chicken.startGame();
+    if (!started) {
+      this.stopAutoPlay("Failed to start Chicken round.");
+      return;
+    }
+
+    const maxSafe = 25 - this.chicken.boneCount;
+    const picksCount = Math.min(maxSafe, Math.max(1, parseInt(this.dom.autoPicksCountInput ? this.dom.autoPicksCountInput.value : 3) || 3));
+    const allIndices = Array.from({ length: 25 }, (_, i) => i).sort(() => Math.random() - 0.5);
+    const picks = allIndices.slice(0, picksCount);
+
+    picks.forEach((dishIdx, step) => {
+      const timer = setTimeout(() => {
+        if (!this.isAutoPlaying || !this.chicken.isPlaying) return;
+        this.chicken.revealDish(dishIdx);
+
+        // If last pick and still safe, auto cash out!
+        if (step === picksCount - 1 && this.chicken.isPlaying) {
+          const cashoutTimer = setTimeout(() => {
+            if (this.isAutoPlaying && this.chicken.isPlaying) {
+              this.handleCashoutClick();
+            }
+          }, 180);
+          this.autoStepTimers.push(cashoutTimer);
+        }
+      }, (step + 1) * 240);
+      this.autoStepTimers.push(timer);
+    });
+  }
+
+  runCrashAutoRound(betAmount) {
+    this.crash.setBetAmount(betAmount);
+    this.crash.setAutoCashout(parseFloat(this.dom.crashAutoCashoutInput.value) || 2.0);
+    const started = this.crash.startGame();
+    if (!started) {
+      this.stopAutoPlay("Failed to start Crash round.");
+    }
+  }
+
+  handleAutoRoundCompleted(res) {
+    if (!this.isAutoPlaying) return;
+    this.autoRoundsCompleted++;
+
+    const bet = parseFloat(this.dom.betAmountInput.value) || 10;
+    const roundProfit = res.won ? (res.payout - bet) : -bet;
+    this.autoSessionProfit += roundProfit;
+
+    if (this.dom.autoLiveRoundsText) {
+      this.dom.autoLiveRoundsText.innerText = `${this.autoRoundsCompleted} / ${this.autoRoundsTotal || '∞'}`;
+    }
+    if (this.dom.autoLiveProfitText) {
+      const formatted = `${this.autoSessionProfit >= 0 ? '+' : ''}${window.wallet.currency}${this.autoSessionProfit.toFixed(2)}`;
+      this.dom.autoLiveProfitText.innerText = formatted;
+      this.dom.autoLiveProfitText.style.color = this.autoSessionProfit >= 0 ? '#00e701' : '#fe2c55';
+    }
+    if (this.dom.btnAutoStartText) {
+      this.dom.btnAutoStartText.innerText = `⏹️ STOP AUTO (${this.autoRoundsCompleted} / ${this.autoRoundsTotal || '∞'})`;
+    }
+
+    if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+      this.stopAutoPlay(`Completed ${this.autoRoundsTotal} rounds!`);
+      return;
+    }
+
+    // Schedule next round with clean cooldown
+    const nextTimer = setTimeout(() => {
+      this.runNextAutoRound();
+    }, 750);
+    this.autoStepTimers.push(nextTimer);
+  }
+
+  // ================= LIMBO AUTO PLAY (Page 2) =================
+  setLimboMode(mode) {
+    if (this.isLimboAutoPlaying) return;
+    window.soundEngine.playClick();
+    this.limboMode = mode;
+
+    if (this.dom.btnLimboModeManual) this.dom.btnLimboModeManual.classList.toggle('active', mode === 'manual');
+    if (this.dom.btnLimboModeAuto) this.dom.btnLimboModeAuto.classList.toggle('active', mode === 'auto');
+
+    if (mode === 'auto') {
+      if (this.dom.limboAutoSettings) this.dom.limboAutoSettings.style.display = 'block';
+      if (this.dom.btnRollLimbo) this.dom.btnRollLimbo.style.display = 'none';
+      if (this.dom.btnAutoRollLimbo) this.dom.btnAutoRollLimbo.style.display = 'flex';
+    } else {
+      if (this.dom.limboAutoSettings) this.dom.limboAutoSettings.style.display = 'none';
+      if (this.dom.btnRollLimbo) this.dom.btnRollLimbo.style.display = 'flex';
+      if (this.dom.btnAutoRollLimbo) this.dom.btnAutoRollLimbo.style.display = 'none';
+    }
+  }
+
+  setLimboAutoRounds(rounds) {
+    window.soundEngine.playClick();
+    if (this.dom.limboAutoCountInput) {
+      this.dom.limboAutoCountInput.value = rounds;
+      if (this.dom.limboAutoCountHelper) {
+        this.dom.limboAutoCountHelper.innerText = rounds === 0 ? "∞ Infinite Rolls" : `${rounds} Rounds`;
+      }
+    }
+  }
+
+  toggleAutoLimbo() {
+    if (this.isLimboAutoPlaying) {
+      this.stopAutoLimbo("Auto Roll stopped by user.");
+    } else {
+      this.startAutoLimbo();
+    }
+  }
+
+  startAutoLimbo() {
+    const bet = parseFloat(this.dom.limboBetAmountInput.value) || 20;
+    if (!window.wallet.hasFunds(bet)) {
+      this.showNotification("Insufficient balance for Limbo Auto!", "error");
+      return;
+    }
+
+    const totalRounds = parseInt(this.dom.limboAutoCountInput ? this.dom.limboAutoCountInput.value : 10);
+    this.limboAutoRoundsTotal = (isNaN(totalRounds) || totalRounds < 0) ? 0 : totalRounds;
+    this.limboAutoRoundsCompleted = 0;
+    this.limboAutoSessionProfit = 0;
+    this.isLimboAutoPlaying = true;
+
+    if (this.dom.btnAutoRollLimbo) {
+      this.dom.btnAutoRollLimbo.classList.add('btn-auto-running');
+      if (this.dom.btnAutoLimboText) {
+        this.dom.btnAutoLimboText.innerText = `⏹️ STOP AUTO (0 / ${this.limboAutoRoundsTotal || '∞'})`;
+      }
+    }
+
+    this.showNotification("⚡ Limbo Auto Roll Started!", "success");
+    this.runNextAutoLimboRound();
+  }
+
+  stopAutoLimbo(reason = '') {
+    this.isLimboAutoPlaying = false;
+    if (this.limboAutoTimer) clearTimeout(this.limboAutoTimer);
+
+    if (this.dom.btnAutoRollLimbo) {
+      this.dom.btnAutoRollLimbo.classList.remove('btn-auto-running');
+      if (this.dom.btnAutoLimboText) {
+        this.dom.btnAutoLimboText.innerText = `⚡ START AUTO ROLL`;
+      }
+    }
+
+    if (reason) {
+      this.showNotification(`⏹️ ${reason} (Rounds: ${this.limboAutoRoundsCompleted})`, "info");
+    }
+  }
+
+  runNextAutoLimboRound() {
+    if (!this.isLimboAutoPlaying) return;
+
+    if (this.limboAutoRoundsTotal > 0 && this.limboAutoRoundsCompleted >= this.limboAutoRoundsTotal) {
+      this.stopAutoLimbo(`Completed all ${this.limboAutoRoundsTotal} Limbo rolls!`);
+      return;
+    }
+
+    const bet = parseFloat(this.dom.limboBetAmountInput.value) || 20;
+    if (!window.wallet.hasFunds(bet)) {
+      this.stopAutoLimbo("Insufficient balance to continue Limbo Auto!");
+      return;
+    }
+
+    this.rollLimbo();
+    this.limboAutoRoundsCompleted++;
+
+    if (this.dom.btnAutoLimboText) {
+      this.dom.btnAutoLimboText.innerText = `⏹️ STOP AUTO (${this.limboAutoRoundsCompleted} / ${this.limboAutoRoundsTotal || '∞'})`;
+    }
+
+    if (this.limboAutoRoundsTotal > 0 && this.limboAutoRoundsCompleted >= this.limboAutoRoundsTotal) {
+      this.stopAutoLimbo(`Completed all ${this.limboAutoRoundsTotal} Limbo rolls!`);
+      return;
+    }
+
+    this.limboAutoTimer = setTimeout(() => {
+      this.runNextAutoLimboRound();
+    }, 450);
   }
 
   showToast(result) {
@@ -2519,13 +3864,27 @@ class AppController {
 
   getRandomSimulatedBet() {
     const randomPool = [
-      50, 100, 150, 200, 250, 300, 350, 400, 500, 650, 750, 800, 1000,
-      1200, 1500, 1800, 2000, 2500, 3200, 4000, 5000, 6500, 8000, 10000,
-      12500, 15000, 20000, 25000
+      65, 115, 140, 185, 230, 275, 340, 415, 520, 685, 790, 935, 1150,
+      1420, 1860, 2350, 3180, 4250, 5670, 7850, 11200
     ];
     const base = randomPool[Math.floor(Math.random() * randomPool.length)];
-    const extra = Math.random() < 0.35 ? (Math.floor(Math.random() * 9) * 10) : 0;
+    const oddOffsets = [0, 7, 13, 21, 33, 47, 59];
+    const extra = oddOffsets[Math.floor(Math.random() * oddOffsets.length)];
     return base + extra;
+  }
+
+  generateRealisticWinAmount(bet, mult) {
+    let intVal = Math.round(bet * mult);
+    if (intVal < 20) intVal = 20;
+
+    // Ensure natural distribution across realistic odd and even numbers (e.g. 207, 341, 583, 749, 915, 1264, 492, 758)
+    const naturalEndings = [1, 3, 7, 9, 2, 4, 6, 8];
+    const lastDigit = intVal % 10;
+    if (lastDigit === 0 || lastDigit === 5) {
+      const chosen = naturalEndings[Math.floor(Math.random() * naturalEndings.length)];
+      intVal = Math.floor(intVal / 10) * 10 + chosen;
+    }
+    return intVal;
   }
 
   insertSimulatedWinRow(fakeUsers, fakeGames, fakeAmounts, isAnimated = true) {
@@ -2537,9 +3896,18 @@ class AppController {
     
     // 30% Loss Probability (2 to 4 out of 10 bets result in loss)
     const isLoss = Math.random() < 0.30;
-    let mult = isLoss ? 0.00 : (Math.random() * (game.multRange[1] - game.multRange[0]) + game.multRange[0]);
-    mult = Math.round(mult * 100) / 100;
-    const payout = isLoss ? 0 : Math.round((bet * mult) * 100) / 100;
+    let mult = 0.00;
+    let payout = 0;
+
+    if (isLoss) {
+      mult = 0.00;
+      payout = 0;
+    } else {
+      let rawMult = (Math.random() * (game.multRange[1] - game.multRange[0]) + game.multRange[0]);
+      payout = this.generateRealisticWinAmount(bet, rawMult);
+      mult = Math.round((payout / bet) * 100) / 100;
+    }
+
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     const tr = document.createElement('tr');
@@ -2584,11 +3952,11 @@ class AppController {
       this.dom.winToastPayout.innerText = `-${window.wallet.currency}${bet.toLocaleString('en-US')} on ${game.name} (0.00x)`;
       this.dom.winToastPayout.style.color = '#fe2c55';
     } else {
-      let mult = (Math.random() * (game.multRange[1] - game.multRange[0]) + game.multRange[0]);
-      mult = Math.round(mult * 100) / 100;
-      const payout = Math.round((bet * mult) * 100) / 100;
+      let rawMult = (Math.random() * (game.multRange[1] - game.multRange[0]) + game.multRange[0]);
+      const payout = this.generateRealisticWinAmount(bet, rawMult);
+      const mult = Math.round((payout / bet) * 100) / 100;
       this.dom.winToastUser.innerText = `🔥 ${user} just won!`;
-      this.dom.winToastPayout.innerText = `+${window.wallet.currency}${payout.toLocaleString('en-US', { maximumFractionDigits: 2 })} on ${game.name} (${mult.toFixed(2)}x)`;
+      this.dom.winToastPayout.innerText = `+${window.wallet.currency}${payout.toLocaleString('en-US')} on ${game.name} (${mult.toFixed(2)}x)`;
       this.dom.winToastPayout.style.color = '#00e701';
     }
 
