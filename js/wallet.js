@@ -254,6 +254,10 @@ class CasinoWallet {
     this.saveBalance();
   }
 
+  add(amount) {
+    return this.addWin(amount);
+  }
+
   // Create a new deposit request requiring Admin Confirmation
   submitDepositRequest(amount, utr = '', upiId = '') {
     amount = parseFloat(amount);
