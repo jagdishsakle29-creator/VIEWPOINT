@@ -454,25 +454,29 @@ class AppController {
 
   initGames() {
     // 1. Mines Game Instance
-    this.mines = new window.MinesGame({
-      onMultiplierUpdate: (data) => this.onGameMultiplierUpdate(data),
-      onGameStart: (data) => this.onGameStarted(data),
-      onTileReveal: (index, type, isMine) => this.onMineTileReveal(index, type, isMine),
-      onRevealRemaining: (index, type) => this.onMineRevealRemaining(index, type),
-      onGameOver: (result) => this.onGameOverResult(result),
-      onError: (msg) => this.showNotification(msg, 'error')
-    });
+    if (window.MinesGame) {
+      this.mines = new window.MinesGame({
+        onMultiplierUpdate: (data) => this.onGameMultiplierUpdate(data),
+        onGameStart: (data) => this.onGameStarted(data),
+        onTileReveal: (index, type, isMine) => this.onMineTileReveal(index, type, isMine),
+        onRevealRemaining: (index, type) => this.onMineRevealRemaining(index, type),
+        onGameOver: (result) => this.onGameOverResult(result),
+        onError: (msg) => this.showNotification(msg, 'error')
+      });
+    }
 
     // 2. Chicken Road Crossing Highway Game Instance
-    this.chicken = new window.ChickenGame({
-      onMultiplierUpdate: (data) => this.onChickenMultiplierUpdate(data),
-      onGameStart: (data) => this.onChickenGameStart(data),
-      onHopAnimation: (lane) => this.onChickenHopAnimation(lane),
-      onSafeHop: (data) => this.onChickenSafeHop(data),
-      onCarHit: (data) => this.onChickenCarHit(data),
-      onCashOut: (data) => this.onChickenCashOut(data),
-      onError: (msg) => this.showNotification(msg, 'error')
-    });
+    if (window.ChickenGame) {
+      this.chicken = new window.ChickenGame({
+        onMultiplierUpdate: (data) => this.onChickenMultiplierUpdate(data),
+        onGameStart: (data) => this.onChickenGameStart(data),
+        onHopAnimation: (lane) => this.onChickenHopAnimation(lane),
+        onSafeHop: (data) => this.onChickenSafeHop(data),
+        onCarHit: (data) => this.onChickenCarHit(data),
+        onCashOut: (data) => this.onChickenCashOut(data),
+        onError: (msg) => this.showNotification(msg, 'error')
+      });
+    }
 
     // 3. Crash Game Instance
     if (window.CrashGame && this.dom.crashCanvas) {
@@ -599,8 +603,10 @@ class AppController {
     }
 
     this.activeInstance = this.mines;
-    this.activeInstance.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
-    this.activeInstance.setMineCount(parseInt(this.dom.minesCountSelect.value) || 3);
+    if (this.activeInstance) {
+      if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(parseFloat(this.dom.betAmountInput ? this.dom.betAmountInput.value : 10) || 10);
+      if (this.activeInstance.setMineCount) this.activeInstance.setMineCount(parseInt(this.dom.minesCountSelect ? this.dom.minesCountSelect.value : 3) || 3);
+    }
     this.renderHighwayLanes();
   }
 

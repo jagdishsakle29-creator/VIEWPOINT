@@ -221,3 +221,5 @@ class ChickenGame {
     this.updateNextMultiplierPreview();
   }
 }
+
+window.ChickenGame = ChickenGame;
