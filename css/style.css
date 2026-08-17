@@ -1571,18 +1571,6 @@ body {
 
 /* ================= PAGE 0: AUTH & LOGIN GATE SCREEN ================= */
 .auth-gate-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  background: radial-gradient(circle at 50% 20%, #172a3a 0%, #0c1822 60%, #070e14 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.auth-gate-screen.hidden {
   display: none !important;
 }
 

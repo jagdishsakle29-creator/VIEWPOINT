@@ -1890,21 +1890,6 @@ class AppController {
       window.wallet.switchUser(activeId);
     }
 
-    // Gate Page (Page 0) vs Game Dashboard (Page 1 & 2)
-    if (this.dom.authGatePage) {
-      if (isLoggedIn) {
-        this.dom.authGatePage.style.display = 'none';
-        this.dom.authGatePage.classList.add('hidden');
-      } else {
-        this.dom.authGatePage.style.display = 'flex';
-        this.dom.authGatePage.classList.remove('hidden');
-      }
-    }
-
-    if (this.dom.gameDashboardWrapper) {
-      this.dom.gameDashboardWrapper.style.display = isLoggedIn ? 'block' : 'none';
-    }
-
     // Top Navbar Profile Badges
     if (this.dom.authLoggedOutBox && this.dom.authLoggedInBox) {
       if (isLoggedIn) {
