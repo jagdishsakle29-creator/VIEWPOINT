@@ -1110,17 +1110,20 @@ class AppController {
     }
 
     // Tiranga Interval Buttons
-      btn.addEventListener('click', () => {
-        window.soundEngine.playClick();
-        this.dom.tirangaModeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const dur = parseInt(btn.dataset.duration) || 30;
-        if (this.colortrading) {
-          this.colortrading.periodDuration = dur;
-          this.colortrading.timeLeft = dur;
-        }
+    if (this.dom.tirangaModeBtns) {
+      this.dom.tirangaModeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          window.soundEngine.playClick();
+          this.dom.tirangaModeBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const dur = parseInt(btn.dataset.duration) || 30;
+          if (this.colortrading) {
+            this.colortrading.periodDuration = dur;
+            this.colortrading.timeLeft = dur;
+          }
+        });
       });
-    });
+    }
 
     // Color Trading Button Events
     if (this.dom.btnBetGreen) {
