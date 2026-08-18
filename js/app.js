@@ -3314,10 +3314,17 @@ class AppController {
     if (p2Hop) p2Hop.style.display = 'none';
     if (p2Cashout) p2Cashout.style.display = 'none';
 
-    this.dom.btnActionBet.style.display = 'flex';
-    this.dom.btnActionCashout.style.display = 'none';
-    this.dom.betAmountInput.disabled = false;
-    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+    if (this.isAutoPlaying) {
+      this.dom.btnActionBet.style.display = 'none';
+      this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+      this.handleAutoRoundCompleted({ won: false, payout: 0, multiplier: 0 });
+    } else {
+      this.dom.btnActionBet.style.display = 'flex';
+      this.dom.btnActionCashout.style.display = 'none';
+      this.dom.betAmountInput.disabled = false;
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+    }
 
     this.showToast({
       won: false,
@@ -3340,10 +3347,17 @@ class AppController {
     if (p2Hop) p2Hop.style.display = 'none';
     if (p2Cashout) p2Cashout.style.display = 'none';
 
-    this.dom.btnActionBet.style.display = 'flex';
-    this.dom.btnActionCashout.style.display = 'none';
-    this.dom.betAmountInput.disabled = false;
-    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+    if (this.isAutoPlaying) {
+      this.dom.btnActionBet.style.display = 'none';
+      this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+      this.handleAutoRoundCompleted({ won: true, payout: data.winAmount, multiplier: data.multiplier });
+    } else {
+      this.dom.btnActionBet.style.display = 'flex';
+      this.dom.btnActionCashout.style.display = 'none';
+      this.dom.betAmountInput.disabled = false;
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+    }
 
     this.showToast({
       won: true,
@@ -3519,10 +3533,10 @@ class AppController {
     if (!this.dom.autoPicksGroup) return;
     if (this.currentGame === 'mines') {
       this.dom.autoPicksGroup.style.display = 'flex';
-      if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Diamond Picks";
+      if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Diamond Picks (1 - 24)";
     } else if (this.currentGame === 'chicken') {
       this.dom.autoPicksGroup.style.display = 'flex';
-      if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Cloche Picks";
+      if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Target Lanes (1 - 25)";
     } else {
       this.dom.autoPicksGroup.style.display = 'none';
     }
@@ -3538,15 +3552,12 @@ class AppController {
 
   updateAutoBetHelper() {
     if (!this.dom.autoBetCountHelper || !this.dom.autoBetCountInput) return;
-    const r = parseInt(this.dom.autoBetCountInput.value);
-    if (isNaN(r) || r <= 0) {
-      this.dom.autoBetCountHelper.innerText = "∞ Infinite Rounds";
-    } else {
-      this.dom.autoBetCountHelper.innerText = `${r} Rounds`;
-    }
+    const count = parseInt(this.dom.autoBetCountInput.value);
+    this.dom.autoBetCountHelper.innerText = (isNaN(count) || count === 0) ? 'Infinite Rounds' : `${count} Auto Rounds`;
   }
 
-  toggleAutoPlay() {
+  handleAutoPlayToggle() {
+    window.soundEngine.playClick();
     if (this.isAutoPlaying) {
       this.stopAutoPlay("Auto Play stopped by user.");
     } else {
@@ -3682,32 +3693,35 @@ class AppController {
     this.chicken.setBetAmount(betAmount);
     const started = this.chicken.startGame();
     if (!started) {
-      this.stopAutoPlay("Failed to start Chicken round.");
+      this.stopAutoPlay("Failed to start Chicken Road round.");
       return;
     }
 
-    const maxSafe = 25 - this.chicken.boneCount;
-    const picksCount = Math.min(maxSafe, Math.max(1, parseInt(this.dom.autoPicksCountInput ? this.dom.autoPicksCountInput.value : 3) || 3));
-    const allIndices = Array.from({ length: 25 }, (_, i) => i).sort(() => Math.random() - 0.5);
-    const picks = allIndices.slice(0, picksCount);
+    // Number of lanes to jump automatically (1 to 25)
+    const targetHops = Math.min(25, Math.max(1, parseInt(this.dom.autoPicksCountInput ? this.dom.autoPicksCountInput.value : 3) || 3));
+    let currentHop = 0;
 
-    picks.forEach((dishIdx, step) => {
-      const timer = setTimeout(() => {
-        if (!this.isAutoPlaying || !this.chicken.isPlaying) return;
-        this.chicken.revealDish(dishIdx);
+    const performNextHop = () => {
+      if (!this.isAutoPlaying || !this.chicken.isPlaying) return;
 
-        // If last pick and still safe, auto cash out!
-        if (step === picksCount - 1 && this.chicken.isPlaying) {
-          const cashoutTimer = setTimeout(() => {
-            if (this.isAutoPlaying && this.chicken.isPlaying) {
-              this.handleCashoutClick();
-            }
-          }, 180);
-          this.autoStepTimers.push(cashoutTimer);
-        }
-      }, (step + 1) * 240);
-      this.autoStepTimers.push(timer);
-    });
+      currentHop++;
+      this.chicken.hopForward();
+
+      if (currentHop < targetHops && this.chicken.isPlaying) {
+        const nextHopTimer = setTimeout(performNextHop, 340);
+        this.autoStepTimers.push(nextHopTimer);
+      } else if (currentHop >= targetHops && this.chicken.isPlaying && this.chicken.currentStep > 0) {
+        const cashoutTimer = setTimeout(() => {
+          if (this.isAutoPlaying && this.chicken.isPlaying) {
+            this.handleCashoutClick();
+          }
+        }, 220);
+        this.autoStepTimers.push(cashoutTimer);
+      }
+    };
+
+    const firstHopTimer = setTimeout(performNextHop, 260);
+    this.autoStepTimers.push(firstHopTimer);
   }
 
   runCrashAutoRound(betAmount) {

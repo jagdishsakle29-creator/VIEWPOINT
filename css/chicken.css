@@ -150,21 +150,23 @@
   z-index: 5;
   animation: henIdle 1.2s infinite ease-in-out;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8));
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .hen-character.hopping {
-  animation: henJump 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: henJump 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes henIdle {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-4px) scale(1.04); }
+  0%, 100% { transform: translateY(0) scale(1) translateZ(0); }
+  50% { transform: translateY(-4px) scale(1.04) translateZ(0); }
 }
 
 @keyframes henJump {
-  0% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-24px) scale(1.25) rotate(-6deg); }
-  100% { transform: translateY(0) scale(1); }
+  0% { transform: translateY(0) scale(1) translateZ(0); }
+  50% { transform: translateY(-24px) scale(1.2) rotate(-5deg) translateZ(0); }
+  100% { transform: translateY(0) scale(1) translateZ(0); }
 }
 
 /* Speeding Car Obstacle Animation */
