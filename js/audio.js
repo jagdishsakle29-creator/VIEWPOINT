@@ -302,6 +302,29 @@ class CasinoAudioEngine {
   playWin() {
     this.playDeposit();
   }
+
+  playCardFlip() {
+    this.triggerHaptic('light');
+    if (!this.enabled || !this.ctx) return;
+    try {
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(450, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.08);
+
+      gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.08);
+    } catch(e) {}
+  }
 }
 
 window.soundEngine = new CasinoAudioEngine();

@@ -221,6 +221,7 @@ class AppController {
       tabMines: document.getElementById('tabMines'),
       tabChicken: document.getElementById('tabChicken'),
       tabCrash: document.getElementById('tabCrash'),
+      tabDragonTiger: document.getElementById('tabDragonTiger'),
       tabColorTrading: document.getElementById('tabColorTrading'),
       tabStock: document.getElementById('tabStock'),
 
@@ -228,6 +229,7 @@ class AppController {
       minesView: document.getElementById('minesView'),
       chickenView: document.getElementById('chickenView'),
       crashView: document.getElementById('crashView'),
+      dragontigerView: document.getElementById('dragontigerView'),
       colortradingView: document.getElementById('colortradingView'),
       stockView: document.getElementById('stockView'),
 
@@ -286,7 +288,35 @@ class AppController {
       numberBetButtons: document.querySelectorAll('.btn-number-bet'),
       tradingActiveBetsSlip: document.getElementById('tradingActiveBetsSlip'),
       activeBetsList: document.getElementById('activeBetsList'),
-      trendBallsRow: document.getElementById('trendBallsRow'),
+      // Dragon Tiger Live Elements
+      dtStatusText: document.getElementById('dtStatusText'),
+      dtRoundIdTag: document.getElementById('dtRoundIdTag'),
+      dtTimerSeconds: document.getElementById('dtTimerSeconds'),
+      dtDragonPod: document.getElementById('dtDragonPod'),
+      dtTigerPod: document.getElementById('dtTigerPod'),
+      dtDragonCardInner: document.getElementById('dtDragonCardInner'),
+      dtTigerCardInner: document.getElementById('dtTigerCardInner'),
+      dtDragonCardFront: document.getElementById('dtDragonCardFront'),
+      dtTigerCardFront: document.getElementById('dtTigerCardFront'),
+      dtDragonRankTop: document.getElementById('dtDragonRankTop'),
+      dtDragonSuitTop: document.getElementById('dtDragonSuitTop'),
+      dtDragonSuitCenter: document.getElementById('dtDragonSuitCenter'),
+      dtDragonRankBot: document.getElementById('dtDragonRankBot'),
+      dtDragonSuitBot: document.getElementById('dtDragonSuitBot'),
+      dtTigerRankTop: document.getElementById('dtTigerRankTop'),
+      dtTigerSuitTop: document.getElementById('dtTigerSuitTop'),
+      dtTigerSuitCenter: document.getElementById('dtTigerSuitCenter'),
+      dtTigerRankBot: document.getElementById('dtTigerRankBot'),
+      dtTigerSuitBot: document.getElementById('dtTigerSuitBot'),
+      dtDragonScorePill: document.getElementById('dtDragonScorePill'),
+      dtTigerScorePill: document.getElementById('dtTigerScorePill'),
+      dtWinnerBanner: document.getElementById('dtWinnerBanner'),
+      dtTotalBetDisplay: document.getElementById('dtTotalBetDisplay'),
+      dtBeadRoadGrid: document.getElementById('dtBeadRoadGrid'),
+      dtStatDragon: document.getElementById('dtStatDragon'),
+      dtStatTiger: document.getElementById('dtStatTiger'),
+      dtStatTie: document.getElementById('dtStatTie'),
+      dtCasinoChips: document.querySelectorAll('.dt-casino-chip'),
 
       // Stock Market Elements
       stockAssetSelect: document.getElementById('stockAssetSelect'),
@@ -543,7 +573,55 @@ class AppController {
       this.renderCrashHistory();
     }
 
-    // 4. Color Trading Game Instance
+    // 4. Dragon Tiger Live Casino Game Instance (Evolution Theme)
+    if (window.DragonTigerGame) {
+      this.dragontiger = new window.DragonTigerGame({
+        onTimerTick: (data) => {
+          if (this.dom.dtRoundIdTag) this.dom.dtRoundIdTag.innerText = data.roundId;
+          if (this.dom.dtTimerSeconds) {
+            this.dom.dtTimerSeconds.innerText = data.timeLeft;
+            this.dom.dtTimerSeconds.classList.toggle('hurry', data.timeLeft <= 3);
+          }
+          if (this.dom.dtStatusText) {
+            if (data.state === 'betting') {
+              this.dom.dtStatusText.innerText = data.timeLeft <= 3 ? "BETS CLOSING..." : "PLACE YOUR BETS";
+              this.dom.dtStatusText.style.color = data.timeLeft <= 3 ? "#ff3366" : "#fbbf24";
+            }
+          }
+        },
+        onDealingStart: (data) => {
+          if (this.dom.dtStatusText) {
+            this.dom.dtStatusText.innerText = "DEALING CARDS...";
+            this.dom.dtStatusText.style.color = "#00e5ff";
+          }
+          this.resetDtTableVisuals();
+        },
+        onDragonCardReveal: (card) => {
+          this.revealDtCard('dragon', card);
+        },
+        onTigerCardReveal: (card) => {
+          this.revealDtCard('tiger', card);
+        },
+        onRoundSettled: (res) => {
+          this.handleDtRoundSettled(res);
+        },
+        onNewRoundReady: (data) => {
+          this.resetDtTableVisuals();
+          if (this.dom.dtStatusText) {
+            this.dom.dtStatusText.innerText = "PLACE YOUR BETS";
+            this.dom.dtStatusText.style.color = "#fbbf24";
+          }
+          if (this.dom.dtRoundIdTag) this.dom.dtRoundIdTag.innerText = data.roundId;
+          this.renderDtBeadRoad(data.history);
+        },
+        onBetsUpdated: (bets, total) => {
+          this.updateDtChipBadges(bets, total);
+        }
+      });
+      this.renderDtBeadRoad(this.dragontiger.history);
+    }
+
+    // 5. Color Trading Game Instance
     if (window.ColorTradingGame) {
       this.colortrading = new window.ColorTradingGame({
         onTimerTick: (data) => {
@@ -1007,6 +1085,7 @@ class AppController {
     if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
     if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
     if (this.dom.tabCrash) this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
+    if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.addEventListener('click', () => this.switchGame('dragontiger'));
     if (this.dom.tabColorTrading) this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
     if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
 
@@ -2765,8 +2844,8 @@ class AppController {
     this.hideToast();
 
     // Reset all tab classes
-    [this.dom.tabMines, this.dom.tabChicken, this.dom.tabCrash, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
-    [this.dom.minesView, this.dom.chickenView, this.dom.crashView, this.dom.colortradingView, this.dom.stockView].forEach(v => v && v.classList.remove('active'));
+    [this.dom.tabMines, this.dom.tabChicken, this.dom.tabCrash, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
+    [this.dom.minesView, this.dom.chickenView, this.dom.crashView, this.dom.dragontigerView, this.dom.colortradingView, this.dom.stockView].forEach(v => v && v.classList.remove('active'));
 
     // Reset control groups safely
     if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'none';
@@ -2779,8 +2858,8 @@ class AppController {
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Auto Play Toggle visibility: Enabled ONLY on Mines, Chicken, Crash (Disabled on Color Trading & Stock)
-    if (gameType === 'colortrading' || gameType === 'stock') {
+    // Auto Play Toggle visibility: Enabled ONLY on Mines, Chicken, Crash (Disabled on Dragon Tiger, Color Trading & Stock)
+    if (gameType === 'colortrading' || gameType === 'stock' || gameType === 'dragontiger') {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
       if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
@@ -2836,6 +2915,14 @@ class AppController {
         this.crash.renderIdle();
         this.renderCrashHistory();
       }
+    } else if (gameType === 'dragontiger') {
+      if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.classList.add('active');
+      if (this.dom.dragontigerView) this.dom.dragontigerView.classList.add('active');
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
+      this.activeInstance = this.dragontiger;
+      if (this.dragontiger) {
+        this.renderDtBeadRoad(this.dragontiger.history);
+      }
     } else if (gameType === 'colortrading') {
       if (this.dom.tabColorTrading) this.dom.tabColorTrading.classList.add('active');
       if (this.dom.colortradingView) this.dom.colortradingView.classList.add('active');
@@ -2858,10 +2945,10 @@ class AppController {
       }
     }
 
-    if (this.betMode === 'auto' && gameType !== 'colortrading' && gameType !== 'stock') {
+    if (this.betMode === 'auto' && gameType !== 'colortrading' && gameType !== 'stock' && gameType !== 'dragontiger') {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
-    } else if (gameType !== 'colortrading' && gameType !== 'stock') {
+    } else if (gameType !== 'colortrading' && gameType !== 'stock' && gameType !== 'dragontiger') {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
     }
@@ -4011,6 +4098,194 @@ class AppController {
     setTimeout(() => {
       this.dom.liveWinFloatingToast.classList.remove('show');
     }, 3800);
+  }
+
+  // ================= DRAGON TIGER LIVE CONTROLLER METHODS =================
+  selectDtChip(val) {
+    if (this.dragontiger) {
+      this.dragontiger.setSelectedChip(val);
+    }
+    const chips = document.querySelectorAll('.dt-casino-chip');
+    chips.forEach(c => {
+      const chipVal = parseFloat(c.dataset.chip);
+      c.classList.toggle('active', chipVal === parseFloat(val));
+    });
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+  }
+
+  handleDtBetClick(spotId) {
+    if (!this.dragontiger) return;
+    const res = this.dragontiger.placeBet(spotId);
+    if (!res.success) {
+      this.showNotification(res.msg, 'error');
+    }
+  }
+
+  handleDtClearBets() {
+    if (!this.dragontiger) return;
+    const res = this.dragontiger.clearBets();
+    if (!res.success) {
+      this.showNotification(res.msg, 'info');
+    } else {
+      this.showNotification(`Refunded ${window.wallet.currency}${res.refunded.toFixed(2)} bets.`, 'info');
+    }
+  }
+
+  handleDtDoubleBets() {
+    if (!this.dragontiger) return;
+    const res = this.dragontiger.doubleBets();
+    if (!res.success) {
+      this.showNotification(res.msg, 'error');
+    } else {
+      window.soundEngine && window.soundEngine.playBet && window.soundEngine.playBet();
+    }
+  }
+
+  handleDtRebet() {
+    if (!this.dragontiger) return;
+    const res = this.dragontiger.rebet();
+    if (!res.success) {
+      this.showNotification(res.msg, 'error');
+    } else {
+      window.soundEngine && window.soundEngine.playBet && window.soundEngine.playBet();
+      this.showNotification(`Rebet placed: ${window.wallet.currency}${res.total.toFixed(2)}!`, 'success');
+    }
+  }
+
+  revealDtCard(side, card) {
+    if (!card) return;
+    const isDragon = side === 'dragon';
+    const inner = isDragon ? this.dom.dtDragonCardInner : this.dom.dtTigerCardInner;
+    const front = isDragon ? this.dom.dtDragonCardFront : this.dom.dtTigerCardFront;
+    const rTop = isDragon ? this.dom.dtDragonRankTop : this.dom.dtTigerRankTop;
+    const sTop = isDragon ? this.dom.dtDragonSuitTop : this.dom.dtTigerSuitTop;
+    const sCenter = isDragon ? this.dom.dtDragonSuitCenter : this.dom.dtTigerSuitCenter;
+    const rBot = isDragon ? this.dom.dtDragonRankBot : this.dom.dtTigerRankBot;
+    const sBot = isDragon ? this.dom.dtDragonSuitBot : this.dom.dtTigerSuitBot;
+    const scorePill = isDragon ? this.dom.dtDragonScorePill : this.dom.dtTigerScorePill;
+
+    if (rTop) rTop.innerText = card.rank;
+    if (sTop) sTop.innerText = card.suit;
+    if (sCenter) sCenter.innerText = card.suit;
+    if (rBot) rBot.innerText = card.rank;
+    if (sBot) sBot.innerText = card.suit;
+
+    if (front) {
+      front.className = card.isRed ? 'dt-card-face dt-card-front red-suit' : 'dt-card-face dt-card-front black-suit';
+    }
+
+    if (inner) {
+      inner.classList.add('flipped');
+    }
+
+    if (scorePill) {
+      scorePill.innerText = `${card.rank} (${card.value})`;
+      scorePill.style.color = card.isRed ? '#ff4d4d' : '#00e5ff';
+    }
+  }
+
+  handleDtRoundSettled(res) {
+    // Highlight winning side
+    if (res.winner === 'D') {
+      if (this.dom.dtDragonPod) this.dom.dtDragonPod.classList.add('winner');
+      if (this.dom.dtWinnerBanner) {
+        this.dom.dtWinnerBanner.innerText = "🐉 DRAGON WINS!";
+        this.dom.dtWinnerBanner.className = "dt-winner-banner dragon-won";
+      }
+    } else if (res.winner === 'T') {
+      if (this.dom.dtTigerPod) this.dom.dtTigerPod.classList.add('winner');
+      if (this.dom.dtWinnerBanner) {
+        this.dom.dtWinnerBanner.innerText = "🐯 TIGER WINS!";
+        this.dom.dtWinnerBanner.className = "dt-winner-banner tiger-won";
+      }
+    } else {
+      if (this.dom.dtWinnerBanner) {
+        this.dom.dtWinnerBanner.innerText = res.isSuitedTie ? "💎 SUITED TIE (50:1)!" : "🟢 TIE (11:1)!";
+        this.dom.dtWinnerBanner.className = "dt-winner-banner tie-won";
+      }
+    }
+
+    if (res.totalWinPayout > 0) {
+      this.showNotification(`🎉 Dragon Tiger Payout: ${window.wallet.currency}${res.totalWinPayout.toFixed(2)}!`, 'success');
+    } else if (res.totalUserBet > 0) {
+      this.showNotification(`💥 Round settled. Good luck next round!`, 'info');
+    }
+
+    this.renderDtBeadRoad(res.history);
+    this.renderHistoryTable();
+  }
+
+  resetDtTableVisuals() {
+    if (this.dom.dtDragonCardInner) this.dom.dtDragonCardInner.classList.remove('flipped');
+    if (this.dom.dtTigerCardInner) this.dom.dtTigerCardInner.classList.remove('flipped');
+    if (this.dom.dtDragonPod) this.dom.dtDragonPod.classList.remove('winner');
+    if (this.dom.dtTigerPod) this.dom.dtTigerPod.classList.remove('winner');
+    if (this.dom.dtDragonScorePill) {
+      this.dom.dtDragonScorePill.innerText = "--";
+      this.dom.dtDragonScorePill.style.color = "#e2e8f0";
+    }
+    if (this.dom.dtTigerScorePill) {
+      this.dom.dtTigerScorePill.innerText = "--";
+      this.dom.dtTigerScorePill.style.color = "#e2e8f0";
+    }
+    if (this.dom.dtWinnerBanner) {
+      this.dom.dtWinnerBanner.innerText = "READY";
+      this.dom.dtWinnerBanner.className = "dt-winner-banner";
+    }
+  }
+
+  updateDtChipBadges(bets, total) {
+    // Reset all spot badges
+    const allBadges = document.querySelectorAll('.dt-spot-chip-badge');
+    allBadges.forEach(b => {
+      b.innerText = '₹0';
+    });
+    const allSpots = document.querySelectorAll('.dt-bet-spot, .dt-side-bet-btn');
+    allSpots.forEach(s => s.classList.remove('has-bet'));
+
+    // Apply active bets
+    for (const spotId in bets) {
+      const amt = bets[spotId];
+      const badge = document.getElementById(`dtChip_${spotId}`);
+      if (badge && amt > 0) {
+        badge.innerText = `${window.wallet.currency}${amt >= 1000 ? (amt/1000)+'k' : amt}`;
+        const parentSpot = badge.closest('.dt-bet-spot, .dt-side-bet-btn');
+        if (parentSpot) parentSpot.classList.add('has-bet');
+      }
+    }
+
+    if (this.dom.dtTotalBetDisplay) {
+      this.dom.dtTotalBetDisplay.innerText = `${window.wallet.currency}${(total || 0).toFixed(2)}`;
+    }
+  }
+
+  renderDtBeadRoad(history) {
+    if (!this.dom.dtBeadRoadGrid || !history) return;
+    this.dom.dtBeadRoadGrid.innerHTML = '';
+
+    // Render up to 32 road beads
+    history.slice(0, 32).forEach(item => {
+      const cell = document.createElement('div');
+      const win = item.winner;
+      if (win === 'D') {
+        cell.className = 'dt-bead-cell d';
+        cell.innerText = 'D';
+      } else if (win === 'T') {
+        cell.className = 'dt-bead-cell t';
+        cell.innerText = 'T';
+      } else {
+        cell.className = 'dt-bead-cell tie';
+        cell.innerText = 'Tie';
+      }
+      this.dom.dtBeadRoadGrid.appendChild(cell);
+    });
+
+    if (this.dragontiger) {
+      const stats = this.dragontiger.getRoadmapStats();
+      if (this.dom.dtStatDragon) this.dom.dtStatDragon.innerText = `🐉 D: ${stats.dragonPercent}%`;
+      if (this.dom.dtStatTiger) this.dom.dtStatTiger.innerText = `🐯 T: ${stats.tigerPercent}%`;
+      if (this.dom.dtStatTie) this.dom.dtStatTie.innerText = `🟢 Tie: ${stats.tiePercent}%`;
+    }
   }
 }
 

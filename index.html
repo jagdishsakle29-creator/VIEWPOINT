@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/crash.css">
   <link rel="stylesheet" href="css/colortrading.css">
   <link rel="stylesheet" href="css/stocktrading.css">
+  <link rel="stylesheet" href="css/dragontiger.css">
 </head>
 <body>
 
@@ -149,6 +150,11 @@
         <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.app && window.app.switchGame('crash')">
           <svg class="game-svg-icon" viewBox="0 0 24 24"><path d="M14 2c0 0 6 3 6 10l-4 4-4-4c0-4-3-6-3-6s3-1 5-4z" fill="#00f5d4"/><path d="M12 12l-4 4-4-1 3-3 5 0z" fill="#00b4d8"/><path d="M5 19l2 2-4 1 2-3z" fill="#f59e0b"/><circle cx="15" cy="8" r="1.5" fill="#ffffff"/></svg>
           <span>Crash</span>
+        </button>
+        <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.app && window.app.switchGame('dragontiger')" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
+          <span style="font-weight: 800;">Dragon Tiger</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #dc2626, #f59e0b); color: #fff; font-size:10px; font-weight:900;">LIVE</span>
         </button>
         <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.app && window.app.switchGame('colortrading')">
           <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#1e293b" stroke="#334155" stroke-width="1.5"/><path d="M12 3a9 9 0 0 1 7.8 4.5L12 12V3z" fill="#00e701"/><path d="M19.8 7.5A9 9 0 0 1 19.8 16.5L12 12l7.8-4.5z" fill="#fe2c55"/><path d="M19.8 16.5A9 9 0 0 1 12 21V12l7.8 4.5z" fill="#8b5cf6"/><circle cx="12" cy="12" r="3.5" fill="#0f172a" stroke="#ffffff" stroke-width="1.5"/></svg>
@@ -497,7 +503,213 @@
           </div>
         </div>
 
-        <!-- Game 4: Tiranga Color Trading (Win Go) View -->
+        <!-- Game 4: Evolution Gaming Dragon Tiger Live View -->
+        <div id="dragontigerView" class="game-view dragontiger-view">
+          <div class="dt-live-stage">
+            <!-- Stage Header: Status, Round ID & Countdown -->
+            <div class="dt-header-bar">
+              <div class="dt-status-pill">
+                <span class="dt-live-dot"></span>
+                <span id="dtStatusText" class="dt-status-text">PLACE YOUR BETS</span>
+              </div>
+              <div style="font-family: var(--font-display); font-size: 11px; font-weight: 800; color: #94a3b8;" id="dtRoundIdTag">DT-0001</div>
+              <div class="dt-timer-container">
+                <span class="dt-timer-clock">⏱️</span>
+                <span id="dtTimerSeconds" class="dt-timer-seconds">15</span>
+              </div>
+            </div>
+
+            <!-- Arena Table: Dragon vs Tiger Card Dealing -->
+            <div class="dt-arena-table">
+              <!-- Dragon Pod -->
+              <div class="dt-fighter-pod dragon" id="dtDragonPod">
+                <div class="dt-fighter-badge dragon">
+                  <span>🐉</span>
+                  <span>DRAGON</span>
+                </div>
+                <!-- 3D Dragon Card -->
+                <div class="dt-card-slot">
+                  <div class="dt-card-inner" id="dtDragonCardInner">
+                    <!-- Back of Card -->
+                    <div class="dt-card-face dt-card-back">
+                      <div class="dt-card-back-pattern">
+                        <div class="dt-card-back-logo">🐉<br>DRAGON</div>
+                      </div>
+                    </div>
+                    <!-- Front of Card -->
+                    <div class="dt-card-face dt-card-front" id="dtDragonCardFront">
+                      <div class="dt-card-corner-top">
+                        <span id="dtDragonRankTop">K</span>
+                        <span class="dt-card-suit-mini" id="dtDragonSuitTop">♠</span>
+                      </div>
+                      <div class="dt-card-center-suit" id="dtDragonSuitCenter">♠</div>
+                      <div class="dt-card-corner-bot">
+                        <span id="dtDragonRankBot">K</span>
+                        <span class="dt-card-suit-mini" id="dtDragonSuitBot">♠</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dt-card-score-pill" id="dtDragonScorePill">--</div>
+              </div>
+
+              <!-- Center VS & Winner Announcement -->
+              <div class="dt-center-arena">
+                <div class="dt-vs-emblem">VS</div>
+                <div id="dtWinnerBanner" class="dt-winner-banner">READY</div>
+              </div>
+
+              <!-- Tiger Pod -->
+              <div class="dt-fighter-pod tiger" id="dtTigerPod">
+                <div class="dt-fighter-badge tiger">
+                  <span>🐯</span>
+                  <span>TIGER</span>
+                </div>
+                <!-- 3D Tiger Card -->
+                <div class="dt-card-slot">
+                  <div class="dt-card-inner" id="dtTigerCardInner">
+                    <!-- Back of Card -->
+                    <div class="dt-card-face dt-card-back" style="border-color: #f59e0b;">
+                      <div class="dt-card-back-pattern">
+                        <div class="dt-card-back-logo" style="color: #f59e0b;">🐯<br>TIGER</div>
+                      </div>
+                    </div>
+                    <!-- Front of Card -->
+                    <div class="dt-card-face dt-card-front" id="dtTigerCardFront">
+                      <div class="dt-card-corner-top">
+                        <span id="dtTigerRankTop">A</span>
+                        <span class="dt-card-suit-mini" id="dtTigerSuitTop">♥</span>
+                      </div>
+                      <div class="dt-card-center-suit" id="dtTigerSuitCenter">♥</div>
+                      <div class="dt-card-corner-bot">
+                        <span id="dtTigerRankBot">A</span>
+                        <span class="dt-card-suit-mini" id="dtTigerSuitBot">♥</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dt-card-score-pill" id="dtTigerScorePill">--</div>
+              </div>
+            </div>
+
+            <!-- Evolution Style Main Betting Board -->
+            <div class="dt-betting-board">
+              <!-- Spot 1: DRAGON -->
+              <div class="dt-bet-spot dragon-spot" data-spot="dragon" onclick="window.app && window.app.handleDtBetClick('dragon')">
+                <div class="dt-bet-spot-title" style="color: #ff4d4d;">🐉 DRAGON</div>
+                <div class="dt-bet-spot-payout">1 : 1 (2.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon">₹0</div>
+              </div>
+
+              <!-- Spot 2: TIE -->
+              <div class="dt-bet-spot tie-spot" data-spot="tie" onclick="window.app && window.app.handleDtBetClick('tie')">
+                <div class="dt-bet-spot-title" style="color: #10b981;">🟢 TIE</div>
+                <div class="dt-bet-spot-payout">11 : 1 (12.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_tie">₹0</div>
+              </div>
+
+              <!-- Spot 3: SUITED TIE -->
+              <div class="dt-bet-spot suited-tie-spot" data-spot="suited_tie" onclick="window.app && window.app.handleDtBetClick('suited_tie')">
+                <div class="dt-bet-spot-title" style="color: #c084fc;">💎 SUITED TIE</div>
+                <div class="dt-bet-spot-payout">50 : 1 (51.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_suited_tie">₹0</div>
+              </div>
+
+              <!-- Spot 4: TIGER -->
+              <div class="dt-bet-spot tiger-spot" data-spot="tiger" onclick="window.app && window.app.handleDtBetClick('tiger')">
+                <div class="dt-bet-spot-title" style="color: #fbbf24;">🐯 TIGER</div>
+                <div class="dt-bet-spot-payout">1 : 1 (2.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger">₹0</div>
+              </div>
+            </div>
+
+            <!-- Side Bets Row -->
+            <div class="dt-side-bets-row">
+              <div class="dt-side-bet-btn" data-spot="dragon_big" onclick="window.app && window.app.handleDtBetClick('dragon_big')">
+                <span class="dt-side-title">🐉 Dragon Big (8-K)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_big">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="dragon_small" onclick="window.app && window.app.handleDtBetClick('dragon_small')">
+                <span class="dt-side-title">🐉 Dragon Small (A-6)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_small">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_big" onclick="window.app && window.app.handleDtBetClick('tiger_big')">
+                <span class="dt-side-title">🐯 Tiger Big (8-K)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_big">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_small" onclick="window.app && window.app.handleDtBetClick('tiger_small')">
+                <span class="dt-side-title">🐯 Tiger Small (A-6)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_small">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="dragon_red" onclick="window.app && window.app.handleDtBetClick('dragon_red')">
+                <span class="dt-side-title" style="color:#ef4444;">🐉 Dragon Red ♥️♦️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_red">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="dragon_black" onclick="window.app && window.app.handleDtBetClick('dragon_black')">
+                <span class="dt-side-title">🐉 Dragon Black ♠️♣️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_black">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_red" onclick="window.app && window.app.handleDtBetClick('tiger_red')">
+                <span class="dt-side-title" style="color:#ef4444;">🐯 Tiger Red ♥️♦️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_red">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_black" onclick="window.app && window.app.handleDtBetClick('tiger_black')">
+                <span class="dt-side-title">🐯 Tiger Black ♠️♣️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_black">₹0</div>
+              </div>
+            </div>
+
+            <!-- Evolution Luxury Chip Selector & Betting Tools -->
+            <div class="dt-chips-control-bar">
+              <div class="dt-chips-row">
+                <div class="dt-casino-chip chip-10 active" data-chip="10" onclick="window.app && window.app.selectDtChip(10)">₹10</div>
+                <div class="dt-casino-chip chip-50" data-chip="50" onclick="window.app && window.app.selectDtChip(50)">₹50</div>
+                <div class="dt-casino-chip chip-100" data-chip="100" onclick="window.app && window.app.selectDtChip(100)">₹100</div>
+                <div class="dt-casino-chip chip-500" data-chip="500" onclick="window.app && window.app.selectDtChip(500)">₹500</div>
+                <div class="dt-casino-chip chip-1000" data-chip="1000" onclick="window.app && window.app.selectDtChip(1000)">₹1K</div>
+                <div class="dt-casino-chip chip-5000" data-chip="5000" onclick="window.app && window.app.selectDtChip(5000)">₹5K</div>
+              </div>
+              <div class="dt-chip-tools">
+                <button class="dt-tool-btn btn-clear" onclick="window.app && window.app.handleDtClearBets()">✕ Clear</button>
+                <button class="dt-tool-btn btn-double" onclick="window.app && window.app.handleDtDoubleBets()">2X Double</button>
+                <button class="dt-tool-btn btn-rebet" onclick="window.app && window.app.handleDtRebet()">↺ Rebet</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Active Bet Slip -->
+          <div class="dt-active-slip">
+            <span>Your Total Round Stake:</span>
+            <span class="dt-total-bet-val" id="dtTotalBetDisplay">₹0.00</span>
+          </div>
+
+          <!-- Scoreboard Roadmap: Bead Road & Live Stats -->
+          <div class="dt-roadmap-card">
+            <div class="dt-roadmap-header">
+              <span class="dt-roadmap-title">📊 Bead Road Streak History</span>
+              <div class="dt-stats-row">
+                <span class="dt-stat-pill dragon" id="dtStatDragon">🐉 D: 45%</span>
+                <span class="dt-stat-pill tiger" id="dtStatTiger">🐯 T: 45%</span>
+                <span class="dt-stat-pill tie" id="dtStatTie">🟢 Tie: 10%</span>
+              </div>
+            </div>
+            <div class="dt-bead-road-container">
+              <div class="dt-bead-road-grid" id="dtBeadRoadGrid">
+                <!-- Dynamically filled with D, T, Tie badges -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 5: Tiranga Color Trading (Win Go) View -->
         <div id="colortradingView" class="game-view colortrading-view">
           <!-- Tiranga Intervals -->
           <div class="tiranga-modes-row">
@@ -1764,6 +1976,7 @@
   <script src="js/mines.js?v=3.1"></script>
   <script src="js/chicken.js?v=3.1"></script>
   <script src="js/crash.js?v=3.1"></script>
+  <script src="js/dragontiger.js?v=3.1"></script>
   <script src="js/colortrading.js?v=3.1"></script>
   <script src="js/stocktrading.js?v=3.1"></script>
   <script src="js/app.js?v=3.1"></script>
