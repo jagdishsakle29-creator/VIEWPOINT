@@ -317,6 +317,7 @@ class AppController {
       dtStatTiger: document.getElementById('dtStatTiger'),
       dtStatTie: document.getElementById('dtStatTie'),
       dtCasinoChips: document.querySelectorAll('.dt-casino-chip'),
+      modalDtHowToPlay: document.getElementById('modalDtHowToPlay'),
 
       // Stock Market Elements
       stockAssetSelect: document.getElementById('stockAssetSelect'),
@@ -4101,6 +4102,19 @@ class AppController {
   }
 
   // ================= DRAGON TIGER LIVE CONTROLLER METHODS =================
+  openDtHowToPlayModal() {
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    if (this.dom.modalDtHowToPlay) {
+      this.dom.modalDtHowToPlay.classList.add('open');
+    }
+  }
+
+  closeDtHowToPlayModal() {
+    if (this.dom.modalDtHowToPlay) {
+      this.dom.modalDtHowToPlay.classList.remove('open');
+    }
+  }
+
   selectDtChip(val) {
     if (this.dragontiger) {
       this.dragontiger.setSelectedChip(val);

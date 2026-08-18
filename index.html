@@ -512,6 +512,9 @@
                 <span class="dt-live-dot"></span>
                 <span id="dtStatusText" class="dt-status-text">PLACE YOUR BETS</span>
               </div>
+              <button id="btnDtHowToPlay" class="dt-help-btn" onclick="window.app && window.app.openDtHowToPlayModal()" title="How to Play Dragon Tiger">
+                <span>📖 How to Play</span>
+              </button>
               <div style="font-family: var(--font-display); font-size: 11px; font-weight: 800; color: #94a3b8;" id="dtRoundIdTag">DT-0001</div>
               <div class="dt-timer-container">
                 <span class="dt-timer-clock">⏱️</span>
@@ -1384,6 +1387,64 @@
         1. Share your link with friends.<br>
         2. When they register and play games, you earn 1.0% commission instantly.<br>
         3. Withdraw or use commissions anytime with 0 wagering requirement.
+      </div>
+    </div>
+  </div>
+
+  <!-- Dragon Tiger How to Play Guide Modal -->
+  <div id="modalDtHowToPlay" class="modal-backdrop">
+    <div class="modal-card modal-dt-rules-card" style="max-width: 540px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🐉🐯</span>
+          <h3 class="modal-title">Dragon Tiger - Rules & How to Play</h3>
+        </div>
+        <button id="btnCloseDtRulesModal" class="modal-close-btn" onclick="window.app && window.app.closeDtHowToPlayModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body dt-rules-body" style="max-height: 70vh; overflow-y: auto; padding-right: 4px;">
+        <div class="dt-rule-card">
+          <h4 style="color: #fbbf24; margin-bottom: 6px; font-size: 14px;">🎯 Game Objective</h4>
+          <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin: 0;">Two cards are dealt from a 52-card shoe: one to <strong>Dragon (🐉)</strong> and one to <strong>Tiger (🐯)</strong>. The side that receives the higher value card wins the round!</p>
+        </div>
+
+        <div class="dt-rule-card" style="margin-top: 10px;">
+          <h4 style="color: #38bdf8; margin-bottom: 6px; font-size: 14px;">🎴 Card Rank Hierarchy</h4>
+          <div style="background: rgba(15, 23, 42, 0.6); padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: #f8fafc; text-align: center;">
+            <span style="color:#00e5ff;">K (13)</span> &gt; <span style="color:#00e5ff;">Q (12)</span> &gt; <span style="color:#00e5ff;">J (11)</span> &gt; 10 &gt; 9 &gt; 8 &gt; 7 &gt; 6 &gt; 5 &gt; 4 &gt; 3 &gt; 2 &gt; <span style="color:#ef4444;">A (1, Lowest)</span>
+          </div>
+          <p style="font-size: 11px; color: #94a3b8; margin-top: 4px; margin-bottom: 0;">*Suits (♠, ♥, ♦, ♣) do not affect main card ranking.</p>
+        </div>
+
+        <div class="dt-rule-card" style="margin-top: 10px;">
+          <h4 style="color: #00e701; margin-bottom: 8px; font-size: 14px;">💰 Bets & Payout Table</h4>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #ff4d4d;">🐉 Dragon Bet</span>
+              <span style="font-weight: 800; color: #fff;">1 : 1 (2.0x) • 50% refund on Tie</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #fbbf24;">🐯 Tiger Bet</span>
+              <span style="font-weight: 800; color: #fff;">1 : 1 (2.0x) • 50% refund on Tie</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #34d399;">🟢 Tie Bet (Same Rank)</span>
+              <span style="font-weight: 800; color: #00e701;">11 : 1 (12.0x)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #c084fc;">💎 Suited Tie (Same Rank & Suit)</span>
+              <span style="font-weight: 800; color: #e879f9;">50 : 1 (51.0x)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #38bdf8;">🎯 Side Bets (Big/Small, Red/Black)</span>
+              <span style="font-weight: 800; color: #fff;">1 : 1 (2.0x)</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-action-primary" style="margin-top: 14px; width: 100%; height: 44px;" onclick="window.app && window.app.closeDtHowToPlayModal()">
+          <span>✅ Got It! Let's Play</span>
+        </button>
       </div>
     </div>
   </div>
