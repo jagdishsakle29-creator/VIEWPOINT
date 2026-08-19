@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=27.0">
-  <link rel="stylesheet" href="css/mines.css?v=27.0">
-  <link rel="stylesheet" href="css/chicken.css?v=27.0">
-  <link rel="stylesheet" href="css/crash.css?v=27.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=27.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=27.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=27.0">
+  <link rel="stylesheet" href="css/style.css?v=28.0">
+  <link rel="stylesheet" href="css/mines.css?v=28.0">
+  <link rel="stylesheet" href="css/chicken.css?v=28.0">
+  <link rel="stylesheet" href="css/crash.css?v=28.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=28.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=28.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=28.0">
 </head>
 <body>
 
@@ -304,12 +304,12 @@
 
     window.switchAdminTab = function(t) {
       if (window.app && window.app.switchAdminTab) return window.app.switchAdminTab(t);
-      var tabs = ['tabAdminPending', 'tabAdminWithdraw', 'tabAdminUpi', 'tabAdminTelegram', 'tabAdminSms', 'tabAdminUsers'];
+      var tabs = ['tabAdminPending', 'tabAdminWithdraw', 'tabAdminAnalytics', 'tabAdminUsers', 'tabAdminUpi', 'tabAdminTelegram', 'tabAdminSms'];
       tabs.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.classList.remove('active');
       });
-      var views = ['viewAdminPending', 'viewAdminWithdraw', 'viewAdminUpi', 'viewAdminTelegram', 'viewAdminSms', 'viewAdminUsers'];
+      var views = ['viewAdminPending', 'viewAdminWithdraw', 'viewAdminAnalytics', 'viewAdminUsers', 'viewAdminUpi', 'viewAdminTelegram', 'viewAdminSms'];
       views.forEach(function(id) {
         var el = document.getElementById(id);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
@@ -318,10 +318,11 @@
       var map = {
         pending: ['tabAdminPending', 'viewAdminPending'],
         withdraw: ['tabAdminWithdraw', 'viewAdminWithdraw'],
+        analytics: ['tabAdminAnalytics', 'viewAdminAnalytics'],
+        users: ['tabAdminUsers', 'viewAdminUsers'],
         upi: ['tabAdminUpi', 'viewAdminUpi'],
         telegram: ['tabAdminTelegram', 'viewAdminTelegram'],
-        sms: ['tabAdminSms', 'viewAdminSms'],
-        users: ['tabAdminUsers', 'viewAdminUsers']
+        sms: ['tabAdminSms', 'viewAdminSms']
       };
       if (map[t]) {
         var tabEl = document.getElementById(map[t][0]);
@@ -2441,6 +2442,13 @@
           <span>💸 Withdrawals</span>
           <span id="adminWithdrawBadge" class="admin-badge-count" style="background:#f59e0b;">0</span>
         </button>
+        <button id="tabAdminAnalytics" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('analytics') : (window.app && window.app.switchAdminTab('analytics'))">
+          <span>📊 6-Month Ledger</span>
+        </button>
+        <button id="tabAdminUsers" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('users') : (window.app && window.app.switchAdminTab('users'))">
+          <span>👥 Members</span>
+          <span id="adminUsersBadge" class="admin-badge-count" style="background:#3b82f6;">0</span>
+        </button>
         <button id="tabAdminUpi" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('upi') : (window.app && window.app.switchAdminTab('upi'))">
           <span>💳 UPI Config</span>
         </button>
@@ -2449,10 +2457,6 @@
         </button>
         <button id="tabAdminSms" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('sms') : (window.app && window.app.switchAdminTab('sms'))">
           <span>📲 SMS & Email API</span>
-        </button>
-        <button id="tabAdminUsers" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('users') : (window.app && window.app.switchAdminTab('users'))">
-          <span>👥 Members & FB Logins</span>
-          <span id="adminUsersBadge" class="admin-badge-count" style="background:#3b82f6;">0</span>
         </button>
       </div>
 
@@ -2574,12 +2578,67 @@
         </button>
       </div>
 
+      <!-- View: 6-Month Financial Ledger & Monthly Revenue -->
+      <div id="viewAdminAnalytics" class="admin-tab-view">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 14px;">
+          <div style="background: rgba(0, 231, 1, 0.1); border: 1px solid rgba(0, 231, 1, 0.3); border-radius: 12px; padding: 12px; text-align: center;">
+            <div style="font-size: 11px; color: var(--accent-green); font-weight: 800; text-transform: uppercase;">This Month Deposits</div>
+            <div style="font-size: 18px; font-weight: 900; color: #fff; margin-top: 4px;" id="adminThisMonthDep">₹0.00</div>
+          </div>
+          <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 12px; text-align: center;">
+            <div style="font-size: 11px; color: #f87171; font-weight: 800; text-transform: uppercase;">This Month Payouts</div>
+            <div style="font-size: 18px; font-weight: 900; color: #fff; margin-top: 4px;" id="adminThisMonthWth">₹0.00</div>
+          </div>
+          <div style="background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 12px; padding: 12px; text-align: center;">
+            <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase;">Net Profit (GGR)</div>
+            <div style="font-size: 18px; font-weight: 900; color: #00e701; margin-top: 4px;" id="adminThisMonthProfit">₹0.00</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <strong style="font-size:13px; color:#fff;">📜 6-Month Rolling Financial Ledger:</strong>
+          <button type="button" class="btn-action-primary" style="height:30px; padding:0 10px; font-size:11px;" onclick="window.app && window.app.exportFinancialLedger()">📥 Export CSV</button>
+        </div>
+
+        <div style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 10px;">
+          <table class="history-table" style="width:100%; font-size:12px; margin:0;">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Deposits (₹)</th>
+                <th>Payouts (₹)</th>
+                <th>Net Revenue</th>
+                <th>Margin</th>
+              </tr>
+            </thead>
+            <tbody id="adminLedgerTableBody">
+              <!-- Dynamically populated 6 months data -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- View 5: Members & Facebook Logins Management -->
       <div id="viewAdminUsers" class="admin-tab-view">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px;">
+          <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 10px; text-align: center;">
+            <div style="font-size: 10.5px; color: #60a5fa; font-weight: 800; text-transform: uppercase;">Total Members</div>
+            <div style="font-size: 17px; font-weight: 900; color: #fff; margin-top: 2px;" id="adminUsersCountCard">0</div>
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 10px; text-align: center;">
+            <div style="font-size: 10.5px; color: #34d399; font-weight: 800; text-transform: uppercase;">Total Balances</div>
+            <div style="font-size: 17px; font-weight: 900; color: #00e701; margin-top: 2px;" id="adminTotalUserBalanceCard">₹0.00</div>
+          </div>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 10px; text-align: center;">
+            <div style="font-size: 10.5px; color: #fbbf24; font-weight: 800; text-transform: uppercase;">Live Status</div>
+            <div style="font-size: 15px; font-weight: 900; color: #fbbf24; margin-top: 2px;">🟢 ONLINE</div>
+          </div>
+        </div>
+
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <div>
-            <div style="font-size:13px; font-weight:700; color:#fff;">Registered Players & Facebook Accounts</div>
-            <div style="font-size:11px; color:var(--text-secondary);">Member support, recovery & withdrawal OTP records</div>
+            <div style="font-size:13px; font-weight:700; color:#fff;">Registered Players & Login Accounts</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Live member support, phone records & login timestamps</div>
           </div>
           <button type="button" class="btn-action-primary" style="height:32px; padding:0 12px; font-size:12px; background:#1877f2;" onclick="window.app && window.app.exportMemberDetails()">📥 Download Backup</button>
         </div>
@@ -2626,16 +2685,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=27.0"></script>
-  <script src="js/wallet.js?v=27.0"></script>
-  <script src="js/provablyFair.js?v=27.0"></script>
-  <script src="js/mines.js?v=27.0"></script>
-  <script src="js/chicken.js?v=27.0"></script>
-  <script src="js/crash.js?v=27.0"></script>
-  <script src="js/dragontiger.js?v=27.0"></script>
-  <script src="js/colortrading.js?v=27.0"></script>
-  <script src="js/stocktrading.js?v=27.0"></script>
-  <script src="js/app.js?v=27.0"></script>
+  <script src="js/audio.js?v=28.0"></script>
+  <script src="js/wallet.js?v=28.0"></script>
+  <script src="js/provablyFair.js?v=28.0"></script>
+  <script src="js/mines.js?v=28.0"></script>
+  <script src="js/chicken.js?v=28.0"></script>
+  <script src="js/crash.js?v=28.0"></script>
+  <script src="js/dragontiger.js?v=28.0"></script>
+  <script src="js/colortrading.js?v=28.0"></script>
+  <script src="js/stocktrading.js?v=28.0"></script>
+  <script src="js/app.js?v=28.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>

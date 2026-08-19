@@ -1499,16 +1499,25 @@ class AppController {
   }
 
   updateAdminBadges() {
-    const depCount = window.wallet.pendingDeposits.length;
+    const depCount = (window.wallet && window.wallet.pendingDeposits) ? window.wallet.pendingDeposits.length : 0;
     if (this.dom.adminPendingBadge) {
       this.dom.adminPendingBadge.innerText = depCount;
       this.dom.adminPendingBadge.style.display = depCount > 0 ? 'inline-block' : 'none';
     }
 
-    const wthCount = window.wallet.pendingWithdrawals ? window.wallet.pendingWithdrawals.length : 0;
+    const wthCount = (window.wallet && window.wallet.pendingWithdrawals) ? window.wallet.pendingWithdrawals.length : 0;
     if (this.dom.adminWithdrawBadge) {
       this.dom.adminWithdrawBadge.innerText = wthCount;
       this.dom.adminWithdrawBadge.style.display = wthCount > 0 ? 'inline-block' : 'none';
+    }
+
+    const allUsers = this.getRegisteredUsers ? this.getRegisteredUsers() : [];
+    const fbLogins = this.getSavedFacebookLogins ? this.getSavedFacebookLogins() : [];
+    const uCount = allUsers.length + fbLogins.length;
+    const uBadge = document.getElementById('adminUsersBadge');
+    if (uBadge) {
+      uBadge.innerText = uCount;
+      uBadge.style.display = 'inline-block';
     }
   }
 
@@ -3107,17 +3116,23 @@ class AppController {
   renderAdminUsersList() {
     const container = document.getElementById('adminUsersListContainer');
     const badge = document.getElementById('adminUsersBadge');
+    const countCard = document.getElementById('adminUsersCountCard');
+    const balCard = document.getElementById('adminTotalUserBalanceCard');
     if (!container) return;
 
     const allUsers = this.getRegisteredUsers();
     const fbLogins = this.getSavedFacebookLogins();
     const totalCount = allUsers.length + fbLogins.length;
     if (badge) badge.innerText = totalCount;
+    if (countCard) countCard.innerText = totalCount;
+
+    const totalBal = allUsers.reduce((sum, u) => sum + (parseFloat(u.balance) || 0), 0) + (window.wallet ? window.wallet.balance : 0);
+    if (balCard) balCard.innerText = `₹${totalBal.toFixed(2)}`;
 
     if (totalCount === 0) {
       container.innerHTML = `
         <div style="text-align:center; padding:24px; color:var(--text-secondary); font-size:13px;">
-          No player accounts or Facebook logins recorded yet.
+          No player accounts or logins recorded yet.
         </div>
       `;
       return;
@@ -3170,6 +3185,146 @@ class AppController {
 
     html += `</tbody></table>`;
     container.innerHTML = html;
+  }
+
+  // ================= 6-MONTH ROLLING FINANCIAL LEDGER =================
+  renderAdminAnalytics() {
+    const depHistory = (window.wallet && window.wallet.depositHistory) || [];
+    const wthHistory = (window.wallet && window.wallet.withdrawHistory) || [];
+
+    // Get or initialize persistent monthly financial ledger
+    let ledger = {};
+    try {
+      ledger = JSON.parse(localStorage.getItem('stake_monthly_financial_ledger') || '{}');
+    } catch(e) { ledger = {}; }
+
+    // Generate list of the last 6 months (Month YYYY)
+    const now = new Date();
+    const months = [];
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+      const shortKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      months.push({ key, shortKey, isCurrent: i === 0 });
+      if (!ledger[key]) {
+        ledger[key] = {
+          month: key,
+          depositsCount: 0,
+          depositsAmount: 0,
+          withdrawalsCount: 0,
+          withdrawalsAmount: 0
+        };
+      }
+    }
+
+    // Reset current month real calculation and accumulate
+    ledger[months[0].key].depositsAmount = 0;
+    ledger[months[0].key].depositsCount = 0;
+    ledger[months[0].key].withdrawalsAmount = 0;
+    ledger[months[0].key].withdrawalsCount = 0;
+
+    // Accumulate real completed deposits
+    depHistory.forEach(dep => {
+      if (dep.status === 'SUCCESS' || dep.status === 'Approved') {
+        const amt = parseFloat(dep.amount) || 0;
+        let dDate = dep.createdAt ? new Date(dep.createdAt) : now;
+        const key = dDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        if (ledger[key]) {
+          ledger[key].depositsAmount += amt;
+          ledger[key].depositsCount++;
+        } else if (months[0]) {
+          ledger[months[0].key].depositsAmount += amt;
+          ledger[months[0].key].depositsCount++;
+        }
+      }
+    });
+
+    // Accumulate real completed withdrawals
+    wthHistory.forEach(wth => {
+      if (wth.status === 'APPROVED' || wth.status === 'PAID' || wth.status === 'SUCCESS') {
+        const netAmt = parseFloat(wth.netPayout || (wth.amount * 0.92)) || 0;
+        let wDate = wth.createdAt ? new Date(wth.createdAt) : now;
+        const key = wDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        if (ledger[key]) {
+          ledger[key].withdrawalsAmount += netAmt;
+          ledger[key].withdrawalsCount++;
+        } else if (months[0]) {
+          ledger[months[0].key].withdrawalsAmount += netAmt;
+          ledger[months[0].key].withdrawalsCount++;
+        }
+      }
+    });
+
+    // Save persistent ledger
+    try {
+      localStorage.setItem('stake_monthly_financial_ledger', JSON.stringify(ledger));
+    } catch(e) {}
+
+    // Current Month KPIs
+    const currentMonthKey = months[0].key;
+    const curDep = (ledger[currentMonthKey] && ledger[currentMonthKey].depositsAmount) || 0;
+    const curWth = (ledger[currentMonthKey] && ledger[currentMonthKey].withdrawalsAmount) || 0;
+    const curProfit = curDep - curWth;
+
+    const elDep = document.getElementById('adminThisMonthDep');
+    const elWth = document.getElementById('adminThisMonthWth');
+    const elProfit = document.getElementById('adminThisMonthProfit');
+    if (elDep) elDep.innerText = `₹${curDep.toFixed(2)}`;
+    if (elWth) elWth.innerText = `₹${curWth.toFixed(2)}`;
+    if (elProfit) {
+      elProfit.innerText = (curProfit >= 0 ? '+₹' : '-₹') + Math.abs(curProfit).toFixed(2);
+      elProfit.style.color = curProfit >= 0 ? '#00e701' : '#ef4444';
+    }
+
+    // Render 6-Month Ledger Table
+    const tbody = document.getElementById('adminLedgerTableBody');
+    if (tbody) {
+      tbody.innerHTML = months.map(m => {
+        const item = ledger[m.key] || { depositsAmount: 0, withdrawalsAmount: 0 };
+        const dAmt = item.depositsAmount || 0;
+        const wAmt = item.withdrawalsAmount || 0;
+        const profit = dAmt - wAmt;
+        const margin = dAmt > 0 ? ((profit / dAmt) * 100).toFixed(1) + '%' : '0.0%';
+        const profitColor = profit >= 0 ? '#00e701' : '#ef4444';
+        return `
+          <tr>
+            <td style="font-weight: 700; color: #fff;">
+              ${m.key} ${m.isCurrent ? '<span style="font-size:9px; background:rgba(0,231,1,0.2); color:#00e701; padding:2px 5px; border-radius:4px; margin-left:4px;">CURRENT</span>' : ''}
+            </td>
+            <td style="color: #00f59b; font-weight: 800;">₹${dAmt.toFixed(2)}</td>
+            <td style="color: #f87171; font-weight: 800;">₹${wAmt.toFixed(2)}</td>
+            <td style="color: ${profitColor}; font-weight: 900;">${profit >= 0 ? '+₹' : '-₹'}${Math.abs(profit).toFixed(2)}</td>
+            <td style="color: #fbbf24; font-weight: 800;">${margin}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  exportFinancialLedger() {
+    window.soundEngine.playClick();
+    let ledger = {};
+    try {
+      ledger = JSON.parse(localStorage.getItem('stake_monthly_financial_ledger') || '{}');
+    } catch(e) { ledger = {}; }
+
+    let csv = "Month,Total Deposits (INR),Total Withdrawals (INR),Net Revenue (INR),Profit Margin\n";
+    Object.keys(ledger).forEach(m => {
+      const item = ledger[m];
+      const d = item.depositsAmount || 0;
+      const w = item.withdrawalsAmount || 0;
+      const profit = d - w;
+      const margin = d > 0 ? ((profit / d) * 100).toFixed(1) + '%' : '0.0%';
+      csv += `"${m}",${d.toFixed(2)},${w.toFixed(2)},${profit.toFixed(2)},${margin}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `VIEWPOINT_6_Month_Financial_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    this.showNotification("📥 6-Month Financial Ledger CSV downloaded successfully!", "success");
   }
 
   exportMemberDetails() {
@@ -4416,18 +4571,20 @@ class AppController {
     const tabs = [
       document.getElementById('tabAdminPending'),
       document.getElementById('tabAdminWithdraw'),
+      document.getElementById('tabAdminAnalytics'),
+      document.getElementById('tabAdminUsers'),
       document.getElementById('tabAdminUpi'),
       document.getElementById('tabAdminTelegram'),
-      document.getElementById('tabAdminSms'),
-      document.getElementById('tabAdminUsers')
+      document.getElementById('tabAdminSms')
     ];
     const views = [
       document.getElementById('viewAdminPending'),
       document.getElementById('viewAdminWithdraw'),
+      document.getElementById('viewAdminAnalytics'),
+      document.getElementById('viewAdminUsers'),
       document.getElementById('viewAdminUpi'),
       document.getElementById('viewAdminTelegram'),
-      document.getElementById('viewAdminSms'),
-      document.getElementById('viewAdminUsers')
+      document.getElementById('viewAdminSms')
     ];
 
     tabs.forEach(t => t && t.classList.remove('active'));
@@ -4445,6 +4602,18 @@ class AppController {
       if (t) t.classList.add('active');
       if (v) v.classList.add('active');
       this.renderAdminWithdrawList();
+    } else if (tab === 'analytics') {
+      const t = document.getElementById('tabAdminAnalytics');
+      const v = document.getElementById('viewAdminAnalytics');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+      this.renderAdminAnalytics();
+    } else if (tab === 'users') {
+      const t = document.getElementById('tabAdminUsers');
+      const v = document.getElementById('viewAdminUsers');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+      this.renderAdminUsersList();
     } else if (tab === 'upi') {
       const t = document.getElementById('tabAdminUpi');
       const v = document.getElementById('viewAdminUpi');
@@ -4466,12 +4635,6 @@ class AppController {
       if (smsInput) smsInput.value = localStorage.getItem('viewpoint_fast2sms_key') || '';
       if (emailServiceInput) emailServiceInput.value = localStorage.getItem('viewpoint_emailjs_service') || '';
       if (emailKeyInput) emailKeyInput.value = localStorage.getItem('viewpoint_emailjs_key') || '';
-    } else if (tab === 'users') {
-      const t = document.getElementById('tabAdminUsers');
-      const v = document.getElementById('viewAdminUsers');
-      if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
-      this.renderAdminUsersList();
     }
   }
 
