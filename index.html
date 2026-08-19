@@ -34,15 +34,57 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=8.0">
-  <link rel="stylesheet" href="css/mines.css?v=8.0">
-  <link rel="stylesheet" href="css/chicken.css?v=8.0">
-  <link rel="stylesheet" href="css/crash.css?v=8.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=8.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=8.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=8.0">
+  <link rel="stylesheet" href="css/style.css?v=9.0">
+  <link rel="stylesheet" href="css/mines.css?v=9.0">
+  <link rel="stylesheet" href="css/chicken.css?v=9.0">
+  <link rel="stylesheet" href="css/crash.css?v=9.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=9.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=9.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=9.0">
 </head>
 <body>
+
+  <!-- Inline Instant Click Handler (Zero Network Latency / 100% Reliable) -->
+  <script>
+    window.openAuthModal = function(type) {
+      if (window.app && window.app.openAuthModal) return window.app.openAuthModal(type);
+      var m = document.getElementById('modalAuth');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeAuthModal = function() {
+      if (window.app && window.app.closeAuthModal) return window.app.closeAuthModal();
+      var m = document.getElementById('modalAuth');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openDepositModal = function() {
+      if (window.app && window.app.openDepositModal) return window.app.openDepositModal();
+      var m = document.getElementById('modalDepositUpi');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.openWithdrawModal = function() {
+      if (window.app && window.app.openWithdrawModal) return window.app.openWithdrawModal();
+      var m = document.getElementById('modalWithdraw');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.openTxHistoryModal = function() {
+      if (window.app && window.app.openTxHistoryModal) return window.app.openTxHistoryModal();
+      var m = document.getElementById('modalTxHistory');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.openSupportModal = function() {
+      if (window.app && window.app.openSupportModal) return window.app.openSupportModal();
+      var m = document.getElementById('modalLiveSupport');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.openReferModal = function() {
+      if (window.app && window.app.openReferModal) return window.app.openReferModal();
+      var m = document.getElementById('modalRefer');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.switchGame = function(g) {
+      if (window.app && window.app.switchGame) return window.app.switchGame(g);
+    };
+  </script>
 
   <!-- Top Navigation Bar (2-Tier Sleek Header) -->
   <header class="navbar">
@@ -2267,17 +2309,19 @@
     </button>
   </nav>
 
-  <!-- JavaScript Modules (Cache-Busting Enabled) -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="js/audio.js?v=8.0"></script>
-  <script src="js/wallet.js?v=8.0"></script>
-  <script src="js/provablyFair.js?v=8.0"></script>
-  <script src="js/mines.js?v=8.0"></script>
-  <script src="js/chicken.js?v=8.0"></script>
-  <script src="js/crash.js?v=8.0"></script>
-  <script src="js/dragontiger.js?v=8.0"></script>
-  <script src="js/colortrading.js?v=8.0"></script>
-  <script src="js/stocktrading.js?v=8.0"></script>
-  <script src="js/app.js?v=8.0"></script>
+  <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
+  <script src="js/audio.js?v=9.0"></script>
+  <script src="js/wallet.js?v=9.0"></script>
+  <script src="js/provablyFair.js?v=9.0"></script>
+  <script src="js/mines.js?v=9.0"></script>
+  <script src="js/chicken.js?v=9.0"></script>
+  <script src="js/crash.js?v=9.0"></script>
+  <script src="js/dragontiger.js?v=9.0"></script>
+  <script src="js/colortrading.js?v=9.0"></script>
+  <script src="js/stocktrading.js?v=9.0"></script>
+  <script src="js/app.js?v=9.0"></script>
+
+  <!-- Non-Blocking Optional Third-Party Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
 </body>
 </html>
