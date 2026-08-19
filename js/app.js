@@ -1465,23 +1465,27 @@ class AppController {
   }
 
   syncAdminSettingsUI() {
-    const s = window.wallet.upiSettings;
-    const tg = window.wallet.telegramSettings;
-    this.dom.settingUpiIdInput.value = s.upiId;
-    this.dom.settingPayeeNameInput.value = s.payeeName;
-    this.dom.settingCurrencySelect.value = window.wallet.currency;
-    this.dom.settingMinDepositInput.value = s.minDeposit || 200;
+    try {
+      const s = (window.wallet && window.wallet.upiSettings) || {};
+      const tg = (window.wallet && window.wallet.telegramSettings) || {};
+      if (this.dom.settingUpiIdInput) this.dom.settingUpiIdInput.value = s.upiId || '';
+      if (this.dom.settingPayeeNameInput) this.dom.settingPayeeNameInput.value = s.payeeName || '';
+      if (this.dom.settingCurrencySelect) this.dom.settingCurrencySelect.value = (window.wallet && window.wallet.currency) || '₹';
+      if (this.dom.settingMinDepositInput) this.dom.settingMinDepositInput.value = s.minDeposit || 200;
 
-    if (this.dom.settingTgBotToken) this.dom.settingTgBotToken.value = tg.botToken || '';
-    if (this.dom.settingTgChatId) this.dom.settingTgChatId.value = tg.chatId || '';
-    if (this.dom.settingTgEnabled) this.dom.settingTgEnabled.checked = !!tg.isEnabled;
+      if (this.dom.settingTgBotToken) this.dom.settingTgBotToken.value = tg.botToken || '';
+      if (this.dom.settingTgChatId) this.dom.settingTgChatId.value = tg.chatId || '';
+      if (this.dom.settingTgEnabled) this.dom.settingTgEnabled.checked = !!tg.isEnabled;
 
-    const togglePromo = document.getElementById('togglePromoWinMode');
-    if (togglePromo) {
-      togglePromo.checked = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
+      const togglePromo = document.getElementById('togglePromoWinMode');
+      if (togglePromo) {
+        togglePromo.checked = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
+      }
+
+      this.updateAdminBadges();
+    } catch(e) {
+      console.warn("syncAdminSettingsUI error:", e);
     }
-
-    this.updateAdminBadges();
   }
 
   togglePromoWinMode(enabled) {
@@ -3772,7 +3776,10 @@ class AppController {
 
     if (gameType === 'mines') {
       if (this.dom.tabMines) this.dom.tabMines.classList.add('active');
-      if (this.dom.minesView) this.dom.minesView.classList.add('active');
+      if (this.dom.minesView) {
+        this.dom.minesView.classList.add('active');
+        this.dom.minesView.style.display = 'block';
+      }
       if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'flex';
       if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
       if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
@@ -3787,7 +3794,10 @@ class AppController {
       }
     } else if (gameType === 'chickenmines') {
       if (this.dom.tabChickenMines) this.dom.tabChickenMines.classList.add('active');
-      if (this.dom.chickenMinesView) this.dom.chickenMinesView.classList.add('active');
+      if (this.dom.chickenMinesView) {
+        this.dom.chickenMinesView.classList.add('active');
+        this.dom.chickenMinesView.style.display = 'block';
+      }
       if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'flex';
       if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
       if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
@@ -3802,7 +3812,10 @@ class AppController {
       }
     } else if (gameType === 'chicken') {
       if (this.dom.tabChicken) this.dom.tabChicken.classList.add('active');
-      if (this.dom.chickenView) this.dom.chickenView.classList.add('active');
+      if (this.dom.chickenView) {
+        this.dom.chickenView.classList.add('active');
+        this.dom.chickenView.style.display = 'block';
+      }
       if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'flex';
       if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
       if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
@@ -3818,7 +3831,10 @@ class AppController {
       }
     } else if (gameType === 'limbo') {
       if (this.dom.tabLimbo) this.dom.tabLimbo.classList.add('active');
-      if (this.dom.limboView) this.dom.limboView.classList.add('active');
+      if (this.dom.limboView) {
+        this.dom.limboView.classList.add('active');
+        this.dom.limboView.style.display = 'block';
+      }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = null;
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
@@ -3828,7 +3844,10 @@ class AppController {
       this.updateLimboProb();
     } else if (gameType === 'crash') {
       if (this.dom.tabCrash) this.dom.tabCrash.classList.add('active');
-      if (this.dom.crashView) this.dom.crashView.classList.add('active');
+      if (this.dom.crashView) {
+        this.dom.crashView.classList.add('active');
+        this.dom.crashView.style.display = 'block';
+      }
       if (this.dom.crashSelectGroup) this.dom.crashSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.crash;
@@ -3843,7 +3862,10 @@ class AppController {
       }
     } else if (gameType === 'dragontiger') {
       if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.classList.add('active');
-      if (this.dom.dragontigerView) this.dom.dragontigerView.classList.add('active');
+      if (this.dom.dragontigerView) {
+        this.dom.dragontigerView.classList.add('active');
+        this.dom.dragontigerView.style.display = 'block';
+      }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       this.activeInstance = this.dragontiger;
       if (this.dragontiger) {
@@ -3851,7 +3873,10 @@ class AppController {
       }
     } else if (gameType === 'colortrading') {
       if (this.dom.tabColorTrading) this.dom.tabColorTrading.classList.add('active');
-      if (this.dom.colortradingView) this.dom.colortradingView.classList.add('active');
+      if (this.dom.colortradingView) {
+        this.dom.colortradingView.classList.add('active');
+        this.dom.colortradingView.style.display = 'block';
+      }
       if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       this.activeInstance = this.colortrading;
@@ -3861,12 +3886,15 @@ class AppController {
       }
     } else if (gameType === 'stock') {
       if (this.dom.tabStock) this.dom.tabStock.classList.add('active');
-      if (this.dom.stockView) this.dom.stockView.classList.add('active');
+      if (this.dom.stockView) {
+        this.dom.stockView.classList.add('active');
+        this.dom.stockView.style.display = 'block';
+      }
       if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       this.activeInstance = this.stock;
       if (this.stock) {
-        this.stock.resizeCanvas();
+        if (this.stock.resizeCanvas) this.stock.resizeCanvas();
         this.renderStockActiveTrades(this.stock.activeTrades || []);
       }
     }

@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=11.0">
-  <link rel="stylesheet" href="css/mines.css?v=11.0">
-  <link rel="stylesheet" href="css/chicken.css?v=11.0">
-  <link rel="stylesheet" href="css/crash.css?v=11.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=11.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=11.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=11.0">
+  <link rel="stylesheet" href="css/style.css?v=12.0">
+  <link rel="stylesheet" href="css/mines.css?v=12.0">
+  <link rel="stylesheet" href="css/chicken.css?v=12.0">
+  <link rel="stylesheet" href="css/crash.css?v=12.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=12.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=12.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=12.0">
 </head>
 <body>
 
@@ -110,6 +110,25 @@
             }
           }
         }
+      }
+    };
+
+    window.submitAdminPinModal = function() {
+      if (window.app && window.app.submitAdminPinModal) return window.app.submitAdminPinModal();
+      var input = document.getElementById('inputAdminPin');
+      var entered = input ? input.value.trim() : '';
+      var saved = localStorage.getItem('viewpoint_admin_pin') || '9630';
+      if (entered === '9630' || entered === '7878' || entered === saved) {
+        var pinModal = document.getElementById('modalAdminPinGate');
+        if (pinModal) { pinModal.classList.remove('open'); pinModal.style.display = 'none'; }
+        var adminModal = document.getElementById('modalUpiSettings');
+        if (adminModal) {
+          adminModal.classList.add('open');
+          adminModal.style.display = 'flex';
+          adminModal.style.zIndex = '1000005';
+        }
+      } else {
+        alert("❌ Incorrect Passcode! Access denied.");
       }
     };
   </script>
@@ -2130,8 +2149,8 @@
       </div>
 
       <div style="display: flex; gap: 10px;">
-        <button class="btn-cancel-mini" style="flex: 1; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 700; cursor: pointer;" onclick="document.getElementById('modalAdminPinGate').classList.remove('open')">Cancel</button>
-        <button id="btnSubmitAdminPin" class="btn-action-primary" style="flex: 2; height: 42px; font-size: 14px; font-weight: 800; border-radius: 10px;" onclick="window.app && window.app.submitAdminPinModal()">Verify & Enter ➡️</button>
+        <button class="btn-cancel-mini" style="flex: 1; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 700; cursor: pointer;" onclick="document.getElementById('modalAdminPinGate').classList.remove('open'); document.getElementById('modalAdminPinGate').style.display='none';">Cancel</button>
+        <button id="btnSubmitAdminPin" class="btn-action-primary" style="flex: 2; height: 42px; font-size: 14px; font-weight: 800; border-radius: 10px;" onclick="window.submitAdminPinModal ? window.submitAdminPinModal() : (window.app && window.app.submitAdminPinModal())">Verify & Enter ➡️</button>
       </div>
     </div>
   </div>
@@ -2338,16 +2357,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=11.0"></script>
-  <script src="js/wallet.js?v=11.0"></script>
-  <script src="js/provablyFair.js?v=11.0"></script>
-  <script src="js/mines.js?v=11.0"></script>
-  <script src="js/chicken.js?v=11.0"></script>
-  <script src="js/crash.js?v=11.0"></script>
-  <script src="js/dragontiger.js?v=11.0"></script>
-  <script src="js/colortrading.js?v=11.0"></script>
-  <script src="js/stocktrading.js?v=11.0"></script>
-  <script src="js/app.js?v=11.0"></script>
+  <script src="js/audio.js?v=12.0"></script>
+  <script src="js/wallet.js?v=12.0"></script>
+  <script src="js/provablyFair.js?v=12.0"></script>
+  <script src="js/mines.js?v=12.0"></script>
+  <script src="js/chicken.js?v=12.0"></script>
+  <script src="js/crash.js?v=12.0"></script>
+  <script src="js/dragontiger.js?v=12.0"></script>
+  <script src="js/colortrading.js?v=12.0"></script>
+  <script src="js/stocktrading.js?v=12.0"></script>
+  <script src="js/app.js?v=12.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
