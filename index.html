@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=17.0">
-  <link rel="stylesheet" href="css/mines.css?v=17.0">
-  <link rel="stylesheet" href="css/chicken.css?v=17.0">
-  <link rel="stylesheet" href="css/crash.css?v=17.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=17.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=17.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=17.0">
+  <link rel="stylesheet" href="css/style.css?v=18.0">
+  <link rel="stylesheet" href="css/mines.css?v=18.0">
+  <link rel="stylesheet" href="css/chicken.css?v=18.0">
+  <link rel="stylesheet" href="css/crash.css?v=18.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=18.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=18.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=18.0">
 </head>
 <body>
 
@@ -275,6 +275,10 @@
     window.handleCashoutClick = function() {
       if (window.app && window.app.handleCashoutClick) return window.app.handleCashoutClick();
     };
+
+    window.handleChickenHop = function() {
+      if (window.app && window.app.handleChickenHop) return window.app.handleChickenHop();
+    };
   </script>
 
   <!-- Top Navigation Bar (2-Tier Sleek Header) -->
@@ -293,7 +297,7 @@
 
       <div class="nav-top-actions">
         <!-- Refer & Earn Button -->
-        <button id="btnOpenRefer" class="btn-refer-nav" onclick="window.app && window.app.openReferModal()">
+        <button id="btnOpenRefer" class="btn-refer-nav" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
           <span>Refer & Earn</span>
         </button>
@@ -594,7 +598,7 @@
             <span class="funny-risk-text">✨ take risk if you dont risk then eat i-pilll ✨</span>
           </div>
 
-          <button id="btnActionBet" class="btn-stake-primary btn-bet" onclick="window.app && window.app.handleBetClick()">
+          <button id="btnActionBet" class="btn-stake-primary btn-bet" onclick="window.handleBetClick ? window.handleBetClick() : (window.app && window.app.handleBetClick())">
             <span>BET</span>
           </button>
 
@@ -602,7 +606,7 @@
             <span id="btnAutoStartText">⚡ START AUTO PLAY</span>
           </button>
           
-          <button id="btnActionCashout" class="btn-stake-primary btn-cashout" style="display: none;" onclick="window.app && window.app.handleCashoutClick()">
+          <button id="btnActionCashout" class="btn-stake-primary btn-cashout" style="display: none;" onclick="window.handleCashoutClick ? window.handleCashoutClick() : (window.app && window.app.handleCashoutClick())">
             <span>CASHOUT</span>
             <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
           </button>
@@ -720,7 +724,7 @@
               <div class="funny-risk-tagline" style="margin-bottom: 4px;">
                 <span class="funny-risk-text">✨ take risk if you dont risk then eat i-pilll ✨</span>
               </div>
-              <button id="btnChickenHop" class="btn-chicken-go" onclick="window.app && window.app.handleChickenHop()">
+              <button id="btnChickenHop" class="btn-chicken-go" onclick="window.handleChickenHop ? window.handleChickenHop() : (window.app && window.app.handleChickenHop())">
                 <span>🐔 JUMP NEXT LANE ➡️</span>
               </button>
             </div>
@@ -2503,16 +2507,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=17.0"></script>
-  <script src="js/wallet.js?v=17.0"></script>
-  <script src="js/provablyFair.js?v=17.0"></script>
-  <script src="js/mines.js?v=17.0"></script>
-  <script src="js/chicken.js?v=17.0"></script>
-  <script src="js/crash.js?v=17.0"></script>
-  <script src="js/dragontiger.js?v=17.0"></script>
-  <script src="js/colortrading.js?v=17.0"></script>
-  <script src="js/stocktrading.js?v=17.0"></script>
-  <script src="js/app.js?v=17.0"></script>
+  <script src="js/audio.js?v=18.0"></script>
+  <script src="js/wallet.js?v=18.0"></script>
+  <script src="js/provablyFair.js?v=18.0"></script>
+  <script src="js/mines.js?v=18.0"></script>
+  <script src="js/chicken.js?v=18.0"></script>
+  <script src="js/crash.js?v=18.0"></script>
+  <script src="js/dragontiger.js?v=18.0"></script>
+  <script src="js/colortrading.js?v=18.0"></script>
+  <script src="js/stocktrading.js?v=18.0"></script>
+  <script src="js/app.js?v=18.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
