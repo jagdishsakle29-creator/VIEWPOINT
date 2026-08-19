@@ -3190,21 +3190,23 @@ class AppController {
     this.showNotification(`🎉 Claimed ₹${unclaimed.toFixed(2)} referral commission!`, "success");
   }
 
-  // ================= MULTI-PAGE SWITCHER (3 CLEAN CATEGORIES) =================
+  // ================= MULTI-PAGE SWITCHER (DEDICATED PAGES) =================
   switchMainPage(pageNumber) {
     window.soundEngine.playClick();
     this.currentPage = pageNumber;
     if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.toggle('active', pageNumber === 1);
     if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.toggle('active', pageNumber === 2);
-    if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.toggle('active', pageNumber === 3);
+    if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.toggle('active', pageNumber === 3 || pageNumber === 4);
 
     // Sync Bottom Mobile Navigation Bar
     const mNav1 = document.getElementById('mNavOriginals');
     const mNav2 = document.getElementById('mNavCrash');
-    const mNav3 = document.getElementById('mNavTrading');
+    const mNavCasino = document.getElementById('mNavCasino') || document.getElementById('mNavTrading');
+    const mNavLiveBet = document.getElementById('mNavLiveBet');
     if (mNav1) mNav1.classList.toggle('active', pageNumber === 1);
     if (mNav2) mNav2.classList.toggle('active', pageNumber === 2);
-    if (mNav3) mNav3.classList.toggle('active', pageNumber === 3);
+    if (mNavCasino) mNavCasino.classList.toggle('active', pageNumber === 3);
+    if (mNavLiveBet) mNavLiveBet.classList.toggle('active', pageNumber === 4);
 
     if (pageNumber === 1) {
       if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
@@ -3214,6 +3216,7 @@ class AppController {
       if (this.currentGame !== 'chicken' && this.currentGame !== 'chickenmines' && this.currentGame !== 'mines') {
         this.switchGame('chicken');
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (pageNumber === 2) {
       if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
       if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
@@ -3225,14 +3228,40 @@ class AppController {
       if (this.crash && this.crash.resizeCanvas) {
         setTimeout(() => this.crash.resizeCanvas(), 60);
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (pageNumber === 3) {
+      // DEDICATED CASINO: Dragon Tiger Live VIP Arena
       if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'none';
       if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'block';
 
+      // Ensure Dragon Tiger card is fully visible
+      const dtCard = document.querySelector('.dt-vip-card');
+      if (dtCard) dtCard.style.display = 'block';
+      if (this.dom.dragontigerView) {
+        this.dom.dragontigerView.style.display = 'block';
+        this.dom.dragontigerView.classList.add('active');
+      }
+      this.currentGame = 'dragontiger';
+      this.activeInstance = this.dragontiger;
+
+      if (this.dragontiger) {
+        this.renderDtBeadRoad(this.dragontiger.history);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (pageNumber === 4) {
+      // DEDICATED LIVE BET: Win Go Color Trading & Stock Market BTC
+      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'none';
+      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'block';
+
+      const stockCard = document.querySelector('.stock-card');
+      if (stockCard) {
+        stockCard.style.display = 'block';
+        stockCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       if (this.stock) {
         setTimeout(() => {
           this.stock.resizeCanvas();
-        }, 60);
+        }, 80);
       }
       this.drawLuckyWheel(this.wheelAngle || 0);
       this.checkWheelDailyAvailability();
