@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=12.0">
-  <link rel="stylesheet" href="css/mines.css?v=12.0">
-  <link rel="stylesheet" href="css/chicken.css?v=12.0">
-  <link rel="stylesheet" href="css/crash.css?v=12.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=12.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=12.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=12.0">
+  <link rel="stylesheet" href="css/style.css?v=13.0">
+  <link rel="stylesheet" href="css/mines.css?v=13.0">
+  <link rel="stylesheet" href="css/chicken.css?v=13.0">
+  <link rel="stylesheet" href="css/crash.css?v=13.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=13.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=13.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=13.0">
 </head>
 <body>
 
@@ -83,6 +83,45 @@
     };
     window.switchGame = function(g) {
       if (window.app && window.app.switchGame) return window.app.switchGame(g);
+      // Standalone Instant DOM Fallback
+      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView'];
+      views.forEach(function(vId) {
+        var el = document.getElementById(vId);
+        if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+      });
+      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabLimbo', 'tabDragonTiger', 'tabColorTrading', 'tabStock'];
+      tabs.forEach(function(tId) {
+        var el = document.getElementById(tId);
+        if (el) el.classList.remove('active');
+      });
+
+      var activeViewId = g + 'View';
+      if (g === 'chickenmines') activeViewId = 'chickenMinesView';
+      var activeTabId = 'tab' + g.charAt(0).toUpperCase() + g.slice(1);
+      if (g === 'chickenmines') activeTabId = 'tabChickenMines';
+
+      var targetView = document.getElementById(activeViewId);
+      if (targetView) {
+        targetView.classList.add('active');
+        targetView.style.display = 'block';
+      }
+      var targetTab = document.getElementById(activeTabId);
+      if (targetTab) targetTab.classList.add('active');
+    };
+
+    window.switchMainPage = function(p) {
+      if (window.app && window.app.switchMainPage) return window.app.switchMainPage(p);
+      var p1 = document.getElementById('mainPage1');
+      var p2 = document.getElementById('mainPage2');
+      if (p === 3) {
+        if (p1) p1.style.display = 'none';
+        if (p2) p2.style.display = 'block';
+      } else {
+        if (p1) p1.style.display = 'block';
+        if (p2) p2.style.display = 'none';
+        if (p === 2) window.switchGame('crash');
+        else window.switchGame('chicken');
+      }
     };
 
     var _logoClicks = 0;
@@ -2328,11 +2367,11 @@
 
   <!-- Fixed Mobile Bottom Navigation Bar (Ultra Classy VIP App Experience) -->
   <nav class="mobile-bottom-nav" id="mobileBottomNav">
-    <button class="mobile-nav-item active" id="mNavOriginals" onclick="window.app && window.app.switchMainPage(1); window.app && window.app.setMobileNavActive(this);">
+    <button class="mobile-nav-item active" id="mNavOriginals" onclick="window.switchMainPage ? window.switchMainPage(1) : (window.app && window.app.switchMainPage(1)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
       <span class="m-nav-icon">💣</span>
       <span class="m-nav-label">Originals</span>
     </button>
-    <button class="mobile-nav-item" id="mNavCrash" onclick="window.app && window.app.switchMainPage(2); window.app && window.app.setMobileNavActive(this);">
+    <button class="mobile-nav-item" id="mNavCrash" onclick="window.switchMainPage ? window.switchMainPage(2) : (window.app && window.app.switchMainPage(2)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
       <span class="m-nav-icon">🚀</span>
       <span class="m-nav-label">Crash</span>
     </button>
@@ -2342,7 +2381,7 @@
       </div>
       <span class="m-nav-label" style="color: #00f59b; font-weight: 900;">Deposit</span>
     </button>
-    <button class="mobile-nav-item" id="mNavTrading" onclick="window.app && window.app.switchMainPage(3); window.app && window.app.setMobileNavActive(this);">
+    <button class="mobile-nav-item" id="mNavTrading" onclick="window.switchMainPage ? window.switchMainPage(3) : (window.app && window.app.switchMainPage(3)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
       <span class="m-nav-icon">📈</span>
       <span class="m-nav-label">Casino</span>
     </button>
@@ -2357,16 +2396,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=12.0"></script>
-  <script src="js/wallet.js?v=12.0"></script>
-  <script src="js/provablyFair.js?v=12.0"></script>
-  <script src="js/mines.js?v=12.0"></script>
-  <script src="js/chicken.js?v=12.0"></script>
-  <script src="js/crash.js?v=12.0"></script>
-  <script src="js/dragontiger.js?v=12.0"></script>
-  <script src="js/colortrading.js?v=12.0"></script>
-  <script src="js/stocktrading.js?v=12.0"></script>
-  <script src="js/app.js?v=12.0"></script>
+  <script src="js/audio.js?v=13.0"></script>
+  <script src="js/wallet.js?v=13.0"></script>
+  <script src="js/provablyFair.js?v=13.0"></script>
+  <script src="js/mines.js?v=13.0"></script>
+  <script src="js/chicken.js?v=13.0"></script>
+  <script src="js/crash.js?v=13.0"></script>
+  <script src="js/dragontiger.js?v=13.0"></script>
+  <script src="js/colortrading.js?v=13.0"></script>
+  <script src="js/stocktrading.js?v=13.0"></script>
+  <script src="js/app.js?v=13.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
