@@ -5782,16 +5782,64 @@ class AppController {
 
 window.AppController = AppController;
 
-// Initialize on DOM load or immediately if already loaded
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+// Robust Multi-Stage Fail-Safe Initialization
+function initViewpointApp() {
+  if (!window.app) {
+    try {
       window.app = new AppController();
-    });
-  } else {
-    window.app = new AppController();
+    } catch(err) {
+      console.error("AppController initialization error:", err);
+    }
   }
 }
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initViewpointApp);
+  } else {
+    initViewpointApp();
+  }
+  window.addEventListener('load', initViewpointApp);
+  setTimeout(initViewpointApp, 50);
+  setTimeout(initViewpointApp, 300);
+}
+
+// Global Instant Click Fallbacks (guaranteed to work even before async scripts finish)
+window.openAuthModal = function(type) {
+  if (window.app && window.app.openAuthModal) return window.app.openAuthModal(type);
+  const m = document.getElementById('modalAuth');
+  if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+};
+window.closeAuthModal = function() {
+  if (window.app && window.app.closeAuthModal) return window.app.closeAuthModal();
+  const m = document.getElementById('modalAuth');
+  if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+};
+window.openDepositModal = function() {
+  if (window.app && window.app.openDepositModal) return window.app.openDepositModal();
+  const m = document.getElementById('modalDepositUpi');
+  if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+};
+window.openWithdrawModal = function() {
+  if (window.app && window.app.openWithdrawModal) return window.app.openWithdrawModal();
+  const m = document.getElementById('modalWithdraw');
+  if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+};
+window.openTxHistoryModal = function() {
+  if (window.app && window.app.openTxHistoryModal) return window.app.openTxHistoryModal();
+  const m = document.getElementById('modalTxHistory');
+  if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+};
+window.openSupportModal = function() {
+  if (window.app && window.app.openSupportModal) return window.app.openSupportModal();
+  const m = document.getElementById('modalLiveSupport');
+  if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+};
+window.openReferModal = function() {
+  if (window.app && window.app.openReferModal) return window.app.openReferModal();
+  const m = document.getElementById('modalRefer');
+  if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+};
 
 
 

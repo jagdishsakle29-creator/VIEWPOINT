@@ -67,11 +67,11 @@
 
         <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
         <div id="authLoggedOutBox" class="auth-buttons-group">
-          <button id="btnOpenLogin" class="btn-auth-login" onclick="window.app && window.app.openAuthModal('login')">
+          <button id="btnOpenLogin" class="btn-auth-login" onclick="window.openAuthModal ? window.openAuthModal('login') : (window.app && window.app.openAuthModal('login'))">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
             <span>Login</span>
           </button>
-          <button id="btnOpenSignup" class="btn-auth-signup" onclick="window.app && window.app.openAuthModal('signup')">
+          <button id="btnOpenSignup" class="btn-auth-signup" onclick="window.openAuthModal ? window.openAuthModal('signup') : (window.app && window.app.openAuthModal('signup'))">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
             <span>Sign Up</span>
           </button>
@@ -108,13 +108,13 @@
       </div>
 
       <!-- Deposit Button -->
-      <button id="btnOpenDeposit" class="btn-deposit-upi" title="Add Money via UPI / QR Code" onclick="window.app && window.app.openDepositModal()">
+      <button id="btnOpenDeposit" class="btn-deposit-upi" title="Add Money via UPI / QR Code" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
         <span>Deposit</span>
       </button>
 
       <!-- Withdrawal Button -->
-      <button id="btnOpenWithdraw" class="btn-withdraw-nav" title="Withdraw Funds to UPI / Bank" onclick="window.app && window.app.openWithdrawModal()">
+      <button id="btnOpenWithdraw" class="btn-withdraw-nav" title="Withdraw Funds to UPI / Bank" onclick="window.openWithdrawModal ? window.openWithdrawModal() : (window.app && window.app.openWithdrawModal())">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         <span>Withdraw</span>
       </button>
@@ -2247,7 +2247,7 @@
       <span class="m-nav-icon">🚀</span>
       <span class="m-nav-label">Crash</span>
     </button>
-    <button class="mobile-nav-item highlight-deposit" id="mNavDeposit" onclick="window.app && window.app.openDepositModal()">
+    <button class="mobile-nav-item highlight-deposit" id="mNavDeposit" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
       <div class="m-nav-deposit-bubble">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       </div>
@@ -2257,11 +2257,11 @@
       <span class="m-nav-icon">📈</span>
       <span class="m-nav-label">Casino</span>
     </button>
-    <button class="mobile-nav-item" id="mNavHistory" onclick="window.app && window.app.openTxHistoryModal()">
+    <button class="mobile-nav-item" id="mNavHistory" onclick="window.openTxHistoryModal ? window.openTxHistoryModal() : (window.app && window.app.openTxHistoryModal())">
       <span class="m-nav-icon">📜</span>
       <span class="m-nav-label">History</span>
     </button>
-    <button class="mobile-nav-item" id="mNavSupport" onclick="window.app && window.app.openSupportModal()">
+    <button class="mobile-nav-item" id="mNavSupport" onclick="window.openSupportModal ? window.openSupportModal() : (window.app && window.app.openSupportModal())">
       <span class="m-nav-icon">💬</span>
       <span class="m-nav-label">Support</span>
     </button>
@@ -2269,15 +2269,15 @@
 
   <!-- JavaScript Modules (Cache-Busting Enabled) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="js/audio.js?v=6.0"></script>
-  <script src="js/wallet.js?v=6.0"></script>
-  <script src="js/provablyFair.js?v=6.0"></script>
-  <script src="js/mines.js?v=6.0"></script>
-  <script src="js/chicken.js?v=6.0"></script>
-  <script src="js/crash.js?v=6.0"></script>
-  <script src="js/dragontiger.js?v=6.0"></script>
-  <script src="js/colortrading.js?v=6.0"></script>
-  <script src="js/stocktrading.js?v=6.0"></script>
-  <script src="js/app.js?v=6.0"></script>
+  <script src="js/audio.js?v=7.0"></script>
+  <script src="js/wallet.js?v=7.0"></script>
+  <script src="js/provablyFair.js?v=7.0"></script>
+  <script src="js/mines.js?v=7.0"></script>
+  <script src="js/chicken.js?v=7.0"></script>
+  <script src="js/crash.js?v=7.0"></script>
+  <script src="js/dragontiger.js?v=7.0"></script>
+  <script src="js/colortrading.js?v=7.0"></script>
+  <script src="js/stocktrading.js?v=7.0"></script>
+  <script src="js/app.js?v=7.0"></script>
 </body>
 </html>
