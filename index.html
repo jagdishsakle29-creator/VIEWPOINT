@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=18.0">
-  <link rel="stylesheet" href="css/mines.css?v=18.0">
-  <link rel="stylesheet" href="css/chicken.css?v=18.0">
-  <link rel="stylesheet" href="css/crash.css?v=18.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=18.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=18.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=18.0">
+  <link rel="stylesheet" href="css/style.css?v=19.0">
+  <link rel="stylesheet" href="css/mines.css?v=19.0">
+  <link rel="stylesheet" href="css/chicken.css?v=19.0">
+  <link rel="stylesheet" href="css/crash.css?v=19.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=19.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=19.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=19.0">
 </head>
 <body>
 
@@ -61,10 +61,88 @@
       var m = document.getElementById('modalDepositUpi');
       if (m) { m.classList.add('open'); m.style.display = 'flex'; }
     };
-    window.openWithdrawModal = function() {
-      if (window.app && window.app.openWithdrawModal) return window.app.openWithdrawModal();
+    window.closeDepositModal = function() {
+      if (window.app && window.app.closeDepositModal) return window.app.closeDepositModal();
+      var m = document.getElementById('modalDepositUpi');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.switchDepositTab = function(t) {
+      if (window.app && window.app.switchDepositTab) return window.app.switchDepositTab(t);
+      var isForm = (t === 'form');
+      var tf = document.getElementById('tabDepositForm');
+      var th = document.getElementById('tabDepositHistory');
+      var vf = document.getElementById('viewDepositForm');
+      var vh = document.getElementById('viewDepositHistory');
+      if (tf) tf.classList.toggle('active', isForm);
+      if (th) th.classList.toggle('active', !isForm);
+      if (vf) { vf.classList.toggle('active', isForm); vf.style.display = isForm ? 'block' : 'none'; }
+      if (vh) { vh.classList.toggle('active', !isForm); vh.style.display = !isForm ? 'block' : 'none'; }
+      if (!isForm && window.app && window.app.renderDepositHistoryTable) window.app.renderDepositHistoryTable();
+    };
+    window.setDepositAmount = function(amt) {
+      var inp = document.getElementById('depositAmountInput');
+      if (inp) { inp.value = amt; }
+      var chips = document.querySelectorAll('.deposit-quick-chips .chip-btn');
+      chips.forEach(function(c) {
+        c.classList.toggle('active', c.getAttribute('data-amount') === String(amt));
+      });
+      if (window.app && window.app.updateUpiQr) window.app.updateUpiQr();
+    };
+    window.closeWithdrawModal = function() {
+      if (window.app && window.app.closeWithdrawModal) return window.app.closeWithdrawModal();
       var m = document.getElementById('modalWithdraw');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.switchWithdrawTab = function(t) {
+      if (window.app && window.app.switchWithdrawTab) return window.app.switchWithdrawTab(t);
+      var isForm = (t === 'form');
+      var tf = document.getElementById('tabWithdrawForm');
+      var th = document.getElementById('tabWithdrawHistory');
+      var vf = document.getElementById('viewWithdrawForm');
+      var vh = document.getElementById('viewWithdrawHistory');
+      if (tf) tf.classList.toggle('active', isForm);
+      if (th) th.classList.toggle('active', !isForm);
+      if (vf) { vf.classList.toggle('active', isForm); vf.style.display = isForm ? 'block' : 'none'; }
+      if (vh) { vh.classList.toggle('active', !isForm); vh.style.display = !isForm ? 'block' : 'none'; }
+      if (!isForm && window.app && window.app.renderWithdrawHistoryTable) window.app.renderWithdrawHistoryTable();
+    };
+    window.selectWithdrawMethod = function(method) {
+      if (window.app && window.app.selectWithdrawMethod) return window.app.selectWithdrawMethod(method);
+      var mUpi = document.getElementById('btnMethodUpi');
+      var mBank = document.getElementById('btnMethodBank');
+      var mCrypto = document.getElementById('btnMethodCrypto');
+      if (mUpi) mUpi.classList.toggle('active', method === 'UPI');
+      if (mBank) mBank.classList.toggle('active', method === 'BANK');
+      if (mCrypto) mCrypto.classList.toggle('active', method === 'CRYPTO');
+      var fUpi = document.getElementById('channelUpiFields');
+      var fBank = document.getElementById('channelBankFields');
+      var fCrypto = document.getElementById('channelCryptoFields');
+      if (fUpi) fUpi.style.display = (method === 'UPI') ? 'block' : 'none';
+      if (fBank) fBank.style.display = (method === 'BANK') ? 'block' : 'none';
+      if (fCrypto) fCrypto.style.display = (method === 'CRYPTO') ? 'block' : 'none';
+    };
+    window.openProvablyFairModal = function() {
+      if (window.app && window.app.openProvablyFairModal) return window.app.openProvablyFairModal();
+      var m = document.getElementById('modalProvablyFair');
       if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeProvablyFairModal = function() {
+      var m = document.getElementById('modalProvablyFair');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openRatingModal = function() {
+      if (window.app && window.app.openRatingModal) return window.app.openRatingModal();
+      var m = document.getElementById('modalRating');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeRatingModal = function() {
+      var m = document.getElementById('modalRating');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.closeSupportModal = function() {
+      if (window.app && window.app.closeSupportModal) return window.app.closeSupportModal();
+      var m = document.getElementById('modalLiveSupport');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
     };
     window.openTxHistoryModal = function() {
       if (window.app && window.app.openTxHistoryModal) return window.app.openTxHistoryModal();
@@ -1772,7 +1850,7 @@
     <div class="modal-card">
       <div class="modal-title-row">
         <h3 class="modal-title">🛡️ Provably Fair Verification</h3>
-        <button id="btnCloseFairModal" class="modal-close-btn">&times;</button>
+        <button id="btnCloseFairModal" class="modal-close-btn" onclick="window.closeProvablyFairModal ? window.closeProvablyFairModal() : (document.getElementById('modalProvablyFair').classList.remove('open'), document.getElementById('modalProvablyFair').style.display='none')">&times;</button>
       </div>
       <div class="modal-body">
         <p>Stake games use SHA-256 hash algorithms to guarantee that every tile and mine placement is 100% predetermined and unchangeable before each round starts.</p>
@@ -1785,7 +1863,7 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span class="control-label">Nonce: <strong id="nonceVal" style="color: #fff;">1</strong></span>
-          <button id="btnRotateSeed" class="btn-reset-wallet">🔄 Rotate Server Seed</button>
+          <button id="btnRotateSeed" class="btn-reset-wallet" onclick="window.app && window.app.rotateServerSeed()">🔄 Rotate Server Seed</button>
         </div>
       </div>
     </div>
@@ -1799,34 +1877,34 @@
           <div class="deposit-icon-badge">⚡</div>
           <h3 class="modal-title">Add Funds via UPI / QR Code</h3>
         </div>
-        <button id="btnCloseDepositModal" class="modal-close-btn">&times;</button>
+        <button id="btnCloseDepositModal" class="modal-close-btn" onclick="window.closeDepositModal ? window.closeDepositModal() : (document.getElementById('modalDepositUpi').classList.remove('open'), document.getElementById('modalDepositUpi').style.display='none')">&times;</button>
       </div>
 
       <div class="deposit-nav-tabs">
-        <button id="tabDepositForm" class="dep-tab-btn active">💸 Deposit Online</button>
-        <button id="tabDepositHistory" class="dep-tab-btn">📜 Deposit History</button>
+        <button id="tabDepositForm" class="dep-tab-btn active" onclick="window.switchDepositTab ? window.switchDepositTab('form') : (window.app && window.app.switchDepositTab('form'))">💸 Deposit Online</button>
+        <button id="tabDepositHistory" class="dep-tab-btn" onclick="window.switchDepositTab ? window.switchDepositTab('history') : (window.app && window.app.switchDepositTab('history'))">📜 Deposit History</button>
       </div>
 
       <!-- Deposit Online View -->
       <div id="viewDepositForm" class="deposit-tab-view active">
-        <!-- Step 1: Quick Amount Selector (Min ₹200 to ₹50,000) -->
+        <!-- Step 1: Quick Amount Selector (Odd Amounts for Instant UTR Matching) -->
         <div class="deposit-section">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <label class="control-label">1. Select Deposit Amount:</label>
-            <span style="font-size:11px; font-weight:700; color:var(--accent-green);">Min: ₹200 | Max: ₹50,000</span>
+            <span style="font-size:11px; font-weight:700; color:var(--accent-green);">Instant Auto Match Enabled ⚡</span>
           </div>
           <div class="deposit-quick-chips">
-            <button class="chip-btn active" data-amount="200">₹200</button>
-            <button class="chip-btn" data-amount="500">₹500</button>
-            <button class="chip-btn" data-amount="1000">₹1,000</button>
-            <button class="chip-btn" data-amount="2000">₹2,000</button>
-            <button class="chip-btn" data-amount="5000">₹5,000</button>
-            <button class="chip-btn" data-amount="10000">₹10,000</button>
-            <button class="chip-btn" data-amount="50000">₹50,000</button>
+            <button type="button" class="chip-btn active" data-amount="199" onclick="window.setDepositAmount ? window.setDepositAmount(199) : (document.getElementById('depositAmountInput').value='199', window.app && window.app.updateUpiQr())">₹199</button>
+            <button type="button" class="chip-btn" data-amount="499" onclick="window.setDepositAmount ? window.setDepositAmount(499) : (document.getElementById('depositAmountInput').value='499', window.app && window.app.updateUpiQr())">₹499</button>
+            <button type="button" class="chip-btn" data-amount="999" onclick="window.setDepositAmount ? window.setDepositAmount(999) : (document.getElementById('depositAmountInput').value='999', window.app && window.app.updateUpiQr())">₹999</button>
+            <button type="button" class="chip-btn" data-amount="1999" onclick="window.setDepositAmount ? window.setDepositAmount(1999) : (document.getElementById('depositAmountInput').value='1999', window.app && window.app.updateUpiQr())">₹1,999</button>
+            <button type="button" class="chip-btn" data-amount="4999" onclick="window.setDepositAmount ? window.setDepositAmount(4999) : (document.getElementById('depositAmountInput').value='4999', window.app && window.app.updateUpiQr())">₹4,999</button>
+            <button type="button" class="chip-btn" data-amount="9999" onclick="window.setDepositAmount ? window.setDepositAmount(9999) : (document.getElementById('depositAmountInput').value='9999', window.app && window.app.updateUpiQr())">₹9,999</button>
+            <button type="button" class="chip-btn" data-amount="49999" onclick="window.setDepositAmount ? window.setDepositAmount(49999) : (document.getElementById('depositAmountInput').value='49999', window.app && window.app.updateUpiQr())">₹49,999</button>
           </div>
           <div class="custom-amount-row">
             <span class="curr-prefix" id="depCurrPrefix">₹</span>
-            <input type="number" id="depositAmountInput" class="custom-select dep-input" value="200" min="200" max="50000" step="50">
+            <input type="number" id="depositAmountInput" class="custom-select dep-input" value="199" min="100" max="50000" step="50" oninput="window.app && window.app.updateUpiQr()">
           </div>
         </div>
 
@@ -1835,7 +1913,7 @@
           <div class="qr-code-wrapper">
             <img id="upiQrCodeImg" class="upi-qr-image" src="" alt="Scan UPI QR Code">
             <div class="qr-overlay-brand">
-              <span id="qrAmountTag">₹200</span>
+              <span id="qrAmountTag">₹199</span>
             </div>
           </div>
 
@@ -1858,43 +1936,48 @@
 
             <!-- UPI App Fast Links for Mobile -->
             <div class="upi-apps-row">
-              <a id="linkGPay" class="btn-upi-app gpay-btn" href="#" target="_blank">GPay</a>
-              <a id="linkPhonePe" class="btn-upi-app phonepe-btn" href="#" target="_blank">PhonePe</a>
-              <a id="linkPaytm" class="btn-upi-app paytm-btn" href="#" target="_blank">Paytm</a>
-              <a id="linkAnyUpi" class="btn-upi-app anyupi-btn" href="#" target="_blank">Any UPI</a>
+              <a id="linkGPay" href="#" class="upi-app-btn gpay" target="_blank">
+                <span>GPay</span>
+              </a>
+              <a id="linkPhonePe" href="#" class="upi-app-btn phonepe" target="_blank">
+                <span>PhonePe</span>
+              </a>
+              <a id="linkPaytm" href="#" class="upi-app-btn paytm" target="_blank">
+                <span>Paytm</span>
+              </a>
+              <a id="linkAnyUpi" href="#" class="upi-app-btn other-upi" target="_blank">
+                <span>Other UPI</span>
+              </a>
             </div>
           </div>
         </div>
 
-        <!-- Step 3: UTR / Reference No Verification -->
+        <!-- Step 3: Enter 12-Digit UTR -->
         <div class="deposit-section">
-          <label class="control-label">2. Enter 12-Digit UTR / Transaction ID (from your UPI app):</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423589123456" maxlength="16" style="font-family: monospace; font-size: 15px;">
-            <button type="button" id="btnSubmitDeposit" class="btn-action-primary" style="white-space: nowrap; padding: 0 18px; cursor: pointer;" onclick="window.app && window.app.submitDepositUtr()">
-              <span>Submit UTR</span>
-            </button>
-          </div>
-          <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-            After completing payment in your UPI app, copy the 12-digit UTR / Reference ID and submit here. Funds will be credited instantly.
-          </p>
+          <label class="control-label">2. Enter 12-Digit UTR / Transaction ID:</label>
+          <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423456789012" maxlength="16" style="font-family: monospace; font-size: 15px; letter-spacing: 1px;">
+          <p class="utr-hint">📌 Found in your payment app under "Transfer Details" or "UPI Ref ID".</p>
+          
+          <button id="btnSubmitDeposit" class="btn-action-primary" style="margin-top: 8px;" onclick="window.app && window.app.submitDepositUtr()">
+            <span>✓ SUBMIT DEPOSIT REQUEST</span>
+          </button>
         </div>
       </div>
 
       <!-- Deposit History View -->
-      <div id="viewDepositHistory" class="deposit-tab-view">
-        <div class="history-table-container dep-history-table">
+      <div id="viewDepositHistory" class="deposit-tab-view" style="display: none;">
+        <div class="history-table-wrapper">
           <table class="history-table">
             <thead>
               <tr>
                 <th>Time</th>
                 <th>Amount</th>
-                <th>UTR / Ref ID</th>
+                <th>UTR</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody id="depositHistoryTableBody">
-              <!-- Dynamically rendered -->
+              <tr><td colspan="4" class="empty-state">No deposit records yet.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1902,24 +1985,20 @@
     </div>
   </div>
 
-  <!-- Feature-Packed Withdrawal Modal -->
+  <!-- Withdrawal Modal -->
   <div id="modalWithdraw" class="modal-backdrop">
-    <div class="modal-card modal-withdraw-card" style="max-width: 580px;">
+    <div class="modal-card modal-deposit-card">
       <div class="modal-title-row">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div class="deposit-icon-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; font-size: 20px;">💸</div>
-          <div>
-            <h3 class="modal-title" style="font-size: 18px;">Withdraw Earnings</h3>
-            <span style="font-size: 11px; color: #00e701; font-weight: 700;">🔒 256-Bit SSL Verified Fast Payout Gateway</span>
-          </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: linear-gradient(135deg, #00e5ff, #0077ff); color: #fff;">💸</div>
+          <h3 class="modal-title">Withdraw Funds</h3>
         </div>
-        <button id="btnCloseWithdrawModal" class="modal-close-btn">&times;</button>
+        <button id="btnCloseWithdrawModal" class="modal-close-btn" onclick="window.closeWithdrawModal ? window.closeWithdrawModal() : (document.getElementById('modalWithdraw').classList.remove('open'), document.getElementById('modalWithdraw').style.display='none')">&times;</button>
       </div>
 
-      <!-- Withdrawal Tabs -->
       <div class="deposit-tabs-row">
-        <button id="tabWithdrawForm" class="dep-tab-btn active">⚡ Request Payout</button>
-        <button id="tabWithdrawHistory" class="dep-tab-btn">📜 Payout History & Receipts</button>
+        <button id="tabWithdrawForm" class="dep-tab-btn active" onclick="window.switchWithdrawTab ? window.switchWithdrawTab('form') : (window.app && window.app.switchWithdrawTab('form'))">⚡ Request Payout</button>
+        <button id="tabWithdrawHistory" class="dep-tab-btn" onclick="window.switchWithdrawTab ? window.switchWithdrawTab('history') : (window.app && window.app.switchWithdrawTab('history'))">📜 Payout History & Receipts</button>
       </div>
 
       <!-- Tab 1: Withdrawal Form -->
@@ -1943,21 +2022,21 @@
         <!-- Payout Method Selector -->
         <label class="control-label">1. Choose Payout Channel:</label>
         <div class="withdraw-methods-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-          <button type="button" class="withdraw-method-btn active" id="btnMethodUpi" data-method="UPI">
+          <button type="button" class="withdraw-method-btn active" id="btnMethodUpi" data-method="UPI" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('UPI') : (window.app && window.app.selectWithdrawMethod('UPI'))">
             <span style="font-size: 18px;">⚡</span>
             <div style="text-align: left;">
               <strong style="display:block; font-size:12px;">Instant UPI</strong>
               <span style="font-size:10px; color:#00e701;">5-15 Mins</span>
             </div>
           </button>
-          <button type="button" class="withdraw-method-btn" id="btnMethodBank" data-method="BANK">
+          <button type="button" class="withdraw-method-btn" id="btnMethodBank" data-method="BANK" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('BANK') : (window.app && window.app.selectWithdrawMethod('BANK'))">
             <span style="font-size: 18px;">🏦</span>
             <div style="text-align: left;">
               <strong style="display:block; font-size:12px;">Bank IMPS</strong>
               <span style="font-size:10px; color:#00e5ff;">15-30 Mins</span>
             </div>
           </button>
-          <button type="button" class="withdraw-method-btn" id="btnMethodCrypto" data-method="CRYPTO">
+          <button type="button" class="withdraw-method-btn" id="btnMethodCrypto" data-method="CRYPTO" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('CRYPTO') : (window.app && window.app.selectWithdrawMethod('CRYPTO'))">
             <span style="font-size: 18px;">🪙</span>
             <div style="text-align: left;">
               <strong style="display:block; font-size:12px;">USDT TRC20</strong>
@@ -2169,7 +2248,7 @@
             <span style="font-size: 11px; color: #00e701; font-weight: 700;">● Online 24/7 (Instant Help)</span>
           </div>
         </div>
-        <button id="btnCloseSupportModal" class="modal-close-btn">&times;</button>
+        <button id="btnCloseSupportModal" class="modal-close-btn" onclick="window.closeSupportModal ? window.closeSupportModal() : (document.getElementById('modalLiveSupport').classList.remove('open'), document.getElementById('modalLiveSupport').style.display='none')">&times;</button>
       </div>
 
       <!-- Chat Messages Scroll Area -->
@@ -2193,7 +2272,7 @@
       <!-- Chat Input Field -->
       <div class="chat-input-row">
         <input type="text" id="chatInputField" class="chat-input-field" placeholder="Apna sawaal yahan likhein...">
-        <button id="btnSendChat" class="btn-send-chat">Send</button>
+        <button id="btnSendChat" class="btn-send-chat" onclick="window.app && window.app.handleUserChatMessage()">Send</button>
       </div>
     </div>
   </div>
@@ -2203,7 +2282,7 @@
     <div class="modal-card rating-card">
       <div class="modal-title-row">
         <h3 class="modal-title">⭐ Rate Your Experience</h3>
-        <button id="btnCloseRatingModal" class="modal-close-btn">&times;</button>
+        <button id="btnCloseRatingModal" class="modal-close-btn" onclick="window.closeRatingModal ? window.closeRatingModal() : (document.getElementById('modalRating').classList.remove('open'), document.getElementById('modalRating').style.display='none')">&times;</button>
       </div>
 
       <div class="modal-body">
@@ -2507,16 +2586,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=18.0"></script>
-  <script src="js/wallet.js?v=18.0"></script>
-  <script src="js/provablyFair.js?v=18.0"></script>
-  <script src="js/mines.js?v=18.0"></script>
-  <script src="js/chicken.js?v=18.0"></script>
-  <script src="js/crash.js?v=18.0"></script>
-  <script src="js/dragontiger.js?v=18.0"></script>
-  <script src="js/colortrading.js?v=18.0"></script>
-  <script src="js/stocktrading.js?v=18.0"></script>
-  <script src="js/app.js?v=18.0"></script>
+  <script src="js/audio.js?v=19.0"></script>
+  <script src="js/wallet.js?v=19.0"></script>
+  <script src="js/provablyFair.js?v=19.0"></script>
+  <script src="js/mines.js?v=19.0"></script>
+  <script src="js/chicken.js?v=19.0"></script>
+  <script src="js/crash.js?v=19.0"></script>
+  <script src="js/dragontiger.js?v=19.0"></script>
+  <script src="js/colortrading.js?v=19.0"></script>
+  <script src="js/stocktrading.js?v=19.0"></script>
+  <script src="js/app.js?v=19.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>

@@ -2036,8 +2036,6 @@ class AppController {
     }
   }
 
-  }
-
   // ================= USER DATABASE & AUTHENTICATION SYSTEM =================
   loadRegisteredUsers() {
     try {
