@@ -56,8 +56,17 @@ class ChickenGame {
     const houseEdge = 0.97; // 3% house edge
     let mult = 1.0;
 
+    // Hard max multiplier target capped at 270x (not 600x)
+    const maxTarget = this.difficulty === 'hard' ? 270.0 : (this.difficulty === 'medium' ? 88.0 : 26.5);
+
     for (let i = 1; i <= this.totalLanes; i++) {
       mult = mult * (1.0 / safeProbability) * houseEdge;
+      if (i === this.totalLanes) {
+        mult = maxTarget;
+      } else {
+        mult = Math.min(maxTarget * (i / this.totalLanes), mult);
+        mult = Math.min(265.0, mult);
+      }
       this.multipliers.push(Math.round(mult * 100) / 100);
     }
   }
@@ -83,7 +92,7 @@ class ChickenGame {
     }
   }
 
-  async startGame() {
+  startGame() {
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui.onError) this.ui.onError("Insufficient balance! Please deposit to play.");
@@ -115,7 +124,18 @@ class ChickenGame {
 
   generateLaneHazards() {
     this.laneHazards = [];
-    // Ensure provably fair distribution
+    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
+
+    if (isPromoWin) {
+      // In Promo Mode: 85% full jackpot runs, 15% realistic close call at lane 6-8 for natural video reactions
+      const isCloseCall = Math.random() < 0.15;
+      const hitLane = isCloseCall ? (Math.floor(Math.random() * 3) + 6) : -1;
+      for (let i = 1; i <= this.totalLanes; i++) {
+        this.laneHazards.push(i === hitLane);
+      }
+      return;
+    }
+
     for (let i = 0; i < this.totalLanes; i++) {
       const isHazard = Math.random() < this.hazardRate;
       this.laneHazards.push(isHazard);

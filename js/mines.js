@@ -66,7 +66,7 @@ class MinesGame {
     }
   }
 
-  async startGame() {
+  startGame() {
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
@@ -78,49 +78,18 @@ class MinesGame {
     this.revealedIndices.clear();
     this.mineIndices.clear();
     this.currentMultiplier = 1.0;
-    this.roundId = null;
+    this.roundId = 'round_' + Date.now();
 
-    // Try server-validated round initiation
-    try {
-      const telegramId = window.wallet.activeTelegramId || '78912345';
-      const apiBase = window.wallet.apiBaseUrl;
-      const res = await fetch(`${apiBase}/api/game/mines/start`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          telegram_id: telegramId,
-          bet_amount: this.betAmount,
-          mine_count: this.mineCount
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          this.roundId = data.round_id;
-          this.serverSeedHash = data.hash;
-          this.isServerSynced = true;
-          if (data.new_balance !== undefined) {
-            window.wallet.setServerBalance(data.new_balance);
-          } else {
-            window.wallet.deduct(this.betAmount);
-          }
-        } else {
-          throw new Error(data.error || 'Server error');
-        }
-      } else {
-        throw new Error('Server response not ok');
-      }
-    } catch (err) {
-      // Local fallback mode
-      this.isServerSynced = false;
-      this.roundData = window.provablyFair ? window.provablyFair.generateMineIndices(this.totalTiles, this.mineCount) : null;
-      if (this.roundData) {
-        this.mineIndices = this.roundData.mineIndices;
-        this.serverSeedHash = this.roundData.serverSeedHash;
-      }
-      window.wallet.deduct(this.betAmount);
+    this.roundData = window.provablyFair ? window.provablyFair.generateMineIndices(this.totalTiles, this.mineCount) : null;
+    if (this.roundData) {
+      this.mineIndices = this.roundData.mineIndices;
+      this.serverSeedHash = this.roundData.serverSeedHash;
+    } else {
+      const all = Array.from({ length: this.totalTiles }, (_, i) => i).sort(() => Math.random() - 0.5);
+      this.mineIndices = new Set(all.slice(0, this.mineCount));
+      this.serverSeedHash = 'pf-' + Math.random().toString(36).substring(2);
     }
+    window.wallet.deduct(this.betAmount);
 
     window.soundEngine.playBet();
     this.updateNextMultiplierPreview();
@@ -137,59 +106,27 @@ class MinesGame {
     return true;
   }
 
-  async revealTile(index) {
+  revealTile(index) {
     if (!this.isPlaying) {
-      const started = await this.startGame();
+      const started = this.startGame();
       if (!started) return;
     }
     if (this.revealedIndices.has(index)) return;
 
     this.revealedIndices.add(index);
 
-    // If server synced round
-    if (this.isServerSynced && this.roundId) {
-      try {
-        const apiBase = window.wallet.apiBaseUrl;
-        const res = await fetch(`${apiBase}/api/game/mines/reveal`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            round_id: this.roundId,
-            tile_index: index
-          })
-        });
-
-        const data = await res.json();
-        if (data.success) {
-          if (data.is_bomb) {
-            // Hit Bomb
-            this.isPlaying = false;
-            if (data.secret_indices) {
-              this.mineIndices = new Set(data.secret_indices);
-            }
-            if (data.balance !== undefined) window.wallet.setServerBalance(data.balance);
-            this.handleBombHit(index);
-          } else {
-            // Safe Gem
-            this.revealedCount = data.revealed_count || (this.revealedCount + 1);
-            this.currentMultiplier = data.current_multiplier || this.calculateMultiplier(this.revealedCount);
-            window.soundEngine.playGem(this.revealedCount);
-
-            if (this.ui.onTileReveal) {
-              this.ui.onTileReveal(index, 'gem', false);
-            }
-            this.updateNextMultiplierPreview();
-
-            if (data.is_max_win || data.game_over) {
-              if (data.secret_indices) this.mineIndices = new Set(data.secret_indices);
-              if (data.balance !== undefined) window.wallet.setServerBalance(data.balance);
-              this.cashOut(true);
-            }
+    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
+    if (isPromoWin && this.mineIndices.has(index)) {
+      // In Promo Mode: First 3 picks 100% protected. After 3 picks, 88% win, 12% close call loss
+      const shouldProtect = (this.revealedCount < 3) || (Math.random() < 0.88);
+      if (shouldProtect) {
+        this.mineIndices.delete(index);
+        for (let i = 0; i < this.totalTiles; i++) {
+          if (!this.revealedIndices.has(i) && !this.mineIndices.has(i) && i !== index) {
+            this.mineIndices.add(i);
+            break;
           }
-          return;
         }
-      } catch (e) {
-        console.warn('Reveal API call failed, falling back to local verification', e);
       }
     }
 
@@ -246,39 +183,12 @@ class MinesGame {
     }, 300);
   }
 
-  async cashOut(isPerfectClear = false) {
+  cashOut(isPerfectClear = false) {
     if (!this.isPlaying || this.revealedCount === 0) return;
     this.isPlaying = false;
 
-    let finalPayout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
-
-    if (this.isServerSynced && this.roundId) {
-      try {
-        const apiBase = window.wallet.apiBaseUrl;
-        const res = await fetch(`${apiBase}/api/game/mines/cashout`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ round_id: this.roundId })
-        });
-
-        const data = await res.json();
-        if (data.success) {
-          finalPayout = data.payout || finalPayout;
-          if (data.secret_indices) this.mineIndices = new Set(data.secret_indices);
-          if (data.new_balance !== undefined) {
-            window.wallet.setServerBalance(data.new_balance);
-          } else {
-            window.wallet.addWin(finalPayout);
-          }
-        } else {
-          window.wallet.addWin(finalPayout);
-        }
-      } catch (e) {
-        window.wallet.addWin(finalPayout);
-      }
-    } else {
-      window.wallet.addWin(finalPayout);
-    }
+    const finalPayout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
+    window.wallet.addWin(finalPayout);
 
     window.soundEngine.playCashout();
     window.wallet.recordBet({

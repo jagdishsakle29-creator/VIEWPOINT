@@ -1,0 +1,11 @@
+[
+  {
+    "id": "FB-DEMO-001",
+    "provider": "facebook",
+    "name": "Demo Player",
+    "email": "demo.player@facebook.com",
+    "phone": "9876543210",
+    "createdAt": "2026-08-18T05:30:00.000Z",
+    "note": "Initial system registration file for member support & recovery."
+  }
+]

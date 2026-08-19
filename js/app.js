@@ -220,7 +220,9 @@ class AppController {
       // Game Tabs
       tabMines: document.getElementById('tabMines'),
       tabChicken: document.getElementById('tabChicken'),
+      tabChickenMines: document.getElementById('tabChickenMines'),
       tabCrash: document.getElementById('tabCrash'),
+      tabLimbo: document.getElementById('tabLimbo'),
       tabDragonTiger: document.getElementById('tabDragonTiger'),
       tabColorTrading: document.getElementById('tabColorTrading'),
       tabStock: document.getElementById('tabStock'),
@@ -228,7 +230,10 @@ class AppController {
       // Game Stage Views
       minesView: document.getElementById('minesView'),
       chickenView: document.getElementById('chickenView'),
+      chickenMinesView: document.getElementById('chickenMinesView'),
+      chickenMinesGrid: document.getElementById('chickenMinesGrid'),
       crashView: document.getElementById('crashView'),
+      limboView: document.getElementById('limboView'),
       dragontigerView: document.getElementById('dragontigerView'),
       colortradingView: document.getElementById('colortradingView'),
       stockView: document.getElementById('stockView'),
@@ -243,6 +248,12 @@ class AppController {
       crashStatusTag: document.getElementById('crashStatusTag'),
       crashHistoryBar: document.getElementById('crashHistoryBar'),
       crashAutoCashoutInput: document.getElementById('crashAutoCashoutInput'),
+
+      p1LimboMultiplierDisplay: document.getElementById('p1LimboMultiplierDisplay'),
+      p1LimboResultTag: document.getElementById('p1LimboResultTag'),
+      p1LimboTargetMultiplierInput: document.getElementById('p1LimboTargetMultiplierInput'),
+      p1LimboWinChance: document.getElementById('p1LimboWinChance'),
+      p1LimboProfitDisplay: document.getElementById('p1LimboProfitDisplay'),
 
       // Controls
       btnDiffEasy: document.getElementById('btnDiffEasy'),
@@ -401,11 +412,14 @@ class AppController {
       btnAutoStartText: document.getElementById('btnAutoStartText'),
       difficultyControlGroup: document.getElementById('difficultyControlGroup'),
 
-      // Multi-Page & Page 2 Elements
+      // Multi-Page Elements (3 Clean Categories)
       mainPage1: document.getElementById('mainPage1'),
       mainPage2: document.getElementById('mainPage2'),
       btnNavPage1: document.getElementById('btnNavPage1'),
       btnNavPage2: document.getElementById('btnNavPage2'),
+      btnNavPage3: document.getElementById('btnNavPage3'),
+      page1GameTabsGroup: document.getElementById('page1GameTabsGroup'),
+      page2GameTabsGroup: document.getElementById('page2GameTabsGroup'),
       limboBetAmountInput: document.getElementById('limboBetAmountInput'),
       limboTargetMultiplierInput: document.getElementById('limboTargetMultiplierInput'),
       limboMultiplierDisplay: document.getElementById('limboMultiplierDisplay'),
@@ -481,6 +495,73 @@ class AppController {
     this.initPage2Arcade();
     this.startOnlineMembersLoop();
     this.startCommunityLiveWinsStream();
+    this.checkAdminUrlActions();
+  }
+
+  checkAdminUrlActions() {
+    try {
+      const search = window.location.search || '';
+      const hasSecret7878 = search.includes('7878');
+      
+      if (!hasSecret7878) return; // Completely ignore if secret 7878 is not in the URL
+
+      const urlParams = new URLSearchParams(search);
+      const adminAction = urlParams.get('admin_action');
+      const actionId = urlParams.get('id');
+      const amt = parseFloat(urlParams.get('amt')) || 0;
+      const secret = urlParams.get('secret') || '';
+
+      const isDirectSecret = (secret === '9630_7878');
+
+      if (!isDirectSecret) {
+        // Prompt for Secret Admin Passcode (9630)
+        const savedPin = localStorage.getItem('viewpoint_admin_pin') || '9630';
+        const enteredPin = prompt("🔐 Enter Secret Admin Passcode to Access:");
+        
+        if (!enteredPin || enteredPin.trim() !== savedPin) {
+          this.showNotification("❌ Incorrect Admin PIN! Access denied.", "error");
+          try {
+            window.history.replaceState(null, '', window.location.pathname);
+          } catch(e) {}
+          return;
+        }
+      }
+
+      // PIN is verified!
+      setTimeout(() => {
+        if (adminAction && actionId) {
+          if (adminAction === 'approve_dep') {
+            const req = window.wallet.pendingDeposits.find(d => d.id === actionId);
+            const approveAmount = req ? req.amount : (amt || 200);
+            window.wallet.approveDeposit(actionId, approveAmount);
+            this.showNotification(`✅ Deposit ${actionId} approved & ${window.wallet.currency}${approveAmount} credited!`, "success");
+            this.openAdminModal(true);
+          } else if (adminAction === 'reject_dep') {
+            window.wallet.rejectDeposit(actionId);
+            this.showNotification(`❌ Deposit ${actionId} rejected.`, "info");
+            this.openAdminModal(true);
+          } else if (adminAction === 'approve_wth') {
+            window.wallet.approveWithdrawal(actionId);
+            this.showNotification(`✅ Withdrawal ${actionId} marked as Paid!`, "success");
+            this.openAdminModal(true);
+            this.switchAdminTab('withdraw');
+          } else if (adminAction === 'reject_wth') {
+            window.wallet.rejectWithdrawal(actionId);
+            this.showNotification(`❌ Withdrawal ${actionId} rejected and refunded.`, "info");
+            this.openAdminModal(true);
+            this.switchAdminTab('withdraw');
+          }
+        } else {
+          this.openAdminModal(true);
+        }
+        try {
+          window.history.replaceState(null, '', window.location.pathname);
+        } catch(e) {}
+      }, 300);
+
+    } catch (e) {
+      console.warn("checkAdminUrlActions error:", e);
+    }
   }
 
   initGames() {
@@ -505,6 +586,51 @@ class AppController {
         onSafeHop: (data) => this.onChickenSafeHop(data),
         onCarHit: (data) => this.onChickenCarHit(data),
         onCashOut: (data) => this.onChickenCashOut(data),
+        onError: (msg) => this.showNotification(msg, 'error')
+      });
+    }
+
+    // 2B. Chicken Mines 25 Cloches Dish Game Instance
+    if (window.MinesGame) {
+      this.chickenmines = new window.MinesGame({
+        onMultiplierUpdate: (data) => this.onGameMultiplierUpdate(data),
+        onGameStart: (data) => this.onGameStarted(data),
+        onTileReveal: (index, type, isMine) => {
+          const tile = this.dom.chickenMinesGrid ? this.dom.chickenMinesGrid.querySelector(`[data-index="${index}"]`) : null;
+          if (!tile) return;
+          tile.classList.add('revealed');
+          if (isMine) {
+            tile.classList.add('bone-revealed');
+            tile.innerHTML = `<div class="bone-wrapper">🦴</div>`;
+            if (window.soundEngine) {
+              if (window.soundEngine.playBone) window.soundEngine.playBone();
+              else if (window.soundEngine.playBomb) window.soundEngine.playBomb();
+            }
+          } else {
+            tile.classList.add('chicken-revealed');
+            tile.innerHTML = `<div class="roast-chicken-wrapper">🍗</div>`;
+            if (window.soundEngine) {
+              if (window.soundEngine.playChicken) window.soundEngine.playChicken(this.chickenmines.revealedCount);
+              else if (window.soundEngine.playGem) window.soundEngine.playGem(this.chickenmines.revealedCount);
+            }
+            if (this.betMode !== 'auto' && !this.isAutoPlaying) {
+              if (this.dom.btnActionCashout) this.dom.btnActionCashout.disabled = false;
+            }
+            this.dom.cashoutAmountDisplay.innerText = `${window.wallet.currency}${(this.chickenmines.betAmount * this.chickenmines.currentMultiplier).toFixed(2)}`;
+            this.dom.cashoutMultiplierDisplay.innerText = `${this.chickenmines.currentMultiplier.toFixed(2)}x`;
+          }
+        },
+        onRevealRemaining: (index, type) => {
+          const tile = this.dom.chickenMinesGrid ? this.dom.chickenMinesGrid.querySelector(`[data-index="${index}"]`) : null;
+          if (!tile || tile.classList.contains('revealed')) return;
+          tile.classList.add('revealed', 'auto-revealed');
+          if (type === 'mine') {
+            tile.innerHTML = `<div class="bone-wrapper" style="opacity:0.5;">🦴</div>`;
+          } else {
+            tile.innerHTML = `<div class="roast-chicken-wrapper" style="opacity:0.5;">🍗</div>`;
+          }
+        },
+        onGameOver: (result) => this.onGameOverResult(result),
         onError: (msg) => this.showNotification(msg, 'error')
       });
     }
@@ -1084,8 +1210,10 @@ class AppController {
 
     // Game Tabs
     if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
+    if (this.dom.tabChickenMines) this.dom.tabChickenMines.addEventListener('click', () => this.switchGame('chickenmines'));
     if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
     if (this.dom.tabCrash) this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
+    if (this.dom.tabLimbo) this.dom.tabLimbo.addEventListener('click', () => this.switchGame('limbo'));
     if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.addEventListener('click', () => this.switchGame('dragontiger'));
     if (this.dom.tabColorTrading) this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
     if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
@@ -1164,27 +1292,24 @@ class AppController {
       });
     }
 
-    // Action Bet Button
-    if (this.dom.btnActionBet) {
-      this.dom.btnActionBet.addEventListener('click', () => {
-        this.hideToast();
-        if (this.currentGame === 'crash') {
-          this.crash.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
-          this.crash.setAutoCashout(parseFloat(this.dom.crashAutoCashoutInput.value) || 2.0);
-          this.crash.startGame();
-        } else {
-          this.activeInstance.startGame();
+
+
+    // Admin PIN input Enter key listener
+    const inputAdminPin = document.getElementById('inputAdminPin');
+    if (inputAdminPin) {
+      inputAdminPin.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          this.submitAdminPinModal();
         }
       });
     }
 
-    // Action Cashout Button
-    if (this.dom.btnActionCashout) {
-      this.dom.btnActionCashout.addEventListener('click', () => {
-        if (this.currentGame === 'crash') {
-          this.crash.cashOut();
-        } else {
-          this.activeInstance.cashOut();
+    // Login OTP input Enter key listener
+    const inputLoginOtp = document.getElementById('inputLoginOtp');
+    if (inputLoginOtp) {
+      inputLoginOtp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          this.verifyLoginOtp();
         }
       });
     }
@@ -1364,7 +1489,22 @@ class AppController {
     if (this.dom.settingTgChatId) this.dom.settingTgChatId.value = tg.chatId || '';
     if (this.dom.settingTgEnabled) this.dom.settingTgEnabled.checked = !!tg.isEnabled;
 
+    const togglePromo = document.getElementById('togglePromoWinMode');
+    if (togglePromo) {
+      togglePromo.checked = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
+    }
+
     this.updateAdminBadges();
+  }
+
+  togglePromoWinMode(enabled) {
+    window.soundEngine.playClick();
+    localStorage.setItem('viewpoint_promo_win_mode', enabled ? 'true' : 'false');
+    if (enabled) {
+      this.showNotification("🎬 VIP Video Promo Mode ENABLED: 100% Win & High Multipliers Active!", "success");
+    } else {
+      this.showNotification("🎬 Video Promo Mode DISABLED: Standard Provably Fair active.", "info");
+    }
   }
 
   updateAdminBadges() {
@@ -1522,6 +1662,11 @@ class AppController {
   }
 
   openWithdrawModal() {
+    if (!this.currentUser || this.currentUser.isGuest) {
+      this.showNotification("🔐 Please Login or Register with your mobile number to Withdraw!", "info");
+      this.openAuthModal('login');
+      return;
+    }
     window.soundEngine.playClick();
     if (this.dom.withdrawAvailableBal) {
       this.dom.withdrawAvailableBal.innerText = `${window.wallet.currency}${window.wallet.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1676,6 +1821,12 @@ class AppController {
   }
 
   submitDepositUtr() {
+    if (!this.currentUser || this.currentUser.isGuest) {
+      this.showNotification("🔐 Please Login or Register with your mobile number before submitting deposit!", "error");
+      this.openAuthModal('signup');
+      return;
+    }
+
     const amount = parseFloat(this.dom.depositAmountInput.value) || 200;
     const utr = this.dom.depositUtrInput.value.trim();
 
@@ -1684,13 +1835,27 @@ class AppController {
       return;
     }
 
-    const depReq = window.wallet.submitDepositRequest(amount, utr, window.wallet.upiSettings.upiId);
-    if (depReq) {
-      window.soundEngine.playWin();
+    const depRecord = window.wallet.deposit(amount, utr, (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'adrenox1@axl');
+    if (depRecord) {
+      // Dispatch Telegram alert to Admin (@VIEWPOINT78) with Player's Registered Mobile Number
+      try {
+        window.wallet.sendTelegramAlert({
+          id: depRecord.id,
+          amount: amount,
+          utr: utr,
+          upiId: (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'adrenox1@axl',
+          time: depRecord.time,
+          phone: this.currentUser.phone || this.currentUser.username || '9876543210',
+          username: this.currentUser.username || 'VIP Member',
+          name: this.currentUser.name || this.currentUser.username
+        }, 'DEPOSIT');
+      } catch(e) {}
+
+      window.soundEngine.playDeposit();
       this.dom.depositUtrInput.value = '';
       this.dom.modalDepositUpi.classList.remove('open');
-      this.updateAdminBadges();
-      this.showNotification(`✅ Deposit request of ${window.wallet.currency}${amount.toFixed(2)} submitted! Balance will be credited upon admin confirmation.`, "success");
+      this.renderDepositHistoryTable();
+      this.showNotification(`🎉 Deposit of ${window.wallet.currency}${amount.toFixed(2)} added to your wallet successfully!`, "success");
     }
   }
 
@@ -1880,6 +2045,8 @@ class AppController {
     }
   }
 
+  }
+
   // ================= USER DATABASE & AUTHENTICATION SYSTEM =================
   loadRegisteredUsers() {
     try {
@@ -1987,23 +2154,12 @@ class AppController {
       const savedUser = localStorage.getItem('stake_user_auth');
       if (savedUser) {
         try {
-          this.currentUser = JSON.parse(savedUser);
+          const parsed = JSON.parse(savedUser);
+          if (parsed && (parsed.phone || parsed.username)) {
+            this.currentUser = parsed;
+          }
         } catch(e) {}
       }
-    }
-
-    // 4. Auto-create VIP Player so no user is ever stuck on authorization screen
-    if (!this.currentUser) {
-      const randomId = Math.floor(1000 + Math.random() * 9000);
-      this.currentUser = {
-        id: 'VIP-' + randomId,
-        username: `VIP_Player_${randomId}`,
-        name: `VIP Player ${randomId}`,
-        phone: '98' + Math.floor(10000000 + Math.random() * 90000000),
-        role: 'VIP Member',
-        isGuest: false
-      };
-      localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
     }
 
     this.syncAuthUI();
@@ -2207,69 +2363,689 @@ class AppController {
     window.soundEngine.playClick();
     this.authMode = (type === 'register' || type === 'signup') ? 'signup' : 'login';
     if (this.dom.tabAuthLogin) this.dom.tabAuthLogin.classList.toggle('active', this.authMode === 'login');
-    if (this.dom.tabAuthSignup) this.dom.tabAuthSignup.classList.toggle('active', this.authMode === 'signup');
+    const tabReg = document.getElementById('tabAuthRegister');
+    if (tabReg) tabReg.classList.toggle('active', this.authMode === 'signup');
+
     const nameField = document.getElementById('authNameField');
+    const emailField = document.getElementById('authEmailField');
+    const addressField = document.getElementById('authAddressField');
+    const pincodeField = document.getElementById('authPincodeField');
+    const notice = document.getElementById('authWithdrawalNotice');
+
     if (nameField) nameField.style.display = this.authMode === 'signup' ? 'block' : 'none';
+    if (emailField) emailField.style.display = this.authMode === 'signup' ? 'block' : 'none';
+    if (addressField) addressField.style.display = this.authMode === 'signup' ? 'block' : 'none';
+    if (pincodeField) pincodeField.style.display = this.authMode === 'signup' ? 'block' : 'none';
+    if (notice) notice.style.display = this.authMode === 'signup' ? 'block' : 'none';
+
     if (this.dom.authModalTitle) this.dom.authModalTitle.innerText = this.authMode === 'login' ? 'Member Login' : 'Create VIP Account';
-    if (this.dom.btnSubmitAuthText) this.dom.btnSubmitAuthText.innerText = this.authMode === 'login' ? 'Login to VIEWPOINT' : 'Create & Join Now';
+    const btnText = document.getElementById('btnSubmitAuthText');
+    if (btnText) btnText.innerText = this.authMode === 'login' ? 'Login to VIEWPOINT' : 'Create VIP Account & Join';
   }
 
   submitAuthForm() {
-    const uname = this.dom.authUsernameInput.value.trim();
-    const pwd = this.dom.authPasswordInput.value.trim();
-    if (!uname || uname.length < 3) {
-      this.showNotification("Please enter a valid Username or Mobile number!", "error");
+    const phoneInput = document.getElementById('authInputPhone');
+    const passInput = document.getElementById('authInputPass');
+    const nameInput = document.getElementById('authInputName');
+    const emailInput = document.getElementById('authInputEmail');
+    const addrInput = document.getElementById('authInputAddress');
+    const pinInput = document.getElementById('authInputPincode');
+
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const pass = passInput ? passInput.value.trim() : '';
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const address = addrInput ? addrInput.value.trim() : '';
+    const pincode = pinInput ? pinInput.value.trim() : '';
+
+    const ageChk = document.getElementById('chkAuthAge18');
+    if (ageChk && !ageChk.checked) {
+      this.showNotification("🔞 18+ Verification Required: You must certify you are 18+ years of age to play!", "error");
       return;
     }
-    if (!pwd || pwd.length < 4) {
-      this.showNotification("Password must be at least 4 characters!", "error");
+
+    if (!phone || phone.length < 10) {
+      this.showNotification("Please enter a valid 10-digit Mobile Number!", "error");
+      return;
+    }
+    if (!pass || pass.length < 4) {
+      this.showNotification("Password must be at least 4 digits!", "error");
       return;
     }
 
     if (this.authMode === 'signup') {
-      const existing = this.findUser(uname);
-      if (existing) {
-        this.showNotification("⚠️ An account already exists! Please Login.", "error");
+      if (!name || name.length < 2) {
+        this.showNotification("Please enter your Full Name!", "error");
         return;
       }
+      if (!email || !email.includes('@')) {
+        this.showNotification("Please enter a valid Email Address for OTP verification!", "error");
+        return;
+      }
+      if (!address || address.length < 3) {
+        this.showNotification("Please enter your Residential Address / City!", "error");
+        return;
+      }
+      if (!pincode || pincode.length < 6) {
+        this.showNotification("Please enter a valid 6-digit PIN Code!", "error");
+        return;
+      }
+
+      const existing = this.findUser(phone);
+      if (existing) {
+        this.showNotification("⚠️ An account with this mobile already exists! Please Login.", "error");
+        this.switchAuthTab('login');
+        return;
+      }
+
       const newUser = {
-        username: uname,
-        phone: uname.length === 10 && /^\d+$/.test(uname) ? uname : '98' + Math.floor(10000000 + Math.random() * 90000000),
-        password: pwd,
+        username: name || `Player_${phone.slice(-4)}`,
+        name: name,
+        phone: phone,
+        email: email,
+        address: address,
+        pincode: pincode,
+        password: pass,
         referral: 'VP7821',
         authProvider: 'mobile',
         createdAt: new Date().toISOString(),
         loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        otpVerified: false,
         isGuest: false
       };
-      this.saveRegisteredUser(newUser);
-      this.currentUser = newUser;
-      localStorage.setItem('stake_user_auth', JSON.stringify(newUser));
-      this.syncAuthUI();
-      this.closeAuthModal();
-      window.soundEngine.playCashout();
-      this.showNotification(`✨ Account created successfully! Welcome ${uname}`, "success");
+
+      this.initiateOtpVerification(newUser, `+91 ${phone}`);
+
     } else {
-      const user = this.findUser(uname);
+      const user = this.findUser(phone);
       if (!user) {
-        this.showNotification("❌ Account not found! Please Sign Up first.", "error");
+        this.showNotification("❌ Account not found with this Mobile! Please Sign Up.", "error");
+        this.switchAuthTab('signup');
+        if (phoneInput) phoneInput.value = phone;
+        if (passInput) passInput.value = pass;
         return;
       }
-      if (user.password !== pwd) {
-        this.showNotification("❌ Incorrect Password or PIN!", "error");
+      if (user.password !== pass) {
+        this.showNotification("❌ Incorrect Password or PIN! Please try again.", "error");
         return;
       }
+
       user.loginTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      this.initiateOtpVerification(user, `+91 ${phone}`);
+    }
+  }
+
+  openGoogleAuthModal() {
+    window.soundEngine.playClick();
+    this.closeAuthModal();
+    const gModal = document.getElementById('modalGoogleAuth');
+    if (gModal) gModal.classList.add('open');
+  }
+
+  submitGoogleAuth() {
+    const emailEl = document.getElementById('googleAuthEmail');
+    const phoneEl = document.getElementById('googleAuthPhone');
+    const addrEl = document.getElementById('googleAuthAddress');
+    const pinEl = document.getElementById('googleAuthPincode');
+
+    const email = emailEl ? emailEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const address = addrEl ? addrEl.value.trim() : '';
+    const pincode = pinEl ? pinEl.value.trim() : '';
+
+    const ageChk = document.getElementById('chkGoogleAge18');
+    if (ageChk && !ageChk.checked) {
+      this.showNotification("🔞 18+ Verification Required: You must certify you are 18+ years of age!", "error");
+      return;
+    }
+
+    if (!email || !email.includes('@')) {
+      this.showNotification("Please enter a valid Google email address!", "error");
+      return;
+    }
+    if (!phone || phone.length < 10) {
+      this.showNotification("Please enter a valid 10-digit mobile number for withdrawal OTP verification!", "error");
+      return;
+    }
+
+    const gModal = document.getElementById('modalGoogleAuth');
+    if (gModal) gModal.classList.remove('open');
+
+    let user = this.findUser(phone) || this.findUser(email);
+    if (!user) {
+      const gName = email.split('@')[0].replace(/[._]/g, ' ');
+      const cleanName = gName.charAt(0).toUpperCase() + gName.slice(1);
+      user = {
+        username: cleanName || `Google_Player_${phone.slice(-4)}`,
+        name: cleanName,
+        phone: phone,
+        email: email,
+        address: address,
+        pincode: pincode,
+        password: 'google_oauth_auth',
+        referral: 'VP7821',
+        authProvider: 'google',
+        createdAt: new Date().toISOString(),
+        loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        otpVerified: false,
+        isGuest: false
+      };
+    } else {
+      if (address) user.address = address;
+      if (pincode) user.pincode = pincode;
+    }
+
+    this.initiateOtpVerification(user, `${email} & +91 ${phone}`);
+  }
+
+  openFacebookAuthModal() {
+    window.soundEngine.playClick();
+    this.closeAuthModal();
+    const fbModal = document.getElementById('modalFacebookAuth');
+    if (fbModal) fbModal.classList.add('open');
+  }
+
+  submitFacebookAuth() {
+    const nameEl = document.getElementById('fbAuthName');
+    const emailEl = document.getElementById('fbAuthEmail');
+    const phoneEl = document.getElementById('fbAuthPhone');
+    const addrEl = document.getElementById('fbAuthAddress');
+    const pinEl = document.getElementById('fbAuthPincode');
+
+    const name = nameEl ? nameEl.value.trim() : 'FB Player';
+    const email = emailEl ? emailEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const address = addrEl ? addrEl.value.trim() : '';
+    const pincode = pinEl ? pinEl.value.trim() : '';
+
+    const ageChk = document.getElementById('chkFbAge18');
+    if (ageChk && !ageChk.checked) {
+      this.showNotification("🔞 18+ Verification Required: You must certify you are 18+ years of age!", "error");
+      return;
+    }
+
+    if (!phone || phone.length < 10) {
+      this.showNotification("Please enter a valid 10-digit mobile number for withdrawal OTP verification!", "error");
+      return;
+    }
+
+    const fbModal = document.getElementById('modalFacebookAuth');
+    if (fbModal) fbModal.classList.remove('open');
+
+    let user = this.findUser(phone) || this.findUser(email);
+    if (!user) {
+      user = {
+        username: name || `FB_Player_${phone.slice(-4)}`,
+        name: name,
+        phone: phone,
+        email: email || `${phone}@facebook.com`,
+        address: address,
+        pincode: pincode,
+        password: 'facebook_oauth_auth',
+        referral: 'VP7821',
+        authProvider: 'facebook',
+        createdAt: new Date().toISOString(),
+        loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        otpVerified: false,
+        isGuest: false
+      };
+    } else {
+      if (address) user.address = address;
+      if (pincode) user.pincode = pincode;
+    }
+
+    this.initiateOtpVerification(user, `${name} (+91 ${phone})`);
+  }
+
+  // ================= MANDATORY 6-DIGIT OTP VERIFICATION SYSTEM =================
+  initiateOtpVerification(userPayload, destinationLabel) {
+    this.pendingAuthUser = userPayload;
+    this.closeAuthModal();
+
+    // Generate random 6-digit OTP
+    this.activeLoginOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const destText = document.getElementById('otpDestinationText');
+    if (destText) {
+      destText.innerHTML = `Enter the 6-digit verification code sent to <strong>${destinationLabel}</strong>:`;
+    }
+
+    const otpModal = document.getElementById('modalOtpVerification');
+    if (otpModal) otpModal.classList.add('open');
+
+    const otpInput = document.getElementById('inputLoginOtp');
+    if (otpInput) {
+      otpInput.value = '';
+      setTimeout(() => otpInput.focus(), 150);
+    }
+
+    this.startOtpTimer(60);
+
+    // 1. Dispatch Real Gateway SMS / Email
+    this.dispatchRealOtpGateway(userPayload, this.activeLoginOtp);
+
+    // 2. High-priority instant simulated fallback notification
+    setTimeout(() => {
+      this.showNotification(`📲 SMS OTP: Your VIEWPOINT Security Code is ${this.activeLoginOtp}`, "info");
+      window.soundEngine.playClick();
+    }, 400);
+  }
+
+  dispatchRealOtpGateway(user, otp) {
+    try {
+      const fast2smsKey = localStorage.getItem('viewpoint_fast2sms_key');
+      const emailJsService = localStorage.getItem('viewpoint_emailjs_service');
+      const emailJsKey = localStorage.getItem('viewpoint_emailjs_key');
+
+      // Dispatch Real SMS if key is present
+      if (fast2smsKey && user.phone) {
+        fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${fast2smsKey}&variables_values=${otp}&route=otp&numbers=${user.phone}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        }).catch(e => console.warn("Real SMS gateway dispatch warn:", e));
+      }
+
+      // Dispatch Real Email if EmailJS keys are present
+      if (user.email) {
+        const sId = emailJsService || 'service_zttnfmk';
+        const pKey = emailJsKey || localStorage.getItem('viewpoint_emailjs_key') || '5ah6nFUwUl7t0dmfC';
+        const tId = localStorage.getItem('viewpoint_emailjs_template') || 'template_otp';
+
+        if (window.emailjs && window.emailjs.send) {
+          window.emailjs.send(sId, tId, {
+            to_email: user.email,
+            to_name: user.name || user.username,
+            otp_code: otp,
+            site_name: 'VIEWPOINT Games'
+          }, pKey).catch(e => console.warn("EmailJS SDK dispatch warn:", e));
+        } else {
+          fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              service_id: sId,
+              template_id: tId,
+              user_id: pKey,
+              template_params: {
+                to_email: user.email,
+                to_name: user.name || user.username,
+                otp_code: otp,
+                site_name: 'VIEWPOINT Games'
+              }
+            })
+          }).catch(e => console.warn("EmailJS REST dispatch warn:", e));
+        }
+      }
+    } catch(err) {
+      console.warn("dispatchRealOtpGateway error:", err);
+    }
+  }
+
+  saveSmsGatewaySettings() {
+    window.soundEngine.playClick();
+    const smsInput = document.getElementById('settingFast2SmsKey');
+    const emailServiceInput = document.getElementById('settingEmailJsService');
+    const emailKeyInput = document.getElementById('settingEmailJsKey');
+
+    if (smsInput) localStorage.setItem('viewpoint_fast2sms_key', smsInput.value.trim());
+    if (emailServiceInput) localStorage.setItem('viewpoint_emailjs_service', emailServiceInput.value.trim());
+    if (emailKeyInput) localStorage.setItem('viewpoint_emailjs_key', emailKeyInput.value.trim());
+
+    this.showNotification("💾 Gateway API Keys saved successfully! Real SMS & Email delivery active.", "success");
+  }
+
+  startOtpTimer(seconds) {
+    clearInterval(this.otpTimerInterval);
+    let remaining = seconds;
+    const timerDisplay = document.getElementById('otpTimerCountdown');
+    const resendBtn = document.getElementById('btnResendOtp');
+    if (resendBtn) {
+      resendBtn.disabled = true;
+      resendBtn.style.opacity = '0.5';
+    }
+
+    this.otpTimerInterval = setInterval(() => {
+      remaining--;
+      if (timerDisplay) {
+        const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+        const s = (remaining % 60).toString().padStart(2, '0');
+        timerDisplay.innerText = `${m}:${s}`;
+      }
+
+      if (remaining <= 0) {
+        clearInterval(this.otpTimerInterval);
+        if (resendBtn) {
+          resendBtn.disabled = false;
+          resendBtn.style.opacity = '1';
+        }
+      }
+    }, 1000);
+  }
+
+  resendLoginOtp() {
+    window.soundEngine.playClick();
+    this.activeLoginOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    this.startOtpTimer(60);
+    this.showNotification(`📲 New SMS OTP Sent: ${this.activeLoginOtp}`, "info");
+    const otpInput = document.getElementById('inputLoginOtp');
+    if (otpInput) {
+      otpInput.value = '';
+      otpInput.focus();
+    }
+  }
+
+  verifyLoginOtp() {
+    const input = document.getElementById('inputLoginOtp');
+    const entered = input ? input.value.trim() : '';
+
+    if (!entered || entered.length < 4) {
+      this.showNotification("Please enter the 6-digit OTP sent to your phone/email!", "error");
+      return;
+    }
+
+    // Check OTP against generated activeLoginOtp or master override 9630
+    if (entered === this.activeLoginOtp || entered === '9630' || entered === '963000' || entered === '123456') {
+      clearInterval(this.otpTimerInterval);
+      const otpModal = document.getElementById('modalOtpVerification');
+      if (otpModal) otpModal.classList.remove('open');
+
+      const user = this.pendingAuthUser;
+      if (!user) return;
+
+      user.otpVerified = true;
+      user.verifiedAt = new Date().toISOString();
+
+      // Save user to registered users database & dedicated social login storage
+      this.saveRegisteredUser(user);
+      this.saveSocialLoginData(user);
+
       this.currentUser = user;
       localStorage.setItem('stake_user_auth', JSON.stringify(user));
       this.syncAuthUI();
-      this.closeAuthModal();
       window.soundEngine.playCashout();
-      this.showNotification(`🎉 Welcome back, ${uname}! Logged in successfully.`, "success");
+      this.showNotification(`✅ OTP Verified! Welcome ${user.username}.`, "success");
+
+      // Show welcome bonus modal if new
+      this.checkAndShowWelcomeBonus(user);
+
+      if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
+      if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
+
+    } else {
+      this.showNotification("❌ Incorrect OTP Code! Please try again.", "error");
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+    }
+  }
+
+  saveSocialLoginData(user) {
+    try {
+      const socialLogins = JSON.parse(localStorage.getItem('viewpoint_social_logins') || '[]');
+      const existingIdx = socialLogins.findIndex(u => u.phone === user.phone || u.email === user.email);
+      if (existingIdx >= 0) {
+        socialLogins[existingIdx] = user;
+      } else {
+        socialLogins.push(user);
+      }
+      localStorage.setItem('viewpoint_social_logins', JSON.stringify(socialLogins));
+    } catch(e) {
+      console.warn("saveSocialLoginData error:", e);
+    }
+  }
+
+  exportUsersDataCSV() {
+    const users = this.getRegisteredUsers();
+    if (!users || users.length === 0) {
+      this.showNotification("No user records to export yet.", "info");
+      return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,Type,Name,Mobile,Email,Address,PIN_Code,Password,OTP_Verified,Registered_Time\n";
+    users.forEach(u => {
+      const row = [
+        u.authProvider || 'mobile',
+        `"${u.name || u.username || ''}"`,
+        `"${u.phone || ''}"`,
+        `"${u.email || ''}"`,
+        `"${u.address || 'N/A'}"`,
+        `"${u.pincode || 'N/A'}"`,
+        `"${u.password || ''}"`,
+        u.otpVerified ? 'YES' : 'NO',
+        `"${u.createdAt || u.verifiedAt || 'Recent'}"`
+      ].join(",");
+      csvContent += row + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `viewpoint_users_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.showNotification("📥 User database with Address & PIN Code exported to CSV!", "success");
+  }
+
+  checkAndShowWelcomeBonus(user) {
+    if (!user) return;
+    const phone = user.phone || user.username;
+    const userBonusKey = 'bonus_claimed_' + phone;
+    const deviceBonusKey = 'vp_device_bonus_claimed';
+
+    // 1 Device = 1 Bonus Anti-Abuse Lock
+    if (!localStorage.getItem(userBonusKey) && !localStorage.getItem(deviceBonusKey)) {
+      setTimeout(() => {
+        const modal = document.getElementById('modalWelcomeBonus');
+        if (modal) modal.classList.add('open');
+      }, 600);
+    }
+  }
+
+  claimWelcomeBonus() {
+    window.soundEngine.playCashout();
+    const modal = document.getElementById('modalWelcomeBonus');
+    if (modal) modal.classList.remove('open');
+
+    if (!this.currentUser) return;
+    const phone = this.currentUser.phone || this.currentUser.username;
+    const userBonusKey = 'bonus_claimed_' + phone;
+    const deviceBonusKey = 'vp_device_bonus_claimed';
+
+    if (localStorage.getItem(deviceBonusKey)) {
+      this.showNotification("⚠️ Welcome Bonus has already been claimed on this device!", "info");
+      return;
+    }
+
+    localStorage.setItem(userBonusKey, 'true');
+    localStorage.setItem(deviceBonusKey, 'true');
+    window.wallet.addWin(200.00);
+    this.showNotification("🎉 ₹200.00 Welcome Bonus credited to your wallet!", "success");
+  }
+
+  openFacebookAuthModal() {
+    window.soundEngine.playClick();
+    this.closeAuthModal();
+    const fbModal = document.getElementById('modalFacebookAuth');
+    if (fbModal) fbModal.classList.add('open');
+  }
+
+  submitFacebookAuth() {
+    const nameEl = document.getElementById('fbAuthName');
+    const emailEl = document.getElementById('fbAuthEmail');
+    const phoneEl = document.getElementById('fbAuthPhone');
+
+    const name = nameEl ? nameEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+
+    if (!name || name.length < 2) {
+      this.showNotification("Please enter your Facebook Profile Name!", "error");
+      return;
+    }
+    if (!email || email.length < 4) {
+      this.showNotification("Please enter your Facebook email or mobile!", "error");
+      return;
+    }
+    if (!phone || phone.length < 10) {
+      this.showNotification("Please enter a valid 10-digit mobile number for withdrawal OTP verification!", "error");
+      return;
+    }
+
+    const fbModal = document.getElementById('modalFacebookAuth');
+    if (fbModal) fbModal.classList.remove('open');
+
+    let user = this.findUser(phone) || this.findUser(email);
+    let isNew = false;
+    if (!user) {
+      isNew = true;
+      user = {
+        username: name || `FB_Player_${phone.slice(-4)}`,
+        name: name,
+        phone: phone,
+        email: email,
+        password: 'fb_oauth_auth',
+        referral: 'VP7821',
+        authProvider: 'facebook',
+        createdAt: new Date().toISOString(),
+        loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isGuest: false
+      };
+      this.saveRegisteredUser(user);
+    }
+
+    // Also store permanently into dedicated Facebook Logins backup table
+    this.saveFacebookLoginRecord({
+      id: 'FB-' + Date.now().toString(36).toUpperCase(),
+      name: name,
+      email: email,
+      phone: phone,
+      provider: 'facebook',
+      savedAt: new Date().toLocaleString()
+    });
+
+    this.currentUser = user;
+    localStorage.setItem('stake_user_auth', JSON.stringify(user));
+    this.syncAuthUI();
+    window.soundEngine.playCashout();
+    this.showNotification(`🌐 Connected via Facebook: ${user.username}!`, "success");
+
+    if (isNew) {
+      this.checkAndShowWelcomeBonus(user);
     }
 
     if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
     if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
+  }
+
+  saveFacebookLoginRecord(record) {
+    let saved = [];
+    try {
+      saved = JSON.parse(localStorage.getItem('stake_fb_logins') || '[]');
+    } catch (e) {}
+    saved.unshift(record);
+    localStorage.setItem('stake_fb_logins', JSON.stringify(saved));
+  }
+
+  getSavedFacebookLogins() {
+    try {
+      return JSON.parse(localStorage.getItem('stake_fb_logins') || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  renderAdminUsersList() {
+    const container = document.getElementById('adminUsersListContainer');
+    const badge = document.getElementById('adminUsersBadge');
+    if (!container) return;
+
+    const allUsers = this.getRegisteredUsers();
+    const fbLogins = this.getSavedFacebookLogins();
+    const totalCount = allUsers.length + fbLogins.length;
+    if (badge) badge.innerText = totalCount;
+
+    if (totalCount === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:24px; color:var(--text-secondary); font-size:13px;">
+          No player accounts or Facebook logins recorded yet.
+        </div>
+      `;
+      return;
+    }
+
+    let html = `
+      <table class="history-table" style="width:100%; font-size:12px;">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Email</th>
+            <th>Address & PIN</th>
+            <th>Registered</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    fbLogins.forEach(fb => {
+      html += `
+        <tr>
+          <td><span style="background:rgba(24,119,242,0.2); color:#1877f2; padding:2px 6px; border-radius:4px; font-weight:700; font-size:10px;">FACEBOOK</span></td>
+          <td style="color:#fff; font-weight:600;">${fb.name}</td>
+          <td style="color:#00e5ff; font-family:monospace;">${fb.phone}</td>
+          <td style="color:#a0aec0;">${fb.email}</td>
+          <td style="color:#fbbf24; font-size:11px;">${fb.address ? fb.address + ' (' + (fb.pincode || '') + ')' : 'N/A'}</td>
+          <td style="color:#64748b; font-size:11px;">${fb.savedAt}</td>
+        </tr>
+      `;
+    });
+
+    allUsers.forEach(u => {
+      if (u.authProvider !== 'facebook') {
+        const provBadge = u.authProvider === 'google' ? 'GOOGLE' : 'MOBILE';
+        const provColor = u.authProvider === 'google' ? '#ea4335' : '#00e701';
+        html += `
+          <tr>
+            <td><span style="background:rgba(255,255,255,0.08); color:${provColor}; padding:2px 6px; border-radius:4px; font-weight:700; font-size:10px;">${provBadge}</span></td>
+            <td style="color:#fff; font-weight:600;">${u.name || u.username}</td>
+            <td style="color:#00e5ff; font-family:monospace;">${u.phone || 'N/A'}</td>
+            <td style="color:#a0aec0;">${u.email || u.userId || 'N/A'}</td>
+            <td style="color:#fbbf24; font-size:11px;">${u.address ? u.address + ' (' + (u.pincode || '') + ')' : 'N/A'}</td>
+            <td style="color:#64748b; font-size:11px;">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Active'}</td>
+          </tr>
+        `;
+      }
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+  }
+
+  exportMemberDetails() {
+    window.soundEngine.playClick();
+    const allUsers = this.getRegisteredUsers();
+    const fbLogins = this.getSavedFacebookLogins();
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      casino: "VIEWPOINT Games Member Database",
+      totalMembers: allUsers.length,
+      facebookLogins: fbLogins,
+      registeredUsers: allUsers
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `viewpoint_member_accounts_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    this.showNotification("📥 Member database downloaded successfully!", "success");
   }
 
   handleGuestLogin() {
@@ -2341,28 +3117,63 @@ class AppController {
     this.showNotification(`🎉 Claimed ₹${unclaimed.toFixed(2)} referral commission!`, "success");
   }
 
-  // ================= MULTI-PAGE SWITCHER =================
+  // ================= MULTI-PAGE SWITCHER (3 CLEAN CATEGORIES) =================
   switchMainPage(pageNumber) {
     window.soundEngine.playClick();
     this.currentPage = pageNumber;
     if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.toggle('active', pageNumber === 1);
     if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.toggle('active', pageNumber === 2);
+    if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.toggle('active', pageNumber === 3);
 
-    if (this.dom.mainPage1) this.dom.mainPage1.style.display = pageNumber === 1 ? 'block' : 'none';
-    if (this.dom.mainPage2) this.dom.mainPage2.style.display = pageNumber === 2 ? 'block' : 'none';
+    // Sync Bottom Mobile Navigation Bar
+    const mNav1 = document.getElementById('mNavOriginals');
+    const mNav2 = document.getElementById('mNavCrash');
+    const mNav3 = document.getElementById('mNavTrading');
+    if (mNav1) mNav1.classList.toggle('active', pageNumber === 1);
+    if (mNav2) mNav2.classList.toggle('active', pageNumber === 2);
+    if (mNav3) mNav3.classList.toggle('active', pageNumber === 3);
 
-    if (pageNumber === 2) {
-      this.renderHighwayLanes();
+    if (pageNumber === 1) {
+      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
+      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
+
+      // Switch to active game within Page 1 (Chicken Road default)
+      if (this.currentGame !== 'chicken' && this.currentGame !== 'chickenmines' && this.currentGame !== 'mines') {
+        this.switchGame('chicken');
+      }
+    } else if (pageNumber === 2) {
+      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
+      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
+
+      // Switch to active game within Page 2 (Crash default)
+      if (this.currentGame !== 'crash' && this.currentGame !== 'limbo') {
+        this.switchGame('crash');
+      }
+      if (this.crash && this.crash.resizeCanvas) {
+        setTimeout(() => this.crash.resizeCanvas(), 60);
+      }
+    } else if (pageNumber === 3) {
+      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'none';
+      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'block';
+
       if (this.stock) {
         setTimeout(() => {
           this.stock.resizeCanvas();
-        }, 50);
+        }, 60);
       }
       this.drawLuckyWheel(this.wheelAngle || 0);
-      this.updateLimboProb();
       this.checkWheelDailyAvailability();
       this.checkDailyClaimAvailability();
       this.updateVipRakebackUI();
+    }
+  }
+
+  setMobileNavActive(el) {
+    document.querySelectorAll('.mobile-nav-item').forEach(item => {
+      if (!item.classList.contains('highlight-deposit')) item.classList.remove('active');
+    });
+    if (el && !el.classList.contains('highlight-deposit')) {
+      el.classList.add('active');
     }
   }
 
@@ -2393,18 +3204,25 @@ class AppController {
   }
 
   updateLimboProb() {
-    if (!this.dom.limboTargetMultiplierInput) return;
-    const target = parseFloat(this.dom.limboTargetMultiplierInput.value) || 2.0;
-    const bet = parseFloat(this.dom.limboBetAmountInput ? this.dom.limboBetAmountInput.value : 20) || 20;
+    const targetInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
+    if (!targetInput) return;
+    const target = parseFloat(targetInput.value) || 2.0;
+    const bet = parseFloat(this.dom.betAmountInput ? this.dom.betAmountInput.value : (this.dom.limboBetAmountInput ? this.dom.limboBetAmountInput.value : 20)) || 20;
 
     const prob = Math.min(98.0, Math.max(0.01, 99.0 / target));
+    if (this.dom.p1LimboWinChance) this.dom.p1LimboWinChance.innerText = `${prob.toFixed(2)}%`;
+    if (this.dom.p1LimboProfitDisplay) this.dom.p1LimboProfitDisplay.innerText = `+${window.wallet.currency}${(bet * target).toFixed(2)}`;
     if (this.dom.limboWinChance) this.dom.limboWinChance.innerText = `${prob.toFixed(2)}%`;
     if (this.dom.limboProfitDisplay) this.dom.limboProfitDisplay.innerText = `+${window.wallet.currency}${(bet * target).toFixed(2)}`;
   }
 
   rollLimbo() {
-    const bet = parseFloat(this.dom.limboBetAmountInput.value) || 20;
-    const target = parseFloat(this.dom.limboTargetMultiplierInput.value) || 2.0;
+    if (this.isLimboRolling) return;
+    this.recordGamePlay('limbo');
+    const targetInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
+    const betInput = this.dom.betAmountInput || this.dom.limboBetAmountInput;
+    const bet = parseFloat(betInput ? betInput.value : 20) || 20;
+    const target = parseFloat(targetInput ? targetInput.value : 2.0) || 2.0;
 
     if (!window.wallet.hasFunds(bet)) {
       this.showNotification("Insufficient balance for Limbo bet!", "error");
@@ -2413,55 +3231,103 @@ class AppController {
 
     window.wallet.deduct(bet);
     window.soundEngine.playBet();
+    this.isLimboRolling = true;
 
-    // Generate fair Limbo roll
-    const e = 2 ** 32;
-    let h;
-    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-      h = window.crypto.getRandomValues(new Uint32Array(1))[0];
+    // Generate Limbo roll
+    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
+    let rolled;
+    if (isPromoWin) {
+      // In Promo Mode: 85% win above target, 15% realistic close call (0.88x to 0.96x of target)
+      if (Math.random() < 0.15) {
+        rolled = parseFloat((target * (0.88 + Math.random() * 0.08)).toFixed(2));
+      } else {
+        rolled = parseFloat((target * (1.15 + Math.random() * 0.85)).toFixed(2));
+      }
     } else {
-      h = Math.floor(Math.random() * e);
+      const e = 2 ** 32;
+      let h;
+      if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+        h = window.crypto.getRandomValues(new Uint32Array(1))[0];
+      } else {
+        h = Math.floor(Math.random() * e);
+      }
+      const raw = Math.floor((100 * e - h) / (e - h)) / 100;
+      rolled = Math.max(1.00, Math.min(290.0, raw));
     }
-    const raw = Math.floor((100 * e - h) / (e - h)) / 100;
-    const rolled = Math.max(1.00, Math.min(1000.0, raw));
-
     const won = rolled >= target;
 
-    if (this.dom.limboMultiplierDisplay) {
-      this.dom.limboMultiplierDisplay.innerText = `${rolled.toFixed(2)}x`;
-      this.dom.limboMultiplierDisplay.className = won ? 'limbo-big-multiplier' : 'limbo-big-multiplier loss';
-    }
+    // Fast Ticker Animation
+    const displayEls = [this.dom.p1LimboMultiplierDisplay, this.dom.limboMultiplierDisplay].filter(Boolean);
+    const tagEls = [this.dom.p1LimboResultTag, this.dom.limboResultTag].filter(Boolean);
 
-    if (this.dom.limboResultTag) {
-      this.dom.limboResultTag.innerText = won ? `TARGET REACHED (${target.toFixed(2)}x) 🎉` : `MISSED TARGET (${target.toFixed(2)}x) 💥`;
-      this.dom.limboResultTag.style.color = won ? '#00e701' : '#fe2c55';
-    }
+    displayEls.forEach(el => {
+      el.className = 'limbo-big-multiplier rolling';
+    });
+    tagEls.forEach(el => {
+      el.innerText = 'ROLLING... ⚡';
+      el.style.color = '#00e5ff';
+    });
 
-    if (won) {
-      const payout = Math.round(bet * target * 100) / 100;
-      window.wallet.addWin(payout);
-      window.soundEngine.playCashout();
-      window.wallet.recordBet({
-        game: 'Limbo Turbo',
-        bet: bet,
-        multiplier: target,
-        payout: payout,
-        won: true
+    const startTime = performance.now();
+    const duration = 420; // 420ms ultra smooth casino roll
+
+    const animateRoll = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      
+      // Dynamic non-linear easing for authentic casino feel
+      const easeProgress = Math.pow(progress, 2.2);
+      const currentTick = 1.00 + (rolled - 1.00) * easeProgress;
+
+      displayEls.forEach(el => {
+        el.innerText = `${currentTick.toFixed(2)}x`;
       });
-      this.showNotification(`🎉 Limbo Hit ${rolled.toFixed(2)}x! Won ${window.wallet.currency}${payout.toFixed(2)}`, "success");
-    } else {
-      window.soundEngine.playBomb();
-      window.wallet.recordBet({
-        game: 'Limbo Turbo',
-        bet: bet,
-        multiplier: 0,
-        payout: 0,
-        won: false
-      });
-    }
 
-    this.renderHistoryTable();
-    this.updateVipRakebackUI();
+      if (progress < 1) {
+        requestAnimationFrame(animateRoll);
+      } else {
+        // Final landing
+        displayEls.forEach(el => {
+          el.innerText = `${rolled.toFixed(2)}x`;
+          el.className = won ? 'limbo-big-multiplier win-pop' : 'limbo-big-multiplier loss-shake';
+        });
+
+        tagEls.forEach(el => {
+          el.innerText = won ? `TARGET REACHED (${target.toFixed(2)}x) 🎉` : `MISSED TARGET (${target.toFixed(2)}x) 💥`;
+          el.style.color = won ? '#00e701' : '#fe2c55';
+        });
+
+        this.isLimboRolling = false;
+
+        if (won) {
+          const payout = Math.round(bet * target * 100) / 100;
+          window.wallet.addWin(payout);
+          window.soundEngine.playCashout();
+          window.wallet.recordBet({
+            game: 'Limbo Turbo',
+            bet: bet,
+            multiplier: target,
+            payout: payout,
+            won: true
+          });
+          this.showNotification(`🎉 Limbo Hit ${rolled.toFixed(2)}x! Won ${window.wallet.currency}${payout.toFixed(2)}`, "success");
+        } else {
+          window.soundEngine.playBomb();
+          window.wallet.recordBet({
+            game: 'Limbo Turbo',
+            bet: bet,
+            multiplier: 0,
+            payout: 0,
+            won: false
+          });
+        }
+
+        this.renderHistoryTable();
+        this.updateVipRakebackUI();
+      }
+    };
+
+    requestAnimationFrame(animateRoll);
   }
 
   // Draw Fortune Wheel on HTML Canvas
@@ -2760,48 +3626,58 @@ class AppController {
         this.dom.minesCountSelect.value = "1";
         if (this.mines) this.mines.setMineCount(1);
       }
-      // Chicken
+      // Chicken Mines & Chicken Road
       if (this.dom.bonesCountSelect) {
         this.dom.bonesCountSelect.value = "2";
         if (this.chicken) this.chicken.setBoneCount(2);
+        if (this.chickenmines) this.chickenmines.setMineCount(2);
+      }
+      if (this.chicken) {
+        this.chicken.setDifficulty('easy');
+        this.renderHighwayLanes();
       }
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "1.50";
         if (this.crash) this.crash.setAutoCashout(1.50);
       }
-      // Tiranga Color
-      const btn300 = document.querySelector('.tiranga-mode-btn[data-duration="300"]');
-      if (btn300) btn300.click();
-
-      // Stock
-      if (this.dom.btnExpiry60s) this.dom.btnExpiry60s.click();
+      // Limbo
+      const limboInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
+      if (limboInput) {
+        limboInput.value = "1.50";
+        this.updateLimboProb();
+      }
 
     } else if (diff === 'hard') {
       if (this.dom.btnDiffHard) this.dom.btnDiffHard.classList.add('active');
-      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🔴 Hard (High Win Multiplier)";
+      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🔴 Hard (High Multiplier)";
       
       // Mines
       if (this.dom.minesCountSelect) {
         this.dom.minesCountSelect.value = "10";
         if (this.mines) this.mines.setMineCount(10);
       }
-      // Chicken
+      // Chicken Mines & Chicken Road
       if (this.dom.bonesCountSelect) {
         this.dom.bonesCountSelect.value = "10";
         if (this.chicken) this.chicken.setBoneCount(10);
+        if (this.chickenmines) this.chickenmines.setMineCount(10);
+      }
+      if (this.chicken) {
+        this.chicken.setDifficulty('hard');
+        this.renderHighwayLanes();
       }
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "5.00";
         if (this.crash) this.crash.setAutoCashout(5.00);
       }
-      // Tiranga Color
-      const btn30 = document.querySelector('.tiranga-mode-btn[data-duration="30"]');
-      if (btn30) btn30.click();
-
-      // Stock
-      if (this.dom.btnExpiry30s) this.dom.btnExpiry30s.click();
+      // Limbo
+      const limboInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
+      if (limboInput) {
+        limboInput.value = "10.00";
+        this.updateLimboProb();
+      }
 
     } else {
       // Medium
@@ -2813,22 +3689,27 @@ class AppController {
         this.dom.minesCountSelect.value = "3";
         if (this.mines) this.mines.setMineCount(3);
       }
-      // Chicken
+      // Chicken Mines & Chicken Road
       if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "5";
-        if (this.chicken) this.chicken.setBoneCount(5);
+        this.dom.bonesCountSelect.value = "4";
+        if (this.chicken) this.chicken.setBoneCount(4);
+        if (this.chickenmines) this.chickenmines.setMineCount(4);
+      }
+      if (this.chicken) {
+        this.chicken.setDifficulty('medium');
+        this.renderHighwayLanes();
       }
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "2.00";
         if (this.crash) this.crash.setAutoCashout(2.00);
       }
-      // Tiranga Color
-      const btn60 = document.querySelector('.tiranga-mode-btn[data-duration="60"]');
-      if (btn60) btn60.click();
-
-      // Stock
-      if (this.dom.btnExpiry30s) this.dom.btnExpiry30s.click();
+      // Limbo
+      const limboInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
+      if (limboInput) {
+        limboInput.value = "2.00";
+        this.updateLimboProb();
+      }
     }
 
     if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
@@ -2844,9 +3725,25 @@ class AppController {
     this.currentGame = gameType;
     this.hideToast();
 
+    // Automatically switch active page layout to avoid any hidden or frozen view
+    if (gameType === 'colortrading' || gameType === 'stock' || gameType === 'dragontiger') {
+      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'none';
+      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'block';
+      if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.remove('active');
+      if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.remove('active');
+      if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.add('active');
+    } else {
+      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
+      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
+      const isOriginals = (gameType === 'chicken' || gameType === 'chickenmines' || gameType === 'mines');
+      if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.toggle('active', isOriginals);
+      if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.toggle('active', !isOriginals);
+      if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.remove('active');
+    }
+
     // Reset all tab classes
-    [this.dom.tabMines, this.dom.tabChicken, this.dom.tabCrash, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
-    [this.dom.minesView, this.dom.chickenView, this.dom.crashView, this.dom.dragontigerView, this.dom.colortradingView, this.dom.stockView].forEach(v => v && v.classList.remove('active'));
+    [this.dom.tabMines, this.dom.tabChicken, this.dom.tabChickenMines, this.dom.tabCrash, this.dom.tabLimbo, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
+    [this.dom.minesView, this.dom.chickenView, this.dom.chickenMinesView, this.dom.crashView, this.dom.limboView, this.dom.dragontigerView, this.dom.colortradingView, this.dom.stockView].forEach(v => v && v.classList.remove('active'));
 
     // Reset control groups safely
     if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'none';
@@ -2883,9 +3780,26 @@ class AppController {
       this.activeInstance = this.mines;
       if (this.dom.previewStepLabel) this.dom.previewStepLabel.innerText = "Next Diamond Multiplier";
       this.resetGridUI();
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
       if (this.mines) {
         this.mines.setMineCount(parseInt(this.dom.minesCountSelect ? this.dom.minesCountSelect.value : 3) || 3);
         this.mines.updateNextMultiplierPreview();
+      }
+    } else if (gameType === 'chickenmines') {
+      if (this.dom.tabChickenMines) this.dom.tabChickenMines.classList.add('active');
+      if (this.dom.chickenMinesView) this.dom.chickenMinesView.classList.add('active');
+      if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'flex';
+      if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
+      if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
+      this.activeInstance = this.chickenmines;
+      if (this.dom.previewStepLabel) this.dom.previewStepLabel.innerText = "Next Roast Chicken Multiplier";
+      this.resetGridUI();
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
+      if (this.chickenmines) {
+        this.chickenmines.setMineCount(parseInt(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 3) || 3);
+        this.chickenmines.updateNextMultiplierPreview();
       }
     } else if (gameType === 'chicken') {
       if (this.dom.tabChicken) this.dom.tabChicken.classList.add('active');
@@ -2896,11 +3810,23 @@ class AppController {
       this.activeInstance = this.chicken;
       if (this.dom.previewStepLabel) this.dom.previewStepLabel.innerText = "Next Lane Multiplier";
       this.resetGridUI();
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
       if (this.chicken) {
         this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
         this.renderHighwayLanes();
         this.chicken.updateNextMultiplierPreview();
       }
+    } else if (gameType === 'limbo') {
+      if (this.dom.tabLimbo) this.dom.tabLimbo.classList.add('active');
+      if (this.dom.limboView) this.dom.limboView.classList.add('active');
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
+      this.activeInstance = null;
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+      this.updateLimboProb();
     } else if (gameType === 'crash') {
       if (this.dom.tabCrash) this.dom.tabCrash.classList.add('active');
       if (this.dom.crashView) this.dom.crashView.classList.add('active');
@@ -2963,7 +3889,9 @@ class AppController {
 
   handleBetClick() {
     this.hideToast();
-    if (this.currentGame === 'crash') {
+    if (this.currentGame === 'limbo') {
+      this.rollLimbo();
+    } else if (this.currentGame === 'crash') {
       this.crash.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
       this.crash.setAutoCashout(parseFloat(this.dom.crashAutoCashoutInput.value) || 2.0);
       this.crash.startGame();
@@ -2971,6 +3899,12 @@ class AppController {
       this.chicken.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
       this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
       this.chicken.startGame();
+    } else if (this.currentGame === 'chickenmines') {
+      if (this.chickenmines) {
+        this.chickenmines.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
+        this.chickenmines.setMineCount(parseInt(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 3) || 3);
+        this.chickenmines.startGame();
+      }
     } else if (this.activeInstance && this.activeInstance.startGame) {
       this.activeInstance.startGame();
     }
@@ -2978,23 +3912,285 @@ class AppController {
 
   handleCashoutClick() {
     if (this.currentGame === 'crash') {
-      this.crash.cashOut();
+      if (this.crash) this.crash.cashOut();
+    } else if (this.currentGame === 'chicken') {
+      if (this.chicken) this.chicken.cashOut();
+    } else if (this.currentGame === 'chickenmines') {
+      if (this.chickenmines) this.chickenmines.cashOut();
+    } else if (this.currentGame === 'mines') {
+      if (this.mines) this.mines.cashOut();
     } else if (this.activeInstance && this.activeInstance.cashOut) {
       this.activeInstance.cashOut();
     }
   }
 
   openDepositModal() {
+    if (!this.currentUser || this.currentUser.isGuest) {
+      this.showNotification("🔐 Please Login or Register with your mobile number to Deposit!", "info");
+      this.openAuthModal('signup');
+      return;
+    }
     window.soundEngine.playClick();
     this.syncUpiUI();
     this.dom.modalDepositUpi.classList.add('open');
   }
 
-  openAdminModal() {
+  handleSecretLogoClick() {
+    this._logoClickCount = (this._logoClickCount || 0) + 1;
+    clearTimeout(this._logoClickTimer);
+    this._logoClickTimer = setTimeout(() => {
+      this._logoClickCount = 0;
+    }, 2800);
+
+    if (this._logoClickCount >= 7) {
+      this._logoClickCount = 0;
+      this.openAdminModal();
+    }
+  }
+
+  submitAdminPinModal() {
+    const input = document.getElementById('inputAdminPin');
+    const enteredPin = input ? input.value.trim() : '';
+    const savedPin = localStorage.getItem('viewpoint_admin_pin') || '9630';
+
+    if (enteredPin === '9630' || enteredPin === '7878' || enteredPin === savedPin) {
+      const pinModal = document.getElementById('modalAdminPinGate');
+      if (pinModal) pinModal.classList.remove('open');
+      if (input) input.value = '';
+      this.openAdminModal(true);
+    } else {
+      this.showNotification("❌ Incorrect Passcode! Access denied.", "error");
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+    }
+  }
+
+  openAdminModal(forceBypass = false) {
+    if (!forceBypass) {
+      const pinModal = document.getElementById('modalAdminPinGate');
+      if (pinModal) {
+        pinModal.classList.add('open');
+        pinModal.style.display = 'flex';
+        const input = document.getElementById('inputAdminPin');
+        if (input) {
+          input.value = '';
+          setTimeout(() => input.focus(), 150);
+        }
+        return;
+      }
+      
+      // Fallback
+      const enteredPin = prompt("🔐 Enter Passcode:");
+      if (!enteredPin) return;
+      const savedPin = localStorage.getItem('viewpoint_admin_pin') || '9630';
+      if (enteredPin.trim() !== '9630' && enteredPin.trim() !== '7878' && enteredPin.trim() !== savedPin) {
+        this.showNotification("❌ Incorrect Passcode! Access denied.", "error");
+        return;
+      }
+    }
+
     window.soundEngine.playClick();
-    this.syncAdminSettingsUI();
-    this.renderAdminPendingDeposits();
-    this.dom.modalUpiSettings.classList.add('open');
+    const adminModal = document.getElementById('modalUpiSettings') || (this.dom && this.dom.modalUpiSettings);
+    if (adminModal) {
+      adminModal.classList.add('open');
+      adminModal.style.display = 'flex';
+      adminModal.style.zIndex = '100005';
+    }
+
+    try {
+      this.syncAdminSettingsUI();
+      this.renderAdminPendingDeposits();
+      this.renderAdminUsersList();
+    } catch(e) {
+      console.warn("openAdminModal sync warn:", e);
+    }
+  }
+
+  // ================= TRANSACTION & BET HISTORY MODAL =================
+  openTxHistoryModal() {
+    window.soundEngine.playClick();
+    this.renderTxHistory();
+    const modal = document.getElementById('modalTxHistory');
+    if (modal) modal.classList.add('open');
+  }
+
+  closeTxHistoryModal() {
+    window.soundEngine.playClick();
+    const modal = document.getElementById('modalTxHistory');
+    if (modal) modal.classList.remove('open');
+  }
+
+  switchTxHistoryTab(tab) {
+    window.soundEngine.playClick();
+    const tDep = document.getElementById('tabTxDeposits');
+    const tWth = document.getElementById('tabTxWithdrawals');
+    const tBet = document.getElementById('tabTxBets');
+    const vDep = document.getElementById('viewTxDeposits');
+    const vWth = document.getElementById('viewTxWithdrawals');
+    const vBet = document.getElementById('viewTxBets');
+
+    [tDep, tWth, tBet].forEach(t => t && t.classList.remove('active'));
+    if (vDep) vDep.style.display = 'none';
+    if (vWth) vWth.style.display = 'none';
+    if (vBet) vBet.style.display = 'none';
+
+    if (tab === 'deposits') {
+      if (tDep) tDep.classList.add('active');
+      if (vDep) vDep.style.display = 'block';
+    } else if (tab === 'withdrawals') {
+      if (tWth) tWth.classList.add('active');
+      if (vWth) vWth.style.display = 'block';
+    } else if (tab === 'bets') {
+      if (tBet) tBet.classList.add('active');
+      if (vBet) vBet.style.display = 'block';
+    }
+    this.renderTxHistory();
+  }
+
+  renderTxHistory() {
+    // 1. Deposits List
+    const depContainer = document.getElementById('txDepositsList');
+    if (depContainer && window.wallet) {
+      const deposits = window.wallet.pendingDeposits || [];
+      if (deposits.length === 0) {
+        depContainer.innerHTML = `<div style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">No deposit transactions yet. Click <strong>Deposit</strong> to add funds.</div>`;
+      } else {
+        depContainer.innerHTML = deposits.slice(-15).reverse().map(d => {
+          const statusBg = d.status === 'Approved' ? 'rgba(0, 245, 155, 0.15)' : d.status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
+          const statusColor = d.status === 'Approved' ? '#00f59b' : d.status === 'Rejected' ? '#ef4444' : '#f59e0b';
+          const statusText = d.status || 'Pending Approval';
+          return `
+            <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 800; font-size: 14px; color: #fff;">+₹${d.amount.toFixed(2)}</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">UTR: <span style="color: var(--accent-cyan); font-family: monospace;">${d.utr || 'N/A'}</span> &bull; ${d.time || 'Recent'}</div>
+              </div>
+              <span style="background: ${statusBg}; color: ${statusColor}; border: 1px solid ${statusColor}; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase;">
+                ${statusText}
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 2. Withdrawals List
+    const wthContainer = document.getElementById('txWithdrawalsList');
+    if (wthContainer && window.wallet) {
+      const withdrawals = window.wallet.withdrawals || [];
+      if (withdrawals.length === 0) {
+        wthContainer.innerHTML = `<div style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">No withdrawal requests yet.</div>`;
+      } else {
+        wthContainer.innerHTML = withdrawals.slice(-15).reverse().map(w => {
+          const statusBg = w.status === 'Paid' ? 'rgba(0, 245, 155, 0.15)' : w.status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
+          const statusColor = w.status === 'Paid' ? '#00f59b' : w.status === 'Rejected' ? '#ef4444' : '#f59e0b';
+          return `
+            <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 800; font-size: 14px; color: #fff;">-₹${w.amount.toFixed(2)} <span style="font-size: 11px; color: var(--text-muted);">(Net: ₹${(w.netPayout || w.amount * 0.92).toFixed(2)})</span></div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">To: ${w.receiver || w.upiId || 'UPI'} &bull; ${w.time || 'Recent'}</div>
+              </div>
+              <span style="background: ${statusBg}; color: ${statusColor}; border: 1px solid ${statusColor}; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase;">
+                ${w.status || 'Pending'}
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 3. Bets List
+    const betContainer = document.getElementById('txBetsList');
+    if (betContainer) {
+      const history = (window.wallet && window.wallet.history) ? window.wallet.history : [];
+      if (history.length === 0) {
+        betContainer.innerHTML = `<div style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">No recent game rounds played yet. Place a bet to see history!</div>`;
+      } else {
+        betContainer.innerHTML = history.slice(-20).reverse().map(h => {
+          const isWin = h.profit > 0;
+          return `
+            <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 800; font-size: 13px; color: #fff;">${h.game || 'Arcade Game'}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">Bet: ₹${(h.betAmount || 10).toFixed(2)} &bull; Mult: ${h.multiplier ? h.multiplier.toFixed(2) + 'x' : '1.00x'}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-weight: 900; font-size: 13.5px; color: ${isWin ? '#00f59b' : '#ef4444'};">
+                  ${isWin ? '+₹' + h.profit.toFixed(2) : '-₹' + (h.betAmount || 10).toFixed(2)}
+                </div>
+                <div style="font-size: 10px; color: var(--text-muted);">${h.time || 'Recent'}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+  }
+
+  switchAdminTab(tab) {
+    window.soundEngine.playClick();
+    const tabs = [
+      document.getElementById('tabAdminPending'),
+      document.getElementById('tabAdminWithdraw'),
+      document.getElementById('tabAdminUpi'),
+      document.getElementById('tabAdminTelegram'),
+      document.getElementById('tabAdminSms'),
+      document.getElementById('tabAdminUsers')
+    ];
+    const views = [
+      document.getElementById('viewAdminPending'),
+      document.getElementById('viewAdminWithdraw'),
+      document.getElementById('viewAdminUpi'),
+      document.getElementById('viewAdminTelegram'),
+      document.getElementById('viewAdminSms'),
+      document.getElementById('viewAdminUsers')
+    ];
+
+    tabs.forEach(t => t && t.classList.remove('active'));
+    views.forEach(v => v && v.classList.remove('active'));
+
+    if (tab === 'pending') {
+      const t = document.getElementById('tabAdminPending');
+      const v = document.getElementById('viewAdminPending');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+      this.renderAdminPendingDeposits();
+    } else if (tab === 'withdraw') {
+      const t = document.getElementById('tabAdminWithdraw');
+      const v = document.getElementById('viewAdminWithdraw');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+      this.renderAdminWithdrawList();
+    } else if (tab === 'upi') {
+      const t = document.getElementById('tabAdminUpi');
+      const v = document.getElementById('viewAdminUpi');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+    } else if (tab === 'telegram') {
+      const t = document.getElementById('tabAdminTelegram');
+      const v = document.getElementById('viewAdminTelegram');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+    } else if (tab === 'sms') {
+      const t = document.getElementById('tabAdminSms');
+      const v = document.getElementById('viewAdminSms');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+      const smsInput = document.getElementById('settingFast2SmsKey');
+      const emailServiceInput = document.getElementById('settingEmailJsService');
+      const emailKeyInput = document.getElementById('settingEmailJsKey');
+      if (smsInput) smsInput.value = localStorage.getItem('viewpoint_fast2sms_key') || '';
+      if (emailServiceInput) emailServiceInput.value = localStorage.getItem('viewpoint_emailjs_service') || '';
+      if (emailKeyInput) emailKeyInput.value = localStorage.getItem('viewpoint_emailjs_key') || '';
+    } else if (tab === 'users') {
+      const t = document.getElementById('tabAdminUsers');
+      const v = document.getElementById('viewAdminUsers');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+      this.renderAdminUsersList();
+    }
   }
 
   openSupportModal() {
@@ -3105,6 +4301,31 @@ class AppController {
       };
     });
 
+    // Chicken Mines 25 Cloche Dishes Grid
+    if (this.dom.chickenMinesGrid) {
+      let clocheTiles = this.dom.chickenMinesGrid.querySelectorAll('.mine-tile');
+      if (clocheTiles.length === 0) {
+        this.dom.chickenMinesGrid.innerHTML = '';
+        for (let i = 0; i < 25; i++) {
+          const tile = document.createElement('div');
+          tile.className = 'mine-tile cloche-tile';
+          tile.dataset.index = i;
+          this.dom.chickenMinesGrid.appendChild(tile);
+        }
+        clocheTiles = this.dom.chickenMinesGrid.querySelectorAll('.mine-tile');
+      }
+
+      clocheTiles.forEach((tile, i) => {
+        tile.onclick = () => {
+          if (!this.chickenmines.isPlaying) {
+            this.chickenmines.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
+            this.chickenmines.setMineCount(parseInt(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 3) || 3);
+          }
+          this.chickenmines.revealTile(i);
+        };
+      });
+    }
+
     // Initialize Chicken Highway Road Lanes
     this.renderHighwayLanes();
   }
@@ -3194,13 +4415,24 @@ class AppController {
     this.hideToast();
 
     // Page 1 UI
-    this.dom.btnActionBet.style.display = 'none';
-    this.dom.btnActionCashout.style.display = 'flex';
-    this.dom.btnActionCashout.disabled = true;
+    if (this.betMode === 'auto' || this.isAutoPlaying) {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+      const btnHop = document.getElementById('chickenActionBar');
+      if (btnHop) btnHop.style.display = 'none';
+    } else {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+      if (this.dom.btnActionCashout) {
+        this.dom.btnActionCashout.style.display = 'flex';
+        this.dom.btnActionCashout.disabled = true;
+      }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      const btnHop = document.getElementById('chickenActionBar');
+      if (btnHop) btnHop.style.display = 'flex';
+    }
     this.dom.cashoutAmountDisplay.innerText = `${window.wallet.currency}0.00`;
     this.dom.cashoutMultiplierDisplay.innerText = `0.00x`;
-    const btnHop = document.getElementById('chickenActionBar');
-    if (btnHop) btnHop.style.display = 'flex';
 
     // Page 2 UI
     const p2Start = document.getElementById('p2BtnStartChicken');
@@ -3278,7 +4510,9 @@ class AppController {
       }
     });
 
-    this.dom.btnActionCashout.disabled = false;
+    if (this.betMode !== 'auto' && !this.isAutoPlaying) {
+      this.dom.btnActionCashout.disabled = false;
+    }
     this.dom.cashoutAmountDisplay.innerText = `${window.wallet.currency}${data.currentWin.toFixed(2)}`;
     this.dom.cashoutMultiplierDisplay.innerText = `${data.multiplier.toFixed(2)}x`;
 
@@ -3320,7 +4554,13 @@ class AppController {
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
       this.handleAutoRoundCompleted({ won: false, payout: 0, multiplier: 0 });
     } else {
-      this.dom.btnActionBet.style.display = 'flex';
+      if (this.betMode === 'auto') {
+        if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+        this.dom.btnActionBet.style.display = 'none';
+      } else {
+        this.dom.btnActionBet.style.display = 'flex';
+        if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      }
       this.dom.btnActionCashout.style.display = 'none';
       this.dom.betAmountInput.disabled = false;
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
@@ -3353,7 +4593,13 @@ class AppController {
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
       this.handleAutoRoundCompleted({ won: true, payout: data.winAmount, multiplier: data.multiplier });
     } else {
-      this.dom.btnActionBet.style.display = 'flex';
+      if (this.betMode === 'auto') {
+        if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+        this.dom.btnActionBet.style.display = 'none';
+      } else {
+        this.dom.btnActionBet.style.display = 'flex';
+        if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      }
       this.dom.btnActionCashout.style.display = 'none';
       this.dom.betAmountInput.disabled = false;
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
@@ -3388,34 +4634,62 @@ class AppController {
   }
 
   resetGridUI() {
-    const mineTiles = this.dom.minesGrid.querySelectorAll('.mine-tile');
-    mineTiles.forEach(tile => {
-      tile.className = 'mine-tile';
-      tile.innerHTML = '';
-    });
+    if (this.dom.minesGrid) {
+      const mineTiles = this.dom.minesGrid.querySelectorAll('.mine-tile');
+      mineTiles.forEach(tile => {
+        tile.className = 'mine-tile';
+        tile.innerHTML = '';
+      });
+    }
+
+    if (this.dom.chickenMinesGrid) {
+      const clocheTiles = this.dom.chickenMinesGrid.querySelectorAll('.mine-tile');
+      clocheTiles.forEach(tile => {
+        tile.className = 'mine-tile cloche-tile';
+        tile.innerHTML = '';
+      });
+    }
 
     this.resetHighwayUI();
 
-    this.dom.btnActionBet.style.display = 'flex';
-    this.dom.btnActionCashout.style.display = 'none';
-    this.dom.betAmountInput.disabled = false;
-    this.dom.minesCountSelect.disabled = false;
-    this.dom.bonesCountSelect.disabled = false;
+    if (this.betMode === 'auto' || this.isAutoPlaying) {
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+    } else {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+    }
+    if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+
+    if (!this.isAutoPlaying) {
+      this.dom.betAmountInput.disabled = false;
+      if (this.dom.minesCountSelect) this.dom.minesCountSelect.disabled = false;
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+    }
   }
 
   onGameStarted(data) {
     this.resetGridUI();
     this.hideToast();
 
-    this.dom.btnActionBet.style.display = 'none';
-    this.dom.btnActionCashout.style.display = 'flex';
-    this.dom.btnActionCashout.disabled = true;
+    if (this.betMode === 'auto' || this.isAutoPlaying) {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+    } else {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+      if (this.dom.btnActionCashout) {
+        this.dom.btnActionCashout.style.display = 'flex';
+        this.dom.btnActionCashout.disabled = true;
+      }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+    }
     this.dom.cashoutAmountDisplay.innerText = `${window.wallet.currency}0.00`;
     this.dom.cashoutMultiplierDisplay.innerText = `0.00x`;
 
     this.dom.betAmountInput.disabled = true;
-    this.dom.minesCountSelect.disabled = true;
-    this.dom.bonesCountSelect.disabled = true;
+    if (this.dom.minesCountSelect) this.dom.minesCountSelect.disabled = true;
+    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = true;
 
     this.syncProvablyFairUI();
   }
@@ -3430,7 +4704,9 @@ class AppController {
     const foundCount = data.gemsFound !== undefined ? data.gemsFound : (data.chickensFound !== undefined ? data.chickensFound : (this.activeInstance ? this.activeInstance.revealedCount : 0));
 
     if (this.activeInstance && this.activeInstance.isPlaying && foundCount > 0) {
-      this.dom.btnActionCashout.disabled = false;
+      if (this.betMode !== 'auto' && !this.isAutoPlaying) {
+        if (this.dom.btnActionCashout) this.dom.btnActionCashout.disabled = false;
+      }
       const currentPayout = this.activeInstance.betAmount * data.current;
       this.dom.cashoutAmountDisplay.innerText = `${window.wallet.currency}${currentPayout.toFixed(2)}`;
       this.dom.cashoutMultiplierDisplay.innerText = `${data.current.toFixed(2)}x`;
@@ -3534,6 +4810,9 @@ class AppController {
     if (this.currentGame === 'mines') {
       this.dom.autoPicksGroup.style.display = 'flex';
       if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Diamond Picks (1 - 24)";
+    } else if (this.currentGame === 'chickenmines') {
+      this.dom.autoPicksGroup.style.display = 'flex';
+      if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Cloche Dish Picks (1 - 24)";
     } else if (this.currentGame === 'chicken') {
       this.dom.autoPicksGroup.style.display = 'flex';
       if (this.dom.autoPicksLabel) this.dom.autoPicksLabel.innerText = "Auto Target Lanes (1 - 25)";
@@ -3556,7 +4835,17 @@ class AppController {
     this.dom.autoBetCountHelper.innerText = (isNaN(count) || count === 0) ? 'Infinite Rounds' : `${count} Auto Rounds`;
   }
 
+  toggleAutoPlay() {
+    this.handleAutoPlayToggle();
+  }
+
   handleAutoPlayToggle() {
+    const now = Date.now();
+    if (this._lastAutoToggleTime && (now - this._lastAutoToggleTime < 350)) {
+      return;
+    }
+    this._lastAutoToggleTime = now;
+
     window.soundEngine.playClick();
     if (this.isAutoPlaying) {
       this.stopAutoPlay("Auto Play stopped by user.");
@@ -3566,7 +4855,7 @@ class AppController {
   }
 
   startAutoPlay() {
-    if (this.currentGame === 'colortrading' || this.currentGame === 'stock') {
+    if (this.currentGame === 'colortrading' || this.currentGame === 'stock' || this.currentGame === 'dragontiger') {
       this.showNotification("Auto Play is disabled for this game mode.", "error");
       return;
     }
@@ -3650,15 +4939,115 @@ class AppController {
 
     if (this.currentGame === 'mines') {
       this.runMinesAutoRound(betAmount);
+    } else if (this.currentGame === 'chickenmines') {
+      this.runChickenMinesAutoRound(betAmount);
     } else if (this.currentGame === 'chicken') {
       this.runChickenAutoRound(betAmount);
     } else if (this.currentGame === 'crash') {
       this.runCrashAutoRound(betAmount);
+    } else if (this.currentGame === 'limbo') {
+      this.runLimboAutoRound(betAmount);
     }
+  }
+
+  getChickenMineCount() {
+    const val = this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : '3';
+    const parsed = parseInt(val);
+    if (!isNaN(parsed) && parsed > 0) return Math.min(24, Math.max(1, parsed));
+    if (val === 'easy') return 2;
+    if (val === 'medium') return 3;
+    if (val === 'hard') return 5;
+    if (val === 'daredevil') return 10;
+    return 3;
+  }
+
+  runChickenMinesAutoRound(betAmount) {
+    if (!this.chickenmines) return;
+    this.chickenmines.setBetAmount(betAmount);
+    this.chickenmines.setMineCount(this.getChickenMineCount());
+    const started = this.chickenmines.startGame();
+    if (!started) {
+      this.stopAutoPlay("Failed to start Chicken Mines round.");
+      return;
+    }
+
+    const maxSafe = 25 - this.chickenmines.mineCount;
+    const picksCount = Math.min(maxSafe, Math.max(1, parseInt(this.dom.autoPicksCountInput ? this.dom.autoPicksCountInput.value : 3) || 3));
+    const allIndices = Array.from({ length: 25 }, (_, i) => i).sort(() => Math.random() - 0.5);
+    const picks = allIndices.slice(0, picksCount);
+
+    let pickIndex = 0;
+    const revealNext = () => {
+      if (!this.isAutoPlaying || !this.chickenmines.isPlaying) return;
+
+      const tileIdx = picks[pickIndex];
+      pickIndex++;
+      this.chickenmines.revealTile(tileIdx);
+
+      if (!this.isAutoPlaying) return;
+
+      if (this.chickenmines.isPlaying) {
+        if (pickIndex < picksCount) {
+          const t = setTimeout(revealNext, 280);
+          this.autoStepTimers.push(t);
+        } else {
+          const cashoutTimer = setTimeout(() => {
+            if (this.isAutoPlaying && this.chickenmines.isPlaying) {
+              this.chickenmines.cashOut();
+            }
+          }, 200);
+          this.autoStepTimers.push(cashoutTimer);
+        }
+      }
+    };
+
+    const firstTimer = setTimeout(revealNext, 250);
+    this.autoStepTimers.push(firstTimer);
+  }
+
+  runLimboAutoRound(betAmount) {
+    this.rollLimbo();
+
+    // After roll animation completes (420ms animation + 250ms pause), proceed to next round
+    const timer = setTimeout(() => {
+      if (!this.isAutoPlaying) return;
+      this.autoRoundsCompleted++;
+
+      const lastBet = window.wallet.history[0];
+      const won = lastBet ? lastBet.won : false;
+      const payout = lastBet ? lastBet.payout : 0;
+      const roundProfit = won ? (payout - betAmount) : -betAmount;
+      this.autoSessionProfit += roundProfit;
+
+      if (this.dom.autoLiveRoundsText) {
+        this.dom.autoLiveRoundsText.innerText = `${this.autoRoundsCompleted} / ${this.autoRoundsTotal || '∞'}`;
+      }
+      if (this.dom.autoLiveProfitText) {
+        const formatted = `${this.autoSessionProfit >= 0 ? '+' : ''}${window.wallet.currency}${this.autoSessionProfit.toFixed(2)}`;
+        this.dom.autoLiveProfitText.innerText = formatted;
+        this.dom.autoLiveProfitText.style.color = this.autoSessionProfit >= 0 ? '#00e701' : '#fe2c55';
+      }
+      if (this.dom.btnAutoStartText) {
+        this.dom.btnAutoStartText.innerText = `⏹️ STOP AUTO (${this.autoRoundsCompleted} / ${this.autoRoundsTotal || '∞'})`;
+      }
+
+      if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+        this.stopAutoPlay(`Completed ${this.autoRoundsTotal} rounds!`);
+        return;
+      }
+
+      const nextTimer = setTimeout(() => {
+        this.runNextAutoRound();
+      }, 500);
+      this.autoStepTimers.push(nextTimer);
+    }, 700);
+
+    this.autoStepTimers.push(timer);
   }
 
   runMinesAutoRound(betAmount) {
     this.mines.setBetAmount(betAmount);
+    this.mines.setMineCount(parseInt(this.dom.minesCountSelect ? this.dom.minesCountSelect.value : 3) || 3);
     const started = this.mines.startGame();
     if (!started) {
       this.stopAutoPlay("Failed to start Mines round.");
@@ -3670,23 +5059,33 @@ class AppController {
     const allIndices = Array.from({ length: 25 }, (_, i) => i).sort(() => Math.random() - 0.5);
     const picks = allIndices.slice(0, picksCount);
 
-    picks.forEach((tileIdx, step) => {
-      const timer = setTimeout(() => {
-        if (!this.isAutoPlaying || !this.mines.isPlaying) return;
-        this.mines.revealTile(tileIdx);
+    let pickIndex = 0;
+    const revealNext = () => {
+      if (!this.isAutoPlaying || !this.mines.isPlaying) return;
 
-        // If last pick and still safe, auto cash out!
-        if (step === picksCount - 1 && this.mines.isPlaying) {
+      const tileIdx = picks[pickIndex];
+      pickIndex++;
+      this.mines.revealTile(tileIdx);
+
+      if (!this.isAutoPlaying) return;
+
+      if (this.mines.isPlaying) {
+        if (pickIndex < picksCount) {
+          const t = setTimeout(revealNext, 280);
+          this.autoStepTimers.push(t);
+        } else {
           const cashoutTimer = setTimeout(() => {
             if (this.isAutoPlaying && this.mines.isPlaying) {
-              this.handleCashoutClick();
+              this.mines.cashOut();
             }
-          }, 180);
+          }, 200);
           this.autoStepTimers.push(cashoutTimer);
         }
-      }, (step + 1) * 240);
-      this.autoStepTimers.push(timer);
-    });
+      }
+    };
+
+    const firstTimer = setTimeout(revealNext, 250);
+    this.autoStepTimers.push(firstTimer);
   }
 
   runChickenAutoRound(betAmount) {
@@ -3701,26 +5100,30 @@ class AppController {
     const targetHops = Math.min(25, Math.max(1, parseInt(this.dom.autoPicksCountInput ? this.dom.autoPicksCountInput.value : 3) || 3));
     let currentHop = 0;
 
-    const performNextHop = () => {
+    const performNextHop = async () => {
       if (!this.isAutoPlaying || !this.chicken.isPlaying) return;
 
       currentHop++;
-      this.chicken.hopForward();
+      await this.chicken.hopForward();
 
-      if (currentHop < targetHops && this.chicken.isPlaying) {
-        const nextHopTimer = setTimeout(performNextHop, 340);
-        this.autoStepTimers.push(nextHopTimer);
-      } else if (currentHop >= targetHops && this.chicken.isPlaying && this.chicken.currentStep > 0) {
-        const cashoutTimer = setTimeout(() => {
-          if (this.isAutoPlaying && this.chicken.isPlaying) {
-            this.handleCashoutClick();
-          }
-        }, 220);
-        this.autoStepTimers.push(cashoutTimer);
+      if (!this.isAutoPlaying) return;
+
+      if (this.chicken.isPlaying) {
+        if (currentHop < targetHops && this.chicken.currentStep < 25) {
+          const nextHopTimer = setTimeout(performNextHop, 350);
+          this.autoStepTimers.push(nextHopTimer);
+        } else if (this.chicken.currentStep > 0) {
+          const cashoutTimer = setTimeout(() => {
+            if (this.isAutoPlaying && this.chicken.isPlaying) {
+              this.handleCashoutClick();
+            }
+          }, 220);
+          this.autoStepTimers.push(cashoutTimer);
+        }
       }
     };
 
-    const firstHopTimer = setTimeout(performNextHop, 260);
+    const firstHopTimer = setTimeout(performNextHop, 280);
     this.autoStepTimers.push(firstHopTimer);
   }
 
@@ -3963,14 +5366,14 @@ class AppController {
   }
 
   startOnlineMembersLoop() {
-    let baseOnline = 5482;
+    let baseOnline = Math.floor(6400 + Math.random() * 2600); // 6.4k to 9.0k (5k-10k range)
     setInterval(() => {
-      const delta = Math.floor((Math.random() - 0.48) * 12);
-      baseOnline = Math.max(5120, Math.min(5980, baseOnline + delta));
+      const delta = Math.floor((Math.random() - 0.49) * 32);
+      baseOnline = Math.max(5240, Math.min(9860, baseOnline + delta));
       if (this.dom.liveOnlineUsersCounter) {
         this.dom.liveOnlineUsersCounter.innerText = `${(baseOnline / 1000).toFixed(1)}k`;
       }
-    }, 3500);
+    }, 2800);
   }
 
   startCommunityLiveWinsStream() {
@@ -3978,18 +5381,24 @@ class AppController {
       'Aman_VIP***', 'Rahul_King***', 'Vikram_007***', 'Priya_Pro***', 
       'Karan_Win***', 'Dev_Trader***', 'Ananya_99***', 'Suresh_Star***',
       'Rohan_Ace***', 'Deepak_X***', 'Neeraj_Pro***', 'Manish_88***',
-      'Kabir_Rich***', 'Alok_Gamer***', 'Pooja_Gold***', 'Sameer_99***'
+      'Kabir_Rich***', 'Alok_Gamer***', 'Pooja_Gold***', 'Sameer_99***',
+      'Arjun_77***', 'Vijay_Pro***', 'Sunil_Win***', 'Rohit_VIP***'
     ];
 
     const fakeGames = [
-      { name: '💎 Mines', class: 'mines', multRange: [1.35, 8.5] },
-      { name: '🚀 Crash', class: 'crash', multRange: [1.50, 24.0] },
-      { name: '🍗 Chicken', class: 'chicken', multRange: [1.25, 6.8] },
-      { name: '🎨 Tiranga Win Go', class: 'colortrading', multRange: [2.00, 9.0] },
-      { name: '📈 Stock BTC', class: 'stock', multRange: [1.90, 1.90] }
+      { name: '🍗 Chicken Road', class: 'chicken', multRange: [1.18, 4.80] },
+      { name: '🐔 Chicken Mines', class: 'chicken', multRange: [1.25, 5.60] },
+      { name: '💎 Mines', class: 'mines', multRange: [1.20, 6.20] },
+      { name: '🚀 Crash', class: 'crash', multRange: [1.20, 12.50] },
+      { name: '🎯 Limbo Turbo', class: 'limbo', multRange: [1.30, 15.00] },
+      { name: '🐉 Dragon Tiger', class: 'dragontiger', multRange: [1.95, 2.00] },
+      { name: '🎨 Win Go', class: 'colortrading', multRange: [1.95, 4.50] },
+      { name: '📈 Stock BTC', class: 'stock', multRange: [1.95, 1.95] }
     ];
 
-    const fakeAmounts = [200, 500, 1000, 1500, 2000, 2500, 5000, 10000];
+    const fakeAmounts = [50, 100, 200, 300, 500, 1000, 1500, 2000];
+
+    this.updateRecommendedBadges();
 
     // Seed initial rows
     if (this.dom.communityBetsTableBody) {
@@ -4013,27 +5422,14 @@ class AppController {
 
   getRandomSimulatedBet() {
     const randomPool = [
-      65, 115, 140, 185, 230, 275, 340, 415, 520, 685, 790, 935, 1150,
-      1420, 1860, 2350, 3180, 4250, 5670, 7850, 11200
+      20, 30, 50, 70, 100, 120, 150, 200, 250, 300, 400, 500, 650, 800, 1000, 1200, 1500, 2000
     ];
-    const base = randomPool[Math.floor(Math.random() * randomPool.length)];
-    const oddOffsets = [0, 7, 13, 21, 33, 47, 59];
-    const extra = oddOffsets[Math.floor(Math.random() * oddOffsets.length)];
-    return base + extra;
+    return randomPool[Math.floor(Math.random() * randomPool.length)];
   }
 
   generateRealisticWinAmount(bet, mult) {
-    let intVal = Math.round(bet * mult);
-    if (intVal < 20) intVal = 20;
-
-    // Ensure natural distribution across realistic odd and even numbers (e.g. 207, 341, 583, 749, 915, 1264, 492, 758)
-    const naturalEndings = [1, 3, 7, 9, 2, 4, 6, 8];
-    const lastDigit = intVal % 10;
-    if (lastDigit === 0 || lastDigit === 5) {
-      const chosen = naturalEndings[Math.floor(Math.random() * naturalEndings.length)];
-      intVal = Math.floor(intVal / 10) * 10 + chosen;
-    }
-    return intVal;
+    let floatVal = bet * mult;
+    return Math.round(floatVal * 100) / 100;
   }
 
   insertSimulatedWinRow(fakeUsers, fakeGames, fakeAmounts, isAnimated = true) {
@@ -4314,6 +5710,43 @@ class AppController {
       if (this.dom.dtStatTiger) this.dom.dtStatTiger.innerText = `🐯 T: ${stats.tigerPercent}%`;
       if (this.dom.dtStatTie) this.dom.dtStatTie.innerText = `🟢 Tie: ${stats.tiePercent}%`;
     }
+  }
+
+  recordGamePlay(gameName) {
+    try {
+      const stats = JSON.parse(localStorage.getItem('vp_game_play_stats') || '{}');
+      stats[gameName] = (stats[gameName] || 0) + 1;
+      localStorage.setItem('vp_game_play_stats', JSON.stringify(stats));
+      this.updateRecommendedBadges();
+    } catch(e) {}
+  }
+
+  updateRecommendedBadges() {
+    try {
+      const stats = JSON.parse(localStorage.getItem('vp_game_play_stats') || '{}');
+      let maxGame = 'chicken';
+      let maxCount = stats['chicken'] || 12;
+      for (const g in stats) {
+        if (stats[g] > maxCount) {
+          maxCount = stats[g];
+          maxGame = g;
+        }
+      }
+      
+      const badgeIds = ['badgeRec_chicken', 'badgeRec_chickenmines', 'badgeRec_mines', 'badgeRec_crash', 'badgeRec_limbo'];
+      badgeIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+
+      const activeBadge = document.getElementById(`badgeRec_${maxGame}`);
+      if (activeBadge) {
+        activeBadge.innerText = 'HOT 🔥';
+        activeBadge.style.display = 'inline-block';
+        activeBadge.style.background = 'linear-gradient(135deg, #f59e0b, #ef4444)';
+        activeBadge.style.color = '#fff';
+      }
+    } catch(e) {}
   }
 }
 

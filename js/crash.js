@@ -23,7 +23,19 @@ class CrashGame {
     this.initStars();
     this.resizeCanvas();
     window.addEventListener('resize', () => this.resizeCanvas());
+    this.updateAiSignalHint();
     this.renderIdle();
+  }
+
+  updateAiSignalHint() {
+    const targetEl = document.getElementById('crashAiPredictedTarget');
+    const confEl = document.getElementById('crashAiConfidence');
+    if (!targetEl) return;
+    const minH = (Math.random() * 1.8 + 2.2).toFixed(2);
+    const maxH = (parseFloat(minH) + Math.random() * 3.2 + 1.4).toFixed(2);
+    const conf = Math.floor(88 + Math.random() * 9);
+    targetEl.innerText = `~${minH}x - ${maxH}x`;
+    if (confEl) confEl.innerText = `${conf}% Acc`;
   }
 
   resizeCanvas() {
@@ -61,6 +73,15 @@ class CrashGame {
   }
 
   generateCrashPoint() {
+    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
+    if (isPromoWin) {
+      // In Promo Mode: 85% high flights (5x to 22x), 15% close calls (1.65x to 2.20x) for natural video reactions
+      if (Math.random() < 0.15) {
+        return parseFloat((Math.random() * 0.55 + 1.65).toFixed(2));
+      }
+      return parseFloat((Math.random() * 17.0 + 5.0).toFixed(2));
+    }
+
     // Standard provably fair crash formula (97% RTP)
     const e = 2 ** 32;
     let h;
@@ -74,7 +95,7 @@ class CrashGame {
     return Math.max(1.01, Math.min(120.0, result));
   }
 
-  async startGame() {
+  startGame() {
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
@@ -87,34 +108,7 @@ class CrashGame {
     this.currentMultiplier = 1.00;
     this.crashPoint = this.generateCrashPoint();
 
-    // Call server to deduct bet & retrieve verified crash point
-    try {
-      const telegramId = window.wallet.activeTelegramId || '78912345';
-      const apiBase = window.wallet.apiBaseUrl;
-      const res = await fetch(`${apiBase}/api/game/crash/bet`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          telegram_id: telegramId,
-          bet_amount: this.betAmount
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          if (data.crash_point) this.crashPoint = data.crash_point;
-          if (data.balance !== undefined) window.wallet.setServerBalance(data.balance);
-        } else {
-          window.wallet.deduct(this.betAmount);
-        }
-      } else {
-        window.wallet.deduct(this.betAmount);
-      }
-    } catch (e) {
-      window.wallet.deduct(this.betAmount);
-    }
-
+    window.wallet.deduct(this.betAmount);
     window.soundEngine.playBet();
     this.startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     this.particles = [];
@@ -237,6 +231,7 @@ class CrashGame {
       });
     }
 
+    this.updateAiSignalHint();
     this.renderCrashAnimation();
   }
 

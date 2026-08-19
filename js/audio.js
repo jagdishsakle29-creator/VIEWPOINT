@@ -303,6 +303,14 @@ class CasinoAudioEngine {
     this.playDeposit();
   }
 
+  playMineHit() {
+    this.playBomb();
+  }
+
+  playGemReveal(streak = 1) {
+    this.playGem(streak);
+  }
+
   playCardFlip() {
     this.triggerHaptic('light');
     if (!this.enabled || !this.ctx) return;

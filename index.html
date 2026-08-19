@@ -8,7 +8,23 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f212e">
   <link rel="manifest" href="manifest.json">
-  <title>VIEWPOINT - Mines, Chicken, Crash & Color Trading</title>
+  <title>VIEWPOINT - Play Mines, Chicken Road, Crash & Color Trading Online</title>
+  <meta name="description" content="Play India's #1 Online Casino & Arcade Games - Mines, Chicken Road Crossing, Crash, Limbo Turbo, Color Trading & Dragon Tiger. Instant UPI deposits and fast withdrawals!">
+  <meta name="keywords" content="mines game online, chicken road crossing game, crash game, color trading 30s, online casino india, provably fair gaming, fast upi withdrawal, viewpoint games">
+  <meta name="author" content="VIEWPOINT">
+  <meta name="robots" content="index, follow">
+
+  <!-- OpenGraph Metadata for WhatsApp & Telegram Link Previews -->
+  <meta property="og:title" content="VIEWPOINT - Instant Win Games & Casino">
+  <meta property="og:description" content="Join VIEWPOINT and claim ₹200 Welcome Bonus! Play Mines, Chicken Road, Crash & win real cash with instant UPI withdrawal.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="VIEWPOINT Games">
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VIEWPOINT - Online Casino & Arcade Games">
+  <meta name="twitter:description" content="Play Mines, Chicken Road, Crash, Limbo & Color Trading. Instant UPI payouts!">
+
   <!-- Google Fonts: Inter and Outfit for sleek casino typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +48,7 @@
   <header class="navbar">
       <!-- Top Row: Logo & Brand + Auth / Profile + Refer Button -->
       <div class="nav-top-row">
-        <div class="nav-brand">
+        <div class="nav-brand" id="navBrandLogo" onclick="window.app && window.app.handleSecretLogoClick()" style="cursor: pointer;" title="VIEWPOINT">
           <div class="brand-logo-icon">
             <svg viewBox="0 0 24 24">
               <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" fill="none" stroke="#0f212e" stroke-width="2.5"/>
@@ -102,36 +118,15 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         <span>Withdraw</span>
       </button>
-      
-      <!-- 24/7 Live Support Bot Button -->
-      <button id="btnLiveSupport" class="btn-nav-action" title="24/7 Live Support Bot" onclick="window.app && window.app.openSupportModal()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
-        <span>Support</span>
-      </button>
     </div>
   </header>
 
-  <!-- Multi-Page Navigation Bar (Page 1 vs Page 2) -->
-  <div class="page-nav-container">
-    <div class="page-nav-bar">
-      <button id="btnNavPage1" class="btn-page-pill active" onclick="window.app && window.app.switchMainPage(1)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor"/><circle cx="16.5" cy="16.5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
-        <span>Page 1: Classic Lobby</span>
-      </button>
-      <button id="btnNavPage2" class="btn-page-pill" onclick="window.app && window.app.switchMainPage(2)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#fbbf24" opacity="0.3"/></svg>
-        <span>Page 2: Arcade & VIP</span>
-        <span class="hot-pill">HOT 🔥</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Page 1: Classic Casino Lobby (5 Core Games) -->
+  <!-- Page 1: Classic Casino Lobby (Mines & Chicken) -->
   <main id="mainPage1" class="main-layout page-section active">
     
-    <!-- Top Game Selector Header -->
+    <!-- Top Game Selector Header (Unified Swipeable Tabs) -->
     <div class="game-tabs-wrapper">
-      <div class="game-tabs">
+      <div class="game-tabs" id="mainGameTabsList">
         <button id="tabChicken" class="tab-btn active" data-game="chicken" onclick="window.app && window.app.switchGame('chicken')" style="position:relative;">
           <svg class="game-svg-icon" viewBox="0 0 36 36" width="20" height="20">
             <circle cx="18" cy="22" r="10" fill="#ffffff"/>
@@ -141,24 +136,27 @@
             <circle cx="20" cy="13" r="1.5" fill="#0f172a"/>
           </svg>
           <span style="font-weight:900;">🍗 Chicken Road</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size:10px; font-weight:900;">TRENDING 🔥</span>
+          <span class="tab-badge badge-rec" id="badgeRec_chicken" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size:10px; font-weight:900;">270x 🔥</span>
         </button>
-        <button id="tabMines" class="tab-btn" data-game="mines" onclick="window.app && window.app.switchGame('mines')">
+        <button id="tabChickenMines" class="tab-btn" data-game="chickenmines" onclick="window.app && window.app.switchGame('chickenmines')" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🐔🍽️</span>
+          <span style="font-weight: 800;">Chicken Mines</span>
+          <span class="tab-badge badge-rec" id="badgeRec_chickenmines" style="background: linear-gradient(135deg, #ffb703, #fb8500); color: #000; font-size:9px; font-weight:900;">NEW</span>
+        </button>
+        <button id="tabMines" class="tab-btn" data-game="mines" onclick="window.app && window.app.switchGame('mines')" style="position:relative;">
           <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="#ff3b30"/><path d="M12 2v4M12 20v2M2 13h4M18 13h4M5.5 6.5l2.8 2.8M15.7 16.7l2.8 2.8M18.5 6.5l-2.8 2.8M8.3 16.7l-2.8 2.8" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="2" fill="#fff" opacity="0.6"/></svg>
           <span>Mines</span>
+          <span class="tab-badge badge-rec" id="badgeRec_mines" style="display:none;"></span>
         </button>
-        <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.app && window.app.switchGame('crash')">
+        <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.app && window.app.switchGame('crash')" style="position:relative;">
           <svg class="game-svg-icon" viewBox="0 0 24 24"><path d="M14 2c0 0 6 3 6 10l-4 4-4-4c0-4-3-6-3-6s3-1 5-4z" fill="#00f5d4"/><path d="M12 12l-4 4-4-1 3-3 5 0z" fill="#00b4d8"/><path d="M5 19l2 2-4 1 2-3z" fill="#f59e0b"/><circle cx="15" cy="8" r="1.5" fill="#ffffff"/></svg>
-          <span>Crash</span>
+          <span style="font-weight: 900;">🚀 Crash Rocket</span>
+          <span class="tab-badge badge-rec" id="badgeRec_crash" style="background: linear-gradient(135deg, #00f5d4, #00b4d8); color: #000; font-size:9px; font-weight:900;">LIVE</span>
         </button>
-        <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.app && window.app.switchGame('dragontiger')" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
-          <span style="font-weight: 800;">Dragon Tiger</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #dc2626, #f59e0b); color: #fff; font-size:10px; font-weight:900;">LIVE</span>
-        </button>
-        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.app && window.app.switchGame('colortrading')">
-          <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#1e293b" stroke="#334155" stroke-width="1.5"/><path d="M12 3a9 9 0 0 1 7.8 4.5L12 12V3z" fill="#00e701"/><path d="M19.8 7.5A9 9 0 0 1 19.8 16.5L12 12l7.8-4.5z" fill="#fe2c55"/><path d="M19.8 16.5A9 9 0 0 1 12 21V12l7.8 4.5z" fill="#8b5cf6"/><circle cx="12" cy="12" r="3.5" fill="#0f172a" stroke="#ffffff" stroke-width="1.5"/></svg>
-          <span>Win Go</span>
+        <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.app && window.app.switchGame('limbo')" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🎯⚡</span>
+          <span style="font-weight: 800;">Limbo Turbo</span>
+          <span class="tab-badge badge-rec" id="badgeRec_limbo" style="background: linear-gradient(135deg, #00e5ff, #3b82f6); color: #fff; font-size:9px; font-weight:900;">1000x</span>
         </button>
       </div>
     </div>
@@ -231,21 +229,21 @@
             <span class="control-helper" id="difficultyLabelHelper">Balanced Mode</span>
           </div>
           <div class="difficulty-modes-row">
-            <button id="btnDiffEasy" class="btn-diff-mode" data-diff="easy">
+            <button id="btnDiffEasy" class="btn-diff-mode" data-diff="easy" onclick="window.app && window.app.setDifficulty('easy')">
               <span style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                 <span style="width: 7px; height: 7px; border-radius: 50%; background: #00e701; box-shadow: 0 0 6px #00e701;"></span>
                 <span>Easy</span>
               </span>
               <small>Low Risk</small>
             </button>
-            <button id="btnDiffMed" class="btn-diff-mode active" data-diff="medium">
+            <button id="btnDiffMed" class="btn-diff-mode active" data-diff="medium" onclick="window.app && window.app.setDifficulty('medium')">
               <span style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                 <span style="width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span>
                 <span>Medium</span>
               </span>
               <small>Balanced</small>
             </button>
-            <button id="btnDiffHard" class="btn-diff-mode" data-diff="hard">
+            <button id="btnDiffHard" class="btn-diff-mode" data-diff="hard" onclick="window.app && window.app.setDifficulty('hard')">
               <span style="display: flex; align-items: center; justify-content: center; gap: 5px;">
                 <span style="width: 7px; height: 7px; border-radius: 50%; background: #fe2c55; box-shadow: 0 0 6px #fe2c55;"></span>
                 <span>Hard</span>
@@ -358,6 +356,11 @@
 
         <!-- Main Action Buttons (Mines, Chicken, Crash) -->
         <div class="action-button-area" id="mainActionArea">
+          <!-- Funny Stylish Risk Tagline -->
+          <div class="funny-risk-tagline" id="funnyRiskTagline">
+            <span class="funny-risk-text">✨ take risk if you dont risk then eat i-pilll ✨</span>
+          </div>
+
           <button id="btnActionBet" class="btn-stake-primary btn-bet" onclick="window.app && window.app.handleBetClick()">
             <span>BET</span>
           </button>
@@ -480,7 +483,10 @@
             </div>
 
             <!-- Direct Jump Control Button for mobile & desktop -->
-            <div class="chicken-action-bar" id="chickenActionBar" style="display:none; margin-top:6px;">
+            <div class="chicken-action-bar" id="chickenActionBar" style="display:none; margin-top:6px; flex-direction:column; align-items:center;">
+              <div class="funny-risk-tagline" style="margin-bottom: 4px;">
+                <span class="funny-risk-text">✨ take risk if you dont risk then eat i-pilll ✨</span>
+              </div>
               <button id="btnChickenHop" class="btn-chicken-go" onclick="window.app && window.app.handleChickenHop()">
                 <span>🐔 JUMP NEXT LANE ➡️</span>
               </button>
@@ -494,6 +500,18 @@
           <div class="crash-history-bar" id="crashHistoryBar">
             <!-- Crash multiplier pills -->
           </div>
+          <!-- Live AI Signal & Multiplier Hint Bar -->
+          <div class="crash-ai-signal-bar" id="crashAiSignalBar">
+            <div class="ai-signal-badge">
+              <span class="ai-pulse-dot"></span>
+              <span>🤖 AI RADAR SIGNAL</span>
+            </div>
+            <div class="ai-signal-info">
+              <span class="ai-signal-label">Target Exit:</span>
+              <span class="ai-signal-target" id="crashAiPredictedTarget">~3.60x - 6.20x</span>
+              <span class="ai-signal-conf" id="crashAiConfidence">92% Acc</span>
+            </div>
+          </div>
           <div class="crash-canvas-wrapper">
             <canvas id="crashCanvas"></canvas>
             <div class="crash-multiplier-overlay">
@@ -503,8 +521,289 @@
           </div>
         </div>
 
-        <!-- Game 4: Evolution Gaming Dragon Tiger Live View -->
-        <div id="dragontigerView" class="game-view dragontiger-view">
+        <!-- Game: Chicken Mines (25 Cloches Dish Game) -->
+        <div id="chickenMinesView" class="game-view chicken-mines-view">
+          <div class="mines-grid" id="chickenMinesGrid">
+            <div class="mine-tile cloche-tile" data-index="0"></div>
+            <div class="mine-tile cloche-tile" data-index="1"></div>
+            <div class="mine-tile cloche-tile" data-index="2"></div>
+            <div class="mine-tile cloche-tile" data-index="3"></div>
+            <div class="mine-tile cloche-tile" data-index="4"></div>
+            <div class="mine-tile cloche-tile" data-index="5"></div>
+            <div class="mine-tile cloche-tile" data-index="6"></div>
+            <div class="mine-tile cloche-tile" data-index="7"></div>
+            <div class="mine-tile cloche-tile" data-index="8"></div>
+            <div class="mine-tile cloche-tile" data-index="9"></div>
+            <div class="mine-tile cloche-tile" data-index="10"></div>
+            <div class="mine-tile cloche-tile" data-index="11"></div>
+            <div class="mine-tile cloche-tile" data-index="12"></div>
+            <div class="mine-tile cloche-tile" data-index="13"></div>
+            <div class="mine-tile cloche-tile" data-index="14"></div>
+            <div class="mine-tile cloche-tile" data-index="15"></div>
+            <div class="mine-tile cloche-tile" data-index="16"></div>
+            <div class="mine-tile cloche-tile" data-index="17"></div>
+            <div class="mine-tile cloche-tile" data-index="18"></div>
+            <div class="mine-tile cloche-tile" data-index="19"></div>
+            <div class="mine-tile cloche-tile" data-index="20"></div>
+            <div class="mine-tile cloche-tile" data-index="21"></div>
+            <div class="mine-tile cloche-tile" data-index="22"></div>
+            <div class="mine-tile cloche-tile" data-index="23"></div>
+            <div class="mine-tile cloche-tile" data-index="24"></div>
+          </div>
+        </div>
+
+        <!-- Game: Limbo Turbo Multiplier View (Page 1) -->
+        <div id="limboView" class="game-view limbo-view">
+          <div class="limbo-arena" style="margin-bottom: 16px;">
+            <div id="p1LimboMultiplierDisplay" class="limbo-big-multiplier">1.00x</div>
+            <div id="p1LimboResultTag" class="limbo-result-tag">TARGET READY</div>
+          </div>
+          <div class="limbo-controls-grid">
+            <div class="limbo-field">
+              <label class="control-label">Target Multiplier:</label>
+              <input type="number" id="p1LimboTargetMultiplierInput" class="custom-select" value="2.00" min="1.01" max="290" step="0.10" oninput="window.app && window.app.updateLimboProb()">
+            </div>
+            <div class="limbo-field">
+              <label class="control-label">Win Chance:</label>
+              <div id="p1LimboWinChance" style="padding: 12px; background: rgba(0,0,0,0.4); border-radius: 8px; font-weight: 800; color: #00e5ff; text-align: center;">49.50%</div>
+            </div>
+          </div>
+          <div class="quick-targets-row" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+            <button class="chip-btn" onclick="document.getElementById('p1LimboTargetMultiplierInput').value='1.50'; window.app && window.app.updateLimboProb();">1.50x</button>
+            <button class="chip-btn active" onclick="document.getElementById('p1LimboTargetMultiplierInput').value='2.00'; window.app && window.app.updateLimboProb();">2.00x</button>
+            <button class="chip-btn" onclick="document.getElementById('p1LimboTargetMultiplierInput').value='5.00'; window.app && window.app.updateLimboProb();">5.00x</button>
+            <button class="chip-btn" onclick="document.getElementById('p1LimboTargetMultiplierInput').value='10.00'; window.app && window.app.updateLimboProb();">10.00x</button>
+            <button class="chip-btn" onclick="document.getElementById('p1LimboTargetMultiplierInput').value='50.00'; window.app && window.app.updateLimboProb();">50.00x</button>
+            <button class="chip-btn" onclick="document.getElementById('p1LimboTargetMultiplierInput').value='100.00'; window.app && window.app.updateLimboProb();">100.00x</button>
+          </div>
+          <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 700;">
+            <span style="color: #94a3b8;">Max Multiplier: <strong style="color: #fbbf24;">290.00x</strong></span>
+            <span style="color: #94a3b8;">Payout on Win: <strong id="p1LimboProfitDisplay" style="color: #00e701;">+₹20.00</strong></span>
+          </div>
+        </div>
+
+        <!-- Game 5: Tiranga Color Trading (Win Go) View -->
+        <div id="colortradingView" class="game-view colortrading-view">
+          <!-- Tiranga Intervals -->
+          <div class="tiranga-modes-row">
+            <button class="tiranga-mode-btn active" data-duration="30">
+              <span>Win Go 30s</span>
+              <span style="font-size:10px; color:#10b981;">⚡ Fast</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="60">
+              <span>Win Go 1Min</span>
+              <span style="font-size:10px; opacity:0.8;">Popular</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="180">
+              <span>Win Go 3Min</span>
+              <span style="font-size:10px; opacity:0.8;">Standard</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="300">
+              <span>Win Go 5Min</span>
+              <span style="font-size:10px; opacity:0.8;">Classic</span>
+            </button>
+          </div>
+
+          <!-- Win Go Period & Timer Header -->
+          <div class="trading-header-card">
+            <div class="trading-period-badge">
+              <span class="trading-period-label">Period ID</span>
+              <span id="tradingPeriodId" class="trading-period-id">202608150001</span>
+            </div>
+            <div class="trading-timer-box">
+              <span class="trading-timer-label">Time Remaining</span>
+              <div class="trading-timer-digits">
+                <span class="time-digit-pill">0</span>
+                <span class="time-digit-pill">0</span>
+                <span style="font-size:20px; font-weight:800; color:#fff; align-self:center;">:</span>
+                <span id="timerDigit1" class="time-digit-pill">3</span>
+                <span id="timerDigit2" class="time-digit-pill">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Bet Buttons -->
+          <div class="color-bet-buttons-row">
+            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green">
+              <span>🟢 Join Green</span>
+              <span class="payout-tag">2x (1.5x on 5)</span>
+            </button>
+            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet">
+              <span>🟣 Join Violet</span>
+              <span class="payout-tag">4.5x (on 0, 5)</span>
+            </button>
+            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red">
+              <span>🔴 Join Red</span>
+              <span class="payout-tag">2x (1.5x on 0)</span>
+            </button>
+          </div>
+
+          <!-- Numbers 0-9 Keypad Matrix (3 Lines) -->
+          <div class="numbers-bet-grid">
+            <!-- Line 1: 1, 2, 3 -->
+            <button class="btn-number-bet num-green" data-number="1">1 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="2">2 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="3">3 <span class="num-payout">9x</span></button>
+            
+            <!-- Line 2: 4, 5, 6 -->
+            <button class="btn-number-bet num-red" data-number="4">4 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-violet-green" data-number="5">5 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="6">6 <span class="num-payout">9x</span></button>
+            
+            <!-- Line 3: 7, 8, 9 -->
+            <button class="btn-number-bet num-green" data-number="7">7 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="8">8 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="9">9 <span class="num-payout">9x</span></button>
+
+            <!-- Line 4: 0 (Violet/Red) -->
+            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0">0 <span class="num-payout">9x Jackpot (Violet/Red)</span></button>
+          </div>
+
+          <!-- Big / Small Buttons -->
+          <div class="big-small-row">
+            <button id="btnBetBig" class="btn-big-bet" data-choice="big">
+              <span>🟡 Big (5 - 9)</span>
+              <span class="payout-tag">2x Payout</span>
+            </button>
+            <button id="btnBetSmall" class="btn-small-bet" data-choice="small">
+              <span>🔵 Small (0 - 4)</span>
+              <span class="payout-tag">2x Payout</span>
+            </button>
+          </div>
+
+          <!-- Active Bets In Round -->
+          <div id="tradingActiveBetsSlip" class="trading-active-bets" style="display: none;">
+            <strong>Your Active Bets This Round:</strong>
+            <div id="activeBetsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+          </div>
+
+          <!-- Recent Trend Balls -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes & Trends:</span>
+            <div class="trend-balls-row" id="trendBallsRow"></div>
+          </div>
+        </div>
+
+        <!-- Result Toast Popup -->
+        <div id="roundResultToast" class="round-result-toast">
+          <div id="toastMultiplier" class="toast-multiplier">2.45x</div>
+          <div id="toastPayout" class="toast-payout">+₹24.50</div>
+          <div id="toastTagline" class="toast-tagline">CASHOUT SUCCESSFUL! 💰</div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Bottom Live Community Wins & Personal Bet History Section -->
+    <section class="bottom-section">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="community-history-tabs">
+          <button id="tabCommunityWins" class="tab-history-pill active">
+            <span class="pulse-dot" style="background:#00e701;"></span>
+            <span>🔥 Live Community Wins</span>
+          </button>
+          <button id="tabMyBets" class="tab-history-pill">
+            <span>👤 My Bets History</span>
+          </button>
+        </div>
+
+        <div style="font-size:12px; font-weight:700; color:var(--text-muted);">
+          <span>● Live Feed Active</span>
+        </div>
+      </div>
+
+      <!-- Live Community Winners Stream Table View -->
+      <div id="viewCommunityWins" class="history-table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Player</th>
+              <th>Bet Amount</th>
+              <th>Multiplier</th>
+              <th>Payout</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="communityBetsTableBody">
+            <!-- Dynamically injected live stream -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Personal My Bets Table View -->
+      <div id="viewMyBets" class="history-table-container" style="display: none;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Bet Amount</th>
+              <th>Multiplier</th>
+              <th>Payout</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Personal history dynamically injected -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Floating Live Win Toast (Bottom-Left) -->
+    <div id="liveWinFloatingToast" class="live-win-floating-toast">
+      <div class="win-toast-icon">⚡</div>
+      <div class="win-toast-info">
+        <span id="winToastUser" class="win-toast-user">Aman_VIP***</span>
+        <span id="winToastPayout" class="win-toast-payout">+₹14,250.00 on Crash (5.70x)</span>
+      </div>
+    </div>
+
+    <!-- Fixed Bottom-Right Corner Quick Action Dock (1cm Size): Online + Rating + Insta + Settings -->
+    <div class="bottom-corner-dock">
+      <!-- 1cm Mini Live Online Counter -->
+      <div class="btn-corner-pill online" title="Live Players Online">
+        <div class="status-dot live"></div>
+        <span id="liveOnlineUsersCounter">5.4k</span>
+      </div>
+
+      <!-- Rating Button -->
+      <button id="btnOpenRating" class="btn-corner-pill rating" title="Rate Us & Reviews" onclick="window.app && window.app.openRatingModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>4.3 ★</span>
+      </button>
+
+      <!-- Instagram Button (Compact) -->
+      <a href="https://instagram.com/goowinminer_bot" target="_blank" class="btn-corner-pill insta" title="Official Instagram @goowinminer_bot">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="6" stroke="#ffffff" stroke-width="2.2"/>
+          <circle cx="12" cy="12" r="4.5" stroke="#ffffff" stroke-width="2.2"/>
+          <circle cx="17.5" cy="6.5" r="1.2" fill="#ffffff"/>
+        </svg>
+        <span>Insta</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Page 2: Arcade & VIP Rewards Lounge -->
+  <main id="mainPage2" class="main-layout page-section" style="display: none;">
+    <div class="arcade-grid-layout">
+      <!-- Card 0: Evolution Gaming Dragon Tiger Live Casino VIP Table -->
+      <div class="arcade-card dt-vip-card" style="grid-column: 1 / -1; border-color: rgba(212, 175, 55, 0.35); padding: 14px;">
+        <div class="arcade-card-header" style="margin-bottom: 12px;">
+          <div class="card-header-title">
+            <span class="card-emoji" style="font-size: 24px;">🐉🐯</span>
+            <div>
+              <h3>Dragon Tiger Live Casino</h3>
+              <span class="card-subtitle">Evolution Live Felt Table • 3D Card Dealing • Suited Tie 50:1</span>
+            </div>
+          </div>
+          <span class="badge-tag-hot" style="background: linear-gradient(135deg, #dc2626, #f59e0b); color: #fff;">LIVE VIP 👑</span>
+        </div>
+
+        <div id="dragontigerView" class="dragontiger-view" style="display:block; width:100%;">
           <div class="dt-live-stage">
             <!-- Stage Header: Status, Round ID & Countdown -->
             <div class="dt-header-bar">
@@ -711,222 +1010,9 @@
             </div>
           </div>
         </div>
-
-        <!-- Game 5: Tiranga Color Trading (Win Go) View -->
-        <div id="colortradingView" class="game-view colortrading-view">
-          <!-- Tiranga Intervals -->
-          <div class="tiranga-modes-row">
-            <button class="tiranga-mode-btn active" data-duration="30">
-              <span>Win Go 30s</span>
-              <span style="font-size:10px; color:#10b981;">⚡ Fast</span>
-            </button>
-            <button class="tiranga-mode-btn" data-duration="60">
-              <span>Win Go 1Min</span>
-              <span style="font-size:10px; opacity:0.8;">Popular</span>
-            </button>
-            <button class="tiranga-mode-btn" data-duration="180">
-              <span>Win Go 3Min</span>
-              <span style="font-size:10px; opacity:0.8;">Standard</span>
-            </button>
-            <button class="tiranga-mode-btn" data-duration="300">
-              <span>Win Go 5Min</span>
-              <span style="font-size:10px; opacity:0.8;">Classic</span>
-            </button>
-          </div>
-
-          <!-- Win Go Period & Timer Header -->
-          <div class="trading-header-card">
-            <div class="trading-period-badge">
-              <span class="trading-period-label">Period ID</span>
-              <span id="tradingPeriodId" class="trading-period-id">202608150001</span>
-            </div>
-            <div class="trading-timer-box">
-              <span class="trading-timer-label">Time Remaining</span>
-              <div class="trading-timer-digits">
-                <span class="time-digit-pill">0</span>
-                <span class="time-digit-pill">0</span>
-                <span style="font-size:20px; font-weight:800; color:#fff; align-self:center;">:</span>
-                <span id="timerDigit1" class="time-digit-pill">3</span>
-                <span id="timerDigit2" class="time-digit-pill">0</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Color Bet Buttons -->
-          <div class="color-bet-buttons-row">
-            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green">
-              <span>🟢 Join Green</span>
-              <span class="payout-tag">2x (1.5x on 5)</span>
-            </button>
-            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet">
-              <span>🟣 Join Violet</span>
-              <span class="payout-tag">4.5x (on 0, 5)</span>
-            </button>
-            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red">
-              <span>🔴 Join Red</span>
-              <span class="payout-tag">2x (1.5x on 0)</span>
-            </button>
-          </div>
-
-          <!-- Numbers 0-9 Keypad Matrix (3 Lines) -->
-          <div class="numbers-bet-grid">
-            <!-- Line 1: 1, 2, 3 -->
-            <button class="btn-number-bet num-green" data-number="1">1 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="2">2 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="3">3 <span class="num-payout">9x</span></button>
-            
-            <!-- Line 2: 4, 5, 6 -->
-            <button class="btn-number-bet num-red" data-number="4">4 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-violet-green" data-number="5">5 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="6">6 <span class="num-payout">9x</span></button>
-            
-            <!-- Line 3: 7, 8, 9 -->
-            <button class="btn-number-bet num-green" data-number="7">7 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="8">8 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="9">9 <span class="num-payout">9x</span></button>
-
-            <!-- Line 4: 0 (Violet/Red) -->
-            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0">0 <span class="num-payout">9x Jackpot (Violet/Red)</span></button>
-          </div>
-
-          <!-- Big / Small Buttons -->
-          <div class="big-small-row">
-            <button id="btnBetBig" class="btn-big-bet" data-choice="big">
-              <span>🟡 Big (5 - 9)</span>
-              <span class="payout-tag">2x Payout</span>
-            </button>
-            <button id="btnBetSmall" class="btn-small-bet" data-choice="small">
-              <span>🔵 Small (0 - 4)</span>
-              <span class="payout-tag">2x Payout</span>
-            </button>
-          </div>
-
-          <!-- Active Bets In Round -->
-          <div id="tradingActiveBetsSlip" class="trading-active-bets" style="display: none;">
-            <strong>Your Active Bets This Round:</strong>
-            <div id="activeBetsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
-          </div>
-
-          <!-- Recent Trend Balls -->
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes & Trends:</span>
-            <div class="trend-balls-row" id="trendBallsRow"></div>
-          </div>
-        </div>
-
-        <!-- Result Toast Popup -->
-        <div id="roundResultToast" class="round-result-toast">
-          <div id="toastMultiplier" class="toast-multiplier">2.45x</div>
-          <div id="toastPayout" class="toast-payout">+₹24.50</div>
-          <div id="toastTagline" class="toast-tagline">CASHOUT SUCCESSFUL! 💰</div>
-        </div>
-
-      </section>
-
-    </div>
-
-    <!-- Bottom Live Community Wins & Personal Bet History Section -->
-    <section class="bottom-section">
-      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div class="community-history-tabs">
-          <button id="tabCommunityWins" class="tab-history-pill active">
-            <span class="pulse-dot" style="background:#00e701;"></span>
-            <span>🔥 Live Community Wins</span>
-          </button>
-          <button id="tabMyBets" class="tab-history-pill">
-            <span>👤 My Bets History</span>
-          </button>
-        </div>
-
-        <div style="font-size:12px; font-weight:700; color:var(--text-muted);">
-          <span>● Live Feed Active</span>
-        </div>
       </div>
 
-      <!-- Live Community Winners Stream Table View -->
-      <div id="viewCommunityWins" class="history-table-container">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>Game</th>
-              <th>Player</th>
-              <th>Bet Amount</th>
-              <th>Multiplier</th>
-              <th>Payout</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody id="communityBetsTableBody">
-            <!-- Dynamically injected live stream -->
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Personal My Bets Table View -->
-      <div id="viewMyBets" class="history-table-container" style="display: none;">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>Game</th>
-              <th>Bet Amount</th>
-              <th>Multiplier</th>
-              <th>Payout</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody">
-            <!-- Personal history dynamically injected -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Floating Live Win Toast (Bottom-Left) -->
-    <div id="liveWinFloatingToast" class="live-win-floating-toast">
-      <div class="win-toast-icon">⚡</div>
-      <div class="win-toast-info">
-        <span id="winToastUser" class="win-toast-user">Aman_VIP***</span>
-        <span id="winToastPayout" class="win-toast-payout">+₹14,250.00 on Crash (5.70x)</span>
-      </div>
-    </div>
-
-    <!-- Fixed Bottom-Right Corner Quick Action Dock (1cm Size): Online + Rating + Insta + Settings -->
-    <div class="bottom-corner-dock">
-      <!-- 1cm Mini Live Online Counter -->
-      <div class="btn-corner-pill online" title="Live Players Online">
-        <div class="status-dot live"></div>
-        <span id="liveOnlineUsersCounter">5.4k</span>
-      </div>
-
-      <!-- Rating Button -->
-      <button id="btnOpenRating" class="btn-corner-pill rating" title="Rate Us & Reviews" onclick="window.app && window.app.openRatingModal()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span>4.9</span>
-      </button>
-
-      <!-- Instagram Button (Compact) -->
-      <a href="https://instagram.com/goowinminer_bot" target="_blank" class="btn-corner-pill insta" title="Official Instagram @goowinminer_bot">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none">
-          <rect x="2" y="2" width="20" height="20" rx="6" stroke="#ffffff" stroke-width="2.2"/>
-          <circle cx="12" cy="12" r="4.5" stroke="#ffffff" stroke-width="2.2"/>
-          <circle cx="17.5" cy="6.5" r="1.2" fill="#ffffff"/>
-        </svg>
-        <span>Insta</span>
-      </a>
-
-      <!-- Admin & UPI Settings Button -->
-      <button id="btnOpenAdmin" class="btn-corner-pill settings" title="Admin & Settings" onclick="window.app && window.app.openAdminModal()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        <span>Admin</span>
-      </button>
-    </div>
-
-  </main>
-
-  <!-- Page 2: Arcade & VIP Rewards Lounge -->
-  <main id="mainPage2" class="main-layout page-section" style="display: none;">
-    <div class="arcade-grid-layout">
-      <!-- Card 0: Stock Market Live Candlestick Trading (Binary Options) -->
+      <!-- Card 1: Stock Market Live Candlestick Trading (Binary Options) -->
       <div class="arcade-card stock-card" style="grid-column: 1 / -1;">
         <div class="arcade-card-header">
           <div class="card-header-title">
@@ -1003,81 +1089,7 @@
         </div>
       </div>
 
-      <!-- Card 1: Limbo Game -->
-      <div class="arcade-card limbo-card">
-        <div class="arcade-card-header">
-          <div class="card-header-title">
-            <span class="card-emoji">
-              <svg class="game-svg-icon" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="9" fill="none" stroke="#00e5ff" stroke-width="1.8"/><circle cx="12" cy="12" r="6" fill="none" stroke="#00e701" stroke-width="1.8"/><circle cx="12" cy="12" r="2.5" fill="#00e701"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#00e5ff" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </span>
-            <div>
-              <h3>Limbo Turbo</h3>
-              <span class="card-subtitle">Target Multiplier Up to 1,000x</span>
-            </div>
-          </div>
-          <span class="badge-tag-hot">HOT 🔥</span>
-        </div>
 
-        <!-- Limbo Mode Switcher: Manual vs Auto -->
-        <div class="limbo-mode-toggle-row">
-          <button id="btnLimboModeManual" class="btn-mode-tab active" onclick="window.app && window.app.setLimboMode('manual')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-            <span>Manual</span>
-          </button>
-          <button id="btnLimboModeAuto" class="btn-mode-tab" onclick="window.app && window.app.setLimboMode('auto')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
-            <span>Auto Play</span>
-          </button>
-        </div>
-
-        <div class="limbo-arena">
-          <div id="limboMultiplierDisplay" class="limbo-big-multiplier">1.00x</div>
-          <div id="limboResultTag" class="limbo-result-tag">TARGET READY</div>
-        </div>
-
-        <div class="limbo-controls-grid">
-          <div class="limbo-field">
-            <label class="control-label">Bet Amount:</label>
-            <input type="number" id="limboBetAmountInput" class="custom-select" value="20" min="5" max="10000" step="5">
-          </div>
-          <div class="limbo-field">
-            <label class="control-label">Target Multiplier:</label>
-            <input type="number" id="limboTargetMultiplierInput" class="custom-select" value="2.00" min="1.01" max="1000" step="0.10" oninput="window.app && window.app.updateLimboProb()">
-          </div>
-        </div>
-
-        <!-- Limbo Auto Settings Panel -->
-        <div id="limboAutoSettings" style="display: none; margin-bottom: 8px;">
-          <div class="control-header" style="margin-bottom: 4px;">
-            <label class="control-label">Number of Auto Rolls</label>
-            <span class="control-helper" id="limboAutoCountHelper">10 Rounds</span>
-          </div>
-          <div class="input-with-actions">
-            <input type="number" id="limboAutoCountInput" class="bet-input-field" value="10" min="0" max="1000" step="1">
-            <div class="bet-quick-actions">
-              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboAutoRounds(0)">∞</button>
-              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboAutoRounds(10)">10</button>
-              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboAutoRounds(25)">25</button>
-              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboAutoRounds(50)">50</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="limbo-prob-row">
-          <span>Win Chance: <strong id="limboWinChance" style="color:#00e5ff;">49.50%</strong></span>
-          <span>Payout on Win: <strong id="limboProfitDisplay" style="color:#00e701;">+₹40.00</strong></span>
-        </div>
-
-        <button id="btnRollLimbo" class="btn-stake-primary btn-bet" style="margin-top:10px;" onclick="window.app && window.app.rollLimbo()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
-          <span>ROLL TARGET</span>
-        </button>
-
-        <button id="btnAutoRollLimbo" class="btn-stake-primary btn-auto-start" style="margin-top:10px; display: none;" onclick="window.app && window.app.toggleAutoLimbo()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span id="btnAutoLimboText">START AUTO ROLL</span>
-        </button>
-      </div>
 
       <!-- Card 2: Daily Lucky Fortune Wheel -->
       <div class="arcade-card wheel-card">
@@ -1165,7 +1177,7 @@
 
   <!-- Auth Modal: Login / Register / Guest Access -->
   <div id="modalAuth" class="modal-backdrop">
-    <div class="modal-card modal-auth-card">
+    <div class="modal-card modal-auth-card" style="max-width: 420px;">
       <div class="modal-title-row">
         <div style="display: flex; align-items: center; gap: 8px;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 1 1 4 0v2"/></svg>
@@ -1180,11 +1192,36 @@
         <button id="tabAuthRegister" class="auth-tab-btn" onclick="window.app && window.app.switchAuthTab('register')">Sign Up</button>
       </div>
 
+      <!-- English Withdrawal OTP Warning Notice -->
+      <div id="authWithdrawalNotice" class="auth-withdrawal-warning" style="background: rgba(254, 44, 85, 0.1); border: 1px solid rgba(254, 44, 85, 0.4); border-radius: 8px; padding: 10px 12px; margin: 12px 0 6px; display: none;">
+        <div style="display: flex; gap: 8px; align-items: flex-start;">
+          <span style="font-size: 16px; line-height: 1;">⚠️</span>
+          <p style="font-size: 11.5px; color: #ff859d; line-height: 1.45; margin: 0; font-weight: 500;">
+            <strong style="color: #ffffff; text-transform: uppercase;">Important Notice:</strong> Enter your real Active Mobile Number & Email ID. OTP verification is strictly required during cash withdrawals. Fake or wrong details will permanently block your withdrawals!
+          </p>
+        </div>
+      </div>
+
       <!-- Auth Form -->
       <div class="auth-form-body">
         <div class="auth-field" id="authNameField" style="display: none;">
-          <label class="control-label">Your Name / Username:</label>
-          <input type="text" id="authInputName" class="custom-select" placeholder="e.g. Rahul Sharma" autocomplete="name">
+          <label class="control-label">Full Name:</label>
+          <input type="text" id="authInputName" class="custom-select" placeholder="Enter your full name" autocomplete="name">
+        </div>
+
+        <div class="auth-field" id="authEmailField" style="display: none;">
+          <label class="control-label">Email Address (For OTP Verification):</label>
+          <input type="email" id="authInputEmail" class="custom-select" placeholder="e.g. yourname@gmail.com" autocomplete="email">
+        </div>
+
+        <div class="auth-field" id="authAddressField" style="display: none;">
+          <label class="control-label">Full Residential Address / City:</label>
+          <input type="text" id="authInputAddress" class="custom-select" placeholder="e.g. Flat 402, Royal Enclave, Jaipur" autocomplete="street-address">
+        </div>
+
+        <div class="auth-field" id="authPincodeField" style="display: none;">
+          <label class="control-label">Postal PIN Code (6 Digits):</label>
+          <input type="text" id="authInputPincode" class="custom-select" placeholder="e.g. 302001" maxlength="6" autocomplete="postal-code" style="font-family: monospace;">
         </div>
 
         <div class="auth-field">
@@ -1200,22 +1237,30 @@
           <input type="password" id="authInputPass" class="custom-select" placeholder="Enter 4 to 8 digit PIN/password" maxlength="12" autocomplete="current-password">
         </div>
 
-        <button type="button" id="btnSubmitAuth" class="btn-action-primary" style="margin-top: 14px; width: 100%; height: 44px;" onclick="window.app && window.app.submitAuthForm()">
+        <!-- Mandatory 18+ Age Confirmation -->
+        <div class="auth-field" style="margin-top: 8px; display: flex; align-items: flex-start; gap: 8px;">
+          <input type="checkbox" id="chkAuthAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: #00e701;" checked>
+          <label for="chkAuthAge18" style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; cursor: pointer;">
+            🔞 <strong>I certify that I am 18+ years of age</strong> and legally permitted to participate in online gaming under applicable laws.
+          </label>
+        </div>
+
+        <button type="button" id="btnSubmitAuth" class="btn-action-primary" style="margin-top: 12px; width: 100%; height: 44px;" onclick="window.app && window.app.submitAuthForm()">
           <span id="btnSubmitAuthText">Login to VIEWPOINT</span>
         </button>
 
         <!-- Divider -->
-        <div class="auth-gate-divider" style="margin: 10px 0;">
+        <div class="auth-gate-divider" style="margin: 12px 0;">
           <span>OR CONNECT WITH</span>
         </div>
 
         <!-- Social Login: Google & Facebook -->
         <div class="social-login-grid" style="margin-bottom: 10px;">
-          <button type="button" class="btn-social-auth btn-social-google" onclick="window.app && window.app.handleSocialLogin('google')">
+          <button type="button" class="btn-social-auth btn-social-google" onclick="window.app && window.app.openGoogleAuthModal()">
             <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-            <span>Google</span>
+            <span>Google Account</span>
           </button>
-          <button type="button" class="btn-social-auth btn-social-facebook" onclick="window.app && window.app.handleSocialLogin('facebook')">
+          <button type="button" class="btn-social-auth btn-social-facebook" onclick="window.app && window.app.openFacebookAuthModal()">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             <span>Facebook</span>
           </button>
@@ -1225,6 +1270,144 @@
           <span>⚡ Instant 1-Click Guest Play</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Google Authentication Dialog Modal -->
+  <div id="modalGoogleAuth" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 400px; background: #131b2a; border: 1px solid rgba(66, 133, 244, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+          <h3 class="modal-title" style="color: #fff;">Sign in with Google</h3>
+        </div>
+        <button class="modal-close-btn" onclick="document.getElementById('modalGoogleAuth').classList.remove('open')">&times;</button>
+      </div>
+      <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label class="control-label">Google Email Address:</label>
+          <input type="email" id="googleAuthEmail" class="custom-select" placeholder="your.google.account@gmail.com" value="player.vip@gmail.com">
+        </div>
+        <div>
+          <label class="control-label">Mobile Number (For Withdrawal OTP):</label>
+          <div style="display: flex; gap: 6px;">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="googleAuthPhone" class="custom-select" placeholder="10-digit mobile number" maxlength="10">
+          </div>
+        </div>
+        <div>
+          <label class="control-label">Residential Address & City:</label>
+          <input type="text" id="googleAuthAddress" class="custom-select" placeholder="e.g. Bandra West, Mumbai">
+        </div>
+        <div>
+          <label class="control-label">Postal PIN Code (6 Digits):</label>
+          <input type="text" id="googleAuthPincode" class="custom-select" placeholder="e.g. 400050" maxlength="6" style="font-family: monospace;">
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 8px; margin: 4px 0 6px;">
+          <input type="checkbox" id="chkGoogleAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: #4285f4;" checked>
+          <label for="chkGoogleAge18" style="font-size: 11px; color: #a0aec0; line-height: 1.35; cursor: pointer;">
+            🔞 <strong>I certify that I am 18+ years of age</strong> and accept platform terms.
+          </label>
+        </div>
+        <div style="background: rgba(66, 133, 244, 0.08); border-left: 3px solid #4285f4; padding: 8px 10px; border-radius: 4px;">
+          <p style="font-size: 11px; color: #a0aec0; margin: 0; line-height: 1.4;">
+            🔒 Your Google credentials & address will be securely linked for instant VIP payouts.
+          </p>
+        </div>
+        <button type="button" class="btn-action-primary" style="background: #4285f4; color: #fff; height: 44px;" onclick="window.app && window.app.submitGoogleAuth()">
+          <span>✓ Continue to Casino</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facebook Authentication Dialog Modal -->
+  <div id="modalFacebookAuth" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 400px; background: #111a2d; border: 1px solid rgba(24, 119, 242, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <h3 class="modal-title" style="color: #fff;">Connect with Facebook</h3>
+        </div>
+        <button class="modal-close-btn" onclick="document.getElementById('modalFacebookAuth').classList.remove('open')">&times;</button>
+      </div>
+      <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label class="control-label">Facebook Profile Name / User Name:</label>
+          <input type="text" id="fbAuthName" class="custom-select" placeholder="e.g. Aman Verma" value="FB Player">
+        </div>
+        <div>
+          <label class="control-label">Email / Facebook ID:</label>
+          <input type="email" id="fbAuthEmail" class="custom-select" placeholder="e.g. player@facebook.com">
+        </div>
+        <div>
+          <label class="control-label">Mobile Number (For Withdrawal OTP):</label>
+          <div style="display: flex; gap: 6px;">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="fbAuthPhone" class="custom-select" placeholder="10-digit mobile number" maxlength="10">
+          </div>
+        </div>
+        <div>
+          <label class="control-label">Residential Address & City:</label>
+          <input type="text" id="fbAuthAddress" class="custom-select" placeholder="e.g. Sector 18, Noida">
+        </div>
+        <div>
+          <label class="control-label">Postal PIN Code (6 Digits):</label>
+          <input type="text" id="fbAuthPincode" class="custom-select" placeholder="e.g. 201301" maxlength="6" style="font-family: monospace;">
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 8px; margin: 2px 0 4px;">
+          <input type="checkbox" id="chkFbAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: #1877f2;" checked>
+          <label for="chkFbAge18" style="font-size: 11px; color: #a0aec0; line-height: 1.35; cursor: pointer;">
+            🔞 <strong>I certify that I am 18+ years of age</strong> and accept platform terms.
+          </label>
+        </div>
+        <button type="button" class="btn-action-primary" style="background: #1877f2; color: #fff; height: 44px; margin-top: 6px;" onclick="window.app && window.app.submitFacebookAuth()">
+          <span>✓ Connect & Enter Casino</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mandatory 6-Digit SMS / Email OTP Verification Modal -->
+  <div id="modalOtpVerification" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 380px; text-align: center; padding: 26px 20px;">
+      <div style="font-size: 38px; margin-bottom: 6px;">📲</div>
+      <h3 style="font-size: 19px; font-weight: 900; margin-bottom: 4px; color: #fff;">Verify Security OTP</h3>
+      <p id="otpDestinationText" style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+        A 6-digit OTP has been sent to your Mobile / Email.
+      </p>
+
+      <div style="margin-bottom: 16px;">
+        <input type="text" id="inputLoginOtp" maxlength="6" placeholder="000000" style="width: 100%; height: 50px; text-align: center; font-size: 26px; letter-spacing: 10px; font-weight: 900; background: var(--bg-primary); border: 2px solid var(--accent-green); border-radius: 12px; color: var(--accent-green); outline: none; font-family: monospace;">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); margin-bottom: 16px; padding: 0 4px;">
+        <span>Expires in: <strong id="otpTimerCountdown" style="color: #ffb703; font-family: monospace;">00:59</strong></span>
+        <button id="btnResendOtp" style="background: none; border: none; color: var(--accent-cyan); font-weight: 700; cursor: pointer; text-decoration: underline;" onclick="window.app && window.app.resendLoginOtp()">Resend Code</button>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-cancel-mini" style="flex: 1; height: 44px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 700; cursor: pointer;" onclick="document.getElementById('modalOtpVerification').classList.remove('open')">Cancel</button>
+        <button id="btnVerifyLoginOtp" class="btn-action-primary" style="flex: 2; height: 44px; font-size: 14px; font-weight: 800; border-radius: 10px;" onclick="window.app && window.app.verifyLoginOtp()">Verify & Login ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New User ₹200 Signup Bonus Celebration Modal -->
+  <div id="modalWelcomeBonus" class="modal-backdrop" style="z-index: 100000;">
+    <div class="modal-card" style="max-width: 380px; text-align: center; background: linear-gradient(180deg, #151f30 0%, #0d1422 100%); border: 2px solid #00e701; box-shadow: 0 0 40px rgba(0, 231, 1, 0.35); padding: 26px 20px;">
+      <div style="font-size: 48px; margin-bottom: 10px; animation: bounce 1s infinite alternate;">🎁</div>
+      <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 6px;">Welcome to VIEWPOINT!</h3>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 18px;">
+        Congratulations on joining! You've unlocked your exclusive new player reward:
+      </p>
+      <div style="background: rgba(0, 231, 1, 0.12); border: 1px dashed #00e701; border-radius: 12px; padding: 14px; margin-bottom: 20px;">
+        <span style="font-size: 12px; text-transform: uppercase; color: #8fa0b5; font-weight: 700; letter-spacing: 1px;">Instant Signup Reward</span>
+        <div style="font-size: 32px; font-weight: 900; color: #00e701; margin-top: 4px;">+₹200.00</div>
+      </div>
+      <button id="btnClaimWelcomeBonus" class="btn-action-primary" style="width: 100%; height: 48px; font-size: 15px; font-weight: 800; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); box-shadow: 0 4px 15px rgba(0,231,1,0.4);" onclick="window.app && window.app.claimWelcomeBonus()">
+        <span>🎉 CLAIM ₹200 BONUS NOW</span>
+      </button>
     </div>
   </div>
 
@@ -1621,6 +1804,19 @@
           </div>
         </div>
 
+        <!-- Strict Non-Refundable Account Warning Notice -->
+        <div style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid #ef4444; border-radius: var(--border-radius-md); padding: 10px 12px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <span style="font-size: 18px; line-height: 1;">⚠️</span>
+            <div style="font-size: 11.5px; line-height: 1.45; color: #ff8585;">
+              <strong style="color: #ff4757; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 2px;">
+                🚨 STRICT NOTICE: Double Check Your UPI / Bank Account Details!
+              </strong>
+              Please carefully verify and provide your <strong>authentic, correct UPI ID and Bank Account details</strong>. If an incorrect UPI ID or Account Number is provided and payout funds are transferred, <strong>NO REFUND OR COMPENSATION WILL BE ISSUED</strong>. Payouts cannot be reversed once dispatched.
+            </div>
+          </div>
+        </div>
+
         <!-- Save Account Checkbox -->
         <div style="display:flex; align-items:center; gap:8px; margin-bottom: 14px;">
           <input type="checkbox" id="chkSaveWithdrawDetails" style="width:16px; height:16px; cursor:pointer;" checked>
@@ -1795,18 +1991,77 @@
         <!-- Community Live Stats Box -->
         <div class="community-rating-box">
           <div>
-            <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">4.2 / 5.0 ⭐</div>
+            <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">4.3 / 5.0 ⭐</div>
             <div style="font-size: 11px; color: var(--text-muted);">Overall Rating</div>
           </div>
           <div>
-            <div style="font-size: 20px; font-weight: 900; color: #00e701;">14,850+</div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e701;">18,420+</div>
             <div style="font-size: 11px; color: var(--text-muted);">Verified Reviews</div>
           </div>
           <div>
-            <div style="font-size: 20px; font-weight: 900; color: #00e5ff;">99.8%</div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e5ff;">99.4%</div>
             <div style="font-size: 11px; color: var(--text-muted);">Positive Satisfaction</div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction & Bet History Modal -->
+  <div id="modalTxHistory" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 540px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: rgba(0, 245, 155, 0.2); color: #00f59b;">📜</div>
+          <h3 class="modal-title">Transaction & Bet History</h3>
+        </div>
+        <button id="btnCloseTxHistoryModal" class="modal-close-btn" onclick="window.app && window.app.closeTxHistoryModal()">&times;</button>
+      </div>
+
+      <!-- History Navigation Tabs -->
+      <div class="admin-nav-tabs" style="margin: 14px 0 12px 0;">
+        <button id="tabTxDeposits" class="admin-tab-btn active" onclick="window.app && window.app.switchTxHistoryTab('deposits')">
+          <span>💰 Deposits</span>
+        </button>
+        <button id="tabTxWithdrawals" class="admin-tab-btn" onclick="window.app && window.app.switchTxHistoryTab('withdrawals')">
+          <span>💸 Withdrawals</span>
+        </button>
+        <button id="tabTxBets" class="admin-tab-btn" onclick="window.app && window.app.switchTxHistoryTab('bets')">
+          <span>🎮 Game Bets</span>
+        </button>
+      </div>
+
+      <!-- Tab View: Deposits -->
+      <div id="viewTxDeposits" class="tx-history-tab-view" style="display: block; overflow-y: auto; max-height: 380px;">
+        <div id="txDepositsList"></div>
+      </div>
+
+      <!-- Tab View: Withdrawals -->
+      <div id="viewTxWithdrawals" class="tx-history-tab-view" style="display: none; overflow-y: auto; max-height: 380px;">
+        <div id="txWithdrawalsList"></div>
+      </div>
+
+      <!-- Tab View: Game Bets -->
+      <div id="viewTxBets" class="tx-history-tab-view" style="display: none; overflow-y: auto; max-height: 380px;">
+        <div id="txBetsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security PIN Gate Modal (No Default Passcode Text!) -->
+  <div id="modalAdminPinGate" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 360px; text-align: center; padding: 26px 20px;">
+      <div style="font-size: 36px; margin-bottom: 6px;">🔐</div>
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 4px; color: var(--text-primary);">Security Passcode</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Enter your secret PIN to access settings:</p>
+      
+      <div style="margin-bottom: 16px;">
+        <input type="password" id="inputAdminPin" maxlength="8" placeholder="••••" style="width: 100%; height: 48px; text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 900; background: var(--bg-primary); border: 2px solid var(--border-color); border-radius: 12px; color: var(--accent-green); outline: none;">
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-cancel-mini" style="flex: 1; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 700; cursor: pointer;" onclick="document.getElementById('modalAdminPinGate').classList.remove('open')">Cancel</button>
+        <button id="btnSubmitAdminPin" class="btn-action-primary" style="flex: 2; height: 42px; font-size: 14px; font-weight: 800; border-radius: 10px;" onclick="window.app && window.app.submitAdminPinModal()">Verify & Enter ➡️</button>
       </div>
     </div>
   </div>
@@ -1837,6 +2092,13 @@
         </button>
         <button id="tabAdminTelegram" class="admin-tab-btn">
           <span>🤖 Telegram</span>
+        </button>
+        <button id="tabAdminSms" class="admin-tab-btn" onclick="window.app && window.app.switchAdminTab('sms')">
+          <span>📲 SMS & Email API</span>
+        </button>
+        <button id="tabAdminUsers" class="admin-tab-btn" onclick="window.app && window.app.switchAdminTab('users')">
+          <span>👥 Members & FB Logins</span>
+          <span id="adminUsersBadge" class="admin-badge-count" style="background:#3b82f6;">0</span>
         </button>
       </div>
 
@@ -1891,6 +2153,20 @@
         <button id="btnSaveUpiSettings" class="btn-action-primary" style="margin-top: 14px; height: 46px;">
           <span>💾 Save & Apply UPI Settings</span>
         </button>
+
+        <!-- Secret VIP Video Creator / Promo Mode -->
+        <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(239, 68, 68, 0.15) 100%); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: var(--border-radius-md); padding: 14px; margin-top: 16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap: 12px;">
+            <div>
+              <div style="font-size:13px; font-weight:800; color:#fbbf24;">🎬 VIP Video Creator / Promo Mode</div>
+              <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">Turn ON while recording YouTube/Reel promotional videos for 100% Win & High Multipliers across all games!</div>
+            </div>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="togglePromoWinMode" onchange="window.app && window.app.togglePromoWinMode(this.checked)" style="width:20px; height:20px; cursor:pointer; accent-color:#fbbf24;">
+              <span style="font-size:12px; font-weight:800; color:#fbbf24;">PROMO WIN</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <!-- View 4: Telegram Bot Alerts Setup -->
@@ -1923,19 +2199,85 @@
         </button>
       </div>
 
+      <!-- View: Real SMS & Real Gmail Gateway API -->
+      <div id="viewAdminSms" class="admin-tab-view">
+        <div style="background: rgba(0, 245, 155, 0.1); border: 1px solid rgba(0, 245, 155, 0.3); border-radius: var(--border-radius-md); padding: 12px; margin-bottom: 14px;">
+          <div style="font-size: 12px; font-weight: 800; color: #00f59b;">📲 Real SMS & Real Gmail Gateway Connected</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">Sends real 6-digit OTP to mobile phones (+91 SMS) and real Gmail inboxes!</div>
+        </div>
+
+        <label class="control-label">Indian Real SMS API Key (Fast2SMS / 2Factor):</label>
+        <input type="text" id="settingFast2SmsKey" class="custom-select" placeholder="Enter Fast2SMS API Key (Optional for Real SIM SMS)" style="font-family: monospace;">
+
+        <label class="control-label" style="margin-top: 10px;">Gmail / EmailJS Service ID:</label>
+        <input type="text" id="settingEmailJsService" class="custom-select" value="service_zttnfmk" style="font-family: monospace;">
+
+        <label class="control-label" style="margin-top: 10px;">EmailJS Public Key / User ID:</label>
+        <input type="text" id="settingEmailJsKey" class="custom-select" value="5ah6nFUwUl7t0dmfC" style="font-family: monospace;">
+
+        <button type="button" class="btn-action-primary" style="margin-top: 14px; height: 44px;" onclick="window.app && window.app.saveSmsGatewaySettings()">
+          <span>💾 Save Gateway API Keys</span>
+        </button>
+      </div>
+
+      <!-- View 5: Members & Facebook Logins Management -->
+      <div id="viewAdminUsers" class="admin-tab-view">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#fff;">Registered Players & Facebook Accounts</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Member support, recovery & withdrawal OTP records</div>
+          </div>
+          <button type="button" class="btn-action-primary" style="height:32px; padding:0 12px; font-size:12px; background:#1877f2;" onclick="window.app && window.app.exportMemberDetails()">📥 Download Backup</button>
+        </div>
+        <div id="adminUsersListContainer" style="max-height: 380px; overflow-y: auto;">
+          <!-- Dynamically populated member accounts and FB logins -->
+        </div>
+      </div>
+
     </div>
   </div>
 
+  <!-- Fixed Mobile Bottom Navigation Bar (Ultra Classy VIP App Experience) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <button class="mobile-nav-item active" id="mNavOriginals" onclick="window.app && window.app.switchMainPage(1); window.app && window.app.setMobileNavActive(this);">
+      <span class="m-nav-icon">💣</span>
+      <span class="m-nav-label">Originals</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavCrash" onclick="window.app && window.app.switchMainPage(2); window.app && window.app.setMobileNavActive(this);">
+      <span class="m-nav-icon">🚀</span>
+      <span class="m-nav-label">Crash</span>
+    </button>
+    <button class="mobile-nav-item highlight-deposit" id="mNavDeposit" onclick="window.app && window.app.openDepositModal()">
+      <div class="m-nav-deposit-bubble">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="m-nav-label" style="color: #00f59b; font-weight: 900;">Deposit</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavTrading" onclick="window.app && window.app.switchMainPage(3); window.app && window.app.setMobileNavActive(this);">
+      <span class="m-nav-icon">📈</span>
+      <span class="m-nav-label">Casino</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavHistory" onclick="window.app && window.app.openTxHistoryModal()">
+      <span class="m-nav-icon">📜</span>
+      <span class="m-nav-label">History</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavSupport" onclick="window.app && window.app.openSupportModal()">
+      <span class="m-nav-icon">💬</span>
+      <span class="m-nav-label">Support</span>
+    </button>
+  </nav>
+
   <!-- JavaScript Modules (Cache-Busting Enabled) -->
-  <script src="js/audio.js?v=3.1"></script>
-  <script src="js/wallet.js?v=3.1"></script>
-  <script src="js/provablyFair.js?v=3.1"></script>
-  <script src="js/mines.js?v=3.1"></script>
-  <script src="js/chicken.js?v=3.1"></script>
-  <script src="js/crash.js?v=3.1"></script>
-  <script src="js/dragontiger.js?v=3.1"></script>
-  <script src="js/colortrading.js?v=3.1"></script>
-  <script src="js/stocktrading.js?v=3.1"></script>
-  <script src="js/app.js?v=3.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="js/audio.js?v=3.2"></script>
+  <script src="js/wallet.js?v=3.2"></script>
+  <script src="js/provablyFair.js?v=3.2"></script>
+  <script src="js/mines.js?v=3.2"></script>
+  <script src="js/chicken.js?v=3.2"></script>
+  <script src="js/crash.js?v=3.2"></script>
+  <script src="js/dragontiger.js?v=3.2"></script>
+  <script src="js/colortrading.js?v=3.2"></script>
+  <script src="js/stocktrading.js?v=3.2"></script>
+  <script src="js/app.js?v=3.2"></script>
 </body>
 </html>
