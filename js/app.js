@@ -484,18 +484,18 @@ class AppController {
     this.limboAutoSessionProfit = 0;
     this.limboAutoTimer = null;
 
-    this.initGames();
-    this.bindEvents();
-    this.renderGrids();
-    this.updateWalletUI(window.wallet.balance, window.wallet.currency);
-    this.renderHistoryTable();
-    this.syncProvablyFairUI();
-    this.syncUpiUI();
-    this.initAuthAndRefer();
-    this.initPage2Arcade();
-    this.startOnlineMembersLoop();
-    this.startCommunityLiveWinsStream();
-    this.checkAdminUrlActions();
+    try { this.initGames(); } catch(e) { console.error("initGames error:", e); }
+    try { this.bindEvents(); } catch(e) { console.error("bindEvents error:", e); }
+    try { this.renderGrids(); } catch(e) { console.error("renderGrids error:", e); }
+    try { this.updateWalletUI(window.wallet.balance, window.wallet.currency); } catch(e) {}
+    try { this.renderHistoryTable(); } catch(e) {}
+    try { this.syncProvablyFairUI(); } catch(e) {}
+    try { this.syncUpiUI(); } catch(e) {}
+    try { this.initAuthAndRefer(); } catch(e) { console.error("initAuth error:", e); }
+    try { this.initPage2Arcade(); } catch(e) {}
+    try { this.startOnlineMembersLoop(); } catch(e) {}
+    try { this.startCommunityLiveWinsStream(); } catch(e) {}
+    try { this.checkAdminUrlActions(); } catch(e) {}
   }
 
   checkAdminUrlActions() {
