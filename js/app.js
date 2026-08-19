@@ -4891,35 +4891,46 @@ class AppController {
   }
 
   startAutoPlay() {
+    if (!this.currentGame) this.currentGame = 'chicken';
     if (this.currentGame === 'colortrading' || this.currentGame === 'stock' || this.currentGame === 'dragontiger') {
-      this.showNotification("Auto Play is disabled for this game mode.", "error");
+      this.showNotification("Auto Play is only available for Chicken Road, Chicken Mines, Mines, Crash & Limbo!", "error");
       return;
     }
 
-    const betAmount = parseFloat(this.dom.betAmountInput.value) || 10;
-    if (!window.wallet.hasFunds(betAmount)) {
-      this.showNotification("Insufficient balance for Auto Play!", "error");
+    const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
+    const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
+    
+    if (!window.wallet || !window.wallet.hasFunds(betAmount)) {
+      const balStr = window.wallet ? `${window.wallet.currency}${window.wallet.balance.toFixed(2)}` : '₹0.00';
+      this.showNotification(`❌ Insufficient balance (${balStr})! Please deposit funds to start Auto Play.`, "error");
+      if (this.openDepositModal) this.openDepositModal();
       return;
     }
 
-    const totalRounds = parseInt(this.dom.autoBetCountInput ? this.dom.autoBetCountInput.value : 10);
+    const countInput = (this.dom && this.dom.autoBetCountInput) || document.getElementById('autoBetCountInput');
+    const totalRounds = parseInt(countInput ? countInput.value : 10);
     this.autoRoundsTotal = (isNaN(totalRounds) || totalRounds < 0) ? 0 : totalRounds;
     this.autoRoundsCompleted = 0;
     this.autoSessionProfit = 0;
     this.isAutoPlaying = true;
 
     // UI State while running
-    if (this.dom.btnActionAutoStart) {
-      this.dom.btnActionAutoStart.classList.add('btn-auto-running');
-      if (this.dom.btnAutoStartText) {
-        this.dom.btnAutoStartText.innerText = `⏹️ STOP AUTO (0 / ${this.autoRoundsTotal || '∞'})`;
+    const btnAuto = (this.dom && this.dom.btnActionAutoStart) || document.getElementById('btnActionAutoStart');
+    const btnAutoText = (this.dom && this.dom.btnAutoStartText) || document.getElementById('btnAutoStartText');
+    if (btnAuto) {
+      btnAuto.classList.add('btn-auto-running');
+      if (btnAutoText) {
+        btnAutoText.innerText = `⏹️ STOP AUTO (0 / ${this.autoRoundsTotal || '∞'})`;
       }
     }
 
-    if (this.dom.autoPlayLiveStats) {
-      this.dom.autoPlayLiveStats.style.display = 'flex';
-      if (this.dom.autoLiveRoundsText) this.dom.autoLiveRoundsText.innerText = `0 / ${this.autoRoundsTotal || '∞'}`;
-      if (this.dom.autoLiveProfitText) this.dom.autoLiveProfitText.innerText = `+₹0.00`;
+    const liveStats = (this.dom && this.dom.autoPlayLiveStats) || document.getElementById('autoPlayLiveStats');
+    const liveRounds = (this.dom && this.dom.autoLiveRoundsText) || document.getElementById('autoLiveRoundsText');
+    const liveProfit = (this.dom && this.dom.autoLiveProfitText) || document.getElementById('autoLiveProfitText');
+    if (liveStats) {
+      liveStats.style.display = 'flex';
+      if (liveRounds) liveRounds.innerText = `0 / ${this.autoRoundsTotal || '∞'}`;
+      if (liveProfit) liveProfit.innerText = `+₹0.00`;
     }
 
     this.setInputsDisabledForAuto(true);
@@ -4932,26 +4943,35 @@ class AppController {
     this.isAutoPlaying = false;
     this.clearAutoStepTimers();
 
-    if (this.dom.btnActionAutoStart) {
-      this.dom.btnActionAutoStart.classList.remove('btn-auto-running');
-      if (this.dom.btnAutoStartText) {
-        this.dom.btnAutoStartText.innerText = `⚡ START AUTO PLAY`;
+    const btnAuto = (this.dom && this.dom.btnActionAutoStart) || document.getElementById('btnActionAutoStart');
+    const btnAutoText = (this.dom && this.dom.btnAutoStartText) || document.getElementById('btnAutoStartText');
+    if (btnAuto) {
+      btnAuto.classList.remove('btn-auto-running');
+      if (btnAutoText) {
+        btnAutoText.innerText = `⚡ START AUTO PLAY`;
       }
     }
 
     this.setInputsDisabledForAuto(false);
 
     if (reason) {
-      this.showNotification(`⏹️ ${reason} (Rounds: ${this.autoRoundsCompleted} | Profit: ${this.autoSessionProfit >= 0 ? '+' : ''}${window.wallet.currency}${this.autoSessionProfit.toFixed(2)})`, this.autoSessionProfit >= 0 ? "success" : "info");
+      const curr = (window.wallet && window.wallet.currency) || '₹';
+      this.showNotification(`⏹️ ${reason} (Rounds: ${this.autoRoundsCompleted} | Profit: ${this.autoSessionProfit >= 0 ? '+' : ''}${curr}${this.autoSessionProfit.toFixed(2)})`, this.autoSessionProfit >= 0 ? "success" : "info");
     }
   }
 
   setInputsDisabledForAuto(disabled) {
-    if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = disabled;
-    if (this.dom.minesCountSelect) this.dom.minesCountSelect.disabled = disabled;
-    if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = disabled;
-    if (this.dom.autoBetCountInput) this.dom.autoBetCountInput.disabled = disabled;
-    if (this.dom.autoPicksCountInput) this.dom.autoPicksCountInput.disabled = disabled;
+    const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
+    const minesSelect = (this.dom && this.dom.minesCountSelect) || document.getElementById('minesCountSelect');
+    const bonesSelect = (this.dom && this.dom.bonesCountSelect) || document.getElementById('bonesCountSelect');
+    const countInput = (this.dom && this.dom.autoBetCountInput) || document.getElementById('autoBetCountInput');
+    const picksInput = (this.dom && this.dom.autoPicksCountInput) || document.getElementById('autoPicksCountInput');
+
+    if (betInput) betInput.disabled = disabled;
+    if (minesSelect) minesSelect.disabled = disabled;
+    if (bonesSelect) bonesSelect.disabled = disabled;
+    if (countInput) countInput.disabled = disabled;
+    if (picksInput) picksInput.disabled = disabled;
   }
 
   clearAutoStepTimers() {
@@ -4967,9 +4987,11 @@ class AppController {
       return;
     }
 
-    const betAmount = parseFloat(this.dom.betAmountInput.value) || 10;
-    if (!window.wallet.hasFunds(betAmount)) {
+    const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
+    const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
+    if (!window.wallet || !window.wallet.hasFunds(betAmount)) {
       this.stopAutoPlay("Insufficient balance to continue Auto Play!");
+      if (this.openDepositModal) this.openDepositModal();
       return;
     }
 
@@ -4983,6 +5005,8 @@ class AppController {
       this.runCrashAutoRound(betAmount);
     } else if (this.currentGame === 'limbo') {
       this.runLimboAutoRound(betAmount);
+    } else {
+      this.runChickenAutoRound(betAmount);
     }
   }
 

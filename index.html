@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=14.0">
-  <link rel="stylesheet" href="css/mines.css?v=14.0">
-  <link rel="stylesheet" href="css/chicken.css?v=14.0">
-  <link rel="stylesheet" href="css/crash.css?v=14.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=14.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=14.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=14.0">
+  <link rel="stylesheet" href="css/style.css?v=15.0">
+  <link rel="stylesheet" href="css/mines.css?v=15.0">
+  <link rel="stylesheet" href="css/chicken.css?v=15.0">
+  <link rel="stylesheet" href="css/crash.css?v=15.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=15.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=15.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=15.0">
 </head>
 <body>
 
@@ -231,6 +231,14 @@
       if (inp) inp.value = n;
       var helper = document.getElementById('autoBetCountHelper');
       if (helper) helper.innerText = (n === 0) ? 'Infinite Rounds' : n + ' Auto Rounds';
+    };
+
+    window.handleBetClick = function() {
+      if (window.app && window.app.handleBetClick) return window.app.handleBetClick();
+    };
+
+    window.handleCashoutClick = function() {
+      if (window.app && window.app.handleCashoutClick) return window.app.handleCashoutClick();
     };
   </script>
 
@@ -2458,16 +2466,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=14.0"></script>
-  <script src="js/wallet.js?v=14.0"></script>
-  <script src="js/provablyFair.js?v=14.0"></script>
-  <script src="js/mines.js?v=14.0"></script>
-  <script src="js/chicken.js?v=14.0"></script>
-  <script src="js/crash.js?v=14.0"></script>
-  <script src="js/dragontiger.js?v=14.0"></script>
-  <script src="js/colortrading.js?v=14.0"></script>
-  <script src="js/stocktrading.js?v=14.0"></script>
-  <script src="js/app.js?v=14.0"></script>
+  <script src="js/audio.js?v=15.0"></script>
+  <script src="js/wallet.js?v=15.0"></script>
+  <script src="js/provablyFair.js?v=15.0"></script>
+  <script src="js/mines.js?v=15.0"></script>
+  <script src="js/chicken.js?v=15.0"></script>
+  <script src="js/crash.js?v=15.0"></script>
+  <script src="js/dragontiger.js?v=15.0"></script>
+  <script src="js/colortrading.js?v=15.0"></script>
+  <script src="js/stocktrading.js?v=15.0"></script>
+  <script src="js/app.js?v=15.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
