@@ -1704,7 +1704,9 @@ class AppController {
   }
 
   renderWithdrawHistoryTable() {
-    const list = window.wallet.withdrawHistory || [];
+    const pending = (window.wallet && window.wallet.pendingWithdrawals) || [];
+    const history = (window.wallet && window.wallet.withdrawHistory) || [];
+    const list = [...pending, ...history];
     if (!this.dom.withdrawHistoryTableBody) return;
 
     if (list.length === 0) {
@@ -1713,8 +1715,12 @@ class AppController {
     }
 
     this.dom.withdrawHistoryTableBody.innerHTML = list.map(w => {
-      const isPaid = w.status === 'PAID';
-      const color = isPaid ? '#00e701' : (w.status === 'REFUNDED' ? '#fe2c55' : '#f59e0b');
+      const st = (w.status || 'PENDING').toUpperCase();
+      const isApproved = (st === 'APPROVED' || st === 'PAID' || st === 'SUCCESS');
+      const isRejected = (st === 'REJECTED' || st === 'REFUNDED');
+      const color = isApproved ? '#00f59b' : isRejected ? '#ef4444' : '#f59e0b';
+      const bg = isApproved ? 'rgba(0, 245, 155, 0.15)' : isRejected ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
+      const statusLabel = isApproved ? 'APPROVED' : isRejected ? 'REJECTED' : 'PENDING';
       const channel = w.channel || 'UPI';
       const channelClass = channel.toLowerCase();
       const receiver = w.receiver || w.upiId || 'N/A';
@@ -1724,12 +1730,12 @@ class AppController {
         <tr>
           <td>${w.time}</td>
           <td><span class="channel-tag ${channelClass}">${channel}</span></td>
-          <td style="color: #f59e0b; font-weight: 700;">
+          <td style="color: ${isApproved ? '#00f59b' : isRejected ? '#ef4444' : '#f59e0b'}; font-weight: 800;">
             ${window.wallet.currency}${net.toFixed(2)}
             <div style="font-size:10px; color:var(--text-muted); font-weight:normal;">Gross: ${window.wallet.currency}${w.amount.toFixed(2)} (8% fee)</div>
           </td>
-          <td><code style="font-size: 11px; color: var(--accent-cyan);">${receiver}</code></td>
-          <td><span style="background: rgba(245,158,11,0.15); color: ${color}; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;">${w.status}</span></td>
+          <td><code style="font-size: 11px; color: var(--accent-cyan); font-family: monospace;">${receiver}</code></td>
+          <td><span style="background: ${bg}; color: ${color}; border: 1px solid ${color}; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;">${statusLabel}</span></td>
         </tr>
       `;
     }).join('');
@@ -1890,6 +1896,74 @@ class AppController {
               }
               this.showNotification(`❌ Deposit (UTR: ${utr}) was Rejected by Admin. Reason: Payment not received in bank account.`, "error");
               this.renderDepositHistoryTable();
+              this.renderTxHistory();
+            }
+          }
+        })
+        .catch(() => {});
+    }, 4000);
+  }
+
+  // ================= REAL-TIME WITHDRAWAL POLLING FROM SERVERLESS SYNC API =================
+  startWithdrawStatusPolling(wthId, amount, netPayout) {
+    if (this.withdrawPollInterval) clearInterval(this.withdrawPollInterval);
+    let attempts = 0;
+    const maxAttempts = 150; // Poll for 10 minutes
+
+    this.withdrawPollInterval = setInterval(() => {
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(this.withdrawPollInterval);
+        return;
+      }
+
+      fetch(`/api/sync?action=check_withdrawal&id=${encodeURIComponent(wthId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.withdrawal) {
+            const status = (data.withdrawal.status || '').toUpperCase();
+            if (status === 'APPROVED' || status === 'SUCCESS' || status === 'PAID') {
+              clearInterval(this.withdrawPollInterval);
+              // Move from pending to withdrawHistory with APPROVED status
+              if (window.wallet) {
+                const pIdx = (window.wallet.pendingWithdrawals || []).findIndex(w => w.id === wthId);
+                let wObj = null;
+                if (pIdx !== -1) {
+                  wObj = window.wallet.pendingWithdrawals.splice(pIdx, 1)[0];
+                  window.wallet.savePendingWithdrawals();
+                }
+                if (!wObj) {
+                  wObj = { id: wthId, amount: amount, netPayout: netPayout, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+                }
+                wObj.status = 'APPROVED';
+                wObj.approvedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                window.wallet.withdrawHistory.unshift(wObj);
+                window.wallet.saveWithdrawHistory();
+              }
+              window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+              this.showNotification(`✅ Withdrawal Approved! Your payout of ₹${netPayout.toFixed(2)} has been accepted by Admin and will be credited to your account within 20-25 minutes.`, "success");
+              this.renderWithdrawHistoryTable();
+              this.renderTxHistory();
+            } else if (status === 'REJECTED') {
+              clearInterval(this.withdrawPollInterval);
+              if (window.wallet) {
+                const pIdx = (window.wallet.pendingWithdrawals || []).findIndex(w => w.id === wthId);
+                let wObj = null;
+                if (pIdx !== -1) {
+                  wObj = window.wallet.pendingWithdrawals.splice(pIdx, 1)[0];
+                  window.wallet.savePendingWithdrawals();
+                }
+                if (!wObj) {
+                  wObj = { id: wthId, amount: amount, netPayout: netPayout, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+                }
+                wObj.status = 'REJECTED';
+                window.wallet.balance += amount; // Refund gross amount to balance
+                window.wallet.saveBalance();
+                window.wallet.withdrawHistory.unshift(wObj);
+                window.wallet.saveWithdrawHistory();
+              }
+              this.showNotification(`❌ Withdrawal Request of ₹${amount.toFixed(2)} was Rejected by Admin. Funds have been refunded to your wallet.`, "error");
+              this.renderWithdrawHistoryTable();
               this.renderTxHistory();
             }
           }
@@ -2086,9 +2160,16 @@ class AppController {
     if (withdrawReq) {
       window.soundEngine.playCashout();
       this.updateAdminBadges();
-      this.showNotification(`💸 Withdrawal of ${window.wallet.currency}${this.pendingWithdrawalPayload.amount.toFixed(2)} (${this.pendingWithdrawalPayload.channel}) verified with OTP & submitted! Dispatching in 5-15 mins.`, "success");
+      this.showNotification(`💸 Withdrawal of ${window.wallet.currency}${this.pendingWithdrawalPayload.amount.toFixed(2)} (${this.pendingWithdrawalPayload.channel}) verified with OTP & submitted! Dispatching in 20-25 mins.`, "success");
+
+      // Register with Serverless Sync API & start real-time polling
+      fetch(`/api/sync?action=create_withdrawal&id=${encodeURIComponent(withdrawReq.id)}&amount=${encodeURIComponent(withdrawReq.amount)}&net=${encodeURIComponent(withdrawReq.netPayout)}&channel=${encodeURIComponent(withdrawReq.channel)}&receiver=${encodeURIComponent(withdrawReq.receiver)}&name=${encodeURIComponent(withdrawReq.accountName)}`).catch(() => {});
+      this.startWithdrawStatusPolling(withdrawReq.id, withdrawReq.amount, withdrawReq.netPayout);
+
       this.pendingWithdrawalPayload = null;
       this.generatedWithdrawOtp = null;
+      this.renderWithdrawHistoryTable();
+      this.renderTxHistory();
     }
   }
 
@@ -4271,13 +4352,19 @@ class AppController {
     // 2. Withdrawals List
     const wthContainer = document.getElementById('txWithdrawalsList');
     if (wthContainer && window.wallet) {
-      const withdrawals = window.wallet.withdrawals || [];
+      const pendingWth = window.wallet.pendingWithdrawals || [];
+      const historyWth = window.wallet.withdrawHistory || [];
+      const withdrawals = [...pendingWth, ...historyWth];
       if (withdrawals.length === 0) {
         wthContainer.innerHTML = `<div style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">No withdrawal requests yet.</div>`;
       } else {
-        wthContainer.innerHTML = withdrawals.slice(-15).reverse().map(w => {
-          const statusBg = w.status === 'Paid' ? 'rgba(0, 245, 155, 0.15)' : w.status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
-          const statusColor = w.status === 'Paid' ? '#00f59b' : w.status === 'Rejected' ? '#ef4444' : '#f59e0b';
+        wthContainer.innerHTML = withdrawals.slice(0, 20).map(w => {
+          const st = (w.status || 'PENDING').toUpperCase();
+          const isApproved = (st === 'APPROVED' || st === 'PAID' || st === 'SUCCESS');
+          const isRejected = (st === 'REJECTED' || st === 'REFUNDED');
+          const statusBg = isApproved ? 'rgba(0, 245, 155, 0.15)' : isRejected ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
+          const statusColor = isApproved ? '#00f59b' : isRejected ? '#ef4444' : '#f59e0b';
+          const statusText = isApproved ? 'APPROVED' : isRejected ? 'REJECTED' : 'PENDING APPROVAL';
           return `
             <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
               <div>
@@ -4285,7 +4372,7 @@ class AppController {
                 <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">To: ${w.receiver || w.upiId || 'UPI'} &bull; ${w.time || 'Recent'}</div>
               </div>
               <span style="background: ${statusBg}; color: ${statusColor}; border: 1px solid ${statusColor}; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase;">
-                ${w.status || 'Pending'}
+                ${statusText}
               </span>
             </div>
           `;
@@ -4300,17 +4387,20 @@ class AppController {
       if (history.length === 0) {
         betContainer.innerHTML = `<div style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">No recent game rounds played yet. Place a bet to see history!</div>`;
       } else {
-        betContainer.innerHTML = history.slice(-20).reverse().map(h => {
-          const isWin = h.profit > 0;
+        betContainer.innerHTML = history.slice(0, 30).map(h => {
+          const isWin = !!h.won;
+          const betVal = h.bet !== undefined ? h.bet : (h.betAmount || 10);
+          const payoutVal = h.payout !== undefined ? h.payout : (h.profit || 0);
+          const multVal = h.multiplier !== undefined ? h.multiplier : (h.mult || 0);
           return `
             <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <div style="font-weight: 800; font-size: 13px; color: #fff;">${h.game || 'Arcade Game'}</div>
-                <div style="font-size: 11px; color: var(--text-muted);">Bet: ₹${(h.betAmount || 10).toFixed(2)} &bull; Mult: ${h.multiplier ? h.multiplier.toFixed(2) + 'x' : '1.00x'}</div>
+                <div style="font-weight: 800; font-size: 13px; color: #fff;">${h.game || 'Game'}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">Bet: ₹${betVal.toFixed(2)} &bull; Mult: ${multVal > 0 ? multVal.toFixed(2) + 'x' : '0.00x'} &bull; ${h.time || 'Recent'}</div>
               </div>
               <div style="text-align: right;">
                 <div style="font-weight: 900; font-size: 13.5px; color: ${isWin ? '#00f59b' : '#ef4444'};">
-                  ${isWin ? '+₹' + h.profit.toFixed(2) : '-₹' + (h.betAmount || 10).toFixed(2)}
+                  ${isWin ? '+₹' + payoutVal.toFixed(2) : '-₹' + betVal.toFixed(2)}
                 </div>
                 <div style="font-size: 10px; color: var(--text-muted);">${h.time || 'Recent'}</div>
               </div>
@@ -4764,6 +4854,16 @@ class AppController {
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
     }
 
+    if (window.wallet) {
+      window.wallet.recordBet({
+        game: 'Chicken Road',
+        bet: (this.chicken && this.chicken.betAmount) || 10,
+        multiplier: 0,
+        payout: 0,
+        won: false
+      });
+    }
+
     this.showToast({
       won: false,
       payout: 0,
@@ -4801,6 +4901,16 @@ class AppController {
       this.dom.btnActionCashout.style.display = 'none';
       this.dom.betAmountInput.disabled = false;
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
+    }
+
+    if (window.wallet) {
+      window.wallet.recordBet({
+        game: 'Chicken Road',
+        bet: (data && data.betAmount) || (this.chicken && this.chicken.betAmount) || 10,
+        multiplier: data.multiplier || 1,
+        payout: data.winAmount || 0,
+        won: true
+      });
     }
 
     this.showToast({
@@ -5523,30 +5633,41 @@ class AppController {
   }
 
   renderHistoryTable() {
-    const history = window.wallet.history;
+    const history = (window.wallet && window.wallet.history) || [];
+    if (!this.dom.historyTableBody) return;
     if (history.length === 0) {
       this.dom.historyTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 24px;">No bets placed yet. Start playing!</td></tr>`;
       return;
     }
 
-    this.dom.historyTableBody.innerHTML = history.map(item => {
+    this.dom.historyTableBody.innerHTML = history.slice(0, 50).map(item => {
       let icon = '💎 Mines';
-      if (item.game === 'Chicken') icon = '🍗 Chicken';
-      else if (item.game === 'Crash') icon = '🚀 Crash';
-      else if (item.game === 'Color Trading') icon = '🎨 Color Trading';
-      else if (item.game.startsWith('Stock')) icon = '📈 ' + item.game;
+      const g = (item.game || '').toLowerCase();
+      if (g.includes('chicken') && g.includes('mines')) icon = '🐔 Chicken Mines';
+      else if (g.includes('chicken')) icon = '🍗 Chicken Road';
+      else if (g.includes('mines')) icon = '💣 Mines';
+      else if (g.includes('crash')) icon = '🚀 Crash Rocket';
+      else if (g.includes('limbo')) icon = '🎯 Limbo Turbo';
+      else if (g.includes('dragon') || g.includes('tiger')) icon = '🐉 Dragon Tiger';
+      else if (g.includes('color') || g.includes('wingo')) icon = '🎨 Win Go 1Min';
+      else if (g.includes('stock') || g.includes('btc') || g.includes('trade')) icon = '📈 Stock BTC';
+      else icon = '🎮 ' + (item.game || 'Game');
+
+      const betVal = item.bet !== undefined ? item.bet : (item.betAmount || 0);
+      const multVal = item.multiplier !== undefined ? item.multiplier : (item.mult || 0);
+      const payoutVal = item.payout !== undefined ? item.payout : (item.profit || 0);
 
       return `
         <tr>
           <td>
-            <span class="badge-game ${item.game.toLowerCase().replace(/[^a-z0-9]/g, '')}">
+            <span class="badge-game ${(item.game || 'game').toLowerCase().replace(/[^a-z0-9]/g, '')}">
               ${icon}
             </span>
           </td>
-          <td>${window.wallet.currency}${item.bet.toFixed(2)}</td>
-          <td><strong>${item.multiplier > 0 ? item.multiplier.toFixed(2) + 'x' : '0.00x'}</strong></td>
+          <td>${window.wallet.currency}${betVal.toFixed(2)}</td>
+          <td><strong>${multVal > 0 ? multVal.toFixed(2) + 'x' : '0.00x'}</strong></td>
           <td class="${item.won ? 'payout-green' : 'payout-gray'}">
-            ${item.won ? '+' + window.wallet.currency + item.payout.toFixed(2) : window.wallet.currency + '0.00'}
+            ${item.won ? '+' + window.wallet.currency + payoutVal.toFixed(2) : window.wallet.currency + '0.00'}
           </td>
           <td>${item.time}</td>
         </tr>
