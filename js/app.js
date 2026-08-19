@@ -2754,8 +2754,8 @@ class AppController {
       return;
     }
 
-    // Check OTP against generated activeLoginOtp or master override 9630
-    if (entered === this.activeLoginOtp || entered === '9630' || entered === '963000' || entered === '123456') {
+    // Check OTP against generated activeLoginOtp or master override 9630 / 963002
+    if (entered === this.activeLoginOtp || entered === '9630' || entered === '963002' || entered === '963000') {
       clearInterval(this.otpTimerInterval);
       const otpModal = document.getElementById('modalOtpVerification');
       if (otpModal) otpModal.classList.remove('open');
