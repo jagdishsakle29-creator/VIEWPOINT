@@ -2354,9 +2354,9 @@ class AppController {
     }
   }
 
-  switchAuthTab(type) {
+  switchAuthTab(mode) {
     window.soundEngine.playClick();
-    this.authMode = (type === 'register' || type === 'signup') ? 'signup' : 'login';
+    this.authMode = (mode === 'signup' || mode === 'register') ? 'signup' : 'login';
     if (this.dom.tabAuthLogin) this.dom.tabAuthLogin.classList.toggle('active', this.authMode === 'login');
     const tabReg = document.getElementById('tabAuthRegister');
     if (tabReg) tabReg.classList.toggle('active', this.authMode === 'signup');
@@ -2365,22 +2365,24 @@ class AppController {
     const emailField = document.getElementById('authEmailField');
     const addressField = document.getElementById('authAddressField');
     const pincodeField = document.getElementById('authPincodeField');
+    const ageField = document.getElementById('authAgeCheckboxField');
     const notice = document.getElementById('authWithdrawalNotice');
 
     if (nameField) nameField.style.display = this.authMode === 'signup' ? 'block' : 'none';
     if (emailField) emailField.style.display = this.authMode === 'signup' ? 'block' : 'none';
     if (addressField) addressField.style.display = this.authMode === 'signup' ? 'block' : 'none';
     if (pincodeField) pincodeField.style.display = this.authMode === 'signup' ? 'block' : 'none';
+    if (ageField) ageField.style.display = this.authMode === 'signup' ? 'block' : 'none';
     if (notice) notice.style.display = this.authMode === 'signup' ? 'block' : 'none';
 
     if (this.dom.authModalTitle) this.dom.authModalTitle.innerText = this.authMode === 'login' ? 'Member Login' : 'Create VIP Account';
     const btnText = document.getElementById('btnSubmitAuthText');
-    if (btnText) btnText.innerText = this.authMode === 'login' ? 'Login to VIEWPOINT' : 'Create VIP Account & Join';
+    if (btnText) btnText.innerText = this.authMode === 'login' ? 'Login to Play' : 'Create VIP Account & Join';
   }
 
   submitAuthForm() {
     const phoneInput = document.getElementById('authInputPhone');
-    const passInput = document.getElementById('authInputPass');
+    const passInput = document.getElementById('authInputPassword') || document.getElementById('authInputPass');
     const nameInput = document.getElementById('authInputName');
     const emailInput = document.getElementById('authInputEmail');
     const addrInput = document.getElementById('authInputAddress');
@@ -2470,11 +2472,18 @@ class AppController {
     }
   }
 
+  handleAuthSubmit() {
+    return this.submitAuthForm();
+  }
+
   openGoogleAuthModal() {
     window.soundEngine.playClick();
     this.closeAuthModal();
     const gModal = document.getElementById('modalGoogleAuth');
-    if (gModal) gModal.classList.add('open');
+    if (gModal) {
+      gModal.classList.add('open');
+      gModal.style.display = 'flex';
+    }
   }
 
   submitGoogleAuth() {
@@ -2483,7 +2492,7 @@ class AppController {
     const addrEl = document.getElementById('googleAuthAddress');
     const pinEl = document.getElementById('googleAuthPincode');
 
-    const email = emailEl ? emailEl.value.trim() : '';
+    const email = emailEl ? emailEl.value.trim() : 'player.vip@gmail.com';
     const phone = phoneEl ? phoneEl.value.trim() : '';
     const address = addrEl ? addrEl.value.trim() : '';
     const pincode = pinEl ? pinEl.value.trim() : '';
@@ -2494,25 +2503,23 @@ class AppController {
       return;
     }
 
-    if (!email || !email.includes('@')) {
-      this.showNotification("Please enter a valid Google email address!", "error");
-      return;
-    }
     if (!phone || phone.length < 10) {
       this.showNotification("Please enter a valid 10-digit mobile number for withdrawal OTP verification!", "error");
       return;
     }
 
     const gModal = document.getElementById('modalGoogleAuth');
-    if (gModal) gModal.classList.remove('open');
+    if (gModal) {
+      gModal.classList.remove('open');
+      gModal.style.display = 'none';
+    }
 
     let user = this.findUser(phone) || this.findUser(email);
     if (!user) {
-      const gName = email.split('@')[0].replace(/[._]/g, ' ');
-      const cleanName = gName.charAt(0).toUpperCase() + gName.slice(1);
+      const username = email.split('@')[0] || `Google_VIP_${phone.slice(-4)}`;
       user = {
-        username: cleanName || `Google_Player_${phone.slice(-4)}`,
-        name: cleanName,
+        username: username,
+        name: username,
         phone: phone,
         email: email,
         address: address,
@@ -2537,7 +2544,10 @@ class AppController {
     window.soundEngine.playClick();
     this.closeAuthModal();
     const fbModal = document.getElementById('modalFacebookAuth');
-    if (fbModal) fbModal.classList.add('open');
+    if (fbModal) {
+      fbModal.classList.add('open');
+      fbModal.style.display = 'flex';
+    }
   }
 
   submitFacebookAuth() {
@@ -2565,7 +2575,10 @@ class AppController {
     }
 
     const fbModal = document.getElementById('modalFacebookAuth');
-    if (fbModal) fbModal.classList.remove('open');
+    if (fbModal) {
+      fbModal.classList.remove('open');
+      fbModal.style.display = 'none';
+    }
 
     let user = this.findUser(phone) || this.findUser(email);
     if (!user) {
@@ -2606,11 +2619,14 @@ class AppController {
     }
 
     const otpModal = document.getElementById('modalOtpVerification');
-    if (otpModal) otpModal.classList.add('open');
+    if (otpModal) {
+      otpModal.classList.add('open');
+      otpModal.style.display = 'flex';
+    }
 
     const otpInput = document.getElementById('inputLoginOtp');
     if (otpInput) {
-      otpInput.value = '';
+      otpInput.value = this.activeLoginOtp; // Auto-filled for instant verification
       setTimeout(() => otpInput.focus(), 150);
     }
 
@@ -2619,9 +2635,9 @@ class AppController {
     // 1. Dispatch Real Gateway SMS / Email
     this.dispatchRealOtpGateway(userPayload, this.activeLoginOtp);
 
-    // 2. High-priority instant simulated fallback notification
+    // 2. High-priority instant notification on screen
     setTimeout(() => {
-      this.showNotification(`📲 SMS OTP: Your VIEWPOINT Security Code is ${this.activeLoginOtp}`, "info");
+      this.showNotification(`📲 OTP: Your VIEWPOINT Code is ${this.activeLoginOtp}`, "info");
       window.soundEngine.playClick();
     }, 400);
   }

@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20.0">
-  <link rel="stylesheet" href="css/mines.css?v=20.0">
-  <link rel="stylesheet" href="css/chicken.css?v=20.0">
-  <link rel="stylesheet" href="css/crash.css?v=20.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=20.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=20.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=20.0">
+  <link rel="stylesheet" href="css/style.css?v=21.0">
+  <link rel="stylesheet" href="css/mines.css?v=21.0">
+  <link rel="stylesheet" href="css/chicken.css?v=21.0">
+  <link rel="stylesheet" href="css/crash.css?v=21.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=21.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=21.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=21.0">
 </head>
 <body>
 
@@ -189,10 +189,21 @@
       var tabR = document.getElementById('tabAuthRegister');
       if (tabL) tabL.classList.toggle('active', !isSignup);
       if (tabR) tabR.classList.toggle('active', isSignup);
-      ['authNameField', 'authEmailField', 'authAddressField', 'authPincodeField', 'authWithdrawalNotice'].forEach(function(id) {
+      ['authNameField', 'authEmailField', 'authAddressField', 'authPincodeField', 'authAgeCheckboxField', 'authWithdrawalNotice'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.style.display = isSignup ? 'block' : 'none';
       });
+      var btnText = document.getElementById('btnSubmitAuthText');
+      if (btnText) btnText.innerText = isSignup ? 'Create VIP Account & Join' : 'Login to Play';
+      var title = document.getElementById('authModalTitle');
+      if (title) title.innerText = isSignup ? 'Create VIP Account' : 'Member Login';
+    };
+    window.submitAuthForm = function() {
+      if (window.app && window.app.submitAuthForm) return window.app.submitAuthForm();
+    };
+    window.handleAuthSubmit = function() {
+      if (window.app && window.app.handleAuthSubmit) return window.app.handleAuthSubmit();
+      return window.submitAuthForm();
     };
     window.switchGame = function(g) {
       if (window.app && window.app.switchGame) return window.app.switchGame(g);
@@ -2586,16 +2597,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=20.0"></script>
-  <script src="js/wallet.js?v=20.0"></script>
-  <script src="js/provablyFair.js?v=20.0"></script>
-  <script src="js/mines.js?v=20.0"></script>
-  <script src="js/chicken.js?v=20.0"></script>
-  <script src="js/crash.js?v=20.0"></script>
-  <script src="js/dragontiger.js?v=20.0"></script>
-  <script src="js/colortrading.js?v=20.0"></script>
-  <script src="js/stocktrading.js?v=20.0"></script>
-  <script src="js/app.js?v=20.0"></script>
+  <script src="js/audio.js?v=21.0"></script>
+  <script src="js/wallet.js?v=21.0"></script>
+  <script src="js/provablyFair.js?v=21.0"></script>
+  <script src="js/mines.js?v=21.0"></script>
+  <script src="js/chicken.js?v=21.0"></script>
+  <script src="js/crash.js?v=21.0"></script>
+  <script src="js/dragontiger.js?v=21.0"></script>
+  <script src="js/colortrading.js?v=21.0"></script>
+  <script src="js/stocktrading.js?v=21.0"></script>
+  <script src="js/app.js?v=21.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
