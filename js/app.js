@@ -3916,23 +3916,50 @@ class AppController {
 
   handleBetClick() {
     this.hideToast();
+    if (!this.currentGame) this.currentGame = 'chicken';
+    
+    const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
+    const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
+    
+    if (!window.wallet || !window.wallet.hasFunds(betAmount)) {
+      const balStr = window.wallet ? `${window.wallet.currency}${window.wallet.balance.toFixed(2)}` : '₹0.00';
+      this.showNotification(`❌ Insufficient balance (${balStr})! Please deposit funds to play.`, "error");
+      if (this.openDepositModal) this.openDepositModal();
+      return;
+    }
+
     if (this.currentGame === 'limbo') {
       this.rollLimbo();
     } else if (this.currentGame === 'crash') {
-      this.crash.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
-      this.crash.setAutoCashout(parseFloat(this.dom.crashAutoCashoutInput.value) || 2.0);
-      this.crash.startGame();
+      if (this.crash) {
+        this.crash.setBetAmount(betAmount);
+        const autoCashout = (this.dom && this.dom.crashAutoCashoutInput) || document.getElementById('crashAutoCashoutInput');
+        this.crash.setAutoCashout(parseFloat(autoCashout ? autoCashout.value : 2.0) || 2.0);
+        this.crash.startGame();
+      }
     } else if (this.currentGame === 'chicken') {
-      this.chicken.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
-      this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
-      this.chicken.startGame();
+      if (this.chicken) {
+        this.chicken.setBetAmount(betAmount);
+        const bonesSelect = (this.dom && this.dom.bonesCountSelect) || document.getElementById('bonesCountSelect');
+        this.chicken.setDifficulty(bonesSelect ? bonesSelect.value : 'medium');
+        this.chicken.startGame();
+      }
     } else if (this.currentGame === 'chickenmines') {
       if (this.chickenmines) {
-        this.chickenmines.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
-        this.chickenmines.setMineCount(parseInt(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 3) || 3);
+        this.chickenmines.setBetAmount(betAmount);
+        const bonesSelect = (this.dom && this.dom.bonesCountSelect) || document.getElementById('bonesCountSelect');
+        this.chickenmines.setMineCount(parseInt(bonesSelect ? bonesSelect.value : 3) || 3);
         this.chickenmines.startGame();
       }
+    } else if (this.currentGame === 'mines') {
+      if (this.mines) {
+        this.mines.setBetAmount(betAmount);
+        const minesSelect = (this.dom && this.dom.minesCountSelect) || document.getElementById('minesCountSelect');
+        this.mines.setMineCount(parseInt(minesSelect ? minesSelect.value : 3) || 3);
+        this.mines.startGame();
+      }
     } else if (this.activeInstance && this.activeInstance.startGame) {
+      if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(betAmount);
       this.activeInstance.startGame();
     }
   }
