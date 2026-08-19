@@ -1847,7 +1847,55 @@ class AppController {
       this.dom.modalDepositUpi.classList.remove('open');
       this.renderDepositHistoryTable();
       this.showNotification(`⏳ Deposit of ${window.wallet.currency}${amount.toFixed(2)} (UTR: ${utr}) submitted! Funds will be added as soon as Admin confirms bank receipt.`, "info");
+
+      // Register with real-time serverless sync & start live status polling
+      try {
+        fetch(`/api/sync?action=create_deposit&id=${encodeURIComponent(depRecord.id)}&amount=${encodeURIComponent(amount)}&utr=${encodeURIComponent(utr)}&phone=${encodeURIComponent(this.currentUser.phone || '')}&name=${encodeURIComponent(this.currentUser.name || '')}`).catch(() => {});
+        this.startDepositStatusPolling(depRecord.id, amount, utr);
+      } catch(e) {}
     }
+  }
+
+  startDepositStatusPolling(depositId, amount, utr) {
+    if (!depositId) return;
+    let pollCount = 0;
+    const maxPolls = 180; // Poll for up to 15 minutes (every 5 seconds)
+
+    const pollInterval = setInterval(() => {
+      pollCount++;
+      if (pollCount > maxPolls) {
+        clearInterval(pollInterval);
+        return;
+      }
+
+      fetch(`/api/sync?action=check_deposit&id=${encodeURIComponent(depositId)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.deposit) {
+            const status = data.deposit.status;
+            if (status === 'SUCCESS') {
+              clearInterval(pollInterval);
+              // Credit balance and update history
+              if (window.wallet) {
+                window.wallet.approveDeposit(depositId, data.deposit.amount || amount);
+              }
+              window.soundEngine.playCashout();
+              this.showNotification(`🎉 Payment Verified! ₹${(data.deposit.amount || amount).toFixed(2)} credited to your wallet balance.`, "success");
+              this.renderDepositHistoryTable();
+              this.renderTxHistory();
+            } else if (status === 'REJECTED') {
+              clearInterval(pollInterval);
+              if (window.wallet) {
+                window.wallet.rejectDeposit(depositId, 'Payment not received in bank account');
+              }
+              this.showNotification(`❌ Deposit (UTR: ${utr}) was Rejected by Admin. Reason: Payment not received in bank account.`, "error");
+              this.renderDepositHistoryTable();
+              this.renderTxHistory();
+            }
+          }
+        })
+        .catch(() => {});
+    }, 4000);
   }
 
   submitWithdrawRequest() {
@@ -3608,20 +3656,35 @@ class AppController {
   }
 
   renderDepositHistoryTable() {
-    const deposits = window.wallet.depositHistory;
+    const pending = (window.wallet && window.wallet.pendingDeposits) || [];
+    const completed = (window.wallet && window.wallet.depositHistory) || [];
+    const deposits = [...pending, ...completed];
+
+    if (!this.dom.depositHistoryTableBody) return;
+
     if (deposits.length === 0) {
       this.dom.depositHistoryTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted); padding: 20px;">No deposit transactions yet.</td></tr>`;
       return;
     }
 
-    this.dom.depositHistoryTableBody.innerHTML = deposits.map(d => `
+    this.dom.depositHistoryTableBody.innerHTML = deposits.map(d => {
+      let badge = '';
+      if (d.status === 'SUCCESS') {
+        badge = `<span style="background: rgba(0,231,1,0.15); color: #00e701; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #00e701;">SUCCESS</span>`;
+      } else if (d.status === 'REJECTED') {
+        badge = `<span style="background: rgba(239,68,68,0.15); color: #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #ef4444;">REJECTED</span>`;
+      } else {
+        badge = `<span style="background: rgba(245,158,11,0.15); color: #f59e0b; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #f59e0b;">PENDING</span>`;
+      }
+      return `
       <tr>
-        <td>${d.time}</td>
-        <td style="color: var(--accent-green); font-weight: 700;">+${window.wallet.currency}${d.amount.toFixed(2)}</td>
+        <td>${d.time || 'Recent'}</td>
+        <td style="color: ${d.status === 'REJECTED' ? '#ef4444' : 'var(--accent-green)'}; font-weight: 700;">+${window.wallet.currency}${d.amount.toFixed(2)}</td>
         <td><code style="font-size: 11px; color: var(--accent-cyan);">${d.utr}</code></td>
-        <td><span style="background: rgba(0,231,1,0.15); color: #00e701; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;">SUCCESS</span></td>
+        <td>${badge}</td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
   }
 
   syncProvablyFairUI() {
@@ -4140,18 +4203,23 @@ class AppController {
     // 1. Deposits List
     const depContainer = document.getElementById('txDepositsList');
     if (depContainer && window.wallet) {
-      const deposits = window.wallet.pendingDeposits || [];
+      const pending = window.wallet.pendingDeposits || [];
+      const completed = window.wallet.depositHistory || [];
+      const deposits = [...pending, ...completed];
+
       if (deposits.length === 0) {
         depContainer.innerHTML = `<div style="text-align: center; padding: 28px; color: var(--text-muted); font-size: 13px;">No deposit transactions yet. Click <strong>Deposit</strong> to add funds.</div>`;
       } else {
-        depContainer.innerHTML = deposits.slice(-15).reverse().map(d => {
-          const statusBg = d.status === 'Approved' ? 'rgba(0, 245, 155, 0.15)' : d.status === 'Rejected' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
-          const statusColor = d.status === 'Approved' ? '#00f59b' : d.status === 'Rejected' ? '#ef4444' : '#f59e0b';
-          const statusText = d.status || 'Pending Approval';
+        depContainer.innerHTML = deposits.slice(0, 20).map(d => {
+          const isSuccess = (d.status === 'SUCCESS' || d.status === 'Approved');
+          const isRejected = (d.status === 'REJECTED' || d.status === 'Rejected');
+          const statusBg = isSuccess ? 'rgba(0, 245, 155, 0.15)' : isRejected ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
+          const statusColor = isSuccess ? '#00f59b' : isRejected ? '#ef4444' : '#f59e0b';
+          const statusText = isSuccess ? 'SUCCESS' : isRejected ? 'REJECTED' : 'PENDING APPROVAL';
           return `
             <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
               <div>
-                <div style="font-weight: 800; font-size: 14px; color: #fff;">+₹${d.amount.toFixed(2)}</div>
+                <div style="font-weight: 800; font-size: 14px; color: ${isRejected ? '#ef4444' : '#fff'};">+₹${d.amount.toFixed(2)}</div>
                 <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">UTR: <span style="color: var(--accent-cyan); font-family: monospace;">${d.utr || 'N/A'}</span> &bull; ${d.time || 'Recent'}</div>
               </div>
               <span style="background: ${statusBg}; color: ${statusColor}; border: 1px solid ${statusColor}; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase;">

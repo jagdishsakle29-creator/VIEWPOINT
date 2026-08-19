@@ -519,11 +519,11 @@ class CasinoWallet {
           replyMarkup = {
             inline_keyboard: [
               [
-                { text: "✅ Approve (+₹" + item.amount.toFixed(0) + ")", url: `${origin}?secret=9630_7878&admin_action=approve_dep&id=${encodeURIComponent(item.id)}&amt=${encodeURIComponent(item.amount)}` },
-                { text: "❌ Reject", url: `${origin}?secret=9630_7878&admin_action=reject_dep&id=${encodeURIComponent(item.id)}` }
+                { text: "✅ Approve (+₹" + item.amount.toFixed(0) + ")", url: `${origin}/api/sync?secret=9630_7878&admin_action=approve_dep&id=${encodeURIComponent(item.id)}&amt=${encodeURIComponent(item.amount)}` },
+                { text: "❌ Reject", url: `${origin}/api/sync?secret=9630_7878&admin_action=reject_dep&id=${encodeURIComponent(item.id)}` }
               ],
               [
-                { text: "⚙️ Open Admin Panel", url: `${origin}?secret=9630_7878` }
+                { text: "⚙️ Open Admin Panel", url: `${origin}/?secret=9630_7878` }
               ]
             ]
           };
@@ -543,11 +543,11 @@ class CasinoWallet {
           replyMarkup = {
             inline_keyboard: [
               [
-                { text: "✅ Approve Payout", url: `${origin}?secret=9630_7878&admin_action=approve_wth&id=${encodeURIComponent(item.id)}` },
-                { text: "❌ Reject & Refund", url: `${origin}?secret=9630_7878&admin_action=reject_wth&id=${encodeURIComponent(item.id)}` }
+                { text: "✅ Approve Payout", url: `${origin}/api/sync?secret=9630_7878&admin_action=approve_wth&id=${encodeURIComponent(item.id)}` },
+                { text: "❌ Reject & Refund", url: `${origin}/api/sync?secret=9630_7878&admin_action=reject_wth&id=${encodeURIComponent(item.id)}` }
               ],
               [
-                { text: "⚙️ Open Admin Panel", url: `${origin}?secret=9630_7878` }
+                { text: "⚙️ Open Admin Panel", url: `${origin}/?secret=9630_7878` }
               ]
             ]
           };
