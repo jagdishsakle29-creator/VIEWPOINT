@@ -322,16 +322,25 @@ class CasinoWallet {
     return request;
   }
 
-  // Admin manually approves the pending deposit
-  approveDeposit(depositId) {
+  // Admin manually approves the pending deposit (supports Telegram direct link approval)
+  approveDeposit(depositId, customAmount = 0) {
+    let deposit = null;
     const idx = this.pendingDeposits.findIndex(d => d.id === depositId);
-    if (idx === -1) return null;
-
-    const [deposit] = this.pendingDeposits.splice(idx, 1);
-    deposit.status = 'SUCCESS';
-    deposit.approvedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    this.savePendingDeposits();
+    if (idx !== -1) {
+      [deposit] = this.pendingDeposits.splice(idx, 1);
+      deposit.status = 'SUCCESS';
+      deposit.approvedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      this.savePendingDeposits();
+    } else {
+      deposit = {
+        id: depositId,
+        amount: parseFloat(customAmount) || 200,
+        utr: 'DIRECT-TELEGRAM-APPROVED',
+        status: 'SUCCESS',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: new Date().toLocaleDateString()
+      };
+    }
 
     // Credit balance
     this.balance += deposit.amount;
@@ -340,6 +349,7 @@ class CasinoWallet {
     // Log to deposit history
     this.depositHistory.unshift(deposit);
     this.saveDepositHistory();
+    this.notify();
 
     return deposit;
   }

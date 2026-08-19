@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=16.0">
-  <link rel="stylesheet" href="css/mines.css?v=16.0">
-  <link rel="stylesheet" href="css/chicken.css?v=16.0">
-  <link rel="stylesheet" href="css/crash.css?v=16.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=16.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=16.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=16.0">
+  <link rel="stylesheet" href="css/style.css?v=17.0">
+  <link rel="stylesheet" href="css/mines.css?v=17.0">
+  <link rel="stylesheet" href="css/chicken.css?v=17.0">
+  <link rel="stylesheet" href="css/crash.css?v=17.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=17.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=17.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=17.0">
 </head>
 <body>
 
@@ -80,6 +80,41 @@
       if (window.app && window.app.openReferModal) return window.app.openReferModal();
       var m = document.getElementById('modalRefer');
       if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeReferModal = function() {
+      if (window.app && window.app.closeReferModal) return window.app.closeReferModal();
+      var m = document.getElementById('modalRefer');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openGoogleAuthModal = function() {
+      if (window.app && window.app.openGoogleAuthModal) return window.app.openGoogleAuthModal();
+      var m = document.getElementById('modalGoogleAuth');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeGoogleAuthModal = function() {
+      var m = document.getElementById('modalGoogleAuth');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openFacebookAuthModal = function() {
+      if (window.app && window.app.openFacebookAuthModal) return window.app.openFacebookAuthModal();
+      var m = document.getElementById('modalFacebookAuth');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeFacebookAuthModal = function() {
+      var m = document.getElementById('modalFacebookAuth');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.switchAuthTab = function(type) {
+      if (window.app && window.app.switchAuthTab) return window.app.switchAuthTab(type);
+      var isSignup = (type === 'register' || type === 'signup');
+      var tabL = document.getElementById('tabAuthLogin');
+      var tabR = document.getElementById('tabAuthRegister');
+      if (tabL) tabL.classList.toggle('active', !isSignup);
+      if (tabR) tabR.classList.toggle('active', isSignup);
+      ['authNameField', 'authEmailField', 'authAddressField', 'authPincodeField', 'authWithdrawalNotice'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = isSignup ? 'block' : 'none';
+      });
     };
     window.switchGame = function(g) {
       if (window.app && window.app.switchGame) return window.app.switchGame(g);
@@ -1381,13 +1416,13 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 1 1 4 0v2"/></svg>
           <h3 class="modal-title" id="authModalTitle">Player Account</h3>
         </div>
-        <button id="btnCloseAuthModal" class="modal-close-btn" onclick="window.app && window.app.closeAuthModal()">&times;</button>
+        <button id="btnCloseAuthModal" class="modal-close-btn" onclick="window.closeAuthModal ? window.closeAuthModal() : (window.app && window.app.closeAuthModal())">&times;</button>
       </div>
 
       <!-- Auth Tabs: Login vs Register -->
       <div class="auth-tabs">
-        <button id="tabAuthLogin" class="auth-tab-btn active" onclick="window.app && window.app.switchAuthTab('login')">Login</button>
-        <button id="tabAuthRegister" class="auth-tab-btn" onclick="window.app && window.app.switchAuthTab('register')">Sign Up</button>
+        <button id="tabAuthLogin" class="auth-tab-btn active" onclick="window.switchAuthTab ? window.switchAuthTab('login') : (window.app && window.app.switchAuthTab('login'))">Login</button>
+        <button id="tabAuthRegister" class="auth-tab-btn" onclick="window.switchAuthTab ? window.switchAuthTab('register') : (window.app && window.app.switchAuthTab('register'))">Sign Up</button>
       </div>
 
       <!-- English Withdrawal OTP Warning Notice -->
@@ -1423,7 +1458,7 @@
         </div>
 
         <div class="auth-field">
-          <label class="control-label">Mobile Number / User ID:</label>
+          <label class="control-label">Mobile Number (Login ID):</label>
           <div style="display: flex; gap: 6px;">
             <span class="phone-prefix">+91</span>
             <input type="tel" id="authInputPhone" class="custom-select" placeholder="10-digit mobile number" maxlength="10" autocomplete="tel">
@@ -1431,20 +1466,22 @@
         </div>
 
         <div class="auth-field">
-          <label class="control-label">Password / PIN:</label>
-          <input type="password" id="authInputPass" class="custom-select" placeholder="Enter 4 to 8 digit PIN/password" maxlength="12" autocomplete="current-password">
+          <label class="control-label">Password:</label>
+          <input type="password" id="authInputPassword" class="custom-select" placeholder="••••••••" autocomplete="current-password">
         </div>
 
-        <!-- Mandatory 18+ Age Confirmation -->
-        <div class="auth-field" style="margin-top: 8px; display: flex; align-items: flex-start; gap: 8px;">
-          <input type="checkbox" id="chkAuthAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: #00e701;" checked>
-          <label for="chkAuthAge18" style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; cursor: pointer;">
-            🔞 <strong>I certify that I am 18+ years of age</strong> and legally permitted to participate in online gaming under applicable laws.
-          </label>
+        <!-- 18+ Age & Responsible Gaming Verification Checkbox (Visible in Registration Mode) -->
+        <div class="auth-field" id="authAgeCheckboxField" style="display: none; margin-top: 4px; margin-bottom: 8px;">
+          <div style="display: flex; align-items: flex-start; gap: 8px; background: rgba(0, 231, 1, 0.06); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(0, 231, 1, 0.2);">
+            <input type="checkbox" id="chkAuthAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: var(--accent-green);" checked>
+            <label for="chkAuthAge18" style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.35; cursor: pointer;">
+              🔞 <strong>I certify that I am 18 years of age or older</strong> and agree to the Terms of Service & Fair Play Rules.
+            </label>
+          </div>
         </div>
 
-        <button type="button" id="btnSubmitAuth" class="btn-action-primary" style="margin-top: 12px; width: 100%; height: 44px;" onclick="window.app && window.app.submitAuthForm()">
-          <span id="btnSubmitAuthText">Login to VIEWPOINT</span>
+        <button type="button" id="btnSubmitAuth" class="btn-action-primary" style="margin-top: 6px; height: 46px;" onclick="window.app && window.app.handleAuthSubmit()">
+          <span id="btnSubmitAuthText">Login to Play</span>
         </button>
 
         <!-- Divider -->
@@ -1454,11 +1491,11 @@
 
         <!-- Social Login: Google & Facebook -->
         <div class="social-login-grid" style="margin-bottom: 10px;">
-          <button type="button" class="btn-social-auth btn-social-google" onclick="window.app && window.app.openGoogleAuthModal()">
+          <button type="button" class="btn-social-auth btn-social-google" onclick="window.openGoogleAuthModal ? window.openGoogleAuthModal() : (window.app && window.app.openGoogleAuthModal())">
             <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
             <span>Google Account</span>
           </button>
-          <button type="button" class="btn-social-auth btn-social-facebook" onclick="window.app && window.app.openFacebookAuthModal()">
+          <button type="button" class="btn-social-auth btn-social-facebook" onclick="window.openFacebookAuthModal ? window.openFacebookAuthModal() : (window.app && window.app.openFacebookAuthModal())">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             <span>Facebook</span>
           </button>
@@ -1479,7 +1516,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
           <h3 class="modal-title" style="color: #fff;">Sign in with Google</h3>
         </div>
-        <button class="modal-close-btn" onclick="document.getElementById('modalGoogleAuth').classList.remove('open')">&times;</button>
+        <button class="modal-close-btn" onclick="window.closeGoogleAuthModal ? window.closeGoogleAuthModal() : (document.getElementById('modalGoogleAuth').classList.remove('open'), document.getElementById('modalGoogleAuth').style.display='none')">&times;</button>
       </div>
       <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
         <div>
@@ -1527,7 +1564,7 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           <h3 class="modal-title" style="color: #fff;">Connect with Facebook</h3>
         </div>
-        <button class="modal-close-btn" onclick="document.getElementById('modalFacebookAuth').classList.remove('open')">&times;</button>
+        <button class="modal-close-btn" onclick="window.closeFacebookAuthModal ? window.closeFacebookAuthModal() : (document.getElementById('modalFacebookAuth').classList.remove('open'), document.getElementById('modalFacebookAuth').style.display='none')">&times;</button>
       </div>
       <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
         <div>
@@ -1617,7 +1654,7 @@
           <span style="font-size: 22px;">🤝</span>
           <h3 class="modal-title">Affiliate & Referral Program</h3>
         </div>
-        <button id="btnCloseReferModal" class="modal-close-btn" onclick="window.app && window.app.closeReferModal()">&times;</button>
+        <button id="btnCloseReferModal" class="modal-close-btn" onclick="window.closeReferModal ? window.closeReferModal() : (window.app && window.app.closeReferModal())">&times;</button>
       </div>
 
       <div class="refer-hero-banner">
@@ -2466,16 +2503,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=16.0"></script>
-  <script src="js/wallet.js?v=16.0"></script>
-  <script src="js/provablyFair.js?v=16.0"></script>
-  <script src="js/mines.js?v=16.0"></script>
-  <script src="js/chicken.js?v=16.0"></script>
-  <script src="js/crash.js?v=16.0"></script>
-  <script src="js/dragontiger.js?v=16.0"></script>
-  <script src="js/colortrading.js?v=16.0"></script>
-  <script src="js/stocktrading.js?v=16.0"></script>
-  <script src="js/app.js?v=16.0"></script>
+  <script src="js/audio.js?v=17.0"></script>
+  <script src="js/wallet.js?v=17.0"></script>
+  <script src="js/provablyFair.js?v=17.0"></script>
+  <script src="js/mines.js?v=17.0"></script>
+  <script src="js/chicken.js?v=17.0"></script>
+  <script src="js/crash.js?v=17.0"></script>
+  <script src="js/dragontiger.js?v=17.0"></script>
+  <script src="js/colortrading.js?v=17.0"></script>
+  <script src="js/stocktrading.js?v=17.0"></script>
+  <script src="js/app.js?v=17.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
