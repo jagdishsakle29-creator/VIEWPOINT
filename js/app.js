@@ -2350,13 +2350,19 @@ class AppController {
   }
 
   openAuthModal(type = 'login') {
-    window.soundEngine.playClick();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     this.switchAuthTab(type);
-    if (this.dom.modalAuth) this.dom.modalAuth.classList.add('open');
+    if (this.dom.modalAuth) {
+      this.dom.modalAuth.classList.add('open');
+      this.dom.modalAuth.style.display = 'flex';
+    }
   }
 
   closeAuthModal() {
-    if (this.dom.modalAuth) this.dom.modalAuth.classList.remove('open');
+    if (this.dom.modalAuth) {
+      this.dom.modalAuth.classList.remove('open');
+      this.dom.modalAuth.style.display = 'none';
+    }
   }
 
   switchAuthTab(type) {
@@ -3076,12 +3082,18 @@ class AppController {
 
   // Refer & Earn Modal
   openReferModal() {
-    window.soundEngine.playClick();
-    if (this.dom.modalRefer) this.dom.modalRefer.classList.add('open');
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    if (this.dom.modalRefer) {
+      this.dom.modalRefer.classList.add('open');
+      this.dom.modalRefer.style.display = 'flex';
+    }
   }
 
   closeReferModal() {
-    if (this.dom.modalRefer) this.dom.modalRefer.classList.remove('open');
+    if (this.dom.modalRefer) {
+      this.dom.modalRefer.classList.remove('open');
+      this.dom.modalRefer.style.display = 'none';
+    }
   }
 
   copyReferralLink() {
@@ -3930,9 +3942,12 @@ class AppController {
       this.openAuthModal('signup');
       return;
     }
-    window.soundEngine.playClick();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     this.syncUpiUI();
-    this.dom.modalDepositUpi.classList.add('open');
+    if (this.dom.modalDepositUpi) {
+      this.dom.modalDepositUpi.classList.add('open');
+      this.dom.modalDepositUpi.style.display = 'flex';
+    }
   }
 
   handleSecretLogoClick() {
@@ -3955,7 +3970,10 @@ class AppController {
 
     if (enteredPin === '9630' || enteredPin === '7878' || enteredPin === savedPin) {
       const pinModal = document.getElementById('modalAdminPinGate');
-      if (pinModal) pinModal.classList.remove('open');
+      if (pinModal) {
+        pinModal.classList.remove('open');
+        pinModal.style.display = 'none';
+      }
       if (input) input.value = '';
       this.openAdminModal(true);
     } else {
@@ -3991,7 +4009,7 @@ class AppController {
       }
     }
 
-    window.soundEngine.playClick();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     const adminModal = document.getElementById('modalUpiSettings') || (this.dom && this.dom.modalUpiSettings);
     if (adminModal) {
       adminModal.classList.add('open');
@@ -4010,16 +4028,22 @@ class AppController {
 
   // ================= TRANSACTION & BET HISTORY MODAL =================
   openTxHistoryModal() {
-    window.soundEngine.playClick();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     this.renderTxHistory();
     const modal = document.getElementById('modalTxHistory');
-    if (modal) modal.classList.add('open');
+    if (modal) {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+    }
   }
 
   closeTxHistoryModal() {
-    window.soundEngine.playClick();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     const modal = document.getElementById('modalTxHistory');
-    if (modal) modal.classList.remove('open');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
   }
 
   switchTxHistoryTab(tab) {
@@ -4194,13 +4218,19 @@ class AppController {
   }
 
   openSupportModal() {
-    window.soundEngine.playClick();
-    this.dom.modalLiveSupport.classList.add('open');
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    if (this.dom.modalLiveSupport) {
+      this.dom.modalLiveSupport.classList.add('open');
+      this.dom.modalLiveSupport.style.display = 'flex';
+    }
   }
 
   openRatingModal() {
-    window.soundEngine.playClick();
-    this.dom.modalRating.classList.add('open');
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    if (this.dom.modalRating) {
+      this.dom.modalRating.classList.add('open');
+      this.dom.modalRating.style.display = 'flex';
+    }
   }
 
   resetWallet() {
