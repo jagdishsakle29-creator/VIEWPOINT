@@ -501,30 +501,19 @@ class AppController {
   checkAdminUrlActions() {
     try {
       const search = window.location.search || '';
-      const hasSecret7878 = search.includes('7878');
-      
-      if (!hasSecret7878) return; // Completely ignore if secret 7878 is not in the URL
-
       const urlParams = new URLSearchParams(search);
       const adminAction = urlParams.get('admin_action');
       const actionId = urlParams.get('id');
       const amt = parseFloat(urlParams.get('amt')) || 0;
       const secret = urlParams.get('secret') || '';
 
-      const isDirectSecret = (secret === '9630_7878');
+      if (!adminAction && !secret.includes('7878')) return;
+
+      const isDirectSecret = (secret === '9630_7878' || secret === '7878');
 
       if (!isDirectSecret) {
-        // Prompt for Secret Admin Passcode (9630)
-        const savedPin = localStorage.getItem('viewpoint_admin_pin') || '9630';
-        const enteredPin = prompt("🔐 Enter Secret Admin Passcode to Access:");
-        
-        if (!enteredPin || enteredPin.trim() !== savedPin) {
-          this.showNotification("❌ Incorrect Admin PIN! Access denied.", "error");
-          try {
-            window.history.replaceState(null, '', window.location.pathname);
-          } catch(e) {}
-          return;
-        }
+        this.openAdminModal(false);
+        return;
       }
 
       // PIN is verified!
@@ -843,9 +832,7 @@ class AppController {
     // UPI Deposit Modal Open/Close
     if (this.dom.btnOpenDeposit) {
       this.dom.btnOpenDeposit.addEventListener('click', () => {
-        window.soundEngine.playClick();
-        this.syncUpiUI();
-        if (this.dom.modalDepositUpi) this.dom.modalDepositUpi.classList.add('open');
+        this.openDepositModal();
       });
     }
 
@@ -3996,15 +3983,6 @@ class AppController {
           input.value = '';
           setTimeout(() => input.focus(), 150);
         }
-        return;
-      }
-      
-      // Fallback
-      const enteredPin = prompt("🔐 Enter Passcode:");
-      if (!enteredPin) return;
-      const savedPin = localStorage.getItem('viewpoint_admin_pin') || '9630';
-      if (enteredPin.trim() !== '9630' && enteredPin.trim() !== '7878' && enteredPin.trim() !== savedPin) {
-        this.showNotification("❌ Incorrect Passcode! Access denied.", "error");
         return;
       }
     }
