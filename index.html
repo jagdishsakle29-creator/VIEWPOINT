@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=23.0">
-  <link rel="stylesheet" href="css/mines.css?v=23.0">
-  <link rel="stylesheet" href="css/chicken.css?v=23.0">
-  <link rel="stylesheet" href="css/crash.css?v=23.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=23.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=23.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=23.0">
+  <link rel="stylesheet" href="css/style.css?v=24.0">
+  <link rel="stylesheet" href="css/mines.css?v=24.0">
+  <link rel="stylesheet" href="css/chicken.css?v=24.0">
+  <link rel="stylesheet" href="css/crash.css?v=24.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=24.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=24.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=24.0">
 </head>
 <body>
 
@@ -483,6 +483,21 @@
           <span style="font-size: 16px; line-height: 1;">🎯⚡</span>
           <span style="font-weight: 800;">Limbo Turbo</span>
           <span class="tab-badge badge-rec" id="badgeRec_limbo" style="background: linear-gradient(135deg, #00e5ff, #3b82f6); color: #fff; font-size:9px; font-weight:900;">1000x</span>
+        </button>
+        <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
+          <span style="font-weight: 900;">Dragon Tiger</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #ef4444, #f59e0b); color: #fff; font-size:9px; font-weight:900;">👑 VIP</span>
+        </button>
+        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🎨</span>
+          <span style="font-weight: 800;">Win Go 1Min</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff; font-size:9px; font-weight:900;">TREND</span>
+        </button>
+        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">📈</span>
+          <span style="font-weight: 800;">Stock BTC</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #f59e0b, #00e701); color: #000; font-size:9px; font-weight:900;">PRO</span>
         </button>
       </div>
     </div>
@@ -2597,16 +2612,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=23.0"></script>
-  <script src="js/wallet.js?v=23.0"></script>
-  <script src="js/provablyFair.js?v=23.0"></script>
-  <script src="js/mines.js?v=23.0"></script>
-  <script src="js/chicken.js?v=23.0"></script>
-  <script src="js/crash.js?v=23.0"></script>
-  <script src="js/dragontiger.js?v=23.0"></script>
-  <script src="js/colortrading.js?v=23.0"></script>
-  <script src="js/stocktrading.js?v=23.0"></script>
-  <script src="js/app.js?v=23.0"></script>
+  <script src="js/audio.js?v=24.0"></script>
+  <script src="js/wallet.js?v=24.0"></script>
+  <script src="js/provablyFair.js?v=24.0"></script>
+  <script src="js/mines.js?v=24.0"></script>
+  <script src="js/chicken.js?v=24.0"></script>
+  <script src="js/crash.js?v=24.0"></script>
+  <script src="js/dragontiger.js?v=24.0"></script>
+  <script src="js/colortrading.js?v=24.0"></script>
+  <script src="js/stocktrading.js?v=24.0"></script>
+  <script src="js/app.js?v=24.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
