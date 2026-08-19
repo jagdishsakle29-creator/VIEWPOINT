@@ -1102,12 +1102,14 @@ body {
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 231, 1, 0.35);
   z-index: 50;
   opacity: 0;
+  display: none;
   pointer-events: none;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   min-width: 170px;
 }
 
 .round-result-toast.show {
+  display: block;
   transform: translate(-50%, -50%) scale(1);
   opacity: 1;
   pointer-events: auto;
@@ -1247,12 +1249,13 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(6px);
-  display: flex;
+  -webkit-backdrop-filter: blur(6px);
+  display: none !important;
   align-items: center;
   justify-content: center;
-  z-index: 200;
+  z-index: 1000000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
@@ -1260,8 +1263,9 @@ body {
 }
 
 .modal-backdrop.open {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .modal-card {
