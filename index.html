@@ -34,13 +34,13 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=13.0">
-  <link rel="stylesheet" href="css/mines.css?v=13.0">
-  <link rel="stylesheet" href="css/chicken.css?v=13.0">
-  <link rel="stylesheet" href="css/crash.css?v=13.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=13.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=13.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=13.0">
+  <link rel="stylesheet" href="css/style.css?v=14.0">
+  <link rel="stylesheet" href="css/mines.css?v=14.0">
+  <link rel="stylesheet" href="css/chicken.css?v=14.0">
+  <link rel="stylesheet" href="css/crash.css?v=14.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=14.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=14.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=14.0">
 </head>
 <body>
 
@@ -166,9 +166,71 @@
           adminModal.style.display = 'flex';
           adminModal.style.zIndex = '1000005';
         }
+        if (window.switchAdminTab) window.switchAdminTab('pending');
       } else {
         alert("❌ Incorrect Passcode! Access denied.");
       }
+    };
+
+    window.switchAdminTab = function(t) {
+      if (window.app && window.app.switchAdminTab) return window.app.switchAdminTab(t);
+      var tabs = ['tabAdminPending', 'tabAdminWithdraw', 'tabAdminUpi', 'tabAdminTelegram', 'tabAdminSms', 'tabAdminUsers'];
+      tabs.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      var views = ['viewAdminPending', 'viewAdminWithdraw', 'viewAdminUpi', 'viewAdminTelegram', 'viewAdminSms', 'viewAdminUsers'];
+      views.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+      });
+
+      var map = {
+        pending: ['tabAdminPending', 'viewAdminPending'],
+        withdraw: ['tabAdminWithdraw', 'viewAdminWithdraw'],
+        upi: ['tabAdminUpi', 'viewAdminUpi'],
+        telegram: ['tabAdminTelegram', 'viewAdminTelegram'],
+        sms: ['tabAdminSms', 'viewAdminSms'],
+        users: ['tabAdminUsers', 'viewAdminUsers']
+      };
+      if (map[t]) {
+        var tabEl = document.getElementById(map[t][0]);
+        if (tabEl) tabEl.classList.add('active');
+        var viewEl = document.getElementById(map[t][1]);
+        if (viewEl) { viewEl.classList.add('active'); viewEl.style.display = 'block'; }
+      }
+    };
+
+    window.closeAdminModal = function() {
+      if (window.app && window.app.closeAdminModal) return window.app.closeAdminModal();
+      var m = document.getElementById('modalUpiSettings');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+
+    window.setBetMode = function(mode) {
+      if (window.app && window.app.setBetMode) return window.app.setBetMode(mode);
+      var btnM = document.getElementById('btnModeManual');
+      var btnA = document.getElementById('btnModeAuto');
+      var panel = document.getElementById('autoPlaySettingsPanel');
+      var btnBet = document.getElementById('btnActionBet');
+      var btnAuto = document.getElementById('btnActionAutoStart');
+      if (btnM) btnM.classList.toggle('active', mode === 'manual');
+      if (btnA) btnA.classList.toggle('active', mode === 'auto');
+      if (panel) panel.style.display = mode === 'auto' ? 'flex' : 'none';
+      if (btnBet) btnBet.style.display = mode === 'auto' ? 'none' : 'flex';
+      if (btnAuto) btnAuto.style.display = mode === 'auto' ? 'flex' : 'none';
+    };
+
+    window.toggleAutoPlay = function() {
+      if (window.app && window.app.toggleAutoPlay) return window.app.toggleAutoPlay();
+    };
+
+    window.setAutoBetRounds = function(n) {
+      if (window.app && window.app.setAutoBetRounds) return window.app.setAutoBetRounds(n);
+      var inp = document.getElementById('autoBetCountInput');
+      if (inp) inp.value = n;
+      var helper = document.getElementById('autoBetCountHelper');
+      if (helper) helper.innerText = (n === 0) ? 'Infinite Rounds' : n + ' Auto Rounds';
     };
   </script>
 
@@ -297,11 +359,11 @@
         
         <!-- Mode Switcher: Manual vs Auto Play (Mines, Chicken, Crash) -->
         <div class="bet-mode-toggle-row" id="betModeToggleRow">
-          <button id="btnModeManual" class="btn-mode-tab active" onclick="window.app && window.app.setBetMode('manual')">
+          <button id="btnModeManual" class="btn-mode-tab active" onclick="window.setBetMode ? window.setBetMode('manual') : (window.app && window.app.setBetMode('manual'))">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
             <span>Manual</span>
           </button>
-          <button id="btnModeAuto" class="btn-mode-tab" onclick="window.app && window.app.setBetMode('auto')">
+          <button id="btnModeAuto" class="btn-mode-tab" onclick="window.setBetMode ? window.setBetMode('auto') : (window.app && window.app.setBetMode('auto'))">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
             <span>Auto Play</span>
           </button>
@@ -316,12 +378,12 @@
               <span class="control-helper" id="autoBetCountHelper">10 Rounds</span>
             </div>
             <div class="input-with-actions">
-              <input type="number" id="autoBetCountInput" class="bet-input-field" value="10" min="0" max="1000" step="1" oninput="window.app && window.app.updateAutoBetHelper()">
+              <input type="number" id="autoBetCountInput" class="bet-input-field" value="10" min="0" max="1000" step="1" oninput="window.app && window.app.updateAutoBetHelper ? window.app.updateAutoBetHelper() : (document.getElementById('autoBetCountHelper').innerText = this.value + ' Rounds')">
               <div class="bet-quick-actions">
-                <button class="btn-quick-bet" onclick="window.app && window.app.setAutoBetRounds(0)">∞</button>
-                <button class="btn-quick-bet" onclick="window.app && window.app.setAutoBetRounds(10)">10</button>
-                <button class="btn-quick-bet" onclick="window.app && window.app.setAutoBetRounds(25)">25</button>
-                <button class="btn-quick-bet" onclick="window.app && window.app.setAutoBetRounds(50)">50</button>
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(0) : (window.app && window.app.setAutoBetRounds(0))">∞</button>
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(10) : (window.app && window.app.setAutoBetRounds(10))">10</button>
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(25) : (window.app && window.app.setAutoBetRounds(25))">25</button>
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(50) : (window.app && window.app.setAutoBetRounds(50))">50</button>
               </div>
             </div>
           </div>
@@ -493,7 +555,7 @@
             <span>BET</span>
           </button>
 
-          <button id="btnActionAutoStart" class="btn-stake-primary btn-auto-start" style="display: none;" onclick="window.app && window.app.toggleAutoPlay()">
+          <button id="btnActionAutoStart" class="btn-stake-primary btn-auto-start" style="display: none;" onclick="window.toggleAutoPlay ? window.toggleAutoPlay() : (window.app && window.app.toggleAutoPlay())">
             <span id="btnAutoStartText">⚡ START AUTO PLAY</span>
           </button>
           
@@ -2202,29 +2264,29 @@
           <div class="deposit-icon-badge" style="background: rgba(20, 117, 225, 0.2); color: #1475e1;">⚙️</div>
           <h3 class="modal-title">Admin Management & Deposit Approval</h3>
         </div>
-        <button id="btnCloseAdminModal" class="modal-close-btn">&times;</button>
+        <button id="btnCloseAdminModal" class="modal-close-btn" onclick="window.closeAdminModal ? window.closeAdminModal() : (window.app && window.app.closeAdminModal())">&times;</button>
       </div>
 
       <!-- Admin Navigation Tabs -->
       <div class="admin-nav-tabs">
-        <button id="tabAdminPending" class="admin-tab-btn active">
+        <button id="tabAdminPending" class="admin-tab-btn active" onclick="window.switchAdminTab ? window.switchAdminTab('pending') : (window.app && window.app.switchAdminTab('pending'))">
           <span>⚡ Deposits</span>
           <span id="adminPendingBadge" class="admin-badge-count">0</span>
         </button>
-        <button id="tabAdminWithdraw" class="admin-tab-btn">
+        <button id="tabAdminWithdraw" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('withdraw') : (window.app && window.app.switchAdminTab('withdraw'))">
           <span>💸 Withdrawals</span>
           <span id="adminWithdrawBadge" class="admin-badge-count" style="background:#f59e0b;">0</span>
         </button>
-        <button id="tabAdminUpi" class="admin-tab-btn">
+        <button id="tabAdminUpi" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('upi') : (window.app && window.app.switchAdminTab('upi'))">
           <span>💳 UPI Config</span>
         </button>
-        <button id="tabAdminTelegram" class="admin-tab-btn">
+        <button id="tabAdminTelegram" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('telegram') : (window.app && window.app.switchAdminTab('telegram'))">
           <span>🤖 Telegram</span>
         </button>
-        <button id="tabAdminSms" class="admin-tab-btn" onclick="window.app && window.app.switchAdminTab('sms')">
+        <button id="tabAdminSms" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('sms') : (window.app && window.app.switchAdminTab('sms'))">
           <span>📲 SMS & Email API</span>
         </button>
-        <button id="tabAdminUsers" class="admin-tab-btn" onclick="window.app && window.app.switchAdminTab('users')">
+        <button id="tabAdminUsers" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('users') : (window.app && window.app.switchAdminTab('users'))">
           <span>👥 Members & FB Logins</span>
           <span id="adminUsersBadge" class="admin-badge-count" style="background:#3b82f6;">0</span>
         </button>
@@ -2396,16 +2458,16 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/audio.js?v=13.0"></script>
-  <script src="js/wallet.js?v=13.0"></script>
-  <script src="js/provablyFair.js?v=13.0"></script>
-  <script src="js/mines.js?v=13.0"></script>
-  <script src="js/chicken.js?v=13.0"></script>
-  <script src="js/crash.js?v=13.0"></script>
-  <script src="js/dragontiger.js?v=13.0"></script>
-  <script src="js/colortrading.js?v=13.0"></script>
-  <script src="js/stocktrading.js?v=13.0"></script>
-  <script src="js/app.js?v=13.0"></script>
+  <script src="js/audio.js?v=14.0"></script>
+  <script src="js/wallet.js?v=14.0"></script>
+  <script src="js/provablyFair.js?v=14.0"></script>
+  <script src="js/mines.js?v=14.0"></script>
+  <script src="js/chicken.js?v=14.0"></script>
+  <script src="js/crash.js?v=14.0"></script>
+  <script src="js/dragontiger.js?v=14.0"></script>
+  <script src="js/colortrading.js?v=14.0"></script>
+  <script src="js/stocktrading.js?v=14.0"></script>
+  <script src="js/app.js?v=14.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
