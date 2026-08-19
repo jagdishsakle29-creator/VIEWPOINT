@@ -1818,7 +1818,7 @@ class AppController {
       return;
     }
 
-    const amount = parseFloat(this.dom.depositAmountInput.value) || 200;
+    const amount = parseFloat(this.dom.depositAmountInput.value) || 199;
     const utr = this.dom.depositUtrInput.value.trim();
 
     if (!utr || utr.length < 6) {
@@ -1826,7 +1826,7 @@ class AppController {
       return;
     }
 
-    const depRecord = window.wallet.deposit(amount, utr, (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'adrenox1@axl');
+    const depRecord = window.wallet.submitDepositRequest(amount, utr, (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'adrenox1@axl');
     if (depRecord) {
       // Dispatch Telegram alert to Admin (@VIEWPOINT78) with Player's Registered Mobile Number
       try {
@@ -1846,7 +1846,7 @@ class AppController {
       this.dom.depositUtrInput.value = '';
       this.dom.modalDepositUpi.classList.remove('open');
       this.renderDepositHistoryTable();
-      this.showNotification(`🎉 Deposit of ${window.wallet.currency}${amount.toFixed(2)} added to your wallet successfully!`, "success");
+      this.showNotification(`⏳ Deposit of ${window.wallet.currency}${amount.toFixed(2)} (UTR: ${utr}) submitted! Funds will be added as soon as Admin confirms bank receipt.`, "info");
     }
   }
 
@@ -3742,9 +3742,25 @@ class AppController {
       if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.remove('active');
     }
 
-    // Reset all tab classes
+    // Reset all tab classes and hide all game views completely
     [this.dom.tabMines, this.dom.tabChicken, this.dom.tabChickenMines, this.dom.tabCrash, this.dom.tabLimbo, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
-    [this.dom.minesView, this.dom.chickenView, this.dom.chickenMinesView, this.dom.crashView, this.dom.limboView, this.dom.dragontigerView, this.dom.colortradingView, this.dom.stockView].forEach(v => v && v.classList.remove('active'));
+    
+    const viewsList = [
+      this.dom.minesView || document.getElementById('minesView'),
+      this.dom.chickenView || document.getElementById('chickenView'),
+      this.dom.chickenMinesView || document.getElementById('chickenMinesView'),
+      this.dom.crashView || document.getElementById('crashView'),
+      this.dom.limboView || document.getElementById('limboView'),
+      this.dom.dragontigerView || document.getElementById('dragontigerView'),
+      this.dom.colortradingView || document.getElementById('colortradingView'),
+      this.dom.stockView || document.getElementById('stockView')
+    ];
+    viewsList.forEach(v => {
+      if (v) {
+        v.classList.remove('active');
+        v.style.display = 'none';
+      }
+    });
 
     // Reset control groups safely
     if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'none';
