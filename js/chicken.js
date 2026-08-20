@@ -92,8 +92,14 @@ class ChickenGame {
     }
   }
 
+  reset() {
+    this.isPlaying = false;
+    this.currentStep = 0;
+    this.currentMultiplier = 1.0;
+  }
+
   startGame() {
-    if (this.isPlaying) return false;
+    if (this.isPlaying) this.reset();
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui.onError) this.ui.onError("Insufficient balance! Please deposit to play.");
       return false;

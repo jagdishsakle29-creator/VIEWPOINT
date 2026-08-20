@@ -5270,7 +5270,9 @@ class AppController {
 
   // ================= AUTO PLAY ENGINE (Mines, Chicken, Crash) =================
   setBetMode(mode) {
-    if (this.isAutoPlaying) return;
+    if (this.isAutoPlaying) {
+      this.stopAutoPlay("Switched to " + mode + " mode.");
+    }
     window.soundEngine.playClick();
     this.betMode = mode;
 
@@ -5281,11 +5283,14 @@ class AppController {
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'flex';
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
       this.updateAutoPicksVisibility();
     } else {
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      this.resetGridUI();
     }
   }
 
@@ -5391,6 +5396,11 @@ class AppController {
     this.isAutoPlaying = false;
     this.clearAutoStepTimers();
 
+    if (this.mines && this.mines.reset) this.mines.reset();
+    if (this.chickenmines && this.chickenmines.reset) this.chickenmines.reset();
+    if (this.chicken && this.chicken.reset) this.chicken.reset();
+    if (this.crash && this.crash.reset) this.crash.reset();
+
     const btnAuto = (this.dom && this.dom.btnActionAutoStart) || document.getElementById('btnActionAutoStart');
     const btnAutoText = (this.dom && this.dom.btnAutoStartText) || document.getElementById('btnAutoStartText');
     if (btnAuto) {
@@ -5400,7 +5410,14 @@ class AppController {
       }
     }
 
+    if (this.betMode === 'manual') {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+    }
+
     this.setInputsDisabledForAuto(false);
+    this.resetGridUI();
 
     if (reason) {
       const curr = (window.wallet && window.wallet.currency) || '₹';

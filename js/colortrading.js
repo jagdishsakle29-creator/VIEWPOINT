@@ -67,10 +67,6 @@ class ColorTradingGame {
     this.timerInterval = setInterval(() => {
       this.timeLeft--;
 
-      if (this.timeLeft <= 5 && this.timeLeft > 0) {
-        window.soundEngine.playClick();
-      }
-
       if (this.timeLeft <= 0) {
         this.settleRound();
         this.timeLeft = this.periodDuration;

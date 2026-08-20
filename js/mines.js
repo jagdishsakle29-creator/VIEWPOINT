@@ -66,8 +66,16 @@ class MinesGame {
     }
   }
 
+  reset() {
+    this.isPlaying = false;
+    this.revealedCount = 0;
+    this.revealedIndices.clear();
+    this.mineIndices.clear();
+    this.currentMultiplier = 1.0;
+  }
+
   startGame() {
-    if (this.isPlaying) return false;
+    if (this.isPlaying) this.reset();
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
       return false;

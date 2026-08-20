@@ -211,10 +211,6 @@ class DragonTigerGame {
       if (this.gameState === 'betting') {
         this.timeLeft--;
 
-        if (this.timeLeft <= 3 && this.timeLeft > 0) {
-          window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
-        }
-
         if (this.ui && this.ui.onTimerTick) {
           this.ui.onTimerTick({
             timeLeft: Math.max(0, this.timeLeft),
