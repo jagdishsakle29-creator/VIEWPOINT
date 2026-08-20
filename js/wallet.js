@@ -79,7 +79,7 @@ class CasinoWallet {
       } catch (e) {}
     }
     const defaults = {
-      upiId: '',
+      upiId: 'adrenox1@axl',
       payeeName: 'VIEWPOINT Games',
       minDeposit: 200,
       maxDeposit: 50000,

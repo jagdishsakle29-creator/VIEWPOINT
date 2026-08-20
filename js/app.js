@@ -1747,18 +1747,55 @@ class AppController {
   }
 
   updateUpiQr() {
-    const s = window.wallet.upiSettings;
-    const amount = parseFloat(this.dom.depositAmountInput.value) || 200;
-    const upiUrl = `upi://pay?pa=${encodeURIComponent(s.upiId)}&pn=${encodeURIComponent(s.payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
+    const s = window.wallet.upiSettings || {};
+    const upiId = (s.upiId && s.upiId.trim()) ? s.upiId.trim() : 'adrenox1@axl';
+    const payeeName = (s.payeeName && s.payeeName.trim()) ? s.payeeName.trim() : 'VIEWPOINT';
+    const amount = parseFloat(this.dom.depositAmountInput ? this.dom.depositAmountInput.value : 200) || 200;
+    
+    // Standard UPI URI for 100% compliant QR scanner (GPay, PhonePe, Paytm, BHIM)
+    const standardUpiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
 
-    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUrl)}`;
-    this.dom.upiQrCodeImg.src = qrSrc;
-    this.dom.qrAmountTag.innerText = `${window.wallet.currency}${amount.toLocaleString()}`;
+    // Specific deep link schemes for direct mobile app launching
+    const phonepeUrl = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
+    const gpayUrl = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
+    const paytmUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
 
-    this.dom.linkGPay.href = upiUrl;
-    this.dom.linkPhonePe.href = upiUrl;
-    this.dom.linkPaytm.href = upiUrl;
-    this.dom.linkAnyUpi.href = upiUrl;
+    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(standardUpiUrl)}`;
+    if (this.dom.upiQrCodeImg) this.dom.upiQrCodeImg.src = qrSrc;
+    if (this.dom.qrAmountTag) this.dom.qrAmountTag.innerText = `${window.wallet.currency}${amount.toLocaleString()}`;
+    if (this.dom.displayUpiId) this.dom.displayUpiId.innerText = upiId;
+
+    if (this.dom.linkGPay) {
+      this.dom.linkGPay.href = gpayUrl;
+      this.dom.linkGPay.onclick = (e) => this.handleUpiAppClick(e, gpayUrl, standardUpiUrl, 'Google Pay');
+    }
+    if (this.dom.linkPhonePe) {
+      this.dom.linkPhonePe.href = phonepeUrl;
+      this.dom.linkPhonePe.onclick = (e) => this.handleUpiAppClick(e, phonepeUrl, standardUpiUrl, 'PhonePe');
+    }
+    if (this.dom.linkPaytm) {
+      this.dom.linkPaytm.href = paytmUrl;
+      this.dom.linkPaytm.onclick = (e) => this.handleUpiAppClick(e, paytmUrl, standardUpiUrl, 'Paytm');
+    }
+    if (this.dom.linkAnyUpi) {
+      this.dom.linkAnyUpi.href = standardUpiUrl;
+      this.dom.linkAnyUpi.onclick = (e) => this.handleUpiAppClick(e, standardUpiUrl, standardUpiUrl, 'UPI');
+    }
+  }
+
+  handleUpiAppClick(e, primaryUrl, fallbackUrl, appName) {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (!isMobile) {
+      e.preventDefault();
+      this.copyUpiId();
+      this.showNotification(`📋 UPI ID copied! Open ${appName} on your phone to transfer.`, "info");
+      return;
+    }
+    e.preventDefault();
+    window.location.href = primaryUrl;
+    setTimeout(() => {
+      window.location.href = fallbackUrl;
+    }, 1000);
   }
 
   copyUpiId() {
@@ -4091,21 +4128,12 @@ class AppController {
     this.currentGame = gameType;
     this.hideToast();
 
-    // Automatically switch active page layout to avoid any hidden or frozen view
-    if (gameType === 'colortrading' || gameType === 'stock' || gameType === 'dragontiger') {
-      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'none';
-      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'block';
-      if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.remove('active');
-      if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.remove('active');
-      if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.add('active');
-    } else {
-      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
-      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
-      const isOriginals = (gameType === 'chicken' || gameType === 'chickenmines' || gameType === 'mines');
-      if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.toggle('active', isOriginals);
-      if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.toggle('active', !isOriginals);
-      if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.remove('active');
-    }
+    // Ensure main game page container remains visible for all games
+    if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
+    if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
+    if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.add('active');
+    if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.remove('active');
+    if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.remove('active');
 
     // Reset all tab classes and hide all game views completely
     [this.dom.tabMines, this.dom.tabChicken, this.dom.tabChickenMines, this.dom.tabCrash, this.dom.tabLimbo, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
