@@ -137,6 +137,35 @@ class ProvablyFair {
       nonce: this.nonce - 1
     };
   }
+
+  /**
+   * Independent deterministic verifier for audit
+   */
+  verifyGameRound(serverSeed, clientSeed, nonce, totalTiles = 25, mineCount = 3) {
+    if (!serverSeed) return { valid: false, error: 'Server seed is required' };
+    const computedHash = this.fastHash(serverSeed.trim());
+    const combinedString = `${serverSeed.trim()}:${(clientSeed || '').trim()}:${nonce || 1}`;
+    const roundHash = this.fastHash(combinedString);
+
+    const tiles = Array.from({ length: totalTiles }, (_, i) => i);
+    let hashIdx = 0;
+    for (let i = tiles.length - 1; i > 0; i--) {
+      const hexChunk = roundHash.substr((hashIdx % (roundHash.length - 4)), 4);
+      hashIdx += 4;
+      const randInt = parseInt(hexChunk, 16) || 0;
+      const j = randInt % (i + 1);
+      [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+    }
+
+    const minePositions = tiles.slice(0, mineCount).sort((a, b) => a - b);
+    return {
+      valid: true,
+      serverSeedHash: computedHash,
+      roundHash,
+      minePositions,
+      formattedMinePositions: minePositions.map(p => `Tile #${p + 1}`).join(', ')
+    };
+  }
 }
 
 window.provablyFair = new ProvablyFair();

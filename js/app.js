@@ -741,14 +741,14 @@ class AppController {
     if (window.ColorTradingGame) {
       this.colortrading = new window.ColorTradingGame({
         onTimerTick: (data) => {
-          this.dom.tradingPeriodId.innerText = data.periodId;
+          if (this.dom.tradingPeriodId) this.dom.tradingPeriodId.innerText = data.periodId;
           const tens = Math.floor(data.timeLeft / 10);
           const ones = data.timeLeft % 10;
-          this.dom.timerDigit1.innerText = tens;
-          this.dom.timerDigit2.innerText = ones;
+          if (this.dom.timerDigit1) this.dom.timerDigit1.innerText = tens;
+          if (this.dom.timerDigit2) this.dom.timerDigit2.innerText = ones;
           const isHurry = data.timeLeft <= 5;
-          this.dom.timerDigit1.classList.toggle('hurry', isHurry);
-          this.dom.timerDigit2.classList.toggle('hurry', isHurry);
+          if (this.dom.timerDigit1) this.dom.timerDigit1.classList.toggle('hurry', isHurry);
+          if (this.dom.timerDigit2) this.dom.timerDigit2.classList.toggle('hurry', isHurry);
         },
         onBetPlaced: (bets) => {
           this.renderActiveBetsSlip(bets);
@@ -763,6 +763,9 @@ class AppController {
           this.renderHistoryTable();
         }
       });
+      if (this.dom.tradingPeriodId && this.colortrading.periodId) {
+        this.dom.tradingPeriodId.innerText = this.colortrading.periodId;
+      }
       this.renderTrendBalls(this.colortrading.history);
     }
 
@@ -812,8 +815,8 @@ class AppController {
     if (this.dom.btnResetWallet) {
       this.dom.btnResetWallet.addEventListener('click', () => {
         window.soundEngine.playClick();
-        window.wallet.resetBalance(1000.00);
-        this.showNotification(`Balance reset to ${window.wallet.currency}1,000.00 demo funds!`, "success");
+        window.wallet.resetBalance(0.00);
+        this.showNotification(`Balance cleared to ${window.wallet.currency}0.00!`, "info");
       });
     }
 
@@ -1477,24 +1480,9 @@ class AppController {
       if (this.dom.settingTgChatId) this.dom.settingTgChatId.value = tg.chatId || '';
       if (this.dom.settingTgEnabled) this.dom.settingTgEnabled.checked = !!tg.isEnabled;
 
-      const togglePromo = document.getElementById('togglePromoWinMode');
-      if (togglePromo) {
-        togglePromo.checked = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
-      }
-
       this.updateAdminBadges();
     } catch(e) {
       console.warn("syncAdminSettingsUI error:", e);
-    }
-  }
-
-  togglePromoWinMode(enabled) {
-    window.soundEngine.playClick();
-    localStorage.setItem('viewpoint_promo_win_mode', enabled ? 'true' : 'false');
-    if (enabled) {
-      this.showNotification("🎬 VIP Video Promo Mode ENABLED: 100% Win & High Multipliers Active!", "success");
-    } else {
-      this.showNotification("🎬 Video Promo Mode DISABLED: Standard Provably Fair active.", "info");
     }
   }
 
@@ -1841,17 +1829,18 @@ class AppController {
       return;
     }
 
-    const depRecord = window.wallet.submitDepositRequest(amount, utr, (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'adrenox1@axl');
+    const targetUpi = (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'ADMIN_UPI';
+    const depRecord = window.wallet.submitDepositRequest(amount, utr, targetUpi);
     if (depRecord) {
-      // Dispatch Telegram alert to Admin (@VIEWPOINT78) with Player's Registered Mobile Number
+      // Dispatch alert to Admin with Player's Registered Mobile Number
       try {
         window.wallet.sendTelegramAlert({
           id: depRecord.id,
           amount: amount,
           utr: utr,
-          upiId: (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'adrenox1@axl',
+          upiId: targetUpi,
           time: depRecord.time,
-          phone: this.currentUser.phone || this.currentUser.username || '9876543210',
+          phone: this.currentUser.phone || this.currentUser.username || '',
           username: this.currentUser.username || 'VIP Member',
           name: this.currentUser.name || this.currentUser.username
         }, 'DEPOSIT');
@@ -1982,6 +1971,13 @@ class AppController {
   }
 
   submitWithdrawRequest() {
+    if (!this.currentUser || this.currentUser.isGuest) {
+      this.showNotification("🔐 Please Login or Register with your verified mobile number before requesting withdrawals!", "error");
+      if (this.dom.modalWithdraw) this.dom.modalWithdraw.classList.remove('open');
+      this.openAuthModal('signup');
+      return;
+    }
+
     const amount = parseFloat(this.dom.withdrawAmountInput.value);
     if (isNaN(amount) || amount < 300) {
       this.showNotification("Minimum withdrawal amount is ₹300 INR!", "error");
@@ -2635,13 +2631,9 @@ class AppController {
   submitGoogleAuth() {
     const emailEl = document.getElementById('googleAuthEmail');
     const phoneEl = document.getElementById('googleAuthPhone');
-    const addrEl = document.getElementById('googleAuthAddress');
-    const pinEl = document.getElementById('googleAuthPincode');
 
-    const email = emailEl ? emailEl.value.trim() : 'player.vip@gmail.com';
+    const email = emailEl ? emailEl.value.trim() : '';
     const phone = phoneEl ? phoneEl.value.trim() : '';
-    const address = addrEl ? addrEl.value.trim() : '';
-    const pincode = pinEl ? pinEl.value.trim() : '';
 
     const ageChk = document.getElementById('chkGoogleAge18');
     if (ageChk && !ageChk.checked) {
@@ -2649,8 +2641,13 @@ class AppController {
       return;
     }
 
+    if (!email || !email.includes('@')) {
+      this.showNotification("Please enter a valid Google email address!", "error");
+      return;
+    }
+
     if (!phone || phone.length < 10) {
-      this.showNotification("Please enter a valid 10-digit mobile number for withdrawal OTP verification!", "error");
+      this.showNotification("Please enter a valid 10-digit mobile number for account security & KYC!", "error");
       return;
     }
 
@@ -2662,28 +2659,26 @@ class AppController {
 
     let user = this.findUser(phone) || this.findUser(email);
     if (!user) {
-      const username = email.split('@')[0] || `Google_VIP_${phone.slice(-4)}`;
+      const username = email.split('@')[0] || `Google_User_${phone.slice(-4)}`;
       user = {
         username: username,
         name: username,
         phone: phone,
         email: email,
-        address: address,
-        pincode: pincode,
-        password: 'google_oauth_auth',
-        referral: 'VP7821',
+        password: 'google_oauth_session',
+        referral: 'VP_SECURE',
         authProvider: 'google',
         createdAt: new Date().toISOString(),
         loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        otpVerified: false,
+        otpVerified: true,
         isGuest: false
       };
-    } else {
-      if (address) user.address = address;
-      if (pincode) user.pincode = pincode;
+      this.saveRegisteredUser(user);
     }
 
-    this.initiateOtpVerification(user, `${email} & +91 ${phone}`);
+    this.setCurrentUser(user);
+    this.renderHeaderUserUI();
+    this.showNotification(`🎉 Google Authorization Successful! Welcome, ${user.name}!`, "success");
   }
 
   openFacebookAuthModal() {
@@ -2794,7 +2789,7 @@ class AppController {
       const emailJsService = localStorage.getItem('viewpoint_emailjs_service');
       const emailJsKey = localStorage.getItem('viewpoint_emailjs_key');
 
-      // Dispatch Real SMS if key is present
+      // Dispatch Real SMS if key is explicitly configured
       if (fast2smsKey && user.phone) {
         fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${fast2smsKey}&variables_values=${otp}&route=otp&numbers=${user.phone}`, {
           method: 'GET',
@@ -2802,10 +2797,10 @@ class AppController {
         }).catch(e => console.warn("Real SMS gateway dispatch warn:", e));
       }
 
-      // Dispatch Real Email if EmailJS keys are present
-      if (user.email) {
-        const sId = emailJsService || 'service_zttnfmk';
-        const pKey = emailJsKey || localStorage.getItem('viewpoint_emailjs_key') || '5ah6nFUwUl7t0dmfC';
+      // Dispatch Real Email if EmailJS keys are explicitly configured
+      if (user.email && emailJsService && emailJsKey) {
+        const sId = emailJsService;
+        const pKey = emailJsKey;
         const tId = localStorage.getItem('viewpoint_emailjs_template') || 'template_otp';
 
         if (window.emailjs && window.emailjs.send) {
@@ -3571,27 +3566,16 @@ class AppController {
     window.soundEngine.playBet();
     this.isLimboRolling = true;
 
-    // Generate Limbo roll
-    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
-    let rolled;
-    if (isPromoWin) {
-      // In Promo Mode: 85% win above target, 15% realistic close call (0.88x to 0.96x of target)
-      if (Math.random() < 0.15) {
-        rolled = parseFloat((target * (0.88 + Math.random() * 0.08)).toFixed(2));
-      } else {
-        rolled = parseFloat((target * (1.15 + Math.random() * 0.85)).toFixed(2));
-      }
+    // Generate Limbo roll (Standard Provably Fair formula)
+    const e = 2 ** 32;
+    let h;
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      h = window.crypto.getRandomValues(new Uint32Array(1))[0];
     } else {
-      const e = 2 ** 32;
-      let h;
-      if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-        h = window.crypto.getRandomValues(new Uint32Array(1))[0];
-      } else {
-        h = Math.floor(Math.random() * e);
-      }
-      const raw = Math.floor((100 * e - h) / (e - h)) / 100;
-      rolled = Math.max(1.00, Math.min(290.0, raw));
+      h = Math.floor(Math.random() * e);
     }
+    const raw = Math.floor((100 * e - h) / (e - h)) / 100;
+    const rolled = Math.max(1.00, Math.min(290.0, raw));
     const won = rolled >= target;
 
     // Fast Ticker Animation
@@ -3961,9 +3945,38 @@ class AppController {
   }
 
   syncProvablyFairUI() {
-    this.dom.serverSeedHash.innerText = window.provablyFair.serverSeedHash || 'Generating...';
-    this.dom.clientSeedInput.value = window.provablyFair.clientSeed;
-    this.dom.nonceVal.innerText = window.provablyFair.nonce;
+    if (this.dom.serverSeedHash) this.dom.serverSeedHash.innerText = (window.provablyFair && window.provablyFair.serverSeedHash) || '--';
+    if (this.dom.clientSeedInput) this.dom.clientSeedInput.value = (window.provablyFair && window.provablyFair.clientSeed) || '';
+    if (this.dom.nonceVal) this.dom.nonceVal.innerText = (window.provablyFair && window.provablyFair.nonce) || 1;
+  }
+
+  verifyProvablyFairRound() {
+    const sInput = document.getElementById('verifyServerSeedInput');
+    const cInput = document.getElementById('verifyClientSeedInput');
+    const nInput = document.getElementById('verifyNonceInput');
+    const resEl = document.getElementById('verifyResultDisplay');
+    if (!sInput || !resEl) return;
+
+    const serverSeed = sInput.value.trim();
+    const clientSeed = cInput ? cInput.value.trim() : '';
+    const nonce = parseInt(nInput ? nInput.value : '1') || 1;
+
+    if (!serverSeed) {
+      resEl.style.display = 'block';
+      resEl.innerHTML = `<span style="color:#ef4444; font-weight:700;">❌ Please enter a 64-hex server seed to verify.</span>`;
+      return;
+    }
+
+    const verification = window.provablyFair.verifyGameRound(serverSeed, clientSeed, nonce);
+    resEl.style.display = 'block';
+    resEl.innerHTML = `
+      <div style="background: rgba(0, 245, 155, 0.08); border: 1px solid rgba(0, 245, 155, 0.3); border-radius: 6px; padding: 8px;">
+        <div style="color: #00f59b; font-weight: 700; margin-bottom: 4px;">✅ Verification Result Valid:</div>
+        <div style="font-size: 10px; color: #cbd5e1; word-break: break-all;"><strong>Server Seed Hash:</strong> <code>${verification.serverSeedHash}</code></div>
+        <div style="font-size: 10px; color: #cbd5e1; word-break: break-all; margin-top: 2px;"><strong>Round Hash:</strong> <code>${verification.roundHash}</code></div>
+        <div style="font-size: 11px; color: #ffb703; font-weight: 700; margin-top: 4px;">💣 Deterministic Mine Placements: ${verification.formattedMinePositions}</div>
+      </div>
+    `;
   }
 
   setDifficulty(diff) {
@@ -4656,8 +4669,8 @@ class AppController {
 
   resetWallet() {
     window.soundEngine.playClick();
-    window.wallet.resetBalance(1000.00);
-    this.showNotification(`Balance reset to ${window.wallet.currency}1,000.00 demo funds!`, "success");
+    window.wallet.resetBalance(0.00);
+    this.showNotification(`Balance reset to ${window.wallet.currency}0.00!`, "info");
   }
 
   updateWalletUI(balance, currency) {

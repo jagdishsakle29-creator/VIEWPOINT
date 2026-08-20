@@ -75,11 +75,11 @@ class CasinoWallet {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed.upiId && parsed.upiId !== 'merchant@upi') return parsed;
+        if (parsed.upiId) return parsed;
       } catch (e) {}
     }
     const defaults = {
-      upiId: 'adrenox1@axl',
+      upiId: '',
       payeeName: 'VIEWPOINT Games',
       minDeposit: 200,
       maxDeposit: 50000,
@@ -87,7 +87,6 @@ class CasinoWallet {
       maxWithdraw: 50000,
       note: 'VIEWPOINT Deposit'
     };
-    localStorage.setItem('stake_upi_settings', JSON.stringify(defaults));
     return defaults;
   }
 
@@ -98,23 +97,18 @@ class CasinoWallet {
 
   loadTelegramSettings() {
     const defaultSettings = {
-      botToken: '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M',
-      chatId: '6527377657',
-      username: 'VIEWPOINT78',
-      isEnabled: true
+      botToken: '',
+      chatId: '',
+      username: '',
+      isEnabled: false
     };
     const saved = localStorage.getItem('stake_telegram_settings');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        parsed.botToken = parsed.botToken || defaultSettings.botToken;
-        parsed.chatId = parsed.chatId || defaultSettings.chatId;
-        parsed.username = parsed.username || defaultSettings.username;
-        parsed.isEnabled = parsed.isEnabled !== undefined ? parsed.isEnabled : true;
-        return parsed;
+        return { ...defaultSettings, ...parsed };
       } catch (e) {}
     }
-    localStorage.setItem('stake_telegram_settings', JSON.stringify(defaultSettings));
     return defaultSettings;
   }
 
@@ -494,9 +488,9 @@ class CasinoWallet {
 
   // Send Telegram Notification to Admin (@VIEWPOINT78) - Non-Blocking Background Dispatch
   sendTelegramAlert(item, type = 'DEPOSIT') {
-    const token = (this.telegramSettings && this.telegramSettings.botToken) || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
-    const chatId = (this.telegramSettings && this.telegramSettings.chatId) || '6527377657';
-    if (!token || !chatId) return;
+    const token = (this.telegramSettings && this.telegramSettings.botToken) || '';
+    const chatId = (this.telegramSettings && this.telegramSettings.chatId) || '';
+    if (!token || !chatId || !this.telegramSettings.isEnabled) return;
 
     setTimeout(() => {
       try {

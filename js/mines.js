@@ -115,22 +115,7 @@ class MinesGame {
 
     this.revealedIndices.add(index);
 
-    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
-    if (isPromoWin && this.mineIndices.has(index)) {
-      // In Promo Mode: First 3 picks 100% protected. After 3 picks, 88% win, 12% close call loss
-      const shouldProtect = (this.revealedCount < 3) || (Math.random() < 0.88);
-      if (shouldProtect) {
-        this.mineIndices.delete(index);
-        for (let i = 0; i < this.totalTiles; i++) {
-          if (!this.revealedIndices.has(i) && !this.mineIndices.has(i) && i !== index) {
-            this.mineIndices.add(i);
-            break;
-          }
-        }
-      }
-    }
-
-    // Local fallback verification
+    // Provably fair verification
     const isMine = this.mineIndices.has(index);
     if (isMine) {
       this.isPlaying = false;

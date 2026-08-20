@@ -38,8 +38,8 @@ class ColorTradingGame {
     const dateStr = d.getFullYear().toString() + 
       String(d.getMonth() + 1).padStart(2, '0') + 
       String(d.getDate()).padStart(2, '0');
-    const minuteOfDay = Math.floor((d.getHours() * 60 + d.getMinutes()) * 2 + d.getSeconds() / 30);
-    return `${dateStr}${String(minuteOfDay).padStart(4, '0')}`;
+    const periodIndex = (d.getHours() * 60 + d.getMinutes()) * 2 + Math.floor(d.getSeconds() / 30) + 1;
+    return `${dateStr}${String(periodIndex).padStart(4, '0')}`;
   }
 
   generateInitialHistory() {

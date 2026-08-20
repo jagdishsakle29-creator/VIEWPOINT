@@ -73,15 +73,6 @@ class CrashGame {
   }
 
   generateCrashPoint() {
-    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
-    if (isPromoWin) {
-      // In Promo Mode: 85% high flights (5x to 22x), 15% close calls (1.65x to 2.20x) for natural video reactions
-      if (Math.random() < 0.15) {
-        return parseFloat((Math.random() * 0.55 + 1.65).toFixed(2));
-      }
-      return parseFloat((Math.random() * 17.0 + 5.0).toFixed(2));
-    }
-
     // Standard provably fair crash formula (97% RTP)
     const e = 2 ** 32;
     let h;

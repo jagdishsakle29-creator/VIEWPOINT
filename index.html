@@ -435,7 +435,7 @@
           <span class="wallet-label">Balance</span>
           <div class="wallet-amount">
             <span class="currency-symbol" id="currencySymbol">₹</span>
-            <span id="walletBalance">1,000.00</span>
+            <span id="walletBalance">0.00</span>
           </div>
         </div>
       </div>
@@ -704,9 +704,9 @@
 
         <!-- Main Action Buttons (Mines, Chicken, Crash) -->
         <div class="action-button-area" id="mainActionArea">
-          <!-- Funny Stylish Risk Tagline -->
+          <!-- Responsible Gaming Tagline -->
           <div class="funny-risk-tagline" id="funnyRiskTagline">
-            <span class="funny-risk-text">✨ take risk if you dont risk then eat i-pilll ✨</span>
+            <span class="funny-risk-text">✨ Play Responsibly • Set Limits & Stay Disciplined ✨</span>
           </div>
 
           <button id="btnActionBet" class="btn-stake-primary btn-bet" onclick="window.handleBetClick ? window.handleBetClick() : (window.app && window.app.handleBetClick())">
@@ -833,7 +833,7 @@
             <!-- Direct Jump Control Button for mobile & desktop -->
             <div class="chicken-action-bar" id="chickenActionBar" style="display:none; margin-top:6px; flex-direction:column; align-items:center;">
               <div class="funny-risk-tagline" style="margin-bottom: 4px;">
-                <span class="funny-risk-text">✨ take risk if you dont risk then eat i-pilll ✨</span>
+                <span class="funny-risk-text">✨ Play Responsibly • Set Limits & Stay Disciplined ✨</span>
               </div>
               <button id="btnChickenHop" class="btn-chicken-go" onclick="window.handleChickenHop ? window.handleChickenHop() : (window.app && window.app.handleChickenHop())">
                 <span>🐔 JUMP NEXT LANE ➡️</span>
@@ -848,16 +848,16 @@
           <div class="crash-history-bar" id="crashHistoryBar">
             <!-- Crash multiplier pills -->
           </div>
-          <!-- Live AI Signal & Multiplier Hint Bar -->
+          <!-- Live Market Volatility & Momentum Hint Bar -->
           <div class="crash-ai-signal-bar" id="crashAiSignalBar">
             <div class="ai-signal-badge">
               <span class="ai-pulse-dot"></span>
-              <span>🤖 AI RADAR SIGNAL</span>
+              <span>📈 VOLATILITY INDEX</span>
             </div>
             <div class="ai-signal-info">
-              <span class="ai-signal-label">Target Exit:</span>
-              <span class="ai-signal-target" id="crashAiPredictedTarget">~3.60x - 6.20x</span>
-              <span class="ai-signal-conf" id="crashAiConfidence">92% Acc</span>
+              <span class="ai-signal-label">Momentum:</span>
+              <span class="ai-signal-target" id="crashAiPredictedTarget">Dynamic Curve</span>
+              <span class="ai-signal-conf" id="crashAiConfidence">Algorithmic</span>
             </div>
           </div>
           <div class="crash-canvas-wrapper">
@@ -956,7 +956,7 @@
           <div class="trading-header-card">
             <div class="trading-period-badge">
               <span class="trading-period-label">Period ID</span>
-              <span id="tradingPeriodId" class="trading-period-id">202608150001</span>
+              <span id="tradingPeriodId" class="trading-period-id">--</span>
             </div>
             <div class="trading-timer-box">
               <span class="trading-timer-label">Time Remaining</span>
@@ -1100,11 +1100,11 @@
     </section>
 
     <!-- Floating Live Win Toast (Bottom-Left) -->
-    <div id="liveWinFloatingToast" class="live-win-floating-toast">
+    <div id="liveWinFloatingToast" class="live-win-floating-toast" style="display:none;">
       <div class="win-toast-icon">⚡</div>
       <div class="win-toast-info">
-        <span id="winToastUser" class="win-toast-user">Aman_VIP***</span>
-        <span id="winToastPayout" class="win-toast-payout">+₹14,250.00 on Crash (5.70x)</span>
+        <span id="winToastUser" class="win-toast-user">Player***</span>
+        <span id="winToastPayout" class="win-toast-payout">Live Win</span>
       </div>
     </div>
 
@@ -1368,8 +1368,8 @@
               <svg class="game-svg-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M3 20h18" stroke="#64748b" stroke-width="2" stroke-linecap="round"/><path d="M4 15l5-6 4 4 7-9" stroke="#00e701" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4h4v4" stroke="#00e701" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
             <div>
-              <h3>Stock Market Live Trading</h3>
-              <span class="card-subtitle">Real-Time OTC Candlestick Trading • 90% Instant Profit</span>
+              <h3>Stock Market Live Trading <span style="font-size: 11px; background: rgba(0, 229, 255, 0.15); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; font-weight: 700; vertical-align: middle; margin-left: 4px;">SIMULATED FEED</span></h3>
+              <span class="card-subtitle">Real-Time Algorithmic Candlestick Simulator • 90% Payout Up/Down</span>
             </div>
           </div>
           <span class="badge-tag-hot">LIVE OTC 📈</span>
@@ -1635,37 +1635,29 @@
       </div>
       <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
         <div>
-          <label class="control-label">Google Email Address:</label>
-          <input type="email" id="googleAuthEmail" class="custom-select" placeholder="your.google.account@gmail.com" value="player.vip@gmail.com">
+          <label class="control-label">Google Account Email:</label>
+          <input type="email" id="googleAuthEmail" class="custom-select" placeholder="your.name@gmail.com">
         </div>
         <div>
-          <label class="control-label">Mobile Number (For Withdrawal OTP):</label>
+          <label class="control-label">Mobile Number (For SMS Security & KYC):</label>
           <div style="display: flex; gap: 6px;">
             <span class="phone-prefix">+91</span>
             <input type="tel" id="googleAuthPhone" class="custom-select" placeholder="10-digit mobile number" maxlength="10">
           </div>
         </div>
-        <div>
-          <label class="control-label">Residential Address & City:</label>
-          <input type="text" id="googleAuthAddress" class="custom-select" placeholder="e.g. Bandra West, Mumbai">
-        </div>
-        <div>
-          <label class="control-label">Postal PIN Code (6 Digits):</label>
-          <input type="text" id="googleAuthPincode" class="custom-select" placeholder="e.g. 400050" maxlength="6" style="font-family: monospace;">
-        </div>
         <div style="display: flex; align-items: flex-start; gap: 8px; margin: 4px 0 6px;">
           <input type="checkbox" id="chkGoogleAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: #4285f4;" checked>
           <label for="chkGoogleAge18" style="font-size: 11px; color: #a0aec0; line-height: 1.35; cursor: pointer;">
-            🔞 <strong>I certify that I am 18+ years of age</strong> and accept platform terms.
+            🔞 <strong>I certify that I am 18+ years of age</strong> and accept platform terms & responsible gaming policies.
           </label>
         </div>
         <div style="background: rgba(66, 133, 244, 0.08); border-left: 3px solid #4285f4; padding: 8px 10px; border-radius: 4px;">
           <p style="font-size: 11px; color: #a0aec0; margin: 0; line-height: 1.4;">
-            🔒 Your Google credentials & address will be securely linked for instant VIP payouts.
+            🔒 Secure OAuth Sign-in: End-to-end encrypted session authorization.
           </p>
         </div>
         <button type="button" class="btn-action-primary" style="background: #4285f4; color: #fff; height: 44px;" onclick="window.app && window.app.submitGoogleAuth()">
-          <span>✓ Continue to Casino</span>
+          <span>✓ Authorize Google Account</span>
         </button>
       </div>
     </div>
@@ -1886,17 +1878,29 @@
         <button id="btnCloseFairModal" class="modal-close-btn" onclick="window.closeProvablyFairModal ? window.closeProvablyFairModal() : (document.getElementById('modalProvablyFair').classList.remove('open'), document.getElementById('modalProvablyFair').style.display='none')">&times;</button>
       </div>
       <div class="modal-body">
-        <p>Stake games use SHA-256 hash algorithms to guarantee that every tile and mine placement is 100% predetermined and unchangeable before each round starts.</p>
+        <p>VIEWPOINT games use deterministic SHA-256 cryptographic hashing to guarantee that all round outcomes and mine placements are mathematically predetermined and impossible to alter.</p>
         
         <label class="control-label">Active Server Seed (SHA-256 Hash):</label>
-        <div id="serverSeedHash" class="seed-box">Loading...</div>
+        <div id="serverSeedHash" class="seed-box" style="word-break: break-all; font-size: 12px;">--</div>
 
         <label class="control-label">Client Seed (Customizable):</label>
         <input type="text" id="clientSeedInput" class="custom-select" style="font-family: monospace;">
 
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
           <span class="control-label">Nonce: <strong id="nonceVal" style="color: #fff;">1</strong></span>
           <button id="btnRotateSeed" class="btn-reset-wallet" onclick="window.app && window.app.rotateServerSeed()">🔄 Rotate Server Seed</button>
+        </div>
+
+        <!-- Interactive Verification Box -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 10px;">
+          <strong style="font-size: 12px; color: #00e5ff; display: block; margin-bottom: 6px;">🔍 Independent Round Verifier:</strong>
+          <input type="text" id="verifyServerSeedInput" class="custom-select" placeholder="Paste Past Server Seed (Hex 64)" style="font-family: monospace; font-size: 11px; margin-bottom: 6px;">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; margin-bottom: 8px;">
+            <input type="text" id="verifyClientSeedInput" class="custom-select" placeholder="Client Seed" style="font-family: monospace; font-size: 11px;">
+            <input type="number" id="verifyNonceInput" class="custom-select" placeholder="Nonce" value="1" style="font-size: 11px;">
+          </div>
+          <button type="button" class="btn-action-primary" style="height: 34px; font-size: 11px;" onclick="window.app && window.app.verifyProvablyFairRound()">Validate Hash & Mines</button>
+          <div id="verifyResultDisplay" style="margin-top: 8px; font-size: 11px; color: #a0aec0; display: none;"></div>
         </div>
       </div>
     </div>
@@ -2045,7 +2049,7 @@
         <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 12px 14px; margin-bottom: 14px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <span style="font-size: 12px; color: var(--text-secondary);">Withdrawable Main Balance:</span>
-            <strong id="withdrawAvailableBal" style="font-size: 17px; color: #00e701; font-family: var(--font-display);">₹1,000.00</strong>
+            <strong id="withdrawAvailableBal" style="font-size: 17px; color: #00e701; font-family: var(--font-display);">₹0.00</strong>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
             <span>Daily Limit Remaining:</span>
@@ -2346,16 +2350,16 @@
         <!-- Community Live Stats Box -->
         <div class="community-rating-box">
           <div>
-            <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">4.3 / 5.0 ⭐</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Overall Rating</div>
+            <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">4.8 / 5.0 ⭐</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Player Rating</div>
           </div>
           <div>
-            <div style="font-size: 20px; font-weight: 900; color: #00e701;">18,420+</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Verified Reviews</div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e701;" id="verifiedReviewsCount">Verified</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Fair RTP Audited</div>
           </div>
           <div>
-            <div style="font-size: 20px; font-weight: 900; color: #00e5ff;">99.4%</div>
-            <div style="font-size: 11px; color: var(--text-muted);">Positive Satisfaction</div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e5ff;">100%</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Provably Fair</div>
           </div>
         </div>
       </div>
@@ -2511,44 +2515,22 @@
         <button id="btnSaveUpiSettings" class="btn-action-primary" style="margin-top: 14px; height: 46px;">
           <span>💾 Save & Apply UPI Settings</span>
         </button>
-
-        <!-- Secret VIP Video Creator / Promo Mode -->
-        <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(239, 68, 68, 0.15) 100%); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: var(--border-radius-md); padding: 14px; margin-top: 16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap: 12px;">
-            <div>
-              <div style="font-size:13px; font-weight:800; color:#fbbf24;">🎬 VIP Video Creator / Promo Mode</div>
-              <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">Turn ON while recording YouTube/Reel promotional videos for 100% Win & High Multipliers across all games!</div>
-            </div>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
-              <input type="checkbox" id="togglePromoWinMode" onchange="window.app && window.app.togglePromoWinMode(this.checked)" style="width:20px; height:20px; cursor:pointer; accent-color:#fbbf24;">
-              <span style="font-size:12px; font-weight:800; color:#fbbf24;">PROMO WIN</span>
-            </label>
-          </div>
-        </div>
       </div>
 
       <!-- View 4: Telegram Bot Alerts Setup -->
       <div id="viewAdminTelegram" class="admin-tab-view">
-        <div style="background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: var(--border-radius-md); padding: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase;">Configured Admin Handle</div>
-            <strong style="color: #ffffff; font-size: 15px;">@VIEWPOINT78</strong>
-          </div>
-          <a href="https://t.me/VIEWPOINT78" target="_blank" class="btn-insta-follow" style="background: #0088cc; color: #fff;">Open Telegram ↗</a>
-        </div>
-
         <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
-          Whenever a player deposits funds or requests a withdrawal, you will receive an **instant real-time Telegram notification**!
+          Configure Telegram webhook alerts for deposits and withdrawals:
         </p>
 
         <label class="control-label">Telegram Bot Token (From @BotFather):</label>
-        <input type="text" id="settingTgBotToken" class="custom-select" placeholder="e.g. 7123456789:AAHk...-w9x...">
+        <input type="password" id="settingTgBotToken" class="custom-select" placeholder="Enter Bot Token securely">
 
         <label class="control-label">Your Telegram Chat ID (From @userinfobot):</label>
-        <input type="text" id="settingTgChatId" class="custom-select" placeholder="e.g. 1234567890">
+        <input type="text" id="settingTgChatId" class="custom-select" placeholder="Enter Admin Chat ID">
 
         <div style="display:flex; align-items:center; gap:8px; margin: 12px 0;">
-          <input type="checkbox" id="settingTgEnabled" style="width:18px; height:18px; cursor:pointer;" checked>
+          <input type="checkbox" id="settingTgEnabled" style="width:18px; height:18px; cursor:pointer;">
           <label for="settingTgEnabled" style="font-size:13px; font-weight:700; color:#fff; cursor:pointer;">Enable Instant Telegram Deposit & Payout Alerts</label>
         </div>
 
@@ -2557,21 +2539,21 @@
         </button>
       </div>
 
-      <!-- View: Real SMS & Real Gmail Gateway API -->
+      <!-- View: SMS & Gateway API -->
       <div id="viewAdminSms" class="admin-tab-view">
         <div style="background: rgba(0, 245, 155, 0.1); border: 1px solid rgba(0, 245, 155, 0.3); border-radius: var(--border-radius-md); padding: 12px; margin-bottom: 14px;">
-          <div style="font-size: 12px; font-weight: 800; color: #00f59b;">📲 Real SMS & Real Gmail Gateway Connected</div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">Sends real 6-digit OTP to mobile phones (+91 SMS) and real Gmail inboxes!</div>
+          <div style="font-size: 12px; font-weight: 800; color: #00f59b;">📲 SMS & OTP Dispatch Configuration</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">Configure external SMS/Email gateway for real OTP verification.</div>
         </div>
 
-        <label class="control-label">Indian Real SMS API Key (Fast2SMS / 2Factor):</label>
-        <input type="text" id="settingFast2SmsKey" class="custom-select" placeholder="Enter Fast2SMS API Key (Optional for Real SIM SMS)" style="font-family: monospace;">
+        <label class="control-label">SMS Gateway API Key (Fast2SMS / 2Factor):</label>
+        <input type="password" id="settingFast2SmsKey" class="custom-select" placeholder="Enter SMS Gateway Key" style="font-family: monospace;">
 
-        <label class="control-label" style="margin-top: 10px;">Gmail / EmailJS Service ID:</label>
-        <input type="text" id="settingEmailJsService" class="custom-select" value="service_zttnfmk" style="font-family: monospace;">
+        <label class="control-label" style="margin-top: 10px;">Email Service ID:</label>
+        <input type="text" id="settingEmailJsService" class="custom-select" placeholder="Enter Email Service ID" style="font-family: monospace;">
 
-        <label class="control-label" style="margin-top: 10px;">EmailJS Public Key / User ID:</label>
-        <input type="text" id="settingEmailJsKey" class="custom-select" value="5ah6nFUwUl7t0dmfC" style="font-family: monospace;">
+        <label class="control-label" style="margin-top: 10px;">Email Public Key / API Key:</label>
+        <input type="password" id="settingEmailJsKey" class="custom-select" placeholder="Enter Public Key" style="font-family: monospace;">
 
         <button type="button" class="btn-action-primary" style="margin-top: 14px; height: 44px;" onclick="window.app && window.app.saveSmsGatewaySettings()">
           <span>💾 Save Gateway API Keys</span>

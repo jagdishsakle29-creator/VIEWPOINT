@@ -124,18 +124,6 @@ class ChickenGame {
 
   generateLaneHazards() {
     this.laneHazards = [];
-    const isPromoWin = localStorage.getItem('viewpoint_promo_win_mode') === 'true';
-
-    if (isPromoWin) {
-      // In Promo Mode: 85% full jackpot runs, 15% realistic close call at lane 6-8 for natural video reactions
-      const isCloseCall = Math.random() < 0.15;
-      const hitLane = isCloseCall ? (Math.floor(Math.random() * 3) + 6) : -1;
-      for (let i = 1; i <= this.totalLanes; i++) {
-        this.laneHazards.push(i === hitLane);
-      }
-      return;
-    }
-
     for (let i = 0; i < this.totalLanes; i++) {
       const isHazard = Math.random() < this.hazardRate;
       this.laneHazards.push(isHazard);
