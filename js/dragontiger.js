@@ -234,9 +234,53 @@ class DragonTigerGame {
       this.ui.onDealingStart({ roundId: this.roundId });
     }
 
-    // 1. Draw Cards
+    // 1. Draw Cards default
     this.dragonCard = this.drawCard();
     this.tigerCard = this.drawCard();
+    while (this.tigerCard.rank === this.dragonCard.rank && this.tigerCard.suit === this.dragonCard.suit) {
+      this.tigerCard = this.drawCard();
+    }
+
+    // If bets placed, query server for authoritative result (SEC-05)
+    const totalBet = this.getTotalBetAmount();
+    if (totalBet > 0 && window.wallet) {
+      try {
+        const uid = window.wallet.activeTelegramId || window.wallet.activeUserId;
+        const apiBase = window.wallet.apiBaseUrl;
+        const res = await fetch(`${apiBase}/api/game/dragontiger/play`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegram_id: uid,
+            bets: this.currentBets
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.dragon_card && data.tiger_card) {
+            this.dragonCard = data.dragon_card;
+            this.tigerCard = data.tiger_card;
+            this.serverPayout = data.payout;
+            this.serverBalance = data.balance;
+            this.serverWinner = data.winner;
+          } else {
+            throw new Error(data.error || "Server resolution failed");
+          }
+        } else {
+          throw new Error("Server error");
+        }
+      } catch (err) {
+        console.error("Dragon Tiger Server Deal Error:", err);
+        // SEC-05: Do NOT resolve locally. Display reconnecting state.
+        if (window.app && window.app.showNotification) {
+          window.app.showNotification("⚠️ Network issue: Reconnecting to casino dealer server...", "error");
+        }
+        this.gameState = 'betting';
+        this.startBettingTimer();
+        return;
+      }
+    }
 
     // 2. Animate Dragon Card Reveal (at 700ms)
     setTimeout(() => {
@@ -345,12 +389,17 @@ class DragonTigerGame {
     }
 
     // Add win to wallet if any payout
-    if (totalWinPayout > 0) {
+    if (this.serverBalance !== undefined) {
+      window.wallet.setServerBalance(this.serverBalance);
+      if (totalWinPayout > 0) window.soundEngine && window.soundEngine.playWin && window.soundEngine.playWin();
+      else if (Object.keys(this.currentBets).length > 0) window.soundEngine && window.soundEngine.playBomb && window.soundEngine.playBomb();
+    } else if (totalWinPayout > 0) {
       window.wallet.addWin(totalWinPayout);
       window.soundEngine && window.soundEngine.playWin && window.soundEngine.playWin();
     } else if (Object.keys(this.currentBets).length > 0) {
       window.soundEngine && window.soundEngine.playBomb && window.soundEngine.playBomb();
     }
+    this.serverBalance = undefined;
 
     // Record in global bet history if user participated
     const totalUserBet = this.getTotalBetAmount();

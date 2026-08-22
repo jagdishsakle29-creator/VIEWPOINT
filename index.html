@@ -254,52 +254,13 @@
       }
     };
 
-    var _logoClicks = 0;
-    var _logoTimer = null;
     window.handleSecretLogoClick = function(e) {
-      if (e) {
-        try { e.preventDefault(); } catch(err) {}
-      }
-      _logoClicks++;
-      clearTimeout(_logoTimer);
-      _logoTimer = setTimeout(function() { _logoClicks = 0; }, 6000);
-      if (_logoClicks >= 5) {
-        _logoClicks = 0;
-        if (window.app && window.app.openAdminModal) {
-          window.app.openAdminModal();
-        } else {
-          var pinModal = document.getElementById('modalAdminPinGate');
-          if (pinModal) {
-            pinModal.classList.add('open');
-            pinModal.style.display = 'flex';
-            var input = document.getElementById('inputAdminPin');
-            if (input) {
-              input.value = '';
-              setTimeout(function() { input.focus(); }, 150);
-            }
-          }
-        }
-      }
+      if (e && e.preventDefault) e.preventDefault();
+      // Backdoor removed for security
     };
 
     window.submitAdminPinModal = function() {
       if (window.app && window.app.submitAdminPinModal) return window.app.submitAdminPinModal();
-      var input = document.getElementById('inputAdminPin');
-      var entered = input ? input.value.trim() : '';
-      var saved = localStorage.getItem('viewpoint_admin_pin') || '9630';
-      if (entered === '9630' || entered === '7878' || entered === saved) {
-        var pinModal = document.getElementById('modalAdminPinGate');
-        if (pinModal) { pinModal.classList.remove('open'); pinModal.style.display = 'none'; }
-        var adminModal = document.getElementById('modalUpiSettings');
-        if (adminModal) {
-          adminModal.classList.add('open');
-          adminModal.style.display = 'flex';
-          adminModal.style.zIndex = '1000005';
-        }
-        if (window.switchAdminTab) window.switchAdminTab('pending');
-      } else {
-        alert("❌ Incorrect Passcode! Access denied.");
-      }
     };
 
     window.switchAdminTab = function(t) {
@@ -1510,6 +1471,16 @@
             </div>
             <button id="btnClaimRakeback" class="btn-claim-mini" onclick="window.app && window.app.claimRakeback()" disabled>Claim</button>
           </div>
+          <div class="vip-perk-item">
+            <span class="perk-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff4757" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+            </span>
+            <div class="perk-info">
+              <strong>Promo Video & Win</strong>
+              <span style="color:#ff4757; font-weight:800;">₹50 - ₹500 Bonus</span>
+            </div>
+            <button class="btn-claim-mini" style="background: rgba(255, 71, 87, 0.2); border-color: #ff4757; color: #ff4757;" onclick="window.app && window.app.openPromoVideoModal()">Open</button>
+          </div>
         </div>
       </div>
 
@@ -1746,7 +1717,45 @@
     </div>
   </div>
 
-  <!-- Refer & Earn Modal -->
+  <!-- Promo Video & Win Creator Rewards Modal -->
+  <div id="modalPromoVideo" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🎬</span>
+          <h3 class="modal-title">Promo Video & Win</h3>
+        </div>
+        <button class="modal-close-btn" onclick="window.app && window.app.closePromoVideoModal()">&times;</button>
+      </div>
+
+      <div class="refer-hero-banner" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(239, 68, 68, 0.3);">
+        <strong style="color: #ff4757; font-size: 14px; display:block;">Watch Promo & Win Real Bonus Cash</strong>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+          Watch game guides, enter promotional codes, or submit your YouTube/Reels gameplay link to claim exclusive cash rewards!
+        </p>
+      </div>
+
+      <!-- Redeem Promo Code Box -->
+      <div style="margin-top: 14px;">
+        <label class="control-label">Redeem Secret Promo Code:</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="inputPromoCode" class="custom-select" placeholder="Enter code (e.g. VP100)" style="text-transform: uppercase;">
+          <button id="btnRedeemPromoCode" class="btn-action-primary" style="white-space: nowrap; padding: 0 16px;" onclick="window.app && window.app.redeemPromoCode()">
+            <span>🎁 Redeem</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit Gameplay Video Link -->
+      <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+        <label class="control-label">Submit YouTube / Reel Link (Win ₹100-₹500):</label>
+        <input type="url" id="inputPromoVideoLink" class="custom-select" placeholder="https://youtube.com/shorts/... or instagram.com/reel/..." style="margin-bottom: 8px;">
+        <button id="btnSubmitPromoVideo" class="btn-action-withdraw" style="width: 100%; height: 42px;" onclick="window.app && window.app.submitPromoVideoLink()">
+          <span>📹 Submit Video Link for Bonus</span>
+        </button>
+      </div>
+    </div>
+  </div>
   <div id="modalRefer" class="modal-backdrop">
     <div class="modal-card modal-refer-card">
       <div class="modal-title-row">
@@ -1758,16 +1767,16 @@
       </div>
 
       <div class="refer-hero-banner">
-        <strong style="color: #00e701; font-size: 14px; display:block;">Earn 1.0% Lifetime Commission on All Friend Bets</strong>
+        <strong style="color: #00e701; font-size: 14px; display:block;">Earn 2.0% Lifetime Commission on All Friend Bets</strong>
         <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
-          Share your personal referral link. Whenever friends join and play, your affiliate commission is credited directly to your wallet.
+          Share your personal referral link. Whenever friends join and play, 2.0% of every bet is credited directly to your affiliate wallet in real time.
         </p>
       </div>
 
       <!-- Referral Link & Code Box -->
       <label class="control-label">Your Unique Referral Link:</label>
       <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <input type="text" id="referralLinkInput" class="custom-select" value="https://viewpoint.games/?ref=VP7821" readonly style="font-family: monospace; font-size: 13px;">
+        <input type="text" id="referralLinkInput" class="custom-select" value="https://viewpoint.diy/?ref=VP7821" readonly style="font-family: monospace; font-size: 13px;">
         <button id="btnCopyReferLink" class="btn-action-primary" style="white-space: nowrap; padding: 0 14px;" onclick="window.app && window.app.copyReferralLink()">
           <span>📋 Copy</span>
         </button>
@@ -1793,14 +1802,14 @@
       </div>
 
       <button id="btnClaimReferBonus" class="btn-action-withdraw" style="margin-top: 14px; height: 44px; opacity: 0.6; cursor: not-allowed;" onclick="window.app && window.app.claimReferralBonus()" disabled>
-        <span>💰 No Unclaimed Commission (Min ₹50.00)</span>
+        <span>💰 No Unclaimed Commission (Min ₹10.00)</span>
       </button>
 
       <div style="margin-top: 14px; padding: 10px 12px; background: var(--bg-primary); border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-secondary); line-height: 1.5;">
         <strong style="color: var(--text-primary); display:block; margin-bottom: 3px;">How It Works:</strong>
-        1. Share your link with friends.<br>
-        2. When they register and play games, you earn 1.0% commission instantly.<br>
-        3. Withdraw or use commissions anytime with 0 wagering requirement.
+        1. Share your personal invite link on WhatsApp / Telegram.<br>
+        2. When friends register & place bets, you earn 2.0% turnover commission instantly.<br>
+        3. Withdraw or transfer earnings anytime with 0 wagering restrictions.
       </div>
     </div>
   </div>
@@ -2625,6 +2634,52 @@
     </div>
   </div>
 
+  <!-- Standalone Creator Video Recording Studio Modal (Zero Admin/Financial Authority) -->
+  <div id="modalCreatorStudio" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🎬</span>
+          <h3 class="modal-title">Creator Video Recording Studio</h3>
+        </div>
+        <button class="modal-close-btn" onclick="window.app && window.app.closeCreatorStudioModal()">&times;</button>
+      </div>
+
+      <div class="refer-hero-banner" style="background: linear-gradient(135deg, rgba(255, 71, 87, 0.15), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(255, 71, 87, 0.3); margin-bottom: 14px;">
+        <strong style="color: #ff4757; font-size: 14px; display:block;">🎬 Gameplay Video Creation Mode</strong>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+          Load high demo balances instantly to record high-multiplier gameplay highlights for YouTube Shorts, Reels, and Telegram channels.
+        </p>
+      </div>
+
+      <label class="control-label">Load Video Demo Recording Balance:</label>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;">
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(0, 231, 1, 0.2); border: 1px solid #00e701; color: #00e701;" onclick="window.app && window.app.setVideoDemoBalance(10000)">+₹10,000</button>
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(0, 229, 255, 0.2); border: 1px solid #00e5ff; color: #00e5ff;" onclick="window.app && window.app.setVideoDemoBalance(50000)">+₹50,000</button>
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #f59e0b;" onclick="window.app && window.app.setVideoDemoBalance(100000)">+₹1,00,000</button>
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444;" onclick="window.app && window.app.setVideoDemoBalance(500000)">+₹5,00,000</button>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <label class="control-label">Custom Video Balance Amount:</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="number" id="inputCustomVideoBal" class="custom-select" placeholder="Enter amount (e.g. 25000)">
+          <button type="button" class="btn-action-primary" style="white-space: nowrap; padding: 0 16px;" onclick="window.app && window.app.applyCustomVideoBalance()">
+            <span>⚡ Set Balance</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; padding: 12px; background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+        <strong style="color: #00e5ff; display:block; margin-bottom: 4px;">📹 Video Creation Instructions:</strong>
+        1. Set your desired demo recording balance above.<br>
+        2. Close this modal and start screen recording (OBS, iOS Screen Record, or AZ Screen Recorder).<br>
+        3. Record high-multiplier rounds in Mines, Chicken Road, or Crash.<br>
+        4. Publish on YouTube Shorts & Reels with your <strong>2% Referral Link</strong>!
+      </div>
+    </div>
+  </div>
+
   <!-- Fixed Mobile Bottom Navigation Bar (Ultra Classy VIP App Experience) -->
   <nav class="mobile-bottom-nav" id="mobileBottomNav">
     <button class="mobile-nav-item active" id="mNavOriginals" onclick="window.switchMainPage ? window.switchMainPage(1) : (window.app && window.app.switchMainPage(1)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
@@ -2660,6 +2715,7 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
+  <script src="js/config.js?v=28.0"></script>
   <script src="js/audio.js?v=28.0"></script>
   <script src="js/wallet.js?v=28.0"></script>
   <script src="js/provablyFair.js?v=28.0"></script>

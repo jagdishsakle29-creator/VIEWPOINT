@@ -86,7 +86,7 @@ class CrashGame {
     return Math.max(1.01, Math.min(120.0, result));
   }
 
-  startGame() {
+  async startGame() {
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
@@ -98,9 +98,10 @@ class CrashGame {
     this.hasCashedOut = false;
     this.currentMultiplier = 1.00;
     this.crashPoint = this.generateCrashPoint();
+    this.roundId = 'CRASH-' + Date.now();
 
     window.wallet.deduct(this.betAmount);
-    window.soundEngine.playBet();
+    window.soundEngine && window.soundEngine.playBet && window.soundEngine.playBet();
     this.startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     this.particles = [];
 
@@ -111,7 +112,29 @@ class CrashGame {
       });
     }
 
+    // Start rendering loop instantly (zero lag)
     this.loop();
+
+    // Fetch authoritative server crash point in background
+    try {
+      const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
+      const apiBase = window.wallet.apiBaseUrl;
+      fetch(`${apiBase}/api/games?action=crash_bet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        body: JSON.stringify({
+          action: 'crash_bet',
+          userId: uid,
+          betAmount: this.betAmount
+        })
+      }).then(r => r.json()).then(data => {
+        if (data && data.success && data.crashPoint) {
+          this.crashPoint = data.crashPoint;
+          this.roundId = data.roundId || this.roundId;
+        }
+      }).catch(() => {});
+    } catch (e) {}
+
     return true;
   }
 
@@ -119,25 +142,44 @@ class CrashGame {
     if (!this.isPlaying || this.isCrashed || this.hasCashedOut) return;
 
     this.hasCashedOut = true;
-    const payout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
+    let payout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
 
     try {
-      const telegramId = window.wallet.activeTelegramId || '78912345';
+      const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
       const apiBase = window.wallet.apiBaseUrl;
-      const res = await fetch(`${apiBase}/api/game/crash/cashout`, {
+      let res = await fetch(`${apiBase}/api/games?action=crash_cashout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
         body: JSON.stringify({
-          telegram_id: telegramId,
-          bet_amount: this.betAmount,
+          action: 'crash_cashout',
+          roundId: this.roundId,
+          userId: uid,
           multiplier: this.currentMultiplier
         })
-      });
+      }).catch(() => null);
 
-      if (res.ok) {
+      if (!res || !res.ok) {
+        res = await fetch(`${apiBase}/api/game/crash/cashout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            round_id: this.roundId,
+            telegram_id: uid,
+            bet_amount: this.betAmount,
+            multiplier: this.currentMultiplier
+          })
+        }).catch(() => null);
+      }
+
+      if (res && res.ok) {
         const data = await res.json();
-        if (data.success && data.balance !== undefined) {
-          window.wallet.setServerBalance(data.balance);
+        if (data.success) {
+          payout = data.payout || payout;
+          if (data.balance !== undefined) {
+            window.wallet.setServerBalance(data.balance);
+          } else {
+            window.wallet.addWin(payout);
+          }
         } else {
           window.wallet.addWin(payout);
         }
@@ -148,7 +190,7 @@ class CrashGame {
       window.wallet.addWin(payout);
     }
 
-    window.soundEngine.playGem(4);
+    window.soundEngine && window.soundEngine.playGem && window.soundEngine.playGem(4);
 
     window.wallet.recordBet({
       game: 'Crash',

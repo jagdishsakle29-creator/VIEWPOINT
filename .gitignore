@@ -1,0 +1,9 @@
+# Production ignores
+backups/
+*.sqlite3-shm
+*.sqlite3-wal
+*.pyc
+__pycache__/
+.DS_Store
+android/
+capacitor.config.json

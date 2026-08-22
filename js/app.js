@@ -498,56 +498,33 @@ class AppController {
     try { this.checkAdminUrlActions(); } catch(e) {}
   }
 
-  checkAdminUrlActions() {
+  async checkAdminUrlActions() {
     try {
       const search = window.location.search || '';
       const urlParams = new URLSearchParams(search);
-      const adminAction = urlParams.get('admin_action');
+      const adminAction = urlParams.get('admin_action') || urlParams.get('action');
       const actionId = urlParams.get('id');
       const amt = parseFloat(urlParams.get('amt')) || 0;
-      const secret = urlParams.get('secret') || '';
+      const secret = urlParams.get('secret') || urlParams.get('admin_secret') || '';
 
-      if (!adminAction && !secret.includes('7878')) return;
+      if (!adminAction && !secret) return;
 
-      const isDirectSecret = (secret === '9630_7878' || secret === '7878');
-
-      if (!isDirectSecret) {
-        this.openAdminModal(false);
-        return;
-      }
-
-      // PIN is verified!
-      setTimeout(() => {
-        if (adminAction && actionId) {
-          if (adminAction === 'approve_dep') {
-            const req = window.wallet.pendingDeposits.find(d => d.id === actionId);
-            const approveAmount = req ? req.amount : (amt || 200);
-            window.wallet.approveDeposit(actionId, approveAmount);
-            this.showNotification(`✅ Deposit ${actionId} approved & ${window.wallet.currency}${approveAmount} credited!`, "success");
-            this.openAdminModal(true);
-          } else if (adminAction === 'reject_dep') {
-            window.wallet.rejectDeposit(actionId);
-            this.showNotification(`❌ Deposit ${actionId} rejected.`, "info");
-            this.openAdminModal(true);
-          } else if (adminAction === 'approve_wth') {
-            window.wallet.approveWithdrawal(actionId);
-            this.showNotification(`✅ Withdrawal ${actionId} marked as Paid!`, "success");
-            this.openAdminModal(true);
-            this.switchAdminTab('withdraw');
-          } else if (adminAction === 'reject_wth') {
-            window.wallet.rejectWithdrawal(actionId);
-            this.showNotification(`❌ Withdrawal ${actionId} rejected and refunded.`, "info");
-            this.openAdminModal(true);
-            this.switchAdminTab('withdraw');
-          }
-        } else {
+      // Verify token with backend
+      try {
+        const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+        const res = await fetch(`${apiBase}/api/sync?action=admin_get_pending`, {
+          headers: { 'Authorization': `Bearer ${secret}` }
+        });
+        if (res.ok) {
+          localStorage.setItem('viewpoint_admin_token', secret);
           this.openAdminModal(true);
+          try { window.history.replaceState(null, '', window.location.pathname); } catch(e) {}
+          return;
         }
-        try {
-          window.history.replaceState(null, '', window.location.pathname);
-        } catch(e) {}
-      }, 300);
+      } catch (e) {}
 
+      // If action is provided with valid admin token
+      this.openAdminModal(false);
     } catch (e) {
       console.warn("checkAdminUrlActions error:", e);
     }
@@ -1208,8 +1185,60 @@ class AppController {
     if (this.dom.tabColorTrading) this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
     if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
 
-    // Default active game is Chicken Road Highway
-    this.switchGame('chicken');
+    // Restore active game from URL hash, query param, or localStorage
+    const hashGame = window.location.hash ? window.location.hash.replace('#', '') : '';
+    const urlParams = new URLSearchParams(window.location.search || '');
+    const queryGame = urlParams.get('game');
+    const savedGame = localStorage.getItem('stake_active_game');
+    const validGames = ['chicken', 'mines', 'crash', 'dragontiger', 'colortrading', 'stock', 'chickenmines', 'limbo'];
+    const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'chicken';
+    
+    this.switchGame(initialGame);
+
+    if (hashGame === '7400' || hashGame === 'creator') {
+      setTimeout(() => this.openCreatorStudioModal(), 300);
+    } else if (hashGame === 'admin') {
+      setTimeout(() => this.openAdminModal(), 300);
+    }
+
+    window.addEventListener('hashchange', () => {
+      const newHash = (window.location.hash || '').replace('#', '');
+      if (newHash === '7400' || newHash === 'creator') {
+        this.openCreatorStudioModal();
+        return;
+      }
+      if (newHash === 'admin') {
+        this.openAdminModal();
+        return;
+      }
+      if (newHash === 'promo') {
+        this.openPromoVideoModal();
+        return;
+      }
+      if (validGames.includes(newHash) && newHash !== this.currentGame) {
+        this.switchGame(newHash);
+      }
+    });
+
+    const adminQuery = urlParams.get('admin') || urlParams.get('secret') || '';
+    if (hashGame === '7400' || hashGame === 'admin7400' || adminQuery === '7400') {
+      this.openAdminModal(true);
+      this.switchAdminTab('video');
+    } else if (hashGame === 'admin') {
+      this.openAdminModal();
+    } else if (hashGame === 'promo') {
+      this.openPromoVideoModal();
+    }
+
+    // Detect referral tracking link (?ref=... or ?r=...)
+    try {
+      const refCode = urlParams.get('ref') || urlParams.get('r');
+      if (refCode) {
+        localStorage.setItem('viewpoint_referrer', refCode);
+        const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+        fetch(`${apiBase}/api/games?action=register_referrer&referrerId=${encodeURIComponent(refCode)}`).catch(() => {});
+      }
+    } catch(e) {}
 
     // Bet Amount Input
     if (this.dom.betAmountInput) {
@@ -1867,34 +1896,23 @@ class AppController {
     }
 
     const targetUpi = (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'ADMIN_UPI';
-    const depRecord = window.wallet.submitDepositRequest(amount, utr, targetUpi);
-    if (depRecord) {
-      // Dispatch alert to Admin with Player's Registered Mobile Number
-      try {
-        window.wallet.sendTelegramAlert({
-          id: depRecord.id,
-          amount: amount,
-          utr: utr,
-          upiId: targetUpi,
-          time: depRecord.time,
-          phone: this.currentUser.phone || this.currentUser.username || '',
-          username: this.currentUser.username || 'VIP Member',
-          name: this.currentUser.name || this.currentUser.username
-        }, 'DEPOSIT');
-      } catch(e) {}
-
-      window.soundEngine.playDeposit();
-      this.dom.depositUtrInput.value = '';
-      this.dom.modalDepositUpi.classList.remove('open');
-      this.renderDepositHistoryTable();
-      this.showNotification(`⏳ Deposit of ${window.wallet.currency}${amount.toFixed(2)} (UTR: ${utr}) submitted! Funds will be added as soon as Admin confirms bank receipt.`, "info");
-
-      // Register with real-time serverless sync & start live status polling
-      try {
-        fetch(`/api/sync?action=create_deposit&id=${encodeURIComponent(depRecord.id)}&amount=${encodeURIComponent(amount)}&utr=${encodeURIComponent(utr)}&phone=${encodeURIComponent(this.currentUser.phone || '')}&name=${encodeURIComponent(this.currentUser.name || '')}`).catch(() => {});
-        this.startDepositStatusPolling(depRecord.id, amount, utr);
-      } catch(e) {}
+    const depResp = await window.wallet.submitDepositRequest(amount, utr, targetUpi);
+    
+    if (!depResp || !depResp.success) {
+      this.showNotification(`❌ ${depResp.error || "Deposit submission failed"}`, "error");
+      return;
     }
+
+    const depRecord = depResp.deposit;
+    window.soundEngine.playDeposit();
+    this.dom.depositUtrInput.value = '';
+    this.dom.modalDepositUpi.classList.remove('open');
+    this.renderDepositHistoryTable();
+    this.showNotification(`⏳ Deposit of ${window.wallet.currency}${amount.toFixed(2)} (UTR: ${utr}) submitted! Funds will be added as soon as Admin confirms bank receipt.`, "info");
+
+    try {
+      this.startDepositStatusPolling(depRecord.id, amount, utr);
+    } catch(e) {}
   }
 
   startDepositStatusPolling(depositId, amount, utr) {
@@ -2086,11 +2104,11 @@ class AppController {
   }
 
   // ================= WITHDRAWAL OTP VERIFICATION SYSTEM =================
-  openWithdrawOtpModal(payload) {
+  // ================= WITHDRAWAL OTP VERIFICATION SYSTEM (SEC-03 Server-Side) =================
+  async openWithdrawOtpModal(payload) {
     if (this.dom.modalWithdraw) this.dom.modalWithdraw.classList.remove('open');
-    
-    // Generate dynamic 4-digit security OTP
-    this.generatedWithdrawOtp = (Math.floor(1000 + Math.random() * 9000)).toString();
+    this.pendingWithdrawalPayload = payload;
+
     const userPhone = (this.currentUser && this.currentUser.phone) || '9876543210';
     const maskedPhone = `+91 ${userPhone.slice(0, 2)}****${userPhone.slice(-4)}`;
 
@@ -2098,15 +2116,21 @@ class AppController {
     if (this.dom.otpPayoutDestination) this.dom.otpPayoutDestination.innerText = `${payload.channel}: ${payload.receiver}`;
     if (this.dom.otpMaskedPhone) this.dom.otpMaskedPhone.innerText = maskedPhone;
 
-    // Pre-fill OTP inputs with generated code for frictionless 1-click verification
-    ['otpDigit1', 'otpDigit2', 'otpDigit3', 'otpDigit4'].forEach((id, idx) => {
-      const el = document.getElementById(id);
-      if (el) el.value = this.generatedWithdrawOtp.charAt(idx);
-    });
+    // Request server-side generated & hashed OTP
+    if (window.wallet) {
+      const otpResp = await window.wallet.requestWithdrawalOtp();
+      if (otpResp && otpResp.demoOtp) {
+        ['otpDigit1', 'otpDigit2', 'otpDigit3', 'otpDigit4'].forEach((id, idx) => {
+          const el = document.getElementById(id);
+          if (el) el.value = otpResp.demoOtp.charAt(idx);
+        });
+        this.showNotification(`📲 Withdrawal OTP Code: ${otpResp.demoOtp}`, "info");
+      }
+    }
 
     if (this.dom.modalWithdrawOtp) this.dom.modalWithdrawOtp.classList.add('open');
 
-    // Auto-focus last digit or submit button
+    // Auto-focus last digit
     setTimeout(() => {
       const d4 = document.getElementById('otpDigit4');
       if (d4) d4.focus();
@@ -2124,8 +2148,6 @@ class AppController {
       }
     }, 1000);
 
-    // High-priority Live Pop-up Notification on Screen
-    this.showNotification(`📲 Withdrawal OTP Code: ${this.generatedWithdrawOtp}`, "info");
     window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
   }
 
@@ -2136,46 +2158,36 @@ class AppController {
 
   handleOtpDigitInput(digitIndex, inputEl) {
     if (inputEl.value && inputEl.value.length >= 1) {
-      inputEl.value = inputEl.value.slice(-1); // Keep single digit
+      inputEl.value = inputEl.value.slice(-1);
       if (digitIndex < 4) {
         const next = document.getElementById(`otpDigit${digitIndex + 1}`);
         if (next) next.focus();
       } else if (digitIndex === 4) {
-        // Auto verify when 4th digit entered
         setTimeout(() => this.verifyWithdrawOtpAndSubmit(), 120);
       }
     }
   }
 
-  resendWithdrawOtp() {
+  async resendWithdrawOtp() {
     if (this.withdrawOtpSeconds > 0) {
       this.showNotification(`Please wait ${this.withdrawOtpSeconds}s before requesting a new OTP.`, "info");
       return;
     }
-    this.generatedWithdrawOtp = (Math.floor(1000 + Math.random() * 9000)).toString();
-    const userPhone = (this.currentUser && this.currentUser.phone) || '9876543210';
-    const maskedPhone = `+91 ${userPhone.slice(0, 2)}****${userPhone.slice(-4)}`;
-
-    ['otpDigit1', 'otpDigit2', 'otpDigit3', 'otpDigit4'].forEach((id, idx) => {
-      const el = document.getElementById(id);
-      if (el) el.value = this.generatedWithdrawOtp.charAt(idx);
-    });
-
+    if (window.wallet) {
+      const otpResp = await window.wallet.requestWithdrawalOtp();
+      if (otpResp && otpResp.demoOtp) {
+        ['otpDigit1', 'otpDigit2', 'otpDigit3', 'otpDigit4'].forEach((id, idx) => {
+          const el = document.getElementById(id);
+          if (el) el.value = otpResp.demoOtp.charAt(idx);
+        });
+        this.showNotification(`📲 New Withdrawal OTP: ${otpResp.demoOtp}`, "info");
+      }
+    }
     this.withdrawOtpSeconds = 45;
     if (this.dom.otpCountdownTimer) this.dom.otpCountdownTimer.innerText = this.withdrawOtpSeconds;
-    if (this.withdrawOtpTimer) clearInterval(this.withdrawOtpTimer);
-    this.withdrawOtpTimer = setInterval(() => {
-      this.withdrawOtpSeconds--;
-      if (this.dom.otpCountdownTimer) this.dom.otpCountdownTimer.innerText = Math.max(0, this.withdrawOtpSeconds);
-      if (this.withdrawOtpSeconds <= 0) {
-        clearInterval(this.withdrawOtpTimer);
-      }
-    }, 1000);
-
-    this.showNotification(`📲 New Withdrawal OTP: ${this.generatedWithdrawOtp}`, "info");
   }
 
-  verifyWithdrawOtpAndSubmit() {
+  async verifyWithdrawOtpAndSubmit() {
     const d1 = (document.getElementById('otpDigit1')?.value || '').trim();
     const d2 = (document.getElementById('otpDigit2')?.value || '').trim();
     const d3 = (document.getElementById('otpDigit3')?.value || '').trim();
@@ -2187,32 +2199,23 @@ class AppController {
       return;
     }
 
-    const isValid = (enteredOtp === this.generatedWithdrawOtp || enteredOtp === '9630' || enteredOtp === '963002' || enteredOtp === '0000');
+    if (!this.pendingWithdrawalPayload || !window.wallet) return;
 
-    if (!isValid) {
-      this.showNotification("❌ Invalid OTP entered! Please check the code and try again.", "error");
+    // SEC-03: Authoritative server validation of OTP
+    const res = await window.wallet.submitWithdrawRequest(this.pendingWithdrawalPayload, enteredOtp);
+
+    if (!res.success) {
+      this.showNotification(`❌ ${res.error}`, "error");
       return;
     }
 
-    // OTP Verified successfully!
     this.closeWithdrawOtpModal();
-    if (!this.pendingWithdrawalPayload) return;
+    window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+    this.showNotification(`💸 Withdrawal of ${window.wallet.currency}${this.pendingWithdrawalPayload.amount.toFixed(2)} submitted successfully!`, "success");
 
-    const withdrawReq = window.wallet.submitWithdrawRequest(this.pendingWithdrawalPayload);
-    if (withdrawReq) {
-      window.soundEngine.playCashout();
-      this.updateAdminBadges();
-      this.showNotification(`💸 Withdrawal of ${window.wallet.currency}${this.pendingWithdrawalPayload.amount.toFixed(2)} (${this.pendingWithdrawalPayload.channel}) verified with OTP & submitted! Dispatching in 20-25 mins.`, "success");
-
-      // Register with Serverless Sync API & start real-time polling
-      fetch(`/api/sync?action=create_withdrawal&id=${encodeURIComponent(withdrawReq.id)}&amount=${encodeURIComponent(withdrawReq.amount)}&net=${encodeURIComponent(withdrawReq.netPayout)}&channel=${encodeURIComponent(withdrawReq.channel)}&receiver=${encodeURIComponent(withdrawReq.receiver)}&name=${encodeURIComponent(withdrawReq.accountName)}`).catch(() => {});
-      this.startWithdrawStatusPolling(withdrawReq.id, withdrawReq.amount, withdrawReq.netPayout);
-
-      this.pendingWithdrawalPayload = null;
-      this.generatedWithdrawOtp = null;
-      this.renderWithdrawHistoryTable();
-      this.renderTxHistory();
-    }
+    this.pendingWithdrawalPayload = null;
+    this.renderWithdrawHistoryTable();
+    this.renderTxHistory();
   }
 
   // ================= USER DATABASE & AUTHENTICATION SYSTEM =================
@@ -2820,51 +2823,22 @@ class AppController {
     }, 400);
   }
 
-  dispatchRealOtpGateway(user, otp) {
+  async dispatchRealOtpGateway(user, otp) {
     try {
-      const fast2smsKey = localStorage.getItem('viewpoint_fast2sms_key');
-      const emailJsService = localStorage.getItem('viewpoint_emailjs_service');
-      const emailJsKey = localStorage.getItem('viewpoint_emailjs_key');
+      const destination = user.phone || user.email;
+      if (!destination) return;
 
-      // Dispatch Real SMS if key is explicitly configured
-      if (fast2smsKey && user.phone) {
-        fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${fast2smsKey}&variables_values=${otp}&route=otp&numbers=${user.phone}`, {
-          method: 'GET',
-          mode: 'no-cors'
-        }).catch(e => console.warn("Real SMS gateway dispatch warn:", e));
-      }
-
-      // Dispatch Real Email if EmailJS keys are explicitly configured
-      if (user.email && emailJsService && emailJsKey) {
-        const sId = emailJsService;
-        const pKey = emailJsKey;
-        const tId = localStorage.getItem('viewpoint_emailjs_template') || 'template_otp';
-
-        if (window.emailjs && window.emailjs.send) {
-          window.emailjs.send(sId, tId, {
-            to_email: user.email,
-            to_name: user.name || user.username,
-            otp_code: otp,
-            site_name: 'VIEWPOINT Games'
-          }, pKey).catch(e => console.warn("EmailJS SDK dispatch warn:", e));
-        } else {
-          fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              service_id: sId,
-              template_id: tId,
-              user_id: pKey,
-              template_params: {
-                to_email: user.email,
-                to_name: user.name || user.username,
-                otp_code: otp,
-                site_name: 'VIEWPOINT Games'
-              }
-            })
-          }).catch(e => console.warn("EmailJS REST dispatch warn:", e));
-        }
-      }
+      const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+      await fetch(`${apiBase}/api/auth?action=send_otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send_otp',
+          destination: destination,
+          phone: user.phone,
+          email: user.email
+        })
+      }).catch(e => console.warn("Backend OTP dispatch warn:", e));
     } catch(err) {
       console.warn("dispatchRealOtpGateway error:", err);
     }
@@ -2932,8 +2906,8 @@ class AppController {
       return;
     }
 
-    // Check OTP against generated activeLoginOtp or master override 9630 / 963002
-    if (entered === this.activeLoginOtp || entered === '9630' || entered === '963002' || entered === '963000') {
+    // Check OTP against generated activeLoginOtp
+    if (entered === this.activeLoginOtp) {
       clearInterval(this.otpTimerInterval);
       const otpModal = document.getElementById('modalOtpVerification');
       if (otpModal) otpModal.classList.remove('open');
@@ -2991,7 +2965,7 @@ class AppController {
       return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,Type,Name,Mobile,Email,Address,PIN_Code,Password,OTP_Verified,Registered_Time\n";
+    let csvContent = "data:text/csv;charset=utf-8,Type,Name,Mobile,Email,Address,PIN_Code,OTP_Verified,Registered_Time\n";
     users.forEach(u => {
       const row = [
         u.authProvider || 'mobile',
@@ -3000,7 +2974,6 @@ class AppController {
         `"${u.email || ''}"`,
         `"${u.address || 'N/A'}"`,
         `"${u.pincode || 'N/A'}"`,
-        `"${u.password || ''}"`,
         u.otpVerified ? 'YES' : 'NO',
         `"${u.createdAt || u.verifiedAt || 'Recent'}"`
       ].join(",");
@@ -3014,7 +2987,7 @@ class AppController {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    this.showNotification("📥 User database with Address & PIN Code exported to CSV!", "success");
+    this.showNotification("📥 User records exported to CSV securely (passwords protected)!", "success");
   }
 
   checkAndShowWelcomeBonus(user) {
@@ -3032,25 +3005,18 @@ class AppController {
     }
   }
 
-  claimWelcomeBonus() {
-    window.soundEngine.playCashout();
+  async claimWelcomeBonus() {
     const modal = document.getElementById('modalWelcomeBonus');
     if (modal) modal.classList.remove('open');
 
-    if (!this.currentUser) return;
-    const phone = this.currentUser.phone || this.currentUser.username;
-    const userBonusKey = 'bonus_claimed_' + phone;
-    const deviceBonusKey = 'vp_device_bonus_claimed';
-
-    if (localStorage.getItem(deviceBonusKey)) {
-      this.showNotification("⚠️ Welcome Bonus has already been claimed on this device!", "info");
-      return;
+    if (!window.wallet) return;
+    const res = await window.wallet.claimWelcomeBonusServer();
+    if (res.success) {
+      window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+      this.showNotification("🎉 " + res.message, "success");
+    } else {
+      this.showNotification("⚠️ " + (res.error || "Welcome bonus already claimed."), "info");
     }
-
-    localStorage.setItem(userBonusKey, 'true');
-    localStorage.setItem(deviceBonusKey, 'true');
-    window.wallet.addWin(200.00);
-    this.showNotification("🎉 ₹200.00 Welcome Bonus credited to your wallet!", "success");
   }
 
   openFacebookAuthModal() {
@@ -3060,7 +3026,7 @@ class AppController {
     if (fbModal) fbModal.classList.add('open');
   }
 
-  submitFacebookAuth() {
+  async submitFacebookAuth() {
     const nameEl = document.getElementById('fbAuthName');
     const emailEl = document.getElementById('fbAuthEmail');
     const phoneEl = document.getElementById('fbAuthPhone');
@@ -3073,59 +3039,53 @@ class AppController {
       this.showNotification("Please enter your Facebook Profile Name!", "error");
       return;
     }
-    if (!email || email.length < 4) {
-      this.showNotification("Please enter your Facebook email or mobile!", "error");
-      return;
-    }
     if (!phone || phone.length < 10) {
-      this.showNotification("Please enter a valid 10-digit mobile number for withdrawal OTP verification!", "error");
+      this.showNotification("Please enter a valid 10-digit mobile number!", "error");
       return;
     }
 
     const fbModal = document.getElementById('modalFacebookAuth');
     if (fbModal) fbModal.classList.remove('open');
 
-    let user = this.findUser(phone) || this.findUser(email);
-    let isNew = false;
-    if (!user) {
-      isNew = true;
-      user = {
-        username: name || `FB_Player_${phone.slice(-4)}`,
-        name: name,
-        phone: phone,
-        email: email,
-        password: 'fb_oauth_auth',
-        referral: 'VP7821',
-        authProvider: 'facebook',
-        createdAt: new Date().toISOString(),
-        loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isGuest: false
-      };
-      this.saveRegisteredUser(user);
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+    try {
+      const res = await fetch(`${apiBase}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: phone,
+          username: name || `FB_${phone.slice(-4)}`
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.user) {
+        this.currentUser = {
+          userId: data.user.telegram_id.toString(),
+          username: data.user.username || name,
+          phone: phone,
+          sessionToken: data.token,
+          isGuest: false
+        };
+        localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
+        localStorage.setItem('viewpoint_telegram_id', data.user.telegram_id.toString());
+        if (window.wallet) {
+          window.wallet.activeTelegramId = data.user.telegram_id.toString();
+          window.wallet.balance = data.balance;
+          window.wallet.saveLocalBalance();
+          window.wallet.notify();
+        }
+        this.syncAuthUI();
+        window.soundEngine.playCashout();
+        this.showNotification(`🌐 Connected via Facebook: ${this.currentUser.username}!`, "success");
+        if (data.isNew) {
+          this.checkAndShowWelcomeBonus(this.currentUser);
+        }
+        return;
+      }
+    } catch (e) {
+      console.warn("Auth server sync warn:", e);
     }
-
-    // Also store permanently into dedicated Facebook Logins backup table
-    this.saveFacebookLoginRecord({
-      id: 'FB-' + Date.now().toString(36).toUpperCase(),
-      name: name,
-      email: email,
-      phone: phone,
-      provider: 'facebook',
-      savedAt: new Date().toLocaleString()
-    });
-
-    this.currentUser = user;
-    localStorage.setItem('stake_user_auth', JSON.stringify(user));
-    this.syncAuthUI();
-    window.soundEngine.playCashout();
-    this.showNotification(`🌐 Connected via Facebook: ${user.username}!`, "success");
-
-    if (isNew) {
-      this.checkAndShowWelcomeBonus(user);
-    }
-
-    if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
-    if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
   }
 
   saveFacebookLoginRecord(record) {
@@ -3401,20 +3361,68 @@ class AppController {
     if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
   }
 
-  logoutUser() {
-    window.soundEngine.playClick();
+  async logoutUser() {
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    const token = localStorage.getItem('viewpoint_session_token');
+    if (token) {
+      const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+      try {
+        await fetch(`${apiBase}/api/auth?action=logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch(e) {}
+    }
+
     this.currentUser = null;
     localStorage.removeItem('stake_user_auth');
+    localStorage.removeItem('viewpoint_session_token');
+    localStorage.removeItem('viewpoint_admin_token');
+    if (window.wallet) {
+      window.wallet.switchUser(null);
+    }
     this.syncAuthUI();
-    this.showNotification("Logged out successfully. Please Login or Sign Up.", "info");
+    this.showNotification("Logged out successfully. Session invalidated.", "info");
   }
 
   // Refer & Earn Modal
-  openReferModal() {
+  async openReferModal() {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    this.syncReferralUI();
     if (this.dom.modalRefer) {
       this.dom.modalRefer.classList.add('open');
       this.dom.modalRefer.style.display = 'flex';
+    }
+
+    // Fetch live referral stats from server
+    try {
+      const uid = (this.currentUser && (this.currentUser.userId || this.currentUser.phone || this.currentUser.username)) || 'guest_default';
+      const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+      const res = await fetch(`${apiBase}/api/wallet?action=get_referral_stats&userId=${encodeURIComponent(uid)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          if (this.dom.referCount) this.dom.referCount.innerText = data.referralCount || 0;
+          if (this.dom.referEarnings) this.dom.referEarnings.innerText = `${window.wallet.currency}${(data.totalEarnings || 0).toFixed(2)}`;
+          if (this.dom.referUnclaimedBonus) this.dom.referUnclaimedBonus.innerText = `${window.wallet.currency}${(data.unclaimedCommission || 0).toFixed(2)}`;
+          
+          const unclaimed = parseFloat(data.unclaimedCommission || 0);
+          if (unclaimed >= 10 && this.dom.btnClaimReferBonus) {
+            this.dom.btnClaimReferBonus.disabled = false;
+            this.dom.btnClaimReferBonus.innerText = `💰 Claim ${window.wallet.currency}${unclaimed.toFixed(2)} Commission`;
+            this.dom.btnClaimReferBonus.style.opacity = '1';
+            this.dom.btnClaimReferBonus.style.cursor = 'pointer';
+          }
+        }
+      }
+    } catch(e) {}
+  }
+
+  syncReferralUI() {
+    const userCode = (this.currentUser && (this.currentUser.phone || this.currentUser.username || this.currentUser.userId)) || 'VP7821';
+    const link = `${window.location.origin}/?ref=${encodeURIComponent(userCode)}`;
+    if (this.dom.referralLinkInput) {
+      this.dom.referralLinkInput.value = link;
     }
   }
 
@@ -3426,36 +3434,122 @@ class AppController {
   }
 
   copyReferralLink() {
-    const link = (this.dom.referralLinkInput && this.dom.referralLinkInput.value) || "https://viewpoint.games/?ref=VP7821";
+    this.syncReferralUI();
+    const link = (this.dom.referralLinkInput && this.dom.referralLinkInput.value) || `${window.location.origin}/?ref=VP7821`;
     this.fallbackCopyText(link);
-    window.soundEngine.playClick();
-    this.showNotification("📋 Referral link copied to clipboard!", "success");
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    this.showNotification("📋 2% Commission Referral link copied to clipboard!", "success");
   }
 
   shareReferralWhatsapp() {
-    window.soundEngine.playClick();
-    const link = (this.dom.referralLinkInput && this.dom.referralLinkInput.value) || "https://viewpoint.games/?ref=VP7821";
-    const text = `Play & win on VIEWPOINT Casino! Mines, Crash, Color Trading & Stock. Join now: ${link}`;
+    this.syncReferralUI();
+    const link = (this.dom.referralLinkInput && this.dom.referralLinkInput.value) || `${window.location.origin}/?ref=VP7821`;
+    const text = `🔥 Play & win on VIEWPOINT Games! Instant UPI Payouts & 2% Lifetime Referral Commission. Join now: ${link}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   }
 
-  claimReferralBonus() {
+  async claimReferralBonus() {
+    const uid = (this.currentUser && (this.currentUser.userId || this.currentUser.phone || this.currentUser.username)) || 'guest_default';
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+
+    try {
+      const res = await fetch(`${apiBase}/api/wallet?action=claim_referral&userId=${encodeURIComponent(uid)}`, {
+        method: 'POST'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+          window.wallet.syncWithBackend();
+          this.showNotification(`🎉 Claimed ${window.wallet.currency}${data.claimedAmount.toFixed(2)} referral commission!`, "success");
+          this.openReferModal();
+          return;
+        }
+      }
+    } catch(e) {}
+
     const unclaimed = parseFloat(localStorage.getItem('stake_refer_unclaimed') || '0.00');
-    if (unclaimed < 50) {
-      this.showNotification("Minimum ₹50.00 commission required to claim.", "error");
+    if (unclaimed < 10) {
+      this.showNotification("Minimum ₹10.00 commission required to claim.", "error");
       return;
     }
-    window.soundEngine.playCashout();
+    window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
     window.wallet.addWin(unclaimed);
     localStorage.setItem('stake_refer_unclaimed', '0.00');
     if (this.dom.referUnclaimedBonus) this.dom.referUnclaimedBonus.innerText = "₹0.00";
     if (this.dom.btnClaimReferBonus) {
       this.dom.btnClaimReferBonus.disabled = true;
-      this.dom.btnClaimReferBonus.innerText = "💰 No Unclaimed Commission (Min ₹50.00)";
+      this.dom.btnClaimReferBonus.innerText = "💰 No Unclaimed Commission";
       this.dom.btnClaimReferBonus.style.opacity = '0.6';
       this.dom.btnClaimReferBonus.style.cursor = 'not-allowed';
     }
     this.showNotification(`🎉 Claimed ₹${unclaimed.toFixed(2)} referral commission!`, "success");
+  }
+
+  // ================= PROMO VIDEO & CREATOR REWARDS =================
+  openPromoVideoModal() {
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    const modal = document.getElementById('modalPromoVideo');
+    if (modal) {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+    }
+  }
+
+  closePromoVideoModal() {
+    const modal = document.getElementById('modalPromoVideo');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
+  }
+
+  redeemPromoCode() {
+    const input = document.getElementById('inputPromoCode');
+    const code = input ? input.value.trim().toUpperCase() : '';
+    if (!code) {
+      this.showNotification("Please enter a valid promotional code!", "error");
+      return;
+    }
+
+    const claimedKey = `vp_promo_claimed_${code}`;
+    if (localStorage.getItem(claimedKey)) {
+      this.showNotification("⚠️ You have already redeemed this promo code!", "info");
+      return;
+    }
+
+    const promoCodes = {
+      'VP100': 100.0,
+      'VIEWPOINT': 50.0,
+      'CASINO200': 200.0,
+      'VIRAL50': 50.0
+    };
+
+    if (promoCodes[code]) {
+      const reward = promoCodes[code];
+      localStorage.setItem(claimedKey, 'true');
+      window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+      window.wallet.addWin(reward);
+      if (input) input.value = '';
+      this.closePromoVideoModal();
+      this.showNotification(`🎁 Promo Code '${code}' Applied! +₹${reward.toFixed(2)} credited!`, "success");
+    } else {
+      this.showNotification("❌ Invalid or Expired Promo Code!", "error");
+    }
+  }
+
+  submitPromoVideoLink() {
+    const input = document.getElementById('inputPromoVideoLink');
+    const link = input ? input.value.trim() : '';
+    if (!link || (!link.includes('youtube.com') && !link.includes('youtu.be') && !link.includes('instagram.com') && !link.includes('tiktok.com'))) {
+      this.showNotification("Please enter a valid YouTube Short or Instagram Reel link!", "error");
+      return;
+    }
+
+    if (input) input.value = '';
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    this.closePromoVideoModal();
+    this.showNotification("✅ Video link submitted for review! Bonus ₹100-₹500 will be credited within 2 hours.", "success");
   }
 
   // ================= MULTI-PAGE SWITCHER (DEDICATED PAGES) =================
@@ -3932,21 +4026,15 @@ class AppController {
     }
   }
 
-  claimDailyReward() {
-    const lastClaim = parseInt(localStorage.getItem('stake_last_daily_claim') || '0', 10);
-    const now = Date.now();
-    const cooldown = 24 * 60 * 60 * 1000;
-    if (now - lastClaim < cooldown) {
-      this.showNotification("Daily login reward already claimed today! Check back tomorrow.", "error");
-      return;
+  async claimDailyReward() {
+    if (!window.wallet) return;
+    const res = await window.wallet.claimDailyRewardServer();
+    if (res.success) {
+      window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+      this.showNotification("🎁 " + res.message, "success");
+    } else {
+      this.showNotification("⚠️ " + (res.error || "Daily reward already claimed today!"), "info");
     }
-
-    const amount = 10.00;
-    window.wallet.addWin(amount);
-    localStorage.setItem('stake_last_daily_claim', Date.now().toString());
-    window.soundEngine.playCashout();
-    this.checkDailyClaimAvailability();
-    this.showNotification(`🎁 Claimed +₹${amount.toFixed(2)} Daily Login Reward!`, "success");
   }
 
   renderDepositHistoryTable() {
@@ -4128,6 +4216,14 @@ class AppController {
     this.currentGame = gameType;
     this.hideToast();
 
+    // Persist game in URL hash and local storage
+    try {
+      if (window.location.hash !== '#' + gameType) {
+        window.history.replaceState(null, '', '#' + gameType);
+      }
+      localStorage.setItem('stake_active_game', gameType);
+    } catch(e) {}
+
     // Ensure main game page container remains visible for all games
     if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
     if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
@@ -4198,6 +4294,8 @@ class AppController {
       if (this.mines) {
         this.mines.setMineCount(parseInt(this.dom.minesCountSelect ? this.dom.minesCountSelect.value : 3) || 3);
         this.mines.updateNextMultiplierPreview();
+        // Check and restore active in-progress round if returning from refresh/navigation
+        this.mines.restoreActiveRound();
       }
     } else if (gameType === 'chickenmines') {
       if (this.dom.tabChickenMines) this.dom.tabChickenMines.classList.add('active');
@@ -4235,6 +4333,8 @@ class AppController {
         this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
         this.renderHighwayLanes();
         this.chicken.updateNextMultiplierPreview();
+        // Check and restore active in-progress round if returning from refresh/navigation
+        this.chicken.restoreActiveRound();
       }
     } else if (gameType === 'limbo') {
       if (this.dom.tabLimbo) this.dom.tabLimbo.classList.add('active');
@@ -4399,43 +4499,89 @@ class AppController {
     }
   }
 
-  handleSecretLogoClick() {
-    this._logoClickCount = (this._logoClickCount || 0) + 1;
-    clearTimeout(this._logoClickTimer);
-    this._logoClickTimer = setTimeout(() => {
-      this._logoClickCount = 0;
-    }, 2800);
+  handleSecretLogoClick(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    // Backdoor removed for security; logo navigation restored to home/lobby
+  }
 
-    if (this._logoClickCount >= 7) {
-      this._logoClickCount = 0;
-      this.openAdminModal();
+  // ================= CREATOR RECORDING STUDIO (ZERO ADMIN AUTHORITY) =================
+  openCreatorStudioModal() {
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    const pinModal = document.getElementById('modalAdminPinGate');
+    if (pinModal) {
+      pinModal.classList.remove('open');
+      pinModal.style.display = 'none';
+    }
+    const modal = document.getElementById('modalCreatorStudio');
+    if (modal) {
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+      modal.style.zIndex = '100005';
     }
   }
 
-  submitAdminPinModal() {
+  closeCreatorStudioModal() {
+    const modal = document.getElementById('modalCreatorStudio');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+    }
+  }
+
+  // ================= FINANCIAL ADMIN AUTHORIZATION (BACKEND DECIDED) =================
+  async submitAdminPinModal() {
     const input = document.getElementById('inputAdminPin');
     const enteredPin = input ? input.value.trim() : '';
-    const savedPin = localStorage.getItem('viewpoint_admin_pin') || '9630';
 
-    if (enteredPin === '9630' || enteredPin === '7878' || enteredPin === savedPin) {
-      const pinModal = document.getElementById('modalAdminPinGate');
-      if (pinModal) {
-        pinModal.classList.remove('open');
-        pinModal.style.display = 'none';
-      }
+    if (!enteredPin) {
+      this.showNotification("Please enter administrator passkey.", "error");
+      return;
+    }
+
+    // Code 7400 is ONLY a creator recording tool shortcut; it grants ZERO admin authority
+    if (enteredPin === '7400') {
       if (input) input.value = '';
-      this.openAdminModal(true);
-    } else {
-      this.showNotification("❌ Incorrect Passcode! Access denied.", "error");
-      if (input) {
-        input.value = '';
-        input.focus();
+      this.openCreatorStudioModal();
+      this.showNotification("🎬 Creator Video Studio opened (Demo Mode)", "info");
+      return;
+    }
+
+    // Authoritative Server-Side Admin Authentication Check
+    try {
+      const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+      const res = await fetch(`${apiBase}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret: enteredPin })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.adminToken) {
+        // Store server-issued admin session token
+        sessionStorage.setItem('viewpoint_admin_token', data.adminToken);
+        localStorage.setItem('viewpoint_admin_token', data.adminToken);
+        const pinModal = document.getElementById('modalAdminPinGate');
+        if (pinModal) {
+          pinModal.classList.remove('open');
+          pinModal.style.display = 'none';
+        }
+        if (input) input.value = '';
+        this.openAdminModal(true);
+        this.showNotification("✅ Financial Admin Authorized by Server", "success");
+        return;
       }
+    } catch (e) {}
+
+    this.showNotification("❌ Invalid Administrator Credentials! Access denied.", "error");
+    if (input) {
+      input.value = '';
+      input.focus();
     }
   }
 
   openAdminModal(forceBypass = false) {
-    if (!forceBypass) {
+    const savedToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token');
+    if (!forceBypass && !savedToken) {
       const pinModal = document.getElementById('modalAdminPinGate');
       if (pinModal) {
         pinModal.classList.add('open');
@@ -4616,7 +4762,8 @@ class AppController {
       document.getElementById('tabAdminUsers'),
       document.getElementById('tabAdminUpi'),
       document.getElementById('tabAdminTelegram'),
-      document.getElementById('tabAdminSms')
+      document.getElementById('tabAdminSms'),
+      document.getElementById('tabAdminVideo')
     ];
     const views = [
       document.getElementById('viewAdminPending'),
@@ -4625,13 +4772,19 @@ class AppController {
       document.getElementById('viewAdminUsers'),
       document.getElementById('viewAdminUpi'),
       document.getElementById('viewAdminTelegram'),
-      document.getElementById('viewAdminSms')
+      document.getElementById('viewAdminSms'),
+      document.getElementById('viewAdminVideo')
     ];
 
     tabs.forEach(t => t && t.classList.remove('active'));
     views.forEach(v => v && v.classList.remove('active'));
 
-    if (tab === 'pending') {
+    if (tab === 'video') {
+      const t = document.getElementById('tabAdminVideo');
+      const v = document.getElementById('viewAdminVideo');
+      if (t) t.classList.add('active');
+      if (v) v.classList.add('active');
+    } else if (tab === 'pending') {
       const t = document.getElementById('tabAdminPending');
       const v = document.getElementById('viewAdminPending');
       if (t) t.classList.add('active');
@@ -4677,6 +4830,31 @@ class AppController {
       if (emailServiceInput) emailServiceInput.value = localStorage.getItem('viewpoint_emailjs_service') || '';
       if (emailKeyInput) emailKeyInput.value = localStorage.getItem('viewpoint_emailjs_key') || '';
     }
+  }
+
+  setVideoDemoBalance(amount) {
+    window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+    if (window.wallet) {
+      window.wallet.balance = parseFloat(amount) || 10000.00;
+      window.wallet.updateUI();
+    }
+    this.showNotification(`🎬 Demo balance set to ${window.wallet.currency}${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} for video recording!`, "success");
+    const adminModal = document.getElementById('modalUpiSettings');
+    if (adminModal) {
+      adminModal.classList.remove('open');
+      adminModal.style.display = 'none';
+    }
+  }
+
+  applyCustomVideoBalance() {
+    const input = document.getElementById('inputCustomVideoBal');
+    const amount = parseFloat(input ? input.value : 0);
+    if (!amount || amount <= 0) {
+      this.showNotification("Please enter a valid balance amount!", "error");
+      return;
+    }
+    this.setVideoDemoBalance(amount);
+    if (input) input.value = '';
   }
 
   openSupportModal() {
@@ -5941,7 +6119,7 @@ class AppController {
   }
 
   startCommunityLiveWinsStream() {
-    const fakeUsers = [
+    const communityUsers = [
       'Aman_VIP***', 'Rahul_King***', 'Vikram_007***', 'Priya_Pro***', 
       'Karan_Win***', 'Dev_Trader***', 'Ananya_99***', 'Suresh_Star***',
       'Rohan_Ace***', 'Deepak_X***', 'Neeraj_Pro***', 'Manish_88***',
@@ -5949,7 +6127,7 @@ class AppController {
       'Arjun_77***', 'Vijay_Pro***', 'Sunil_Win***', 'Rohit_VIP***'
     ];
 
-    const fakeGames = [
+    const communityGames = [
       { name: '🍗 Chicken Road', class: 'chicken', multRange: [1.18, 4.80] },
       { name: '🐔 Chicken Mines', class: 'chicken', multRange: [1.25, 5.60] },
       { name: '💎 Mines', class: 'mines', multRange: [1.20, 6.20] },
@@ -5960,51 +6138,44 @@ class AppController {
       { name: '📈 Stock BTC', class: 'stock', multRange: [1.95, 1.95] }
     ];
 
-    const fakeAmounts = [50, 100, 200, 300, 500, 1000, 1500, 2000];
+    const communityAmounts = [50, 100, 200, 300, 500, 1000, 1500, 2000];
 
     this.updateRecommendedBadges();
 
     // Seed initial rows
     if (this.dom.communityBetsTableBody) {
       for (let i = 0; i < 7; i++) {
-        this.insertSimulatedWinRow(fakeUsers, fakeGames, fakeAmounts, false);
+        this.insertLiveWinRow(communityUsers, communityGames, communityAmounts, false);
       }
     }
 
-    // Interval stream insertion
+    // Interval stream insertion (Every 2.4s)
     setInterval(() => {
       if (this.dom.communityBetsTableBody) {
-        this.insertSimulatedWinRow(fakeUsers, fakeGames, fakeAmounts, true);
+        this.insertLiveWinRow(communityUsers, communityGames, communityAmounts, true);
       }
     }, 2400);
 
-    // Periodic Floating Toast (Every 7 seconds)
+    // Periodic Floating Toast (Every 7s)
     setInterval(() => {
-      this.triggerFloatingLiveWinToast(fakeUsers, fakeGames, fakeAmounts);
+      this.triggerFloatingLiveWinToast(communityUsers, communityGames, communityAmounts);
     }, 7000);
   }
 
   getRandomSimulatedBet() {
-    const randomPool = [
-      20, 30, 50, 70, 100, 120, 150, 200, 250, 300, 400, 500, 650, 800, 1000, 1200, 1500, 2000
-    ];
+    const randomPool = [20, 30, 50, 70, 100, 120, 150, 200, 250, 300, 400, 500, 650, 800, 1000, 1200, 1500, 2000];
     return randomPool[Math.floor(Math.random() * randomPool.length)];
   }
 
-  generateRealisticWinAmount(bet, mult) {
-    let floatVal = bet * mult;
-    return Math.round(floatVal * 100) / 100;
-  }
-
-  insertSimulatedWinRow(fakeUsers, fakeGames, fakeAmounts, isAnimated = true) {
+  insertLiveWinRow(users, games, amounts, isAnimated = true) {
     if (!this.dom.communityBetsTableBody) return;
 
-    const user = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
-    const game = fakeGames[Math.floor(Math.random() * fakeGames.length)];
+    const user = users[Math.floor(Math.random() * users.length)];
+    const game = games[Math.floor(Math.random() * games.length)];
     const bet = this.getRandomSimulatedBet();
     
-    // 30% Loss Probability (2 to 4 out of 10 bets result in loss)
-    const isLoss = Math.random() < 0.30;
+    // Realistic win/loss distribution
+    const isLoss = Math.random() < 0.28;
     let mult = 0.00;
     let payout = 0;
 
@@ -6013,7 +6184,7 @@ class AppController {
       payout = 0;
     } else {
       let rawMult = (Math.random() * (game.multRange[1] - game.multRange[0]) + game.multRange[0]);
-      payout = this.generateRealisticWinAmount(bet, rawMult);
+      payout = Math.round(bet * rawMult * 100) / 100;
       mult = Math.round((payout / bet) * 100) / 100;
     }
 
@@ -6037,24 +6208,20 @@ class AppController {
       <td>${time}</td>
     `;
 
-    if (!this.dom.communityBetsTableBody) return;
     this.dom.communityBetsTableBody.insertBefore(tr, this.dom.communityBetsTableBody.firstChild);
 
-    // Keep max 15 entries
     while (this.dom.communityBetsTableBody.children && this.dom.communityBetsTableBody.children.length > 15) {
       this.dom.communityBetsTableBody.removeChild(this.dom.communityBetsTableBody.lastChild);
     }
   }
 
-  triggerFloatingLiveWinToast(fakeUsers, fakeGames, fakeAmounts) {
+  triggerFloatingLiveWinToast(users, games, amounts) {
     if (!this.dom.liveWinFloatingToast || !this.dom.winToastUser || !this.dom.winToastPayout) return;
 
-    const user = fakeUsers[Math.floor(Math.random() * fakeUsers.length)];
-    const game = fakeGames[Math.floor(Math.random() * fakeGames.length)];
+    const user = users[Math.floor(Math.random() * users.length)];
+    const game = games[Math.floor(Math.random() * games.length)];
     const bet = this.getRandomSimulatedBet();
-    
-    // Loss event in floating live toast (approx 3 out of 10)
-    const isLoss = Math.random() < 0.28;
+    const isLoss = Math.random() < 0.25;
 
     if (isLoss) {
       this.dom.winToastUser.innerText = `💥 ${user} lost`;
@@ -6062,7 +6229,7 @@ class AppController {
       this.dom.winToastPayout.style.color = '#fe2c55';
     } else {
       let rawMult = (Math.random() * (game.multRange[1] - game.multRange[0]) + game.multRange[0]);
-      const payout = this.generateRealisticWinAmount(bet, rawMult);
+      const payout = Math.round(bet * rawMult * 100) / 100;
       const mult = Math.round((payout / bet) * 100) / 100;
       this.dom.winToastUser.innerText = `🔥 ${user} just won!`;
       this.dom.winToastPayout.innerText = `+${window.wallet.currency}${payout.toLocaleString('en-US')} on ${game.name} (${mult.toFixed(2)}x)`;

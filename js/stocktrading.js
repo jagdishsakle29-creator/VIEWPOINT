@@ -128,20 +128,34 @@ class StockTradingGame {
     }
 
     try {
-      const telegramId = window.wallet.activeTelegramId || '78912345';
+      const uid = window.wallet.activeUserId || window.wallet.activeTelegramId || '78912345';
       const apiBase = window.wallet.apiBaseUrl;
-      const res = await fetch(`${apiBase}/api/game/stock/bet`, {
+      let res = await fetch(`${apiBase}/api/games?action=stock_bet`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
         body: JSON.stringify({
-          telegram_id: telegramId,
+          action: 'stock_bet',
+          userId: uid,
           direction: direction.toLowerCase(),
           amount: amount,
-          entry_price: this.currentPrice
+          entryPrice: this.currentPrice
         })
-      });
+      }).catch(() => null);
 
-      if (res.ok) {
+      if (!res || !res.ok) {
+        res = await fetch(`${apiBase}/api/game/stock/bet`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegram_id: uid,
+            direction: direction.toLowerCase(),
+            amount: amount,
+            entry_price: this.currentPrice
+          })
+        }).catch(() => null);
+      }
+
+      if (res && res.ok) {
         const data = await res.json();
         if (data.success && data.balance !== undefined) {
           window.wallet.setServerBalance(data.balance);

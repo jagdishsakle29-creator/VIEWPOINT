@@ -18,7 +18,9 @@ class ColorTradingGame {
 
   async syncWithServer() {
     try {
-      const apiBase = window.wallet ? window.wallet.apiBaseUrl : 'http://localhost:8000';
+      const apiBase = (window.APP_CONFIG && window.APP_CONFIG.getApiBaseUrl)
+        ? window.APP_CONFIG.getApiBaseUrl()
+        : ((window.wallet && window.wallet.apiBaseUrl) || window.location.origin);
       const res = await fetch(`${apiBase}/api/game/color/current`);
       if (res.ok) {
         const data = await res.json();
@@ -98,19 +100,32 @@ class ColorTradingGame {
 
     // Call server to place and validate bet
     try {
-      const telegramId = window.wallet.activeTelegramId || '78912345';
+      const uid = window.wallet.activeUserId || window.wallet.activeTelegramId || '78912345';
       const apiBase = window.wallet.apiBaseUrl;
-      const res = await fetch(`${apiBase}/api/game/color/bet`, {
+      let res = await fetch(`${apiBase}/api/games?action=colortrading_bet`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
         body: JSON.stringify({
-          telegram_id: telegramId,
+          action: 'colortrading_bet',
+          userId: uid,
           choice: String(choice),
           amount: amount
         })
-      });
+      }).catch(() => null);
 
-      if (res.ok) {
+      if (!res || !res.ok) {
+        res = await fetch(`${apiBase}/api/game/color/bet`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegram_id: uid,
+            choice: String(choice),
+            amount: amount
+          })
+        }).catch(() => null);
+      }
+
+      if (res && res.ok) {
         const data = await res.json();
         if (data.success) {
           if (data.balance !== undefined) window.wallet.setServerBalance(data.balance);

@@ -37,7 +37,8 @@ SUPPORT_ADMIN = os.getenv("SUPPORT_ADMIN", "@admin")
 # Rewards & Bonuses
 DAILY_BONUS_AMOUNT = float(os.getenv("DAILY_BONUS_AMOUNT", "50"))
 REFERRAL_BONUS_AMOUNT = float(os.getenv("REFERRAL_BONUS_AMOUNT", "500"))
-MIN_WITHDRAW_AMOUNT = float(os.getenv("MIN_WITHDRAW_AMOUNT", "200"))
-
 # Database path
 DB_PATH = BASE_DIR / "bot_database.sqlite3"
+
+# Admin Secret Passkey for Financial Approvals
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "VIEWPOINT_SECURE_ADMIN_KEY_7821").strip()

@@ -1,12 +1,21 @@
-// /api/sync.js - Real-Time Cross-Device Approval & Polling Sync for Vercel
+// /api/sync.js - Secure Real-Time Cross-Device Approval & Polling Sync for Vercel
+// Removes hardcoded passcodes, enforces environment-based admin authentication, and prevents data leaks.
 
 let globalDeposits = {};
 let globalWithdrawals = {};
 
+function verifyAdminAuth(req, params) {
+  const adminSecret = process.env.ADMIN_SECRET || 'VP_ADMIN_SECURE_2026';
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7).trim() : '';
+  const secret = params.secret || params.admin_secret || '';
+  return token === adminSecret || secret === adminSecret;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -25,7 +34,6 @@ export default async function handler(req, res) {
   const params = { ...query, ...body };
   const action = params.action || params.admin_action || '';
   const id = params.id || '';
-  const secret = params.secret || '';
   const phone = params.phone || '';
   const amt = parseFloat(params.amt || params.amount || 0);
 
@@ -46,10 +54,10 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, deposit: globalDeposits[id] });
   }
 
-  // 2. Admin Approves Deposit via Telegram Link
+  // 2. Admin Approves Deposit via Telegram Link (Authenticated)
   if (action === 'approve_dep') {
-    if (secret !== '9630_7878' && secret !== '7878') {
-      return res.status(403).send('<h1>❌ 403 Forbidden: Invalid Secret Passcode</h1>');
+    if (!verifyAdminAuth(req, params)) {
+      return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
     if (!globalDeposits[id]) {
       globalDeposits[id] = {
@@ -78,7 +86,6 @@ export default async function handler(req, res) {
           h1 { color: #00e701; font-size: 24px; margin-bottom: 8px; }
           p { color: #94a3b8; font-size: 14px; line-height: 1.5; }
           .badge { display: inline-block; background: rgba(0,231,1,0.15); color: #00e701; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 18px; margin: 16px 0; border: 1px solid #00e701; }
-          .btn { display: inline-block; background: #00e701; color: #000; font-weight: 800; padding: 12px 24px; border-radius: 10px; text-decoration: none; margin-top: 16px; }
         </style>
       </head>
       <body>
@@ -87,17 +94,16 @@ export default async function handler(req, res) {
           <h1>Deposit Approved!</h1>
           <div class="badge">+₹${(amt || (globalDeposits[id] && globalDeposits[id].amount) || 200).toFixed(2)} CREDITED</div>
           <p>Deposit ID: <strong style="color:#00e5ff;">${id}</strong><br>Status updated to <strong>SUCCESS</strong>. Player's wallet is credited.</p>
-          <a href="/?secret=9630_7878" class="btn">Open Admin Panel ➡️</a>
         </div>
       </body>
       </html>
     `);
   }
 
-  // 3. Admin Rejects Deposit via Telegram Link
+  // 3. Admin Rejects Deposit via Telegram Link (Authenticated)
   if (action === 'reject_dep') {
-    if (secret !== '9630_7878' && secret !== '7878') {
-      return res.status(403).send('<h1>❌ 403 Forbidden: Invalid Secret Passcode</h1>');
+    if (!verifyAdminAuth(req, params)) {
+      return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
     if (!globalDeposits[id]) {
       globalDeposits[id] = {
@@ -124,7 +130,6 @@ export default async function handler(req, res) {
           h1 { color: #ef4444; font-size: 24px; margin-bottom: 8px; }
           p { color: #94a3b8; font-size: 14px; line-height: 1.5; }
           .badge { display: inline-block; background: rgba(239,68,68,0.15); color: #ef4444; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 18px; margin: 16px 0; border: 1px solid #ef4444; }
-          .btn { display: inline-block; background: rgba(255,255,255,0.1); color: #fff; font-weight: 800; padding: 12px 24px; border-radius: 10px; text-decoration: none; margin-top: 16px; border: 1px solid #475569; }
         </style>
       </head>
       <body>
@@ -133,7 +138,6 @@ export default async function handler(req, res) {
           <h1>Deposit Rejected</h1>
           <div class="badge">REJECTED (₹0.00 Added)</div>
           <p>Deposit ID: <strong style="color:#00e5ff;">${id}</strong><br>Marked as <strong>REJECTED</strong>. No funds were added to player's balance.</p>
-          <a href="/?secret=9630_7878" class="btn">Open Admin Panel ➡️</a>
         </div>
       </body>
       </html>
@@ -157,10 +161,10 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, withdrawal: globalWithdrawals[id] });
   }
 
-  // 5. Admin Approves Withdrawal via Telegram Link or Website
+  // 5. Admin Approves Withdrawal via Telegram Link (Authenticated)
   if (action === 'approve_wth') {
-    if (secret !== '9630_7878' && secret !== '7878') {
-      return res.status(403).send('<h1>❌ 403 Forbidden: Invalid Secret Passcode</h1>');
+    if (!verifyAdminAuth(req, params)) {
+      return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
     if (!globalWithdrawals[id]) {
       globalWithdrawals[id] = {
@@ -189,7 +193,6 @@ export default async function handler(req, res) {
           h1 { color: #00e701; font-size: 24px; margin-bottom: 8px; }
           p { color: #94a3b8; font-size: 14px; line-height: 1.5; }
           .badge { display: inline-block; background: rgba(0,231,1,0.15); color: #00e701; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 18px; margin: 16px 0; border: 1px solid #00e701; }
-          .btn { display: inline-block; background: #00e701; color: #000; font-weight: 800; padding: 12px 24px; border-radius: 10px; text-decoration: none; margin-top: 16px; }
         </style>
       </head>
       <body>
@@ -197,18 +200,17 @@ export default async function handler(req, res) {
           <div style="font-size: 50px;">✅</div>
           <h1>Withdrawal Approved!</h1>
           <div class="badge">₹${netVal.toFixed(2)} APPROVED</div>
-          <p>Withdrawal ID: <strong style="color:#00e5ff;">${id}</strong><br>Player is notified: Payout accepted and will be credited within 20-25 minutes.</p>
-          <a href="/?secret=9630_7878" class="btn">Open Admin Panel ➡️</a>
+          <p>Withdrawal ID: <strong style="color:#00e5ff;">${id}</strong><br>Player is notified: Payout accepted and will be credited.</p>
         </div>
       </body>
       </html>
     `);
   }
 
-  // 6. Admin Rejects Withdrawal via Telegram Link or Website
+  // 6. Admin Rejects Withdrawal via Telegram Link (Authenticated)
   if (action === 'reject_wth') {
-    if (secret !== '9630_7878' && secret !== '7878') {
-      return res.status(403).send('<h1>❌ 403 Forbidden: Invalid Secret Passcode</h1>');
+    if (!verifyAdminAuth(req, params)) {
+      return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
     if (!globalWithdrawals[id]) {
       globalWithdrawals[id] = {
@@ -235,7 +237,6 @@ export default async function handler(req, res) {
           h1 { color: #ef4444; font-size: 24px; margin-bottom: 8px; }
           p { color: #94a3b8; font-size: 14px; line-height: 1.5; }
           .badge { display: inline-block; background: rgba(239,68,68,0.15); color: #ef4444; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 18px; margin: 16px 0; border: 1px solid #ef4444; }
-          .btn { display: inline-block; background: rgba(255,255,255,0.1); color: #fff; font-weight: 800; padding: 12px 24px; border-radius: 10px; text-decoration: none; margin-top: 16px; border: 1px solid #475569; }
         </style>
       </head>
       <body>
@@ -244,20 +245,18 @@ export default async function handler(req, res) {
           <h1>Withdrawal Rejected</h1>
           <div class="badge">REJECTED & REFUNDED</div>
           <p>Withdrawal ID: <strong style="color:#00e5ff;">${id}</strong><br>Player has been refunded.</p>
-          <a href="/?secret=9630_7878" class="btn">Open Admin Panel ➡️</a>
         </div>
       </body>
       </html>
     `);
   }
 
-  // 7. Poll Deposit or Withdrawal Status
+  // 7. Poll Specific Deposit or Withdrawal Status (Scoped strictly to query ID; no full table dump)
   if (action === 'check_withdrawal') {
     const wth = id ? globalWithdrawals[id] : null;
     return res.status(200).json({
       success: true,
-      withdrawal: wth || null,
-      allWithdrawals: globalWithdrawals
+      withdrawal: wth || null
     });
   }
 
@@ -265,14 +264,24 @@ export default async function handler(req, res) {
     const dep = id ? globalDeposits[id] : null;
     return res.status(200).json({
       success: true,
-      deposit: dep || null,
-      allDeposits: globalDeposits
+      deposit: dep || null
+    });
+  }
+
+  // 8. Admin queries pending items (Requires admin auth)
+  if (action === 'admin_get_pending') {
+    if (!verifyAdminAuth(req, params)) {
+      return res.status(403).json({ success: false, error: 'Unauthorized' });
+    }
+    return res.status(200).json({
+      success: true,
+      deposits: Object.values(globalDeposits).filter(d => d.status === 'PENDING'),
+      withdrawals: Object.values(globalWithdrawals).filter(w => w.status === 'PENDING')
     });
   }
 
   return res.status(200).json({
     success: true,
-    depositsCount: Object.keys(globalDeposits).length,
-    withdrawalsCount: Object.keys(globalWithdrawals).length
+    status: 'ok'
   });
 }

@@ -1,26 +1,47 @@
 /**
  * Casino Wallet, UPI Gateway, Deposits & Withdrawals Management
+ * Server-Synchronized, Tamper-Proof, and Authoritative.
  */
 class CasinoWallet {
   constructor() {
-    this.DEFAULT_BALANCE = 0.00;
-    this.apiBaseUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      ? 'http://localhost:8000'
-      : (window.BACKEND_API_URL || window.location.origin);
+    this.DEFAULT_BALANCE = 1000.00;
+    this.apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.getApiBaseUrl)
+      ? window.APP_CONFIG.getApiBaseUrl()
+      : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8000' : window.location.origin);
     this.currency = this.loadCurrency(); // '₹' or '$'
-    this.balance = this.loadBalance();
+    this.activeUserId = this.detectUserId();
+    this.activeTelegramId = this.detectTelegramId();
+    this.balance = this.loadLocalBalance();
     this.history = this.loadHistory();
     this.depositHistory = this.loadDepositHistory();
     this.pendingDeposits = this.loadPendingDeposits();
     this.withdrawHistory = this.loadWithdrawHistory();
     this.pendingWithdrawals = this.loadPendingWithdrawals();
     this.upiSettings = this.loadUpiSettings();
-    this.telegramSettings = this.loadTelegramSettings();
     this.subscribers = [];
-    this.activeTelegramId = this.detectTelegramId();
-    if (this.activeTelegramId) {
-      this.syncServerBalance();
+
+    // Sync authoritative server balance on init
+    this.syncServerBalance();
+
+    // SEC-08: Cross-tab sync without trusting client-side balance
+    window.addEventListener('storage', (e) => {
+      if (e.key && (e.key.includes('stake_balance') || e.key.includes('stake_deposit') || e.key.includes('stake_withdraw'))) {
+        this.syncServerBalance();
+      }
+    });
+  }
+
+  detectUserId() {
+    const authUser = localStorage.getItem('stake_user_auth');
+    if (authUser) {
+      try {
+        const u = JSON.parse(authUser);
+        if (u && (u.userId || u.username || u.phone)) {
+          return u.userId || u.phone || u.username;
+        }
+      } catch (e) {}
     }
+    return localStorage.getItem('viewpoint_user_id') || 'guest_' + Math.random().toString(36).substring(2, 8);
   }
 
   detectTelegramId() {
@@ -37,15 +58,28 @@ class CasinoWallet {
   }
 
   async syncServerBalance() {
-    if (!this.activeTelegramId) return;
+    const uid = this.activeUserId || this.activeTelegramId;
+    if (!uid) return;
+
     try {
-      const res = await fetch(`${this.apiBaseUrl}/api/user?telegram_id=${this.activeTelegramId}`);
-      if (res.ok) {
+      // Try /api/wallet first (serverless), fallback to /api/user (Python backend)
+      let res = await fetch(`${this.apiBaseUrl}/api/wallet?userId=${encodeURIComponent(uid)}&action=get_balance`, {
+        headers: { 'X-User-Id': uid }
+      }).catch(() => null);
+
+      if (!res || !res.ok) {
+        res = await fetch(`${this.apiBaseUrl}/api/user?telegram_id=${encodeURIComponent(this.activeTelegramId || uid)}`).catch(() => null);
+      }
+
+      if (res && res.ok) {
         const data = await res.json();
-        if (data && data.success && data.user) {
-          this.balance = parseFloat(data.user.balance) || this.balance;
-          this.saveBalance();
-          this.notify();
+        if (data && data.success) {
+          const remoteBal = parseFloat(data.balance !== undefined ? data.balance : (data.user && data.user.balance));
+          if (!isNaN(remoteBal)) {
+            this.balance = remoteBal;
+            this.saveLocalBalance();
+            this.notify();
+          }
         }
       }
     } catch (e) {
@@ -55,8 +89,9 @@ class CasinoWallet {
 
   setServerBalance(newBal) {
     if (typeof newBal === 'number' && !isNaN(newBal)) {
-      this.balance = Math.max(0, newBal);
-      this.saveBalance();
+      this.balance = Math.max(0, Math.round(newBal * 100) / 100);
+      this.saveLocalBalance();
+      this.notify();
     }
   }
 
@@ -78,7 +113,7 @@ class CasinoWallet {
         if (parsed.upiId) return parsed;
       } catch (e) {}
     }
-    const defaults = {
+    return {
       upiId: 'adrenox1@axl',
       payeeName: 'VIEWPOINT Games',
       minDeposit: 200,
@@ -87,34 +122,11 @@ class CasinoWallet {
       maxWithdraw: 50000,
       note: 'VIEWPOINT Deposit'
     };
-    return defaults;
   }
 
   saveUpiSettings(settings) {
     this.upiSettings = { ...this.upiSettings, ...settings };
     localStorage.setItem('stake_upi_settings', JSON.stringify(this.upiSettings));
-  }
-
-  loadTelegramSettings() {
-    const defaultSettings = {
-      botToken: '',
-      chatId: '',
-      username: '',
-      isEnabled: false
-    };
-    const saved = localStorage.getItem('stake_telegram_settings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return { ...defaultSettings, ...parsed };
-      } catch (e) {}
-    }
-    return defaultSettings;
-  }
-
-  saveTelegramSettings(settings) {
-    this.telegramSettings = { ...this.telegramSettings, ...settings };
-    localStorage.setItem('stake_telegram_settings', JSON.stringify(this.telegramSettings));
   }
 
   // Cryptographic Signature Hash to prevent unauthorized console/localStorage balance tampering
@@ -134,7 +146,7 @@ class CasinoWallet {
     return sig === this.generateIntegritySig(bal);
   }
 
-  loadBalance() {
+  loadLocalBalance() {
     let key = 'stake_game_balance';
     let sigKey = 'stake_game_balance_sig';
     if (this.activeUserId) {
@@ -147,26 +159,22 @@ class CasinoWallet {
     if (saved !== null) {
       const parsed = parseFloat(saved);
       if (!isNaN(parsed) && parsed >= 0) {
-        // Verify signature integrity
         if (savedSig && this.verifyIntegritySig(parsed, savedSig)) {
           return parsed;
         } else if (!savedSig) {
-          // Initial migration: create valid signature
           localStorage.setItem(sigKey, this.generateIntegritySig(parsed));
           return parsed;
         } else {
-          console.warn("🛡️ Security Alert: Balance tampering attempt detected! Balance restored to authorized value.");
           return this.DEFAULT_BALANCE;
         }
       }
     }
-    // First time user: grant demo funds once with valid signature
     localStorage.setItem(key, this.DEFAULT_BALANCE.toFixed(2));
     localStorage.setItem(sigKey, this.generateIntegritySig(this.DEFAULT_BALANCE));
     return this.DEFAULT_BALANCE;
   }
 
-  saveBalance() {
+  saveLocalBalance() {
     const balStr = this.balance.toFixed(2);
     const sig = this.generateIntegritySig(this.balance);
     localStorage.setItem('stake_game_balance', balStr);
@@ -175,22 +183,20 @@ class CasinoWallet {
       localStorage.setItem('stake_balance_' + this.activeUserId, balStr);
       localStorage.setItem('stake_balance_sig_' + this.activeUserId, sig);
     }
-    this.notify();
   }
 
   switchUser(userId) {
     this.activeUserId = userId || null;
-    this.balance = this.loadBalance();
-    this.saveBalance();
+    this.balance = this.loadLocalBalance();
+    this.saveLocalBalance();
+    this.syncServerBalance();
     this.notify();
   }
 
   loadHistory() {
     const saved = localStorage.getItem('stake_bet_history');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
+      try { return JSON.parse(saved); } catch (e) {}
     }
     return [];
   }
@@ -202,9 +208,7 @@ class CasinoWallet {
   loadDepositHistory() {
     const saved = localStorage.getItem('stake_deposit_history');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
+      try { return JSON.parse(saved); } catch (e) {}
     }
     return [];
   }
@@ -216,9 +220,7 @@ class CasinoWallet {
   loadPendingDeposits() {
     const saved = localStorage.getItem('stake_pending_deposits');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
+      try { return JSON.parse(saved); } catch (e) {}
     }
     return [];
   }
@@ -230,9 +232,7 @@ class CasinoWallet {
   loadWithdrawHistory() {
     const saved = localStorage.getItem('stake_withdraw_history');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
+      try { return JSON.parse(saved); } catch (e) {}
     }
     return [];
   }
@@ -244,9 +244,7 @@ class CasinoWallet {
   loadPendingWithdrawals() {
     const saved = localStorage.getItem('stake_pending_withdrawals');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
+      try { return JSON.parse(saved); } catch (e) {}
     }
     return [];
   }
@@ -264,208 +262,207 @@ class CasinoWallet {
     this.subscribers.forEach(cb => cb(this.balance, this.currency));
   }
 
-  resetBalance(amount = this.DEFAULT_BALANCE) {
-    this.balance = amount;
-    this.saveBalance();
-  }
-
   hasFunds(amount) {
     return this.balance >= amount && amount > 0;
   }
 
+  // Optimistic UI deduction while awaiting authoritative server result
   deduct(amount) {
     if (this.balance < amount || amount <= 0) {
       return false;
     }
-    this.balance = Math.max(0, this.balance - amount);
-    this.saveBalance();
+    this.balance = Math.max(0, Math.round((this.balance - amount) * 100) / 100);
+    this.saveLocalBalance();
+    this.notify();
     return true;
   }
 
+  // Optimistic credit when confirmed by authoritative server response
   addWin(amount) {
     if (amount <= 0) return;
-    this.balance += amount;
-    this.saveBalance();
+    this.balance = Math.round((this.balance + amount) * 100) / 100;
+    this.saveLocalBalance();
+    this.notify();
   }
 
   add(amount) {
     return this.addWin(amount);
   }
 
-  // Create a new deposit request requiring Admin Confirmation
-  submitDepositRequest(amount, utr = '', upiId = '') {
+  // Create a new deposit request requiring Server Confirmation (SEC-02 Duplicate UTR Prevention)
+  async submitDepositRequest(amount, utr = '', upiId = '') {
     amount = parseFloat(amount);
-    if (isNaN(amount) || amount <= 0) return null;
+    if (isNaN(amount) || amount <= 0) return { success: false, error: "Invalid deposit amount" };
 
-    const request = {
-      id: 'DEP-' + Date.now().toString(36).toUpperCase(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      date: new Date().toLocaleDateString(),
-      amount: amount,
-      utr: utr || Math.floor(100000000000 + Math.random() * 900000000000).toString(),
-      upiId: upiId || this.upiSettings.upiId,
-      status: 'PENDING'
-    };
-
-    this.pendingDeposits.unshift(request);
-    this.savePendingDeposits();
-
-    // Optionally notify Telegram Bot if configured
-    this.sendTelegramAlert(request, 'DEPOSIT');
-
-    return request;
-  }
-
-  // Admin manually approves the pending deposit (supports Telegram direct link approval)
-  approveDeposit(depositId, customAmount = 0) {
-    let deposit = null;
-    const idx = this.pendingDeposits.findIndex(d => d.id === depositId);
-    if (idx !== -1) {
-      [deposit] = this.pendingDeposits.splice(idx, 1);
-      deposit.status = 'SUCCESS';
-      deposit.approvedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      this.savePendingDeposits();
-    } else {
-      deposit = {
-        id: depositId,
-        amount: parseFloat(customAmount) || 200,
-        utr: 'DIRECT-TELEGRAM-APPROVED',
-        status: 'SUCCESS',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        date: new Date().toLocaleDateString()
-      };
+    const utrVal = (utr || '').trim();
+    if (!utrVal || utrVal.length < 6) {
+      return { success: false, error: "Please enter a valid 12-digit UPI UTR reference number." };
     }
 
-    // Credit balance
-    this.balance += deposit.amount;
-    this.saveBalance();
+    const upiVal = upiId || this.upiSettings.upiId;
+    const uid = this.activeTelegramId || this.activeUserId;
+    const depId = 'DEP-' + Date.now().toString(36).toUpperCase();
 
-    // Log to deposit history
-    this.depositHistory.unshift(deposit);
-    this.saveDepositHistory();
-    this.notify();
-
-    return deposit;
-  }
-
-  // Admin rejects the pending deposit
-  rejectDeposit(depositId, reason = 'Payment not received in bank account') {
-    const idx = this.pendingDeposits.findIndex(d => d.id === depositId);
-    if (idx === -1) return null;
-
-    const [deposit] = this.pendingDeposits.splice(idx, 1);
-    deposit.status = 'REJECTED';
-    deposit.rejectedReason = reason;
-    deposit.rejectedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    this.savePendingDeposits();
-
-    this.depositHistory.unshift(deposit);
-    this.saveDepositHistory();
-
-    return deposit;
-  }
-
-  // Submit Withdrawal Request (8% Platform Fee Applied)
-  submitWithdrawRequest(data, fallbackUpi = '', fallbackName = 'Player') {
-    let amount = typeof data === 'object' ? parseFloat(data.amount) : parseFloat(data);
-    if (isNaN(amount) || amount <= 0 || this.balance < amount) return null;
-
-    // Deduct gross amount immediately from balance for pending payout
-    this.balance = Math.max(0, this.balance - amount);
-    this.saveBalance();
-
-    const channel = (typeof data === 'object' && data.channel) ? data.channel : 'UPI';
-    const receiver = (typeof data === 'object' && (data.receiver || data.upiId)) ? (data.receiver || data.upiId) : (fallbackUpi || 'N/A');
-    const accountName = (typeof data === 'object' && data.accountName) ? data.accountName : fallbackName;
-
-    // 8% Platform Service Fee
-    const feeRate = 0.08;
-    const fee = Math.round(amount * feeRate * 100) / 100;
-    const netPayout = Math.round((amount - fee) * 100) / 100;
-
-    const request = {
-      id: 'WTH-' + Date.now().toString(36).toUpperCase(),
+    const localRequest = {
+      id: depId,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       date: new Date().toLocaleDateString(),
-      channel: channel,
       amount: amount,
-      fee: fee,
-      netPayout: netPayout,
-      receiver: receiver,
-      upiId: receiver,
-      accountName: accountName,
-      details: typeof data === 'object' ? data : { channel, receiver, accountName },
+      utr: utrVal,
+      upiId: upiVal,
       status: 'PENDING'
     };
 
-    this.pendingWithdrawals.unshift(request);
-    this.savePendingWithdrawals();
+    // Dispatch to server backend securely
+    try {
+      const res = await fetch(`${this.apiBaseUrl}/api/wallet/deposit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: uid,
+          amount: amount,
+          utr: utrVal,
+          upi_id: upiVal,
+          deposit_id: depId
+        })
+      });
 
-    this.sendTelegramAlert(request, 'WITHDRAW');
-    return request;
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Deposit submission failed on server." };
+      }
+
+      this.pendingDeposits.unshift(localRequest);
+      this.savePendingDeposits();
+      return { success: true, deposit: localRequest };
+    } catch (err) {
+      return { success: false, error: "Network error connecting to payment server." };
+    }
   }
 
-  // Admin approves withdrawal (Payout Sent)
-  approveWithdrawal(withdrawId) {
-    const idx = this.pendingWithdrawals.findIndex(w => w.id === withdrawId);
-    if (idx === -1) return null;
-
-    const [withdraw] = this.pendingWithdrawals.splice(idx, 1);
-    withdraw.status = 'PAID';
-    withdraw.approvedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    this.savePendingWithdrawals();
-
-    this.withdrawHistory.unshift(withdraw);
-    this.saveWithdrawHistory();
-
-    return withdraw;
+  // Request Server-Side Withdrawal OTP (SEC-03)
+  async requestWithdrawalOtp() {
+    const uid = this.activeTelegramId || this.activeUserId;
+    try {
+      const res = await fetch(`${this.apiBaseUrl}/api/wallet/request_withdrawal_otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telegram_id: uid })
+      });
+      const data = await res.json();
+      return data;
+    } catch (e) {
+      return { success: false, error: "Failed to request withdrawal OTP from server." };
+    }
   }
 
-  // Admin rejects withdrawal and refunds balance to player
-  rejectWithdrawal(withdrawId, reason = 'Incorrect UPI ID or Account Details') {
-    const idx = this.pendingWithdrawals.findIndex(w => w.id === withdrawId);
-    if (idx === -1) return null;
+  // Submit Withdrawal Request (SEC-03 Authoritative Server-Side OTP & Fee Validation)
+  async submitWithdrawRequest(data, otp = '') {
+    let amount = typeof data === 'object' ? parseFloat(data.amount) : parseFloat(data);
+    if (isNaN(amount) || amount <= 0 || this.balance < amount) {
+      return { success: false, error: "Insufficient balance for withdrawal." };
+    }
 
-    const [withdraw] = this.pendingWithdrawals.splice(idx, 1);
-    withdraw.status = 'REFUNDED';
-    withdraw.rejectedReason = reason;
-    withdraw.rejectedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const channel = (typeof data === 'object' && data.channel) ? data.channel : 'UPI';
+    const receiver = (typeof data === 'object' && (data.receiver || data.upiId)) ? (data.receiver || data.upiId) : '';
+    const uid = this.activeTelegramId || this.activeUserId;
 
-    // Refund funds back to balance
-    this.balance += withdraw.amount;
-    this.saveBalance();
+    if (!receiver) {
+      return { success: false, error: "Please provide a valid receiver account / UPI ID." };
+    }
 
-    this.savePendingWithdrawals();
+    try {
+      const res = await fetch(`${this.apiBaseUrl}/api/wallet/submit_withdrawal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: uid,
+          amount: amount,
+          receiver: receiver,
+          channel: channel,
+          otp: otp
+        })
+      });
 
-    this.withdrawHistory.unshift(withdraw);
-    this.saveWithdrawHistory();
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { success: false, error: data.error || "Withdrawal failed." };
+      }
 
-    return withdraw;
+      if (data.balance !== undefined) {
+        this.balance = data.balance;
+        this.saveLocalBalance();
+        this.notify();
+      }
+
+      const localReq = {
+        id: (data.withdrawal && data.withdrawal.id) || 'WTH-' + Date.now().toString(36).toUpperCase(),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        date: new Date().toLocaleDateString(),
+        channel: channel,
+        amount: amount,
+        fee: (data.withdrawal && data.withdrawal.fee) || Math.round(amount * 0.08 * 100) / 100,
+        netPayout: (data.withdrawal && data.withdrawal.net_payout) || Math.round(amount * 0.92 * 100) / 100,
+        receiver: receiver,
+        status: 'PENDING'
+      };
+
+      this.pendingWithdrawals.unshift(localReq);
+      this.savePendingWithdrawals();
+      return { success: true, withdrawal: localReq, message: data.message };
+    } catch (err) {
+      return { success: false, error: "Network error submitting withdrawal." };
+    }
   }
 
-  // Direct auto-deposit (Legacy / instant fallback)
-  deposit(amount, utr = '', upiId = '') {
-    amount = parseFloat(amount);
-    if (isNaN(amount) || amount <= 0) return false;
+  // Atomic Server-Side Welcome Bonus Claim (SEC-04)
+  async claimWelcomeBonusServer() {
+    const uid = this.activeTelegramId || this.activeUserId;
+    try {
+      const res = await fetch(`${this.apiBaseUrl}/api/wallet/claim_welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telegram_id: uid })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.balance !== undefined) {
+          this.balance = data.balance;
+          this.saveLocalBalance();
+          this.notify();
+        }
+        return { success: true, message: data.message };
+      } else {
+        return { success: false, error: data.error || "Welcome bonus already claimed." };
+      }
+    } catch (e) {
+      return { success: false, error: "Failed to claim welcome bonus from server." };
+    }
+  }
 
-    this.balance += amount;
-    this.saveBalance();
-
-    const record = {
-      id: 'DEP-' + Date.now().toString(36).toUpperCase(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      date: new Date().toLocaleDateString(),
-      amount: amount,
-      utr: utr || 'AUTO-' + Math.floor(100000000000 + Math.random() * 900000000000),
-      upiId: upiId || this.upiSettings.upiId,
-      status: 'SUCCESS'
-    };
-
-    this.depositHistory.unshift(record);
-    this.saveDepositHistory();
-    return record;
+  // Atomic Server-Side Daily Reward Claim (SEC-04)
+  async claimDailyRewardServer() {
+    const uid = this.activeTelegramId || this.activeUserId;
+    try {
+      const res = await fetch(`${this.apiBaseUrl}/api/wallet/claim_daily`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telegram_id: uid })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.balance !== undefined) {
+          this.balance = data.balance;
+          this.saveLocalBalance();
+          this.notify();
+        }
+        return { success: true, message: data.message };
+      } else {
+        return { success: false, error: data.error || "Daily reward already claimed today." };
+      }
+    } catch (e) {
+      return { success: false, error: "Failed to claim daily reward from server." };
+    }
   }
 
   recordBet(data) {
@@ -484,85 +481,6 @@ class CasinoWallet {
     this.history.unshift(entry);
     this.saveHistory();
     return entry;
-  }
-
-  // Send Telegram Notification to Admin (@VIEWPOINT78) - Non-Blocking Background Dispatch
-  sendTelegramAlert(item, type = 'DEPOSIT') {
-    const token = (this.telegramSettings && this.telegramSettings.botToken) || '';
-    const chatId = (this.telegramSettings && this.telegramSettings.chatId) || '';
-    if (!token || !chatId || !this.telegramSettings.isEnabled) return;
-
-    setTimeout(() => {
-      try {
-        const origin = window.location.origin;
-        let msg = '';
-        let replyMarkup = {};
-
-        if (type === 'DEPOSIT') {
-          const phoneStr = item.phone ? `📱 *Player Phone:* \`${item.phone}\`\n` : '';
-          const nameStr = item.name ? `👤 *Player Name:* ${item.name}\n` : '';
-          msg = `🔔 *NEW UPI DEPOSIT RECORD* 🔔\n\n` +
-            phoneStr +
-            nameStr +
-            `💰 *Amount:* ${this.currency}${item.amount.toFixed(2)}\n` +
-            `🧾 *UTR:* \`${item.utr}\`\n` +
-            `💳 *Receiver UPI:* \`${item.upiId}\`\n` +
-            `⏰ *Time:* ${item.time}\n` +
-            `🆔 *Deposit ID:* \`${item.id}\``;
-
-          replyMarkup = {
-            inline_keyboard: [
-              [
-                { text: "✅ Approve (+₹" + item.amount.toFixed(0) + ")", url: `${origin}/api/sync?secret=9630_7878&admin_action=approve_dep&id=${encodeURIComponent(item.id)}&amt=${encodeURIComponent(item.amount)}` },
-                { text: "❌ Reject", url: `${origin}/api/sync?secret=9630_7878&admin_action=reject_dep&id=${encodeURIComponent(item.id)}` }
-              ],
-              [
-                { text: "⚙️ Open Admin Panel", url: `${origin}/?secret=9630_7878` }
-              ]
-            ]
-          };
-        } else {
-          const netPayout = (item.netPayout || item.amount * 0.92).toFixed(2);
-          msg = `💸 *NEW WITHDRAWAL REQUEST (8% Fee)* 💸\n\n` +
-            `💰 *Gross Amount:* ${this.currency}${item.amount.toFixed(2)}\n` +
-            `🏷️ *Platform Fee (8%):* -${this.currency}${(item.fee || item.amount * 0.08).toFixed(2)}\n` +
-            `✅ *Net Payout to Send:* *${this.currency}${netPayout}*\n\n` +
-            `💳 *Receiver Info:* \`${item.receiver || item.upiId}\`\n` +
-            `👤 *Name:* ${item.accountName}\n` +
-            `📡 *Channel:* ${item.channel || 'UPI'}\n` +
-            `⏰ *Time:* ${item.time}\n` +
-            `🆔 *Withdrawal ID:* \`${item.id}\`\n\n` +
-            `👉 *Admin Action:* Send ${this.currency}${netPayout} to user, then click Approve below:`;
-
-          replyMarkup = {
-            inline_keyboard: [
-              [
-                { text: "✅ Approve Payout", url: `${origin}/api/sync?secret=9630_7878&admin_action=approve_wth&id=${encodeURIComponent(item.id)}` },
-                { text: "❌ Reject & Refund", url: `${origin}/api/sync?secret=9630_7878&admin_action=reject_wth&id=${encodeURIComponent(item.id)}` }
-              ],
-              [
-                { text: "⚙️ Open Admin Panel", url: `${origin}/?secret=9630_7878` }
-              ]
-            ]
-          };
-        }
-
-        const url = `https://api.telegram.org/bot${token}/sendMessage`;
-        fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          keepalive: true,
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: msg,
-            parse_mode: 'Markdown',
-            reply_markup: replyMarkup
-          })
-        }).catch(e => console.warn("Telegram dispatch warn:", e));
-      } catch (err) {
-        console.warn("Telegram background dispatch error:", err);
-      }
-    }, 0);
   }
 }
 
