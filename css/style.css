@@ -2950,16 +2950,16 @@ body {
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }
 
-.btn-corner-pill.insta {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+.btn-corner-pill.telegram {
+  background: linear-gradient(135deg, #0088cc 0%, #00b4d8 100%);
   color: #ffffff;
   border: none;
-  box-shadow: 0 2px 8px rgba(220, 39, 67, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 136, 204, 0.3);
 }
 
-.btn-corner-pill.insta:hover {
+.btn-corner-pill.telegram:hover {
   transform: translateY(-1px) scale(1.03);
-  box-shadow: 0 4px 12px rgba(220, 39, 67, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 180, 216, 0.5);
 }
 
 .btn-corner-pill.settings {
