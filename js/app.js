@@ -4507,6 +4507,12 @@ class AppController {
   // ================= CREATOR RECORDING STUDIO (ZERO ADMIN AUTHORITY) =================
   openCreatorStudioModal() {
     window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    
+    // Stealth Clean: Remove #7400 from address bar so video recordings look 100% clean
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+
     const pinModal = document.getElementById('modalAdminPinGate');
     if (pinModal) {
       pinModal.classList.remove('open');
