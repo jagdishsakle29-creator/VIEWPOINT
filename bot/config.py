@@ -28,11 +28,11 @@ admin_ids_raw = os.getenv("ADMIN_IDS", "").strip()
 ADMIN_IDS = [int(i.strip()) for i in admin_ids_raw.split(",") if i.strip().isdigit()]
 
 # WebApp URL
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://viewpoint-1.vercel.app").strip()
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://viewpoint.diy").strip()
 
 # Support & Channels
-SUPPORT_CHANNEL = os.getenv("SUPPORT_CHANNEL", "@telegram")
-SUPPORT_ADMIN = os.getenv("SUPPORT_ADMIN", "@admin")
+SUPPORT_CHANNEL = os.getenv("SUPPORT_CHANNEL", "@VIEWPOINT78").strip()
+SUPPORT_ADMIN = os.getenv("SUPPORT_ADMIN", "@VIEWPOINT78").strip()
 
 # Rewards & Bonuses
 DAILY_BONUS_AMOUNT = float(os.getenv("DAILY_BONUS_AMOUNT", "50"))
