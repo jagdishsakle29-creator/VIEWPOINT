@@ -17,11 +17,14 @@ from telegram.ext import (
 from config import (
     BOT_TOKEN,
     ADMIN_IDS,
+    ADMIN_SECRET,
     WEBAPP_URL,
     DAILY_BONUS_AMOUNT,
     REFERRAL_BONUS_AMOUNT,
     MIN_WITHDRAW_AMOUNT
 )
+import urllib.request
+import json
 from database import db
 from keyboards import (
     get_main_menu_keyboard,
@@ -478,6 +481,23 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
         if success:
             await query.edit_message_text(f"✅ Approved Deposit `{dep_id}`! Credited ₹{dep['amount']:.2f} to user `{dep['telegram_id']}`.", parse_mode="Markdown")
             try:
+                # Sync with WebApp
+                req = urllib.request.Request(
+                    f"{WEBAPP_URL}/api/sync",
+                    data=json.dumps({
+                        "action": "approve_dep",
+                        "id": dep_id,
+                        "amt": dep["amount"],
+                        "userId": str(dep["telegram_id"]),
+                        "secret": ADMIN_SECRET
+                    }).encode("utf-8"),
+                    headers={"Content-Type": "application/json"}
+                )
+                urllib.request.urlopen(req, timeout=3)
+            except Exception:
+                pass
+
+            try:
                 await context.bot.send_message(
                     chat_id=dep['telegram_id'],
                     text=f"🎉 *DEPOSIT APPROVED & CREDITED!*\n\n₹{dep['amount']:,.2f} has been added to your VIEWPOINT wallet. Play now!",
@@ -496,6 +516,20 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
         if success:
             await query.edit_message_text(f"❌ Rejected Deposit `{dep_id}` for user `{dep['telegram_id']}`.", parse_mode="Markdown")
             try:
+                req = urllib.request.Request(
+                    f"{WEBAPP_URL}/api/sync",
+                    data=json.dumps({
+                        "action": "reject_dep",
+                        "id": dep_id,
+                        "secret": ADMIN_SECRET
+                    }).encode("utf-8"),
+                    headers={"Content-Type": "application/json"}
+                )
+                urllib.request.urlopen(req, timeout=3)
+            except Exception:
+                pass
+
+            try:
                 await context.bot.send_message(
                     chat_id=dep['telegram_id'],
                     text=f"❌ *Deposit Request Rejected*\nUTR verification failed. Please contact support @VIEWPOINT78 if you have paid.",
@@ -512,6 +546,20 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
         if success:
             await query.edit_message_text(f"✅ Approved Withdrawal `{wth_id}`! Payout sent.", parse_mode="Markdown")
             try:
+                req = urllib.request.Request(
+                    f"{WEBAPP_URL}/api/sync",
+                    data=json.dumps({
+                        "action": "approve_wth",
+                        "id": wth_id,
+                        "secret": ADMIN_SECRET
+                    }).encode("utf-8"),
+                    headers={"Content-Type": "application/json"}
+                )
+                urllib.request.urlopen(req, timeout=3)
+            except Exception:
+                pass
+
+            try:
                 await context.bot.send_message(
                     chat_id=wth['telegram_id'],
                     text=f"🎉 *WITHDRAWAL SENT SUCCESSFULLY!*\n\nNet Payout ₹{wth['net_payout']:,.2f} has been transferred to your UPI `{wth['receiver']}`.",
@@ -527,6 +575,20 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
         success, wth = db.reject_withdrawal(wth_id)
         if success:
             await query.edit_message_text(f"❌ Rejected Withdrawal `{wth_id}` & Refunded ₹{wth['amount']} to player.", parse_mode="Markdown")
+            try:
+                req = urllib.request.Request(
+                    f"{WEBAPP_URL}/api/sync",
+                    data=json.dumps({
+                        "action": "reject_wth",
+                        "id": wth_id,
+                        "secret": ADMIN_SECRET
+                    }).encode("utf-8"),
+                    headers={"Content-Type": "application/json"}
+                )
+                urllib.request.urlopen(req, timeout=3)
+            except Exception:
+                pass
+
             try:
                 await context.bot.send_message(
                     chat_id=wth['telegram_id'],

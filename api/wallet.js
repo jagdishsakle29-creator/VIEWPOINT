@@ -1,6 +1,8 @@
 // /api/wallet.js - Server-Side Authoritative Wallet & Transaction Engine
 // Protects balance, validates deposits/withdrawals, enforces atomic state & prevents tampering.
 
+const store = require('./store');
+
 // In-memory persistent state (persisted across warm invocations; maps userId -> state)
 const userWallets = new Map();
 const userTransactions = new Map();
@@ -12,19 +14,7 @@ const userUnclaimedCommissions = new Map();
 
 // Helper to get or init wallet
 function getWallet(userId) {
-  const uid = String(userId || 'guest_default').trim();
-  if (!userWallets.has(uid)) {
-    userWallets.set(uid, {
-      userId: uid,
-      balance: 1000.00, // Initial welcome / demo balance
-      totalDeposited: 0.00,
-      totalWithdrawn: 0.00,
-      currency: '₹',
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    });
-  }
-  return userWallets.get(uid);
+  return store.getWallet(userId);
 }
 
 function getUserHistory(userId) {
@@ -143,6 +133,7 @@ export default async function handler(req, res) {
     };
 
     activePendingDeposits.set(depId, depRecord);
+    store.saveDeposit(depRecord);
     const history = getUserHistory(userId);
     history.unshift(depRecord);
 
@@ -178,22 +169,20 @@ export default async function handler(req, res) {
 
     const channel = String(params.channel || 'UPI').trim();
     const receiver = String(params.receiver || params.upiId || '').trim();
-    const accountName = String(params.accountName || 'Player').trim();
+    const accountName = String(params.name || params.accountName || 'Player').trim();
 
     if (!receiver || receiver.length < 3) {
       return res.status(400).json({
         success: false,
-        error: 'Valid payout account/UPI details required'
+        error: 'Valid payout destination details required'
       });
     }
 
-    // 8% Platform Service Fee calculated server-side
+    // Atomic balance deduction
+    store.updateWalletBalance(userId, -amount);
+
     const fee = Math.round(amount * 0.08 * 100) / 100;
     const netPayout = Math.round((amount - fee) * 100) / 100;
-
-    // Atomically deduct balance
-    wallet.balance = Math.round((wallet.balance - amount) * 100) / 100;
-    wallet.updatedAt = Date.now();
 
     const wthId = 'WTH-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
     const wthRecord = {
@@ -212,10 +201,11 @@ export default async function handler(req, res) {
     };
 
     activePendingWithdrawals.set(wthId, wthRecord);
+    store.saveWithdrawal(wthRecord);
     const history = getUserHistory(userId);
     history.unshift(wthRecord);
 
-    await dispatchServerTelegramAlert(wthRecord, 'WITHDRAW');
+    await dispatchServerTelegramAlert(wthRecord, 'WITHDRAWAL');
 
     return res.status(200).json({
       success: true,
@@ -248,7 +238,7 @@ export default async function handler(req, res) {
     return res.status(404).json({ success: false, error: 'Transaction not found' });
   }
 
-  return res.status(400).json({ success: false, error: 'Invalid wallet action' });
+  return res.status(400).json({ success: false, error: 'Unknown action parameter' });
 }
 
 function isAdmin(req, params) {
@@ -301,8 +291,8 @@ async function dispatchServerTelegramAlert(item, type) {
     const replyMarkup = {
       inline_keyboard: [
         [
-          { text: type === 'DEPOSIT' ? `✅ Approve (+₹${item.amount.toFixed(0)})` : `✅ Approve Payout`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=${type === 'DEPOSIT' ? 'approve_dep' : 'approve_wth'}&id=${encodeURIComponent(item.id)}&amt=${encodeURIComponent(item.amount)}` },
-          { text: "❌ Reject", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=${type === 'DEPOSIT' ? 'reject_dep' : 'reject_wth'}&id=${encodeURIComponent(item.id)}` }
+          { text: type === 'DEPOSIT' ? `✅ Approve (+₹${item.amount.toFixed(0)})` : `✅ Approve Payout`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=${type === 'DEPOSIT' ? 'approve_dep' : 'approve_wth'}&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}&amt=${encodeURIComponent(item.amount)}` },
+          { text: "❌ Reject", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=${type === 'DEPOSIT' ? 'reject_dep' : 'reject_wth'}&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}` }
         ]
       ]
     };

@@ -1,8 +1,7 @@
 // /api/sync.js - Secure Real-Time Cross-Device Approval & Polling Sync for Vercel
-// Removes hardcoded passcodes, enforces environment-based admin authentication, and prevents data leaks.
+// Connects Telegram Admin approvals directly with persistent wallet store.
 
-let globalDeposits = {};
-let globalWithdrawals = {};
+const store = require('./store');
 
 function verifyAdminAuth(req, params) {
   const adminSecret = process.env.ADMIN_SECRET || 'VP_ADMIN_SECURE_2026';
@@ -24,7 +23,7 @@ export default async function handler(req, res) {
   const query = req.query || {};
   let body = {};
   try {
-    if (typeof req.body === 'string') {
+    if (typeof req.body === 'string' && req.body) {
       body = JSON.parse(req.body);
     } else if (typeof req.body === 'object' && req.body !== null) {
       body = req.body;
@@ -34,44 +33,34 @@ export default async function handler(req, res) {
   const params = { ...query, ...body };
   const action = params.action || params.admin_action || '';
   const id = params.id || '';
-  const phone = params.phone || '';
+  const userId = params.userId || params.phone || params.uid || '';
   const amt = parseFloat(params.amt || params.amount || 0);
 
   // 1. Create Deposit Record
   if (action === 'create_deposit') {
     if (!id) return res.status(400).json({ error: 'Missing deposit ID' });
-    globalDeposits[id] = {
+    const depRecord = {
       id: id,
+      userId: userId || 'Player',
       amount: amt || 199,
       utr: params.utr || '',
-      phone: phone || '',
+      phone: params.phone || '',
       name: params.name || 'Player',
       upiId: params.upiId || '',
       status: 'PENDING',
       time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }),
       createdAt: Date.now()
     };
-    return res.status(200).json({ success: true, deposit: globalDeposits[id] });
+    store.saveDeposit(depRecord);
+    return res.status(200).json({ success: true, deposit: depRecord });
   }
 
-  // 2. Admin Approves Deposit via Telegram Link (Authenticated)
+  // 2. Admin Approves Deposit via Telegram Link (Authenticated & Credited)
   if (action === 'approve_dep') {
     if (!verifyAdminAuth(req, params)) {
       return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
-    if (!globalDeposits[id]) {
-      globalDeposits[id] = {
-        id: id,
-        amount: amt || 200,
-        utr: params.utr || 'TELEGRAM-APPROVED',
-        status: 'SUCCESS',
-        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })
-      };
-    } else {
-      globalDeposits[id].status = 'SUCCESS';
-      globalDeposits[id].approvedAt = Date.now();
-      if (amt) globalDeposits[id].amount = amt;
-    }
+    const result = store.approveDeposit(id, amt, userId);
 
     return res.status(200).send(`
       <!DOCTYPE html>
@@ -92,8 +81,8 @@ export default async function handler(req, res) {
         <div class="card">
           <div style="font-size: 50px;">✅</div>
           <h1>Deposit Approved!</h1>
-          <div class="badge">+₹${(amt || (globalDeposits[id] && globalDeposits[id].amount) || 200).toFixed(2)} CREDITED</div>
-          <p>Deposit ID: <strong style="color:#00e5ff;">${id}</strong><br>Status updated to <strong>SUCCESS</strong>. Player's wallet is credited.</p>
+          <div class="badge">+₹${result.amount.toFixed(2)} CREDITED</div>
+          <p>Deposit ID: <strong style="color:#00e5ff;">${id}</strong><br>Player: <strong style="color:#00e701;">${result.creditedUser || 'Player'}</strong><br>Status updated to <strong>SUCCESS</strong>. Player's wallet is credited.</p>
         </div>
       </body>
       </html>
@@ -105,17 +94,7 @@ export default async function handler(req, res) {
     if (!verifyAdminAuth(req, params)) {
       return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
-    if (!globalDeposits[id]) {
-      globalDeposits[id] = {
-        id: id,
-        amount: amt || 0,
-        status: 'REJECTED',
-        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })
-      };
-    } else {
-      globalDeposits[id].status = 'REJECTED';
-      globalDeposits[id].rejectedAt = Date.now();
-    }
+    store.rejectDeposit(id);
 
     return res.status(200).send(`
       <!DOCTYPE html>
@@ -147,8 +126,9 @@ export default async function handler(req, res) {
   // 4. Create Withdrawal Record
   if (action === 'create_withdrawal') {
     if (!id) return res.status(400).json({ error: 'Missing withdrawal ID' });
-    globalWithdrawals[id] = {
+    const wthRecord = {
       id: id,
+      userId: userId || 'Player',
       amount: amt || 500,
       netPayout: parseFloat(params.net || params.netPayout || (amt * 0.92)),
       channel: params.channel || 'UPI',
@@ -158,7 +138,8 @@ export default async function handler(req, res) {
       time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }),
       createdAt: Date.now()
     };
-    return res.status(200).json({ success: true, withdrawal: globalWithdrawals[id] });
+    store.saveWithdrawal(wthRecord);
+    return res.status(200).json({ success: true, withdrawal: wthRecord });
   }
 
   // 5. Admin Approves Withdrawal via Telegram Link (Authenticated)
@@ -166,20 +147,9 @@ export default async function handler(req, res) {
     if (!verifyAdminAuth(req, params)) {
       return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
-    if (!globalWithdrawals[id]) {
-      globalWithdrawals[id] = {
-        id: id,
-        amount: amt || 500,
-        netPayout: amt ? (amt * 0.92) : 460,
-        status: 'APPROVED',
-        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })
-      };
-    } else {
-      globalWithdrawals[id].status = 'APPROVED';
-      globalWithdrawals[id].approvedAt = Date.now();
-    }
+    const result = store.approveWithdrawal(id);
+    const netVal = (result.withdrawal && result.withdrawal.netPayout) || (amt * 0.92) || 460;
 
-    const netVal = (globalWithdrawals[id] && globalWithdrawals[id].netPayout) || (amt * 0.92) || 460;
     return res.status(200).send(`
       <!DOCTYPE html>
       <html>
@@ -212,17 +182,7 @@ export default async function handler(req, res) {
     if (!verifyAdminAuth(req, params)) {
       return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
-    if (!globalWithdrawals[id]) {
-      globalWithdrawals[id] = {
-        id: id,
-        amount: amt || 500,
-        status: 'REJECTED',
-        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })
-      };
-    } else {
-      globalWithdrawals[id].status = 'REJECTED';
-      globalWithdrawals[id].rejectedAt = Date.now();
-    }
+    store.rejectWithdrawal(id);
 
     return res.status(200).send(`
       <!DOCTYPE html>
@@ -251,9 +211,9 @@ export default async function handler(req, res) {
     `);
   }
 
-  // 7. Poll Specific Deposit or Withdrawal Status (Scoped strictly to query ID; no full table dump)
+  // 7. Poll Specific Deposit or Withdrawal Status (Scoped strictly to query ID)
   if (action === 'check_withdrawal') {
-    const wth = id ? globalWithdrawals[id] : null;
+    const wth = id ? store.getWithdrawal(id) : null;
     return res.status(200).json({
       success: true,
       withdrawal: wth || null
@@ -261,7 +221,7 @@ export default async function handler(req, res) {
   }
 
   if (action === 'poll_status' || action === 'check_deposit') {
-    const dep = id ? globalDeposits[id] : null;
+    const dep = id ? store.getDeposit(id) : null;
     return res.status(200).json({
       success: true,
       deposit: dep || null
@@ -273,10 +233,11 @@ export default async function handler(req, res) {
     if (!verifyAdminAuth(req, params)) {
       return res.status(403).json({ success: false, error: 'Unauthorized' });
     }
+    const st = store.loadStore();
     return res.status(200).json({
       success: true,
-      deposits: Object.values(globalDeposits).filter(d => d.status === 'PENDING'),
-      withdrawals: Object.values(globalWithdrawals).filter(w => w.status === 'PENDING')
+      deposits: Object.values(st.deposits || {}).filter(d => d.status === 'PENDING'),
+      withdrawals: Object.values(st.withdrawals || {}).filter(w => w.status === 'PENDING')
     });
   }
 
