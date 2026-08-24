@@ -323,7 +323,7 @@ async def handle_text_messages(update: Update, context: ContextTypes.DEFAULT_TYP
             f"🧾 *UTR:* `{utr_str}`\n"
             f"🆔 *ID:* `{dep_id}`"
         )
-        for admin_id in ADMIN_IDS:
+        for admin_id in list(dict.fromkeys(ADMIN_IDS)):
             try:
                 await context.bot.send_message(
                     chat_id=admin_id,
@@ -377,7 +377,7 @@ async def handle_text_messages(update: Update, context: ContextTypes.DEFAULT_TYP
             f"💳 *Send to UPI:* `{res['receiver']}`\n"
             f"🆔 *ID:* `{wth_id}`"
         )
-        for admin_id in ADMIN_IDS:
+        for admin_id in list(dict.fromkeys(ADMIN_IDS)):
             try:
                 await context.bot.send_message(
                     chat_id=admin_id,

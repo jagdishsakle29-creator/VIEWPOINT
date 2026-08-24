@@ -188,13 +188,13 @@ class ColorTradingGame {
           multiplier = 9.0;
         }
       } else if (bet.type === 'size') {
-        if (bet.choice.toLowerCase() === result.size.toLowerCase()) {
+        if (result.size.toLowerCase() === bet.choice.toLowerCase()) {
           won = true;
           multiplier = 2.0;
         }
       }
 
-      const payout = won ? bet.amount * multiplier : 0;
+      const payout = won ? Math.round(bet.amount * multiplier * 100) / 100 : 0;
       if (won) {
         totalWin += payout;
         window.wallet.addWin(payout);
@@ -211,11 +211,11 @@ class ColorTradingGame {
       settledBets.push({ ...bet, won, multiplier, payout });
     });
 
-    if (totalWin > 0) {
+    if (totalWin > 0 && this.isGameVisible() && window.soundEngine) {
       window.soundEngine.playGem(5);
     }
 
-    if (this.ui && this.ui.onRoundSettled) {
+    if (this.ui && this.ui.onRoundSettled && this.isGameVisible()) {
       this.ui.onRoundSettled({
         result,
         settledBets,

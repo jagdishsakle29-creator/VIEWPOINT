@@ -1877,42 +1877,54 @@ class AppController {
         this.dom.btnCopyUpiId.style.background = "";
         this.dom.btnCopyUpiId.style.color = "";
       }
-    }, 2500);
-  }
-
-  submitDepositUtr() {
+  async submitDepositUtr() {
     if (!this.currentUser || this.currentUser.isGuest) {
-      this.showNotification("🔐 Please Login or Register with your mobile number before submitting deposit!", "error");
+      this.showNotification("Please Login or Register with your mobile number before submitting deposit!", "error");
       this.openAuthModal('signup');
       return;
     }
 
-    const amount = parseFloat(this.dom.depositAmountInput.value) || 199;
-    const utr = this.dom.depositUtrInput.value.trim();
-
-    if (!utr || utr.length < 6) {
-      this.showNotification("Please enter a valid 12-digit UTR / Reference number from your UPI app!", "error");
-      return;
+    const btn = this.dom.btnSubmitDeposit || document.getElementById('btnSubmitDeposit');
+    if (btn && btn.disabled) return;
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳</span> <span>SUBMITTING DEPOSIT...</span>`;
     }
-
-    const targetUpi = (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'ADMIN_UPI';
-    const depResp = await window.wallet.submitDepositRequest(amount, utr, targetUpi);
-    
-    if (!depResp || !depResp.success) {
-      this.showNotification(`❌ ${depResp.error || "Deposit submission failed"}`, "error");
-      return;
-    }
-
-    const depRecord = depResp.deposit;
-    window.soundEngine.playDeposit();
-    this.dom.depositUtrInput.value = '';
-    this.dom.modalDepositUpi.classList.remove('open');
-    this.renderDepositHistoryTable();
-    this.showNotification(`⏳ Deposit of ${window.wallet.currency}${amount.toFixed(2)} (UTR: ${utr}) submitted! Funds will be added as soon as Admin confirms bank receipt.`, "info");
 
     try {
-      this.startDepositStatusPolling(depRecord.id, amount, utr);
-    } catch(e) {}
+      const amount = parseFloat(this.dom.depositAmountInput.value) || 199;
+      const utr = this.dom.depositUtrInput.value.trim();
+
+      if (!utr || utr.length < 6) {
+        this.showNotification("Please enter a valid 12-digit UTR / Reference number from your UPI app!", "error");
+        return;
+      }
+
+      const targetUpi = (window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'ADMIN_UPI';
+      const depResp = await window.wallet.submitDepositRequest(amount, utr, targetUpi);
+      
+      if (!depResp || !depResp.success) {
+        this.showNotification(depResp.error || "Deposit submission failed", "error");
+        return;
+      }
+
+      const depRecord = depResp.deposit;
+      window.soundEngine && window.soundEngine.playDeposit && window.soundEngine.playDeposit();
+      this.dom.depositUtrInput.value = '';
+      if (this.dom.modalDepositUpi) this.dom.modalDepositUpi.classList.remove('open');
+      this.renderDepositHistoryTable();
+      this.renderTxHistory();
+      this.showNotification(`Deposit of ${window.wallet.currency}${amount.toFixed(2)} (UTR: ${utr}) submitted! Balance will be credited upon bank verification.`, "success");
+
+      try {
+        this.startDepositStatusPolling(depRecord.id, amount, utr);
+      } catch(e) {}
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<span style="font-size: 18px;">⚡</span> <span>SUBMIT DEPOSIT REQUEST</span>`;
+      }
+    }
   }
 
   startDepositStatusPolling(depositId, amount, utr) {
@@ -2201,21 +2213,36 @@ class AppController {
 
     if (!this.pendingWithdrawalPayload || !window.wallet) return;
 
-    // SEC-03: Authoritative server validation of OTP
-    const res = await window.wallet.submitWithdrawRequest(this.pendingWithdrawalPayload, enteredOtp);
-
-    if (!res.success) {
-      this.showNotification(`❌ ${res.error}`, "error");
-      return;
+    const btn = document.getElementById('btnVerifyWithdrawOtp');
+    if (btn && btn.disabled) return;
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<span>⏳</span> <span>VERIFYING & PROCESSING...</span>`;
     }
 
-    this.closeWithdrawOtpModal();
-    window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
-    this.showNotification(`💸 Withdrawal of ${window.wallet.currency}${this.pendingWithdrawalPayload.amount.toFixed(2)} submitted successfully!`, "success");
+    try {
+      // SEC-03: Authoritative server validation of OTP
+      const res = await window.wallet.submitWithdrawRequest(this.pendingWithdrawalPayload, enteredOtp);
 
-    this.pendingWithdrawalPayload = null;
-    this.renderWithdrawHistoryTable();
-    this.renderTxHistory();
+      if (!res.success) {
+        this.showNotification(res.error || "Withdrawal processing failed", "error");
+        return;
+      }
+
+      const payoutAmt = this.pendingWithdrawalPayload.amount;
+      this.closeWithdrawOtpModal();
+      window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
+      this.showNotification(`Withdrawal of ${window.wallet.currency}${payoutAmt.toFixed(2)} submitted successfully! Admin will dispatch payout in 5-15 minutes.`, "success");
+
+      this.pendingWithdrawalPayload = null;
+      this.renderWithdrawHistoryTable();
+      this.renderTxHistory();
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>🛡️ VERIFY OTP & COMPLETE PAYOUT</span>`;
+      }
+    }
   }
 
   // ================= USER DATABASE & AUTHENTICATION SYSTEM =================
@@ -6082,19 +6109,50 @@ class AppController {
 
   showNotification(msg, type = 'info') {
     const toast = document.createElement('div');
+    const isError = type === 'error';
+    const isSuccess = type === 'success';
+    const isWarn = type === 'warning' || type === 'warn';
+
+    let bg = 'linear-gradient(135deg, #0088cc, #00b4d8)';
+    let color = '#ffffff';
+    let border = '1px solid rgba(0, 180, 216, 0.5)';
+    let icon = 'ℹ️';
+
+    if (isError) {
+      bg = 'linear-gradient(135deg, #fe2c55, #dc2626)';
+      color = '#ffffff';
+      border = '1px solid rgba(254, 44, 85, 0.6)';
+      icon = '❌';
+    } else if (isSuccess) {
+      bg = 'linear-gradient(135deg, #00e701, #00b301)';
+      color = '#0f212e';
+      border = '1px solid rgba(0, 231, 1, 0.7)';
+      icon = '✅';
+    } else if (isWarn) {
+      bg = 'linear-gradient(135deg, #f59e0b, #d97706)';
+      color = '#0f212e';
+      border = '1px solid rgba(245, 158, 11, 0.7)';
+      icon = '⚠️';
+    }
+
     toast.style.cssText = `
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: ${type === 'error' ? '#fe2c55' : '#00e701'};
-      color: #0f212e;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-weight: 700;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-25px);
+      background: ${bg};
+      color: ${color};
+      border: ${border};
+      padding: 13px 22px;
+      border-radius: 12px;
+      font-weight: 800;
       font-size: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      z-index: 999;
-      transform: translateY(20px);
+      line-height: 1.4;
+      text-align: center;
+      max-width: 90vw;
+      width: max-content;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 231, 1, 0.25);
+      z-index: 9999999;
       opacity: 0;
       transition: all 0.3s ease;
     `;
@@ -6102,15 +6160,15 @@ class AppController {
     document.body.appendChild(toast);
 
     setTimeout(() => {
-      toast.style.transform = 'translateY(0)';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
       toast.style.opacity = '1';
     }, 10);
 
     setTimeout(() => {
-      toast.style.transform = 'translateY(20px)';
+      toast.style.transform = 'translateX(-50%) translateY(-25px)';
       toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+      setTimeout(() => toast.remove(), 350);
+    }, 4000);
   }
 
   startOnlineMembersLoop() {

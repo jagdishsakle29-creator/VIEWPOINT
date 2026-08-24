@@ -1,11 +1,13 @@
 /**
  * High quality Web Audio API sound synthesizer
- * Zero external assets required, instantaneous playback and low latency.
+ * Zero external assets required, instantaneous playback, zero background leaks.
  */
 class CasinoAudioEngine {
   constructor() {
     this.ctx = null;
     this.enabled = true;
+    this.tabVisible = typeof document !== 'undefined' ? !document.hidden : true;
+
     // Pre-unlock on first user interaction anywhere
     const unlock = () => {
       this.init();
@@ -14,6 +16,23 @@ class CasinoAudioEngine {
     };
     window.addEventListener('pointerdown', unlock, { once: true });
     window.addEventListener('keydown', unlock, { once: true });
+
+    // Instantly mute / suspend audio context when tab is in background
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          this.tabVisible = false;
+          if (this.ctx && this.ctx.state === 'running') {
+            this.ctx.suspend().catch(() => {});
+          }
+        } else {
+          this.tabVisible = true;
+          if (this.enabled && this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        }
+      });
+    }
   }
 
   init() {
@@ -23,12 +42,19 @@ class CasinoAudioEngine {
         this.ctx = new AudioCtx();
       }
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
+    if (this.ctx && this.ctx.state === 'suspended' && this.tabVisible && this.enabled) {
       this.ctx.resume().catch(() => {});
     }
   }
 
+  canPlay() {
+    if (!this.enabled || !this.tabVisible) return false;
+    if (typeof document !== 'undefined' && document.hidden) return false;
+    return true;
+  }
+
   triggerHaptic(type = 'light') {
+    if (!this.canPlay()) return;
     try {
       if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
         const hf = window.Telegram.WebApp.HapticFeedback;
@@ -50,12 +76,17 @@ class CasinoAudioEngine {
 
   toggleSound(enabled) {
     this.enabled = enabled;
+    if (!this.enabled && this.ctx && this.ctx.state === 'running') {
+      this.ctx.suspend().catch(() => {});
+    }
     return this.enabled;
   }
 
   playClick() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('light');
-    if (!this.enabled || !this.ctx) return;
+    this.init();
+    if (!this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
       const osc = this.ctx.createOscillator();
@@ -77,8 +108,10 @@ class CasinoAudioEngine {
   }
 
   playBet() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('medium');
-    if (!this.enabled || !this.ctx) return;
+    this.init();
+    if (!this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
       const osc = this.ctx.createOscillator();
@@ -100,8 +133,10 @@ class CasinoAudioEngine {
   }
 
   playDeposit() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('success');
-    if (!this.enabled || !this.ctx) return;
+    this.init();
+    if (!this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
       const freqs = [523.25, 659.25, 783.99, 1046.50];
@@ -121,8 +156,10 @@ class CasinoAudioEngine {
   }
 
   playGem(streak = 1) {
+    if (!this.canPlay()) return;
     this.triggerHaptic(streak >= 5 ? 'success' : 'light');
-    if (!this.enabled || !this.ctx) return;
+    this.init();
+    if (!this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
       const baseFreqs = [523.25, 587.33, 659.25, 698.46, 783.99, 880.0, 987.77, 1046.5, 1174.66, 1318.51];
@@ -152,9 +189,10 @@ class CasinoAudioEngine {
   }
 
   playChickenHop() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('light');
-    if (!this.enabled) return;
     this.init();
+    if (!this.ctx) return;
     try {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -175,9 +213,10 @@ class CasinoAudioEngine {
   }
 
   playCarHorn() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('heavy');
-    if (!this.enabled) return;
     this.init();
+    if (!this.ctx) return;
     try {
       [340, 420].forEach(freq => {
         const osc = this.ctx.createOscillator();
@@ -195,15 +234,17 @@ class CasinoAudioEngine {
   }
 
   playCarCrash() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('error');
     this.playCarHorn();
     this.playBomb();
   }
 
   playChicken(streak = 1) {
+    if (!this.canPlay()) return;
     this.triggerHaptic(streak >= 5 ? 'success' : 'light');
-    if (!this.enabled) return;
     this.init();
+    if (!this.ctx) return;
     try {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -225,9 +266,10 @@ class CasinoAudioEngine {
   }
 
   playBomb() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('error');
-    if (!this.enabled) return;
     this.init();
+    if (!this.ctx) return;
     try {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -274,8 +316,9 @@ class CasinoAudioEngine {
   }
 
   playBone() {
-    if (!this.enabled) return;
+    if (!this.canPlay()) return;
     this.init();
+    if (!this.ctx) return;
     try {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -312,8 +355,10 @@ class CasinoAudioEngine {
   }
 
   playCardFlip() {
+    if (!this.canPlay()) return;
     this.triggerHaptic('light');
-    if (!this.enabled || !this.ctx) return;
+    this.init();
+    if (!this.ctx) return;
     try {
       if (this.ctx.state === 'suspended') this.ctx.resume();
       const osc = this.ctx.createOscillator();

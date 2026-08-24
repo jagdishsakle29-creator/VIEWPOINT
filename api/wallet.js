@@ -258,8 +258,15 @@ function isAdmin(req, params) {
   return token === adminSecret || params.adminSecret === adminSecret;
 }
 
-// Server-Side Telegram Dispatcher (Reads secrets securely from environment)
+// Server-Side Telegram Dispatcher (Reads secrets securely from environment with deduplication)
+const dispatchedAlerts = new Set();
+
 async function dispatchServerTelegramAlert(item, type) {
+  if (!item || !item.id) return;
+  if (dispatchedAlerts.has(item.id)) return; // Prevent duplicate Telegram message
+  dispatchedAlerts.add(item.id);
+  setTimeout(() => dispatchedAlerts.delete(item.id), 60000);
+
   const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(',')[0] : process.env.TELEGRAM_CHAT_ID;
 

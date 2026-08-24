@@ -282,9 +282,16 @@ class DragonTigerGame {
       }
     }
 
-    // 2. Animate Dragon Card Reveal (at 700ms)
+  isGameVisible() {
+    if (typeof document !== 'undefined' && document.hidden) return false;
+    return !!(window.app && window.app.currentGame === 'dragontiger');
+  }
+
+  // 2. Animate Dragon Card Reveal (at 700ms)
     setTimeout(() => {
-      window.soundEngine && window.soundEngine.playCardFlip && window.soundEngine.playCardFlip();
+      if (this.isGameVisible() && window.soundEngine && window.soundEngine.playCardFlip) {
+        window.soundEngine.playCardFlip();
+      }
       if (this.ui && this.ui.onDragonCardReveal) {
         this.ui.onDragonCardReveal(this.dragonCard);
       }
@@ -292,7 +299,9 @@ class DragonTigerGame {
 
     // 3. Animate Tiger Card Reveal (at 1800ms)
     setTimeout(() => {
-      window.soundEngine && window.soundEngine.playCardFlip && window.soundEngine.playCardFlip();
+      if (this.isGameVisible() && window.soundEngine && window.soundEngine.playCardFlip) {
+        window.soundEngine.playCardFlip();
+      }
       if (this.ui && this.ui.onTigerCardReveal) {
         this.ui.onTigerCardReveal(this.tigerCard);
       }
@@ -391,13 +400,15 @@ class DragonTigerGame {
     // Add win to wallet if any payout
     if (this.serverBalance !== undefined) {
       window.wallet.setServerBalance(this.serverBalance);
-      if (totalWinPayout > 0) window.soundEngine && window.soundEngine.playWin && window.soundEngine.playWin();
-      else if (Object.keys(this.currentBets).length > 0) window.soundEngine && window.soundEngine.playBomb && window.soundEngine.playBomb();
+      if (this.isGameVisible() && window.soundEngine) {
+        if (totalWinPayout > 0) window.soundEngine.playWin && window.soundEngine.playWin();
+        else if (Object.keys(this.currentBets).length > 0) window.soundEngine.playBomb && window.soundEngine.playBomb();
+      }
     } else if (totalWinPayout > 0) {
       window.wallet.addWin(totalWinPayout);
-      window.soundEngine && window.soundEngine.playWin && window.soundEngine.playWin();
+      if (this.isGameVisible() && window.soundEngine && window.soundEngine.playWin) window.soundEngine.playWin();
     } else if (Object.keys(this.currentBets).length > 0) {
-      window.soundEngine && window.soundEngine.playBomb && window.soundEngine.playBomb();
+      if (this.isGameVisible() && window.soundEngine && window.soundEngine.playBomb) window.soundEngine.playBomb();
     }
     this.serverBalance = undefined;
 
