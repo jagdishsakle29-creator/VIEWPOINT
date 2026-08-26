@@ -28,17 +28,18 @@ admin_ids_raw = os.getenv("ADMIN_IDS", "").strip()
 ADMIN_IDS = [int(i.strip()) for i in admin_ids_raw.split(",") if i.strip().isdigit()]
 
 # WebApp URL
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://viewpoint.diy").strip()
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://shasah.com").strip()
 
 # Support & Channels
-SUPPORT_CHANNEL = os.getenv("SUPPORT_CHANNEL", "@VIEWPOINT78").strip()
-SUPPORT_ADMIN = os.getenv("SUPPORT_ADMIN", "@VIEWPOINT78").strip()
+SUPPORT_CHANNEL = os.getenv("SUPPORT_CHANNEL", "@viewpointios").strip()
+SUPPORT_ADMIN = os.getenv("SUPPORT_ADMIN", "@viewpointios").strip()
 
 # Rewards & Bonuses
 DAILY_BONUS_AMOUNT = float(os.getenv("DAILY_BONUS_AMOUNT", "50"))
 REFERRAL_BONUS_AMOUNT = float(os.getenv("REFERRAL_BONUS_AMOUNT", "500"))
+MIN_WITHDRAW_AMOUNT = float(os.getenv("MIN_WITHDRAW_AMOUNT", "200"))
 # Database path
 DB_PATH = BASE_DIR / "bot_database.sqlite3"
 
 # Admin Secret Passkey for Financial Approvals
-ADMIN_SECRET = os.getenv("ADMIN_SECRET", "VIEWPOINT_SECURE_ADMIN_KEY_7821").strip()
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "VIEWPOINT_ADMIN_SECRET_2026").strip()

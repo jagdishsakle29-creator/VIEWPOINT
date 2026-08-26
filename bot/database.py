@@ -436,6 +436,12 @@ class Database:
             cursor.execute("SELECT telegram_id FROM users WHERE is_banned = 0")
             return [row['telegram_id'] for row in cursor.fetchall()]
 
+    def get_all_users(self):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT telegram_id, username, first_name, balance, total_deposited, total_withdrawn, joined_at, is_banned FROM users ORDER BY joined_at DESC")
+            return [dict(row) for row in cursor.fetchall()]
+
     def get_total_stats(self):
         with self.get_connection() as conn:
             cursor = conn.cursor()

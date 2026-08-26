@@ -1,0 +1,167 @@
+/* Dice Stake-Style VIP Layout */
+.dice-game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  gap: 16px;
+  padding: 16px;
+  background: radial-gradient(circle at 50% 20%, rgba(0, 231, 1, 0.06) 0%, rgba(15, 23, 42, 0.7) 80%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dice-result-card {
+  width: 100%;
+  max-width: 320px;
+  background: #0f172a;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dice-result-card.win {
+  border-color: #00e701;
+  box-shadow: 0 0 35px rgba(0, 231, 1, 0.35);
+  background: radial-gradient(circle, rgba(0, 231, 1, 0.12) 0%, #0f172a 80%);
+}
+
+.dice-result-card.loss {
+  border-color: #fe2c55;
+  box-shadow: 0 0 35px rgba(254, 44, 85, 0.35);
+  background: radial-gradient(circle, rgba(254, 44, 85, 0.12) 0%, #0f172a 80%);
+}
+
+.dice-roll-number {
+  font-family: Outfit, -apple-system, sans-serif;
+  font-size: 54px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.dice-result-card.win .dice-roll-number {
+  color: #00e701;
+  text-shadow: 0 0 20px rgba(0, 231, 1, 0.6);
+}
+
+.dice-result-card.loss .dice-roll-number {
+  color: #fe2c55;
+}
+
+.dice-slider-container {
+  width: 100%;
+  position: relative;
+  padding: 20px 8px;
+}
+
+.dice-slider-track {
+  width: 100%;
+  height: 14px;
+  border-radius: 8px;
+  background: #1e293b;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dice-slider-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.dice-range-input {
+  position: absolute;
+  top: 13px;
+  left: 0;
+  width: 100%;
+  height: 28px;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.dice-slider-indicator {
+  position: absolute;
+  top: 8px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border: 3px solid #00e5ff;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  box-shadow: 0 0 12px #00e5ff;
+  z-index: 4;
+  transition: left 0.15s ease-out;
+}
+
+.dice-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.dice-stat-box {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.dice-stat-label {
+  font-size: 10.5px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dice-stat-val {
+  font-family: Outfit, sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 3px;
+}
+
+.dice-history-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 4px;
+}
+
+.dice-history-chip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dice-history-chip.won {
+  background: rgba(0, 231, 1, 0.15);
+  color: #00e701;
+  border: 1px solid rgba(0, 231, 1, 0.3);
+}
+
+.dice-history-chip.lost {
+  background: rgba(254, 44, 85, 0.15);
+  color: #fe2c55;
+  border: 1px solid rgba(254, 44, 85, 0.3);
+}

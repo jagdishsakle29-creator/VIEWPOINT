@@ -1,10 +1,10 @@
-// /api/store.js - Shared Persistent Storage for Vercel Serverless Functions
+// /api/store.js - Shared Persistent Storage for SHASAH Casino Functions
 // Uses /tmp JSON persistence with fast in-memory caching to survive serverless scale & cold starts.
 
 const fs = require('fs');
 const path = require('path');
 
-const STORE_PATH = path.join('/tmp', 'viewpoint_state.json');
+const STORE_PATH = path.join('/tmp', 'shasah_state.json');
 
 let inMemoryCache = null;
 

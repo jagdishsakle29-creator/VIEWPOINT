@@ -13,7 +13,7 @@ def get_main_menu_keyboard(bot_username, user_id):
     
     keyboard = [
         [
-            InlineKeyboardButton("🚀 PLAY VIEWPOINT GAMES (Mini App)", web_app=WebAppInfo(url=game_url))
+            InlineKeyboardButton("🚀 PLAY SHASAH CASINO (Mini App)", web_app=WebAppInfo(url=game_url))
         ],
         [
             InlineKeyboardButton("💰 My Wallet", callback_data="btn_wallet"),
@@ -48,7 +48,7 @@ def get_wallet_keyboard():
 
 def get_referral_keyboard(bot_username, user_id):
     ref_link = f"https://t.me/{bot_username}?start=ref_{user_id}"
-    share_text = f"🔥 Play Mines, Crash & Color Trading on VIEWPOINT and win real cash! Join now using my link: {ref_link}"
+    share_text = f"🔥 Play Mines, Crash, Plinko & Limbo on SHASAH Casino and win real cash! Join now using my link: {ref_link}"
     share_url = f"https://t.me/share/url?url={ref_link}&text={share_text}"
     
     keyboard = [

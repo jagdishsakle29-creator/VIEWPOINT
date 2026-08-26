@@ -7,3 +7,6 @@ __pycache__/
 .DS_Store
 android/
 capacitor.config.json
+venv/
+bot/venv/
+node_modules/

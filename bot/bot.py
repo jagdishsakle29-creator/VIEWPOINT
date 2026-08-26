@@ -67,13 +67,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     bot_info = await context.bot.get_me()
     welcome_text = (
-        f"💎 *WELCOME TO VIEWPOINT GAMING PLATFORM* 💎\n\n"
+        f"💎 *WELCOME TO SHASAH CASINO & GAMING PLATFORM* 💎\n\n"
         f"👋 Namaste *{user.first_name}*!\n\n"
-        f"India's premier casino & skill gaming experience inside Telegram:\n"
+        f"Premier Provably Fair casino & skill gaming experience inside Telegram:\n"
         f"• 💣 *Mines* (Up to 10,000x multiplier)\n"
-        f"• 🍗 *Chicken* (Mystake Cloche hunt)\n"
         f"• 🚀 *Crash* (Aviator Rocket flight)\n"
-        f"• 🎨 *Tiranga Color Trading* (Win Go 30s)\n"
+        f"• ⚪ *Plinko & Limbo* (Turbo Multipliers)\n"
+        f"• 🍗 *Chicken* (Mystake Cloche hunt)\n"
+        f"• 🎨 *Color Trading* (Win Go 30s)\n"
         f"• 📈 *Stock Market Trading* (Call/Put)\n\n"
         f"💰 *Current Balance:* ₹{db_user['balance']:,.2f}\n"
         f"🎁 *Starting Demo Funds:* ₹1,000.00 Credited\n\n"
@@ -103,7 +104,7 @@ async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     bot_info = await context.bot.get_me()
     await update.message.reply_text(
-        "🎮 Click below to launch **VIEWPOINT Mini App**:",
+        "🎮 Click below to launch **SHASAH Casino Mini App**:",
         reply_markup=get_main_menu_keyboard(bot_info.username, user.id),
         parse_mode="Markdown"
     )
@@ -221,10 +222,136 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"📤 *Total Payouts:* ₹{stats['total_withdrawn']:,.2f}\n\n"
         f"⏳ *Pending Deposits:* {stats['pending_deposits']}\n"
         f"⏳ *Pending Withdrawals:* {stats['pending_withdrawals']}\n\n"
+        f"👥 *View Members List:* `/members`\n"
+        f"💳 *Pending Deposits:* `/deposits`\n"
+        f"💸 *Pending Withdrawals:* `/withdrawals`\n"
         f"📢 *Broadcast to all users:* `/broadcast <Your Message>`\n"
         f"➕ *Add Balance to User:* `/addfunds <TelegramID> <Amount>`"
     )
     await update.message.reply_text(text, parse_mode="Markdown")
+
+async def members_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Admin command: /members - View all registered members data
+    """
+    user = update.effective_user
+    if user.id not in ADMIN_IDS:
+        await update.message.reply_text("⛔ Unauthorized: Admin access only.")
+        return
+
+    users = db.get_all_users()
+    stats = db.get_total_stats()
+
+    if not users:
+        await update.message.reply_text("ℹ️ No registered members found in the database yet.")
+        return
+
+    # Check if export requested
+    args = context.args or []
+    if args and args[0].lower() in ["export", "csv", "json"]:
+        import io
+        csv_buffer = io.StringIO()
+        csv_buffer.write("Telegram_ID,Username,First_Name,Balance,Total_Deposited,Total_Withdrawn,Joined_At\n")
+        for u in users:
+            csv_buffer.write(f"{u['telegram_id']},\"{u.get('username','')}\",\"{u.get('first_name','')}\",{u.get('balance',0):.2f},{u.get('total_deposited',0):.2f},{u.get('total_withdrawn',0):.2f},\"{u.get('joined_at','')}\"\n")
+        
+        csv_bytes = io.BytesIO(csv_buffer.getvalue().encode('utf-8'))
+        csv_bytes.name = f"viewpoint_members_{len(users)}.csv"
+        await update.message.reply_document(
+            document=csv_bytes,
+            caption=f"📁 *VIEWPOINT Members Database Export*\nTotal Players: *{len(users)}* | Total Balances: *₹{stats['total_balance']:,.2f}*",
+            parse_mode="Markdown"
+        )
+        return
+
+    # Text summary with top members
+    msg_lines = [
+        f"👥 *VIEWPOINT REGISTERED MEMBERS ({len(users)})* 👥\n",
+        f"💰 *Total System Balance:* ₹{stats['total_balance']:,.2f}",
+        f"📥 *Total Deposited:* ₹{stats['total_deposited']:,.2f}",
+        f"📤 *Total Withdrawn:* ₹{stats['total_withdrawn']:,.2f}\n",
+        f"📋 *Recent Active Players:*"
+    ]
+
+    for idx, u in enumerate(users[:15], 1):
+        uname = f"@{u['username']}" if u.get('username') else "N/A"
+        name = u.get('first_name') or 'Player'
+        tid = u.get('telegram_id')
+        bal = u.get('balance', 0.0)
+        dep = u.get('total_deposited', 0.0)
+        msg_lines.append(f"{idx}. *{name}* ({uname})\n   🆔 `{tid}` | 💰 Bal: ₹{bal:,.2f} | 📥 Dep: ₹{dep:,.2f}")
+
+    if len(users) > 15:
+        msg_lines.append(f"\n_...and {len(users) - 15} more members._")
+
+    msg_lines.append("\n👉 Tip: Type `/members csv` to download the complete database as an Excel/CSV spreadsheet!")
+    await update.message.reply_text("\n".join(msg_lines), parse_mode="Markdown")
+
+async def deposits_list_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Admin command: /deposits or /pending - View pending deposits with approval buttons
+    """
+    user = update.effective_user
+    if user.id not in ADMIN_IDS:
+        return
+
+    with db.get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM deposits WHERE status = 'PENDING' ORDER BY created_at DESC LIMIT 10")
+        pend_deps = [dict(r) for r in cur.fetchall()]
+
+    if not pend_deps:
+        await update.message.reply_text("✅ No pending deposits at the moment! All caught up.")
+        return
+
+    await update.message.reply_text(f"⏳ *Found {len(pend_deps)} Pending Deposit Requests:*", parse_mode="Markdown")
+    for dep in pend_deps:
+        dep_text = (
+            f"💳 *PENDING DEPOSIT*\n"
+            f"🆔 ID: `{dep['id']}`\n"
+            f"👤 User: `{dep['telegram_id']}`\n"
+            f"💰 Amount: *₹{dep['amount']:,.2f}*\n"
+            f"🧾 UTR: `{dep['utr']}`\n"
+            f"⏰ Time: {dep.get('created_at', 'Recent')}"
+        )
+        await update.message.reply_text(
+            text=dep_text,
+            parse_mode="Markdown",
+            reply_markup=get_admin_approval_keyboard(dep['id'], "DEP")
+        )
+
+async def withdrawals_list_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Admin command: /withdrawals - View pending payout requests
+    """
+    user = update.effective_user
+    if user.id not in ADMIN_IDS:
+        return
+
+    with db.get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM withdrawals WHERE status = 'PENDING' ORDER BY created_at DESC LIMIT 10")
+        pend_wths = [dict(r) for r in cur.fetchall()]
+
+    if not pend_wths:
+        await update.message.reply_text("✅ No pending withdrawals at the moment! All payouts cleared.")
+        return
+
+    await update.message.reply_text(f"⏳ *Found {len(pend_wths)} Pending Withdrawal Requests:*", parse_mode="Markdown")
+    for wth in pend_wths:
+        wth_text = (
+            f"💸 *PENDING WITHDRAWAL*\n"
+            f"🆔 ID: `{wth['id']}`\n"
+            f"👤 User: `{wth['telegram_id']}`\n"
+            f"💰 Net Payout: *₹{wth.get('net_payout', wth['amount']*0.92):,.2f}*\n"
+            f"💳 Send to UPI: `{wth['receiver']}`\n"
+            f"⏰ Time: {wth.get('created_at', 'Recent')}"
+        )
+        await update.message.reply_text(
+            text=wth_text,
+            parse_mode="Markdown",
+            reply_markup=get_admin_approval_keyboard(wth['id'], "WTH")
+        )
 
 async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -472,13 +599,15 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
         )
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_back_keyboard())
 
-    # Admin Approval Handlers
-    elif data.startswith("adm_app_DEP_"):
+    # Admin Approval Handlers (Supports both adm_app_ and appr_ callback formats)
+    elif data.startswith("adm_app_DEP_") or data.startswith("appr_dep_"):
         if user.id not in ADMIN_IDS:
+            await query.answer("❌ Unauthorized administrator access.", show_alert=True)
             return
-        dep_id = data.replace("adm_app_DEP_", "")
+        dep_id = data.replace("adm_app_DEP_", "").replace("appr_dep_", "")
         success, dep = db.approve_deposit(dep_id)
         if success:
+            await query.answer("✅ Deposit Approved & Credited!", show_alert=True)
             await query.edit_message_text(f"✅ Approved Deposit `{dep_id}`! Credited ₹{dep['amount']:.2f} to user `{dep['telegram_id']}`.", parse_mode="Markdown")
             try:
                 # Sync with WebApp
@@ -506,14 +635,17 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
             except Exception:
                 pass
         else:
+            await query.answer(f"⚠️ {dep}", show_alert=True)
             await query.edit_message_text(f"⚠️ {dep}")
 
-    elif data.startswith("adm_rej_DEP_"):
+    elif data.startswith("adm_rej_DEP_") or data.startswith("rejc_dep_"):
         if user.id not in ADMIN_IDS:
+            await query.answer("❌ Unauthorized administrator access.", show_alert=True)
             return
-        dep_id = data.replace("adm_rej_DEP_", "")
+        dep_id = data.replace("adm_rej_DEP_", "").replace("rejc_dep_", "")
         success, dep = db.reject_deposit(dep_id)
         if success:
+            await query.answer("❌ Deposit Rejected.", show_alert=True)
             await query.edit_message_text(f"❌ Rejected Deposit `{dep_id}` for user `{dep['telegram_id']}`.", parse_mode="Markdown")
             try:
                 req = urllib.request.Request(
@@ -537,13 +669,17 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
                 )
             except Exception:
                 pass
+        else:
+            await query.answer(f"⚠️ {dep}", show_alert=True)
 
-    elif data.startswith("adm_app_WTH_"):
+    elif data.startswith("adm_app_WTH_") or data.startswith("appr_wth_"):
         if user.id not in ADMIN_IDS:
+            await query.answer("❌ Unauthorized administrator access.", show_alert=True)
             return
-        wth_id = data.replace("adm_app_WTH_", "")
+        wth_id = data.replace("adm_app_WTH_", "").replace("appr_wth_", "")
         success, wth = db.approve_withdrawal(wth_id)
         if success:
+            await query.answer("✅ Withdrawal Marked as Paid!", show_alert=True)
             await query.edit_message_text(f"✅ Approved Withdrawal `{wth_id}`! Payout sent.", parse_mode="Markdown")
             try:
                 req = urllib.request.Request(
@@ -567,14 +703,18 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
                 )
             except Exception:
                 pass
+        else:
+            await query.answer(f"⚠️ {wth}", show_alert=True)
 
-    elif data.startswith("adm_rej_WTH_"):
+    elif data.startswith("adm_rej_WTH_") or data.startswith("rejc_wth_"):
         if user.id not in ADMIN_IDS:
+            await query.answer("❌ Unauthorized administrator access.", show_alert=True)
             return
-        wth_id = data.replace("adm_rej_WTH_", "")
+        wth_id = data.replace("adm_rej_WTH_", "").replace("rejc_wth_", "")
         success, wth = db.reject_withdrawal(wth_id)
         if success:
-            await query.edit_message_text(f"❌ Rejected Withdrawal `{wth_id}` & Refunded ₹{wth['amount']} to player.", parse_mode="Markdown")
+            await query.answer("❌ Withdrawal Rejected & Refunded.", show_alert=True)
+            await query.edit_message_text(f"❌ Rejected Withdrawal `{wth_id}` & Refunded ₹{wth['amount']:.2f}.", parse_mode="Markdown")
             try:
                 req = urllib.request.Request(
                     f"{WEBAPP_URL}/api/sync",
@@ -592,11 +732,13 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
             try:
                 await context.bot.send_message(
                     chat_id=wth['telegram_id'],
-                    text=f"❌ *Withdrawal Rejected & Refunded*\n₹{wth['amount']:,.2f} has been refunded to your wallet. Please check UPI details and re-request.",
+                    text=f"⚠️ *Withdrawal Request Declined*\nAmount ₹{wth['amount']:,.2f} has been refunded back to your wallet.",
                     parse_mode="Markdown"
                 )
             except Exception:
                 pass
+        else:
+            await query.answer(f"⚠️ {wth}", show_alert=True)
 
 def main():
     if not BOT_TOKEN or "1234567890" in BOT_TOKEN:
@@ -619,6 +761,11 @@ def main():
     app.add_handler(CommandHandler("deposit", deposit_command))
     app.add_handler(CommandHandler("withdraw", withdraw_command))
     app.add_handler(CommandHandler("admin", admin_command))
+    app.add_handler(CommandHandler("members", members_command))
+    app.add_handler(CommandHandler("users", members_command))
+    app.add_handler(CommandHandler("deposits", deposits_list_command))
+    app.add_handler(CommandHandler("pending", deposits_list_command))
+    app.add_handler(CommandHandler("withdrawals", withdrawals_list_command))
     app.add_handler(CommandHandler("broadcast", broadcast_command))
     app.add_handler(CommandHandler("addfunds", addfunds_command))
 

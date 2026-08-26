@@ -65,7 +65,7 @@ function drawServerCard() {
 }
 
 // Provably Fair Crash point generation
-function generateCrashPoint(serverSeed, clientSeed = 'viewpoint', nonce = 1) {
+function generateCrashPoint(serverSeed, clientSeed = 'shasah', nonce = 1) {
   const hash = crypto.createHash('sha256').update(`${serverSeed}:${clientSeed}:${nonce}`).digest('hex');
   const firstBytes = parseInt(hash.substring(0, 8), 16);
   // 4% instant crash
@@ -390,7 +390,7 @@ export default async function handler(req, res) {
 
     const newBal = updateUserBalance(userId, -betAmount);
     const serverSeed = crypto.randomBytes(32).toString('hex');
-    const { crashPoint, hash } = generateCrashPoint(serverSeed, params.clientSeed || 'viewpoint');
+    const { crashPoint, hash } = generateCrashPoint(serverSeed, params.clientSeed || 'shasah');
     const roundId = 'CRASH-' + Date.now() + '-' + crypto.randomBytes(4).toString('hex');
 
     const crashData = {

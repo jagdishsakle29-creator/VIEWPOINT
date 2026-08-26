@@ -278,16 +278,10 @@ class DragonTigerGame {
         }
         this.gameState = 'betting';
         this.startBettingTimer();
-        return;
       }
     }
 
-  isGameVisible() {
-    if (typeof document !== 'undefined' && document.hidden) return false;
-    return !!(window.app && window.app.currentGame === 'dragontiger');
-  }
-
-  // 2. Animate Dragon Card Reveal (at 700ms)
+    // 2. Animate Dragon Card Reveal (at 700ms)
     setTimeout(() => {
       if (this.isGameVisible() && window.soundEngine && window.soundEngine.playCardFlip) {
         window.soundEngine.playCardFlip();
@@ -484,6 +478,11 @@ class DragonTigerGame {
       tigerCount: tCount,
       tieCount: tieCount
     };
+  }
+
+  isGameVisible() {
+    if (typeof document !== 'undefined' && document.hidden) return false;
+    return !!(window.app && window.app.currentGame === 'dragontiger');
   }
 }
 

@@ -125,7 +125,7 @@ export default async function handler(req, res) {
       userId: String(userId),
       amount: amount,
       utr: utr,
-      upiId: String(params.upiId || 'official@viewpoint'),
+      upiId: String(params.upiId || 'official@shasah'),
       status: 'PENDING',
       time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }),
       date: new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }),
@@ -265,7 +265,7 @@ async function dispatchServerTelegramAlert(item, type) {
   try {
     let msg = '';
     const origin = process.env.WEBAPP_URL || 'https://viewpoint.diy';
-    const adminSecret = process.env.ADMIN_SECRET || 'VP_ADMIN_SECURE_2026';
+    const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';
 
     if (type === 'DEPOSIT') {
       msg = `🔔 *NEW UPI DEPOSIT RECORD* 🔔\n\n` +

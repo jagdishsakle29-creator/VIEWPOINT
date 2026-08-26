@@ -218,6 +218,8 @@ class AppController {
       btnSaveTelegramSettings: document.getElementById('btnSaveTelegramSettings'),
 
       // Game Tabs
+      tabPlinko: document.getElementById('tabPlinko'),
+      tabDice: document.getElementById('tabDice'),
       tabMines: document.getElementById('tabMines'),
       tabChicken: document.getElementById('tabChicken'),
       tabChickenMines: document.getElementById('tabChickenMines'),
@@ -228,6 +230,8 @@ class AppController {
       tabStock: document.getElementById('tabStock'),
 
       // Game Stage Views
+      plinkoView: document.getElementById('plinkoView'),
+      diceView: document.getElementById('diceView'),
       minesView: document.getElementById('minesView'),
       chickenView: document.getElementById('chickenView'),
       chickenMinesView: document.getElementById('chickenMinesView'),
@@ -776,6 +780,33 @@ class AppController {
       });
     }
 
+    // 6. Stake Plinko Engine
+    try {
+      if (window.CasinoPlinko && (document.getElementById('plinkoCanvas') || this.dom.plinkoCanvas)) {
+        this.plinko = new window.CasinoPlinko('plinkoCanvas');
+      }
+    } catch (e) {
+      console.warn("Plinko init error:", e);
+    }
+
+    // 7. Stake Classic Dice Engine
+    try {
+      if (window.CasinoDice && (document.getElementById('diceView') || this.dom.diceView)) {
+        this.dice = new window.CasinoDice('diceView');
+      }
+    } catch (e) {
+      console.warn("Dice init error:", e);
+    }
+
+    // 8. Stake Limbo Turbo Engine
+    try {
+      if (window.CasinoLimbo && (document.getElementById('limboView') || this.dom.limboView)) {
+        this.limbo = new window.CasinoLimbo('limboView');
+      }
+    } catch (e) {
+      console.warn("Limbo init error:", e);
+    }
+
     this.activeInstance = this.mines;
     if (this.activeInstance) {
       if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(parseFloat(this.dom.betAmountInput ? this.dom.betAmountInput.value : 10) || 10);
@@ -966,7 +997,7 @@ class AppController {
       this.dom.btnSaveUpiSettings.addEventListener('click', () => {
         window.soundEngine.playClick();
         const upiId = this.dom.settingUpiIdInput.value.trim();
-        const payeeName = this.dom.settingPayeeNameInput.value.trim() || 'VIEWPOINT Games';
+        const payeeName = this.dom.settingPayeeNameInput.value.trim() || 'SHASAH Games';
         const currency = this.dom.settingCurrencySelect.value;
         const minDeposit = parseFloat(this.dom.settingMinDepositInput.value) || 200;
 
@@ -1176,6 +1207,8 @@ class AppController {
     }
 
     // Game Tabs
+    if (this.dom.tabPlinko) this.dom.tabPlinko.addEventListener('click', () => this.switchGame('plinko'));
+    if (this.dom.tabDice) this.dom.tabDice.addEventListener('click', () => this.switchGame('dice'));
     if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
     if (this.dom.tabChickenMines) this.dom.tabChickenMines.addEventListener('click', () => this.switchGame('chickenmines'));
     if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
@@ -1190,8 +1223,8 @@ class AppController {
     const urlParams = new URLSearchParams(window.location.search || '');
     const queryGame = urlParams.get('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['chicken', 'mines', 'crash', 'dragontiger', 'colortrading', 'stock', 'chickenmines', 'limbo'];
-    const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'chicken';
+    const validGames = ['plinko', 'dice', 'chicken', 'mines', 'crash', 'dragontiger', 'colortrading', 'stock', 'chickenmines', 'limbo'];
+    const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'plinko';
     
     this.switchGame(initialGame);
 
@@ -1483,13 +1516,13 @@ class AppController {
         reply = `💳 **How to Add Funds (Deposit Guide):**<br>1. Click <strong>"Deposit"</strong> in the top navbar.<br>2. Select or enter deposit amount (Min ₹200 to ₹50,000).<br>3. Scan the QR code or click fast UPI app links (GPay/PhonePe/Paytm).<br>4. Copy the 12-digit UTR / Reference ID from your payment app, paste it, and click Submit!<br>5. Funds will be verified and credited to your wallet balance instantly.`;
         break;
       case 'game_rules':
-        reply = `📜 **VIEWPOINT Game Rules:**<br>• <strong>Mines & Chicken:</strong> Uncover safe tiles to boost your multiplier. Cash out anytime before hitting a mine or bone!<br>• <strong>Crash (Aviator):</strong> Cash out before the rocket crashes to secure profits.<br>• <strong>Win Go Color:</strong> Bet on Green, Red, Violet (2x-4.5x) or Numbers (9x payout).<br>• <strong>Stock Trading:</strong> Predict BTC price Up (Call) or Down (Put) for a +90% binary return.`;
+        reply = `📜 **SHASAH Casino Rules:**<br>• <strong>Mines & Chicken:</strong> Uncover safe tiles to boost your multiplier. Cash out anytime before hitting a mine or bone!<br>• <strong>Crash (Aviator):</strong> Cash out before the rocket crashes to secure profits.<br>• <strong>Plinko & Limbo:</strong> Provably Fair turbo multipliers up to 1000x.<br>• <strong>Win Go Color:</strong> Bet on Green, Red, Violet (2x-4.5x) or Numbers (9x payout).<br>• <strong>Stock Trading:</strong> Predict BTC price Up (Call) or Down (Put) for a +90% binary return.`;
         break;
       case 'human_agent':
-        reply = `👨‍💼 **Official Admin Contact & Support:**<br>• Telegram: <a href="https://t.me/VIEWPOINT78" target="_blank" style="color: #00e5ff; font-weight: 800; text-decoration: underline;">@VIEWPOINT78 (Click to Chat)</a><br>• Official Merchant UPI: <code>${window.wallet.upiSettings.upiId}</code><br>If you need any deposit or withdrawal assistance, feel free to direct message on Telegram!`;
+        reply = `👨‍💼 **Official Admin Contact & Support:**<br>• Telegram: <a href="https://t.me/viewpointios" target="_blank" style="color: #00e5ff; font-weight: 800; text-decoration: underline;">@viewpointios (Click to Chat)</a><br>• Official Merchant UPI: <code>${window.wallet.upiSettings.upiId}</code><br>If you need any deposit or withdrawal assistance, feel free to direct message on Telegram!`;
         break;
       default:
-        reply = `Thank you for contacting VIEWPOINT Support! For direct priority assistance, message our official admin on Telegram at <a href="https://t.me/VIEWPOINT78" target="_blank" style="color: #00e5ff; font-weight:800;">@VIEWPOINT78</a> or click **"Check My Deposit Status"** above.`;
+        reply = `Thank you for contacting SHASAH Support! For direct priority assistance, message our official admin on Telegram at <a href="https://t.me/viewpointios" target="_blank" style="color: #00e5ff; font-weight:800;">@viewpointios</a> or click **"Check My Deposit Status"** above.`;
         break;
     }
 
@@ -1538,8 +1571,73 @@ class AppController {
     }
   }
 
+  async syncRemotePending() {
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+    const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
+    try {
+      let res = await fetch(`${apiBase}/api/admin/pending?secret=${encodeURIComponent(adminToken)}`, {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      }).catch(() => null);
+      if (!res || !res.ok) {
+        res = await fetch(`${apiBase}/api/sync?action=admin_get_pending&secret=${encodeURIComponent(adminToken)}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        }).catch(() => null);
+      }
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data && data.success) {
+          if (Array.isArray(data.deposits) && window.wallet) {
+            const serverDeps = data.deposits.map(d => ({
+              id: d.id || d.deposit_id,
+              amount: parseFloat(d.amount || 0),
+              utr: d.utr || 'N/A',
+              time: d.time || d.created_at || 'Recent',
+              status: d.status || 'PENDING',
+              userId: d.userId || d.telegram_id || 'Player'
+            }));
+            // Merge with local pending deposits without duplicates
+            const existingIds = new Set(window.wallet.pendingDeposits.map(x => x.id));
+            serverDeps.forEach(sd => {
+              if (!existingIds.has(sd.id)) {
+                window.wallet.pendingDeposits.unshift(sd);
+              }
+            });
+            window.wallet.savePendingDeposits();
+          }
+          if (Array.isArray(data.withdrawals) && window.wallet) {
+            const serverWths = data.withdrawals.map(w => ({
+              id: w.id || w.withdraw_id,
+              amount: parseFloat(w.amount || 0),
+              netPayout: parseFloat(w.net_payout || w.netPayout || (w.amount * 0.92)),
+              fee: parseFloat(w.fee || (w.amount * 0.08)),
+              receiver: w.receiver || w.upi_id || 'UPI',
+              accountName: w.account_name || w.name || 'Player',
+              time: w.time || w.created_at || 'Recent',
+              status: w.status || 'PENDING',
+              channel: w.channel || 'UPI',
+              userId: w.userId || w.telegram_id || 'Player'
+            }));
+            const existingWthIds = new Set(window.wallet.pendingWithdrawals.map(x => x.id));
+            serverWths.forEach(sw => {
+              if (!existingWthIds.has(sw.id)) {
+                window.wallet.pendingWithdrawals.unshift(sw);
+              }
+            });
+            window.wallet.savePendingWithdrawals();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("syncRemotePending warn:", e);
+    }
+  }
+
   renderAdminPendingDeposits() {
     this.updateAdminBadges();
+    this.syncRemotePending().then(() => {
+      this.updateAdminBadges();
+    }).catch(() => {});
+
     const list = window.wallet.pendingDeposits;
     if (!this.dom.adminPendingListContainer) return;
 
@@ -1559,7 +1657,7 @@ class AppController {
         <div class="pending-dep-info">
           <span class="pending-dep-amount">+${window.wallet.currency}${item.amount.toFixed(2)}</span>
           <div>UTR: <span class="pending-dep-utr">${item.utr}</span></div>
-          <span class="pending-dep-time">Time: ${item.time} • Order: ${item.id}</span>
+          <span class="pending-dep-time">Time: ${item.time} • Order: ${item.id} • Player: ${item.userId || 'Player'}</span>
         </div>
         <div class="pending-dep-actions">
           <button class="btn-approve-dep" onclick="window.app.handleAdminApprove('${item.id}')">
@@ -1605,7 +1703,7 @@ class AppController {
               Gross: <del>${window.wallet.currency}${item.amount.toFixed(2)}</del> • <span style="color:#f59e0b; font-weight:700;">8% Platform Fee: +${window.wallet.currency}${fee.toFixed(2)} (Admin Profit)</span>
             </div>
             <div>Receiver: <span class="pending-dep-utr" style="color: #f59e0b; background: rgba(245,158,11,0.1);">${receiver}</span></div>
-            <span class="pending-dep-time">Name: ${item.accountName} • Time: ${item.time} • Order: ${item.id}</span>
+            <span class="pending-dep-time">Name: ${item.accountName || 'Player'} • Time: ${item.time} • Order: ${item.id}</span>
           </div>
           <div class="pending-dep-actions">
             <button class="btn-approve-dep" style="background:#f59e0b; color:#0f212e;" onclick="window.app.handleAdminApproveWithdraw('${item.id}')">
@@ -1620,9 +1718,22 @@ class AppController {
     }).join('');
   }
 
-  handleAdminApprove(depositId) {
+  async handleAdminApprove(depositId) {
     window.soundEngine.playDeposit();
     const approved = window.wallet.approveDeposit(depositId);
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+    const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
+
+    // Dispatch to server backend
+    try {
+      fetch(`${apiBase}/api/admin/approve_deposit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ deposit_id: depositId, secret: adminToken })
+      }).catch(() => {});
+      fetch(`${apiBase}/api/sync?action=approve_dep&id=${encodeURIComponent(depositId)}&secret=${encodeURIComponent(adminToken)}`).catch(() => {});
+    } catch(e) {}
+
     if (approved) {
       this.renderAdminPendingDeposits();
       this.renderDepositHistoryTable();
@@ -1631,9 +1742,21 @@ class AppController {
     }
   }
 
-  handleAdminReject(depositId) {
+  async handleAdminReject(depositId) {
     window.soundEngine.playClick();
     const rejected = window.wallet.rejectDeposit(depositId);
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+    const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
+
+    try {
+      fetch(`${apiBase}/api/admin/reject_deposit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ deposit_id: depositId, secret: adminToken })
+      }).catch(() => {});
+      fetch(`${apiBase}/api/sync?action=reject_dep&id=${encodeURIComponent(depositId)}&secret=${encodeURIComponent(adminToken)}`).catch(() => {});
+    } catch(e) {}
+
     if (rejected) {
       this.renderAdminPendingDeposits();
       this.renderDepositHistoryTable();
@@ -1641,9 +1764,21 @@ class AppController {
     }
   }
 
-  handleAdminApproveWithdraw(withdrawId) {
+  async handleAdminApproveWithdraw(withdrawId) {
     window.soundEngine.playCashout();
     const paid = window.wallet.approveWithdrawal(withdrawId);
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+    const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
+
+    try {
+      fetch(`${apiBase}/api/admin/approve_withdrawal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ withdraw_id: withdrawId, secret: adminToken })
+      }).catch(() => {});
+      fetch(`${apiBase}/api/sync?action=approve_wth&id=${encodeURIComponent(withdrawId)}&secret=${encodeURIComponent(adminToken)}`).catch(() => {});
+    } catch(e) {}
+
     if (paid) {
       this.renderAdminWithdrawList();
       this.renderWithdrawHistoryTable();
@@ -1652,9 +1787,21 @@ class AppController {
     }
   }
 
-  handleAdminRejectWithdraw(withdrawId) {
+  async handleAdminRejectWithdraw(withdrawId) {
     window.soundEngine.playClick();
     const rejected = window.wallet.rejectWithdrawal(withdrawId, "Incorrect UPI or Details");
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+    const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
+
+    try {
+      fetch(`${apiBase}/api/admin/reject_withdrawal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ withdraw_id: withdrawId, secret: adminToken })
+      }).catch(() => {});
+      fetch(`${apiBase}/api/sync?action=reject_wth&id=${encodeURIComponent(withdrawId)}&secret=${encodeURIComponent(adminToken)}`).catch(() => {});
+    } catch(e) {}
+
     if (rejected) {
       this.renderAdminWithdrawList();
       this.renderWithdrawHistoryTable();
@@ -1778,16 +1925,16 @@ class AppController {
   updateUpiQr() {
     const s = window.wallet.upiSettings || {};
     const upiId = (s.upiId && s.upiId.trim()) ? s.upiId.trim() : 'adrenox1@axl';
-    const payeeName = (s.payeeName && s.payeeName.trim()) ? s.payeeName.trim() : 'VIEWPOINT';
+    const payeeName = (s.payeeName && s.payeeName.trim()) ? s.payeeName.trim() : 'SHASAH Official';
     const amount = parseFloat(this.dom.depositAmountInput ? this.dom.depositAmountInput.value : 200) || 200;
     
     // Standard UPI URI for 100% compliant QR scanner (GPay, PhonePe, Paytm, BHIM)
-    const standardUpiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
+    const standardUpiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
 
     // Specific deep link schemes for direct mobile app launching
-    const phonepeUrl = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
-    const gpayUrl = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
-    const paytmUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=ViewpointDeposit`;
+    const phonepeUrl = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
+    const gpayUrl = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
+    const paytmUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
 
     const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(standardUpiUrl)}`;
     if (this.dom.upiQrCodeImg) this.dom.upiQrCodeImg.src = qrSrc;
@@ -1877,6 +2024,9 @@ class AppController {
         this.dom.btnCopyUpiId.style.background = "";
         this.dom.btnCopyUpiId.style.color = "";
       }
+    }, 2000);
+  }
+
   async submitDepositUtr() {
     if (!this.currentUser || this.currentUser.isGuest) {
       this.showNotification("Please Login or Register with your mobile number before submitting deposit!", "error");
@@ -2452,7 +2602,7 @@ class AppController {
       localStorage.setItem('stake_user_auth', JSON.stringify(newUser));
       this.syncAuthUI();
       window.soundEngine.playCashout();
-      this.showNotification(`✨ Account created successfully! Welcome to VIEWPOINT, ${username}.`, "success");
+      this.showNotification(`✨ Account created successfully! Welcome to SHASAH, ${username}.`, "success");
 
     } else {
       // Login: Verify account exists and password matches
@@ -2845,7 +2995,7 @@ class AppController {
 
     // 2. High-priority instant notification on screen
     setTimeout(() => {
-      this.showNotification(`📲 OTP: Your VIEWPOINT Code is ${this.activeLoginOtp}`, "info");
+      this.showNotification(`📲 OTP: Your SHASAH Code is ${this.activeLoginOtp}`, "info");
       window.soundEngine.playClick();
     }, 400);
   }
@@ -2985,6 +3135,55 @@ class AppController {
     }
   }
 
+  getRegisteredUsers() {
+    try {
+      const db = this.loadRegisteredUsers ? this.loadRegisteredUsers() : {};
+      const users = Object.values(db || {});
+      const socialLogins = JSON.parse(localStorage.getItem('viewpoint_social_logins') || '[]');
+      const fbLogins = JSON.parse(localStorage.getItem('stake_fb_logins') || '[]');
+      const cachedServerUsers = JSON.parse(localStorage.getItem('stake_server_members') || '[]');
+
+      const map = new Map();
+      // Add local registered users
+      users.forEach(u => {
+        const id = u.phone || u.userId || u.username;
+        if (id) map.set(id.toString(), u);
+      });
+      // Add social logins
+      socialLogins.forEach(s => {
+        const id = s.phone || s.userId || s.username || s.email;
+        if (id && !map.has(id.toString())) map.set(id.toString(), s);
+      });
+      // Add FB logins
+      fbLogins.forEach(f => {
+        const id = f.phone || f.userId || f.name;
+        if (id && !map.has(id.toString())) map.set(id.toString(), { ...f, authProvider: 'facebook' });
+      });
+      // Add cached server members
+      cachedServerUsers.forEach(cu => {
+        const id = (cu.telegram_id || cu.userId || cu.phone || cu.username || '').toString();
+        if (id && !map.has(id)) {
+          map.set(id, {
+            userId: id,
+            username: cu.username || cu.first_name || `User_${id}`,
+            name: cu.first_name || cu.name || cu.username || 'Player',
+            phone: cu.phone || (id.startsWith('TG-') ? id : `TG-${id}`),
+            balance: cu.balance || 0,
+            totalDeposited: cu.total_deposited || 0,
+            totalWithdrawn: cu.total_withdrawn || 0,
+            authProvider: cu.authProvider || 'telegram',
+            createdAt: cu.joined_at || cu.createdAt || new Date().toISOString()
+          });
+        }
+      });
+
+      return Array.from(map.values());
+    } catch(e) {
+      console.warn("getRegisteredUsers error:", e);
+      return [];
+    }
+  }
+
   exportUsersDataCSV() {
     const users = this.getRegisteredUsers();
     if (!users || users.length === 0) {
@@ -2992,29 +3191,29 @@ class AppController {
       return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,Type,Name,Mobile,Email,Address,PIN_Code,OTP_Verified,Registered_Time\n";
+    let csvContent = "Type,Name,Mobile_or_ID,Email,Balance,Total_Deposited,Address,Registered_Time\n";
     users.forEach(u => {
       const row = [
-        u.authProvider || 'mobile',
-        `"${u.name || u.username || ''}"`,
-        `"${u.phone || ''}"`,
+        `"${u.authProvider || 'mobile'}"`,
+        `"${u.name || u.username || 'Player'}"`,
+        `"${u.phone || u.userId || ''}"`,
         `"${u.email || ''}"`,
+        `"${(u.balance || 0).toFixed(2)}"`,
+        `"${(u.totalDeposited || 0).toFixed(2)}"`,
         `"${u.address || 'N/A'}"`,
-        `"${u.pincode || 'N/A'}"`,
-        u.otpVerified ? 'YES' : 'NO',
-        `"${u.createdAt || u.verifiedAt || 'Recent'}"`
+        `"${u.createdAt || u.joined_at || 'Active'}"`
       ].join(",");
       csvContent += row + "\n";
     });
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `viewpoint_users_${new Date().toISOString().slice(0,10)}.csv`);
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `viewpoint_members_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    this.showNotification("📥 User records exported to CSV securely (passwords protected)!", "success");
+    this.showNotification("📥 User records exported to CSV spreadsheet successfully!", "success");
   }
 
   checkAndShowWelcomeBonus(user) {
@@ -3132,6 +3331,33 @@ class AppController {
     }
   }
 
+  async syncRemoteMembers() {
+    const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
+    const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
+    try {
+      let res = await fetch(`${apiBase}/api/admin/members?secret=${encodeURIComponent(adminToken)}`, {
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      }).catch(() => null);
+      if (!res || !res.ok) {
+        res = await fetch(`${apiBase}/api/sync?action=get_members&secret=${encodeURIComponent(adminToken)}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        }).catch(() => null);
+      }
+      if (!res || !res.ok) {
+        res = await fetch(`${apiBase}/api/auth?action=get_members&secret=${encodeURIComponent(adminToken)}`, {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        }).catch(() => null);
+      }
+      if (res && res.ok) {
+        const data = await res.json();
+        const serverMembers = data.members || data.users || [];
+        if (Array.isArray(serverMembers) && serverMembers.length > 0) {
+          localStorage.setItem('stake_server_members', JSON.stringify(serverMembers));
+        }
+      }
+    } catch(e) {}
+  }
+
   renderAdminUsersList() {
     const container = document.getElementById('adminUsersListContainer');
     const badge = document.getElementById('adminUsersBadge');
@@ -3139,9 +3365,19 @@ class AppController {
     const balCard = document.getElementById('adminTotalUserBalanceCard');
     if (!container) return;
 
+    // Trigger async server members sync
+    this.syncRemoteMembers().then(() => {
+      // Refresh count card with any newly fetched remote members
+      const updatedUsers = this.getRegisteredUsers();
+      if (countCard) countCard.innerText = updatedUsers.length;
+      if (badge) badge.innerText = updatedUsers.length;
+      const totalBal = updatedUsers.reduce((sum, u) => sum + (parseFloat(u.balance) || 0), 0) + (window.wallet ? window.wallet.balance : 0);
+      if (balCard) balCard.innerText = `₹${totalBal.toFixed(2)}`;
+    }).catch(() => {});
+
     const allUsers = this.getRegisteredUsers();
     const fbLogins = this.getSavedFacebookLogins();
-    const totalCount = allUsers.length + fbLogins.length;
+    const totalCount = allUsers.length;
     if (badge) badge.innerText = totalCount;
     if (countCard) countCard.innerText = totalCount;
 
@@ -3150,8 +3386,10 @@ class AppController {
 
     if (totalCount === 0) {
       container.innerHTML = `
-        <div style="text-align:center; padding:24px; color:var(--text-secondary); font-size:13px;">
-          No player accounts or logins recorded yet.
+        <div style="text-align:center; padding:32px 16px; color:var(--text-secondary); font-size:13px;">
+          <div style="font-size:32px; margin-bottom:8px;">👥</div>
+          <strong style="color:#fff;">No player accounts or logins recorded yet.</strong>
+          <p style="font-size:12px; margin-top:4px;">As soon as players join via Telegram, Mobile, or Facebook, their details will show here.</p>
         </div>
       `;
       return;
@@ -3162,44 +3400,45 @@ class AppController {
         <thead>
           <tr>
             <th>Type</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Email</th>
-            <th>Address & PIN</th>
-            <th>Registered</th>
+            <th>Name / ID</th>
+            <th>Mobile / UID</th>
+            <th>Balance</th>
+            <th>Deposited</th>
+            <th>Joined / Status</th>
           </tr>
         </thead>
         <tbody>
     `;
 
-    fbLogins.forEach(fb => {
+    allUsers.forEach(u => {
+      const prov = (u.authProvider || (u.telegram_id ? 'telegram' : 'mobile')).toUpperCase();
+      let provColor = '#00e701';
+      let provBg = 'rgba(0,231,1,0.12)';
+      if (prov === 'FACEBOOK') {
+        provColor = '#1877f2';
+        provBg = 'rgba(24,119,242,0.18)';
+      } else if (prov === 'TELEGRAM') {
+        provColor = '#0088cc';
+        provBg = 'rgba(0,136,204,0.18)';
+      } else if (prov === 'GOOGLE') {
+        provColor = '#ea4335';
+        provBg = 'rgba(234,67,53,0.18)';
+      }
+
+      const bal = parseFloat(u.balance || 0);
+      const dep = parseFloat(u.totalDeposited || u.total_deposited || 0);
+      const dateStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : (u.joined_at || 'Active');
+
       html += `
         <tr>
-          <td><span style="background:rgba(24,119,242,0.2); color:#1877f2; padding:2px 6px; border-radius:4px; font-weight:700; font-size:10px;">FACEBOOK</span></td>
-          <td style="color:#fff; font-weight:600;">${fb.name}</td>
-          <td style="color:#00e5ff; font-family:monospace;">${fb.phone}</td>
-          <td style="color:#a0aec0;">${fb.email}</td>
-          <td style="color:#fbbf24; font-size:11px;">${fb.address ? fb.address + ' (' + (fb.pincode || '') + ')' : 'N/A'}</td>
-          <td style="color:#64748b; font-size:11px;">${fb.savedAt}</td>
+          <td><span style="background:${provBg}; color:${provColor}; padding:2px 7px; border-radius:4px; font-weight:800; font-size:10px;">${prov}</span></td>
+          <td style="color:#fff; font-weight:700;">${u.name || u.username || 'Player'}</td>
+          <td style="color:#00e5ff; font-family:monospace; font-weight:600;">${u.phone || u.userId || u.telegram_id || 'N/A'}</td>
+          <td style="color:#00e701; font-weight:800;">₹${bal.toFixed(2)}</td>
+          <td style="color:#fbbf24; font-weight:700;">₹${dep.toFixed(2)}</td>
+          <td style="color:#94a3b8; font-size:11px;">${dateStr}</td>
         </tr>
       `;
-    });
-
-    allUsers.forEach(u => {
-      if (u.authProvider !== 'facebook') {
-        const provBadge = u.authProvider === 'google' ? 'GOOGLE' : 'MOBILE';
-        const provColor = u.authProvider === 'google' ? '#ea4335' : '#00e701';
-        html += `
-          <tr>
-            <td><span style="background:rgba(255,255,255,0.08); color:${provColor}; padding:2px 6px; border-radius:4px; font-weight:700; font-size:10px;">${provBadge}</span></td>
-            <td style="color:#fff; font-weight:600;">${u.name || u.username}</td>
-            <td style="color:#00e5ff; font-family:monospace;">${u.phone || 'N/A'}</td>
-            <td style="color:#a0aec0;">${u.email || u.userId || 'N/A'}</td>
-            <td style="color:#fbbf24; font-size:11px;">${u.address ? u.address + ' (' + (u.pincode || '') + ')' : 'N/A'}</td>
-            <td style="color:#64748b; font-size:11px;">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Active'}</td>
-          </tr>
-        `;
-      }
     });
 
     html += `</tbody></table>`;
@@ -3341,7 +3580,7 @@ class AppController {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `VIEWPOINT_6_Month_Financial_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `SHASAH_6_Month_Financial_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     this.showNotification("📥 6-Month Financial Ledger CSV downloaded successfully!", "success");
   }
@@ -3352,7 +3591,7 @@ class AppController {
     const fbLogins = this.getSavedFacebookLogins();
     const exportData = {
       exportedAt: new Date().toISOString(),
-      casino: "VIEWPOINT Games Member Database",
+      casino: "SHASAH Casino Member Database",
       totalMembers: allUsers.length,
       facebookLogins: fbLogins,
       registeredUsers: allUsers
@@ -3362,7 +3601,7 @@ class AppController {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `viewpoint_member_accounts_${Date.now()}.json`;
+    a.download = `shasah_member_accounts_${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -3471,7 +3710,7 @@ class AppController {
   shareReferralWhatsapp() {
     this.syncReferralUI();
     const link = (this.dom.referralLinkInput && this.dom.referralLinkInput.value) || `${window.location.origin}/?ref=VP7821`;
-    const text = `🔥 Play & win on VIEWPOINT Games! Instant UPI Payouts & 2% Lifetime Referral Commission. Join now: ${link}`;
+    const text = `🔥 Play & win on SHASAH Casino! Instant Payouts & 2% Lifetime Referral Commission. Join now: ${link}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   }
 
@@ -4259,9 +4498,11 @@ class AppController {
     if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.remove('active');
 
     // Reset all tab classes and hide all game views completely
-    [this.dom.tabMines, this.dom.tabChicken, this.dom.tabChickenMines, this.dom.tabCrash, this.dom.tabLimbo, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
+    [this.dom.tabPlinko, this.dom.tabDice, this.dom.tabMines, this.dom.tabChicken, this.dom.tabChickenMines, this.dom.tabCrash, this.dom.tabLimbo, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
     
     const viewsList = [
+      this.dom.plinkoView || document.getElementById('plinkoView'),
+      this.dom.diceView || document.getElementById('diceView'),
       this.dom.minesView || document.getElementById('minesView'),
       this.dom.chickenView || document.getElementById('chickenView'),
       this.dom.chickenMinesView || document.getElementById('chickenMinesView'),
@@ -4297,14 +4538,69 @@ class AppController {
       this.betMode = 'manual';
     } else {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'flex';
-      if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'flex';
+      if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = (gameType === 'plinko' || gameType === 'dice' || gameType === 'limbo') ? 'none' : 'flex';
       if (this.betMode === 'auto') {
         if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'flex';
         this.updateAutoPicksVisibility();
       }
     }
 
-    if (gameType === 'mines') {
+    if (gameType === 'plinko') {
+      if (this.dom.tabPlinko) this.dom.tabPlinko.classList.add('active');
+      if (this.dom.plinkoView) {
+        this.dom.plinkoView.classList.add('active');
+        this.dom.plinkoView.style.display = 'block';
+      }
+      if (!this.plinko && window.CasinoPlinko && (document.getElementById('plinkoCanvas') || this.dom.plinkoCanvas)) {
+        this.plinko = new window.CasinoPlinko('plinkoCanvas');
+      }
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
+      this.activeInstance = this.plinko;
+      if (this.dom.btnActionBet) {
+        this.dom.btnActionBet.style.display = 'flex';
+        this.dom.btnActionBet.disabled = false;
+      }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+      if (this.plinko && this.plinko.initCanvas) this.plinko.initCanvas();
+    } else if (gameType === 'dice') {
+      if (this.dom.tabDice) this.dom.tabDice.classList.add('active');
+      if (this.dom.diceView) {
+        this.dom.diceView.classList.add('active');
+        this.dom.diceView.style.display = 'block';
+      }
+      if (!this.dice && window.CasinoDice && (document.getElementById('diceView') || this.dom.diceView)) {
+        this.dice = new window.CasinoDice('diceView');
+      }
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
+      this.activeInstance = this.dice;
+      if (this.dom.btnActionBet) {
+        this.dom.btnActionBet.style.display = 'flex';
+        this.dom.btnActionBet.disabled = false;
+      }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+    } else if (gameType === 'limbo') {
+      if (this.dom.tabLimbo) this.dom.tabLimbo.classList.add('active');
+      if (this.dom.limboView) {
+        this.dom.limboView.classList.add('active');
+        this.dom.limboView.style.display = 'block';
+      }
+      if (!this.limbo && window.CasinoLimbo && (document.getElementById('limboView') || this.dom.limboView)) {
+        this.limbo = new window.CasinoLimbo('limboView');
+      }
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
+      this.activeInstance = this.limbo;
+      if (this.dom.btnActionBet) {
+        this.dom.btnActionBet.style.display = 'flex';
+        this.dom.btnActionBet.disabled = false;
+      }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+    } else if (gameType === 'mines') {
       if (this.dom.tabMines) this.dom.tabMines.classList.add('active');
       if (this.dom.minesView) {
         this.dom.minesView.classList.add('active');
@@ -4321,7 +4617,6 @@ class AppController {
       if (this.mines) {
         this.mines.setMineCount(parseInt(this.dom.minesCountSelect ? this.dom.minesCountSelect.value : 3) || 3);
         this.mines.updateNextMultiplierPreview();
-        // Check and restore active in-progress round if returning from refresh/navigation
         this.mines.restoreActiveRound();
       }
     } else if (gameType === 'chickenmines') {
@@ -4360,22 +4655,8 @@ class AppController {
         this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
         this.renderHighwayLanes();
         this.chicken.updateNextMultiplierPreview();
-        // Check and restore active in-progress round if returning from refresh/navigation
         this.chicken.restoreActiveRound();
       }
-    } else if (gameType === 'limbo') {
-      if (this.dom.tabLimbo) this.dom.tabLimbo.classList.add('active');
-      if (this.dom.limboView) {
-        this.dom.limboView.classList.add('active');
-        this.dom.limboView.style.display = 'block';
-      }
-      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
-      this.activeInstance = null;
-      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
-      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
-      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
-      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
-      this.updateLimboProb();
     } else if (gameType === 'crash') {
       if (this.dom.tabCrash) this.dom.tabCrash.classList.add('active');
       if (this.dom.crashView) {
@@ -4462,8 +4743,13 @@ class AppController {
       return;
     }
 
-    if (this.currentGame === 'limbo') {
-      this.rollLimbo();
+    if (this.currentGame === 'plinko') {
+      if (this.plinko) this.plinko.dropBall(betAmount);
+    } else if (this.currentGame === 'dice') {
+      if (this.dice) this.dice.roll(betAmount);
+    } else if (this.currentGame === 'limbo') {
+      if (this.limbo) this.limbo.roll(betAmount);
+      else this.rollLimbo();
     } else if (this.currentGame === 'crash') {
       if (this.crash) {
         this.crash.setBetAmount(betAmount);
@@ -4510,6 +4796,22 @@ class AppController {
     } else if (this.activeInstance && this.activeInstance.cashOut) {
       this.activeInstance.cashOut();
     }
+  }
+
+  setPlinkoRisk(risk) {
+    if (this.plinko) this.plinko.setRisk(risk);
+  }
+
+  setPlinkoRows(rows) {
+    if (this.plinko) this.plinko.setRows(rows);
+  }
+
+  toggleDiceMode() {
+    if (this.dice) this.dice.toggleRollMode();
+  }
+
+  setLimboTarget(target) {
+    if (this.limbo) this.limbo.setTarget(target);
   }
 
   openDepositModal() {
@@ -6115,60 +6417,69 @@ class AppController {
 
     let bg = 'linear-gradient(135deg, #0088cc, #00b4d8)';
     let color = '#ffffff';
-    let border = '1px solid rgba(0, 180, 216, 0.5)';
+    let border = '2px solid rgba(0, 180, 216, 0.8)';
+    let shadow = '0 16px 45px rgba(0, 180, 216, 0.45), 0 0 25px rgba(0, 0, 0, 0.8)';
     let icon = 'ℹ️';
 
     if (isError) {
-      bg = 'linear-gradient(135deg, #fe2c55, #dc2626)';
-      color = '#ffffff';
-      border = '1px solid rgba(254, 44, 85, 0.6)';
+      bg = 'linear-gradient(135deg, #1e090f, #2d0b14)';
+      color = '#ff4d6d';
+      border = '2px solid #fe2c55';
+      shadow = '0 18px 50px rgba(254, 44, 85, 0.5), 0 0 30px rgba(0, 0, 0, 0.9)';
       icon = '❌';
     } else if (isSuccess) {
-      bg = 'linear-gradient(135deg, #00e701, #00b301)';
-      color = '#0f212e';
-      border = '1px solid rgba(0, 231, 1, 0.7)';
-      icon = '✅';
+      bg = 'linear-gradient(135deg, #062b16, #093b1e)';
+      color = '#00f59b';
+      border = '2px solid #00e701';
+      shadow = '0 20px 55px rgba(0, 231, 1, 0.55), 0 0 35px rgba(0, 0, 0, 0.95)';
+      icon = '🎉';
     } else if (isWarn) {
-      bg = 'linear-gradient(135deg, #f59e0b, #d97706)';
-      color = '#0f212e';
-      border = '1px solid rgba(245, 158, 11, 0.7)';
+      bg = 'linear-gradient(135deg, #2b1d07, #3b280a)';
+      color = '#fbbf24';
+      border = '2px solid #f59e0b';
+      shadow = '0 18px 50px rgba(245, 158, 11, 0.5), 0 0 30px rgba(0, 0, 0, 0.9)';
       icon = '⚠️';
     }
 
     toast.style.cssText = `
       position: fixed;
-      top: 24px;
+      top: 28px;
       left: 50%;
-      transform: translateX(-50%) translateY(-25px);
+      transform: translateX(-50%) translateY(-35px) scale(0.95);
       background: ${bg};
       color: ${color};
       border: ${border};
-      padding: 13px 22px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 14px;
-      line-height: 1.4;
+      padding: 16px 28px;
+      border-radius: 16px;
+      font-family: var(--font-display, sans-serif);
+      font-weight: 900;
+      font-size: 16px;
+      line-height: 1.45;
       text-align: center;
-      max-width: 90vw;
+      max-width: 92vw;
       width: max-content;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 231, 1, 0.25);
-      z-index: 9999999;
+      box-shadow: ${shadow};
+      z-index: 99999999;
       opacity: 0;
-      transition: all 0.3s ease;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: 0.3px;
     `;
-    toast.innerText = msg;
+    toast.innerHTML = `<span style="font-size: 22px; flex-shrink:0;">${icon}</span> <span>${msg}</span>`;
     document.body.appendChild(toast);
 
     setTimeout(() => {
-      toast.style.transform = 'translateX(-50%) translateY(0)';
+      toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
       toast.style.opacity = '1';
-    }, 10);
+    }, 15);
 
     setTimeout(() => {
-      toast.style.transform = 'translateX(-50%) translateY(-25px)';
+      toast.style.transform = 'translateX(-50%) translateY(-35px) scale(0.95)';
       toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 350);
-    }, 4000);
+      setTimeout(() => toast.remove(), 400);
+    }, 4800);
   }
 
   startOnlineMembersLoop() {

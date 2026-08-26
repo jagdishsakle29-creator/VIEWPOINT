@@ -4,11 +4,71 @@
 const store = require('./store');
 
 function verifyAdminAuth(req, params) {
-  const adminSecret = process.env.ADMIN_SECRET || 'VP_ADMIN_SECURE_2026';
+  const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';
   const authHeader = req.headers['authorization'] || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7).trim() : '';
   const secret = params.secret || params.admin_secret || '';
   return token === adminSecret || secret === adminSecret;
+}
+
+async function dispatchTelegramSyncAlert(item, type) {
+  const token = process.env.BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
+  const adminIds = (process.env.ADMIN_IDS || '6527377657').split(',');
+  if (!token || !adminIds.length) return;
+
+  const origin = process.env.WEBAPP_URL || 'https://viewpoint.diy';
+  const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';
+
+  let text = '';
+  let inline_keyboard = [];
+
+  if (type === 'DEPOSIT') {
+    text = `🔔 <b>NEW DEPOSIT REQUEST</b> 🔔\n\n` +
+      `👤 <b>Player ID:</b> <code>${item.userId}</code>\n` +
+      `💰 <b>Amount:</b> <b>₹${parseFloat(item.amount || 0).toFixed(2)}</b>\n` +
+      `🧾 <b>UTR:</b> <code>${item.utr || 'N/A'}</code>\n` +
+      `💳 <b>UPI:</b> <code>${item.upiId || 'N/A'}</code>\n` +
+      `🆔 <b>ID:</b> <code>${item.id}</code>`;
+
+    inline_keyboard = [
+      [
+        { text: `✅ Approve (+₹${parseFloat(item.amount || 0).toFixed(0)})`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_dep&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}&amt=${encodeURIComponent(item.amount)}` },
+        { text: "❌ Reject", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_dep&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}` }
+      ]
+    ];
+  } else {
+    const fee = parseFloat(item.fee || (item.amount * 0.08) || 0);
+    const net = parseFloat(item.netPayout || (item.amount - fee) || 0);
+    text = `💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n` +
+      `👤 <b>Player ID:</b> <code>${item.userId}</code>\n` +
+      `💰 <b>Gross:</b> ₹${parseFloat(item.amount || 0).toFixed(2)}\n` +
+      `⚡ <b>Fee (8%):</b> -₹${fee.toFixed(2)}\n` +
+      `💵 <b>Net Payout:</b> <b>₹${net.toFixed(2)}</b>\n` +
+      `🏦 <b>Transfer To:</b> <code>${item.receiver || 'UPI'}</code>\n` +
+      `🆔 <b>ID:</b> <code>${item.id}</code>`;
+
+    inline_keyboard = [
+      [
+        { text: `✅ Mark Paid (₹${net.toFixed(0)})`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_wth&id=${encodeURIComponent(item.id)}` },
+        { text: "❌ Reject & Refund", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_wth&id=${encodeURIComponent(item.id)}` }
+      ]
+    ];
+  }
+
+  for (const adminId of adminIds) {
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: adminId.trim(),
+          text: text,
+          parse_mode: 'HTML',
+          reply_markup: { inline_keyboard }
+        })
+      });
+    } catch (e) {}
+  }
 }
 
 export default async function handler(req, res) {
@@ -52,6 +112,7 @@ export default async function handler(req, res) {
       createdAt: Date.now()
     };
     store.saveDeposit(depRecord);
+    await dispatchTelegramSyncAlert(depRecord, 'DEPOSIT');
     return res.status(200).json({ success: true, deposit: depRecord });
   }
 
@@ -68,7 +129,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Deposit Approved - VIEWPOINT</title>
+        <title>Deposit Approved - SHASAH</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #00e701; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(0, 231, 1, 0.25); }
@@ -102,7 +163,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Deposit Rejected - VIEWPOINT</title>
+        <title>Deposit Rejected - SHASAH</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #ef4444; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(239, 68, 68, 0.25); }
@@ -156,7 +217,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Withdrawal Approved - VIEWPOINT</title>
+        <title>Withdrawal Approved - SHASAH</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #00e701; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(0, 231, 1, 0.25); }
@@ -190,7 +251,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Withdrawal Rejected - VIEWPOINT</title>
+        <title>Withdrawal Rejected - SHASAH</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #ef4444; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(239, 68, 68, 0.25); }
@@ -238,6 +299,28 @@ export default async function handler(req, res) {
       success: true,
       deposits: Object.values(st.deposits || {}).filter(d => d.status === 'PENDING'),
       withdrawals: Object.values(st.withdrawals || {}).filter(w => w.status === 'PENDING')
+    });
+  }
+
+  // 9. Get Members List (Admin Authentication Enforced)
+  if (action === 'get_members' || action === 'list_users') {
+    if (!verifyAdminAuth(req, params)) {
+      return res.status(403).json({ success: false, error: 'Unauthorized: Admin authentication required.' });
+    }
+    const st = store.loadStore();
+    const members = Object.values(st.users || st.wallets || {}).map(u => ({
+      userId: u.userId || u.telegram_id,
+      username: u.username || 'Player',
+      name: u.name || u.first_name || u.username || 'Player',
+      balance: u.balance || 0,
+      totalDeposited: u.totalDeposited || u.total_deposited || 0,
+      authProvider: u.authProvider || 'mobile',
+      createdAt: u.createdAt || u.joined_at || new Date().toISOString()
+    }));
+    return res.status(200).json({
+      success: true,
+      members: members,
+      total: members.length
     });
   }
 

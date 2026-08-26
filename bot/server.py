@@ -23,7 +23,7 @@ from database import db
 from config import ADMIN_IDS
 
 PORT = int(os.getenv("PORT", "8000"))
-ADMIN_SECRET = os.getenv("ADMIN_SECRET", "VP_ADMIN_SECURE_2026")
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "VIEWPOINT_ADMIN_SECRET_2026")
 
 def nCr(n, r):
     if r < 0 or r > n:
@@ -145,6 +145,72 @@ def is_rate_limited(client_id, max_reqs=20, window=1.0):
 
 ADMIN_SESSIONS = set()
 
+def send_telegram_admin_alert(item_id, item_type, amount, user_id, utr_or_receiver, upi_id=""):
+    try:
+        from config import BOT_TOKEN, ADMIN_IDS, WEBAPP_URL, ADMIN_SECRET
+        if not BOT_TOKEN or not ADMIN_IDS:
+            return
+        
+        origin = WEBAPP_URL or "https://viewpoint.diy"
+        if item_type == "DEPOSIT":
+            text = (
+                f"🔔 <b>NEW DEPOSIT REQUEST</b> 🔔\n\n"
+                f"👤 <b>Player ID:</b> <code>{user_id}</code>\n"
+                f"💰 <b>Amount:</b> <b>₹{amount:,.2f}</b>\n"
+                f"🧾 <b>UTR / Ref:</b> <code>{utr_or_receiver}</code>\n"
+                f"💳 <b>UPI:</b> <code>{upi_id}</code>\n"
+                f"🆔 <b>Request ID:</b> <code>{item_id}</code>\n\n"
+                f"<i>Tap below to approve or reject instantly:</i>"
+            )
+            markup = {
+                "inline_keyboard": [
+                    [
+                        {"text": f"✅ Approve (+₹{amount:.0f})", "callback_data": f"appr_dep_{item_id}"},
+                        {"text": "❌ Reject", "callback_data": f"rejc_dep_{item_id}"}
+                    ]
+                ]
+            }
+        else:
+            fee = round(amount * 0.08, 2)
+            net = round(amount - fee, 2)
+            text = (
+                f"💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n"
+                f"👤 <b>Player ID:</b> <code>{user_id}</code>\n"
+                f"💰 <b>Gross:</b> ₹{amount:,.2f}\n"
+                f"⚡ <b>Fee (8%):</b> -₹{fee:,.2f}\n"
+                f"💵 <b>Net Payout:</b> <b>₹{net:,.2f}</b>\n"
+                f"🏦 <b>Transfer To UPI:</b> <code>{utr_or_receiver}</code>\n"
+                f"🆔 <b>Request ID:</b> <code>{item_id}</code>\n\n"
+                f"<i>Tap below to mark as paid or reject:</i>"
+            )
+            markup = {
+                "inline_keyboard": [
+                    [
+                        {"text": f"✅ Mark Paid (₹{net:.0f})", "callback_data": f"appr_wth_{item_id}"},
+                        {"text": "❌ Reject & Refund", "callback_data": f"rejc_wth_{item_id}"}
+                    ]
+                ]
+            }
+
+        for admin_id in ADMIN_IDS:
+            try:
+                payload = json.dumps({
+                    "chat_id": admin_id,
+                    "text": text,
+                    "parse_mode": "HTML",
+                    "reply_markup": markup
+                }).encode("utf-8")
+                req = urllib.request.Request(
+                    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                    data=payload,
+                    headers={"Content-Type": "application/json"}
+                )
+                urllib.request.urlopen(req, timeout=3)
+            except Exception as e:
+                print(f"Telegram dispatch error for admin {admin_id}:", e)
+    except Exception as e:
+        print("send_telegram_admin_alert exception:", e)
+
 class GameAPIHandler(BaseHTTPRequestHandler):
     def _send_cors_headers(self):
         origin = self.headers.get("Origin", "")
@@ -177,8 +243,13 @@ class GameAPIHandler(BaseHTTPRequestHandler):
         auth = self.headers.get("Authorization", "")
         token = auth.replace("Bearer ", "").strip() if "Bearer " in auth else ""
         if not token and isinstance(params, dict):
-            token = params.get("adminToken") or params.get("token") or params.get("secret")
-        return (token in ADMIN_SESSIONS) or (token and token == ADMIN_SECRET)
+            raw = params.get("adminToken") or params.get("token") or params.get("secret") or params.get("admin_secret")
+            if isinstance(raw, list) and len(raw) > 0:
+                token = raw[0]
+            elif isinstance(raw, str):
+                token = raw
+        from config import ADMIN_SECRET
+        return (token in ADMIN_SESSIONS) or (token and str(token).strip() == str(ADMIN_SECRET).strip())
 
     def _check_rate_limit(self):
         client_ip = self.client_address[0] if self.client_address else "unknown"
@@ -252,10 +323,56 @@ class GameAPIHandler(BaseHTTPRequestHandler):
             self._json_response({"success": True, "hasActiveRound": False})
             return
 
-        # 2. Stats (Admin only or aggregated public stats)
-        elif parsed.path == "/api/stats":
+        # 2. Stats & Admin Members (Admin or public stats)
+        elif parsed.path in ["/api/stats", "/api/admin/stats"]:
             stats = db.get_total_stats()
             self._json_response({"success": True, "stats": stats})
+            return
+
+        # 2.1 Admin Members List (Protected)
+        elif parsed.path in ["/api/admin/members", "/api/admin/users"] or (parsed.path == "/api/sync" and action in ["get_members", "list_users"]):
+            if not self._is_admin(params):
+                self._error_response("Unauthorized: Administrator credentials required.", status=401)
+                return
+            users = db.get_all_users()
+            self._json_response({"success": True, "members": users, "users": users, "total": len(users)})
+            return
+
+        # 2.2 Admin Pending Deposits & Withdrawals (Protected)
+        elif parsed.path in ["/api/admin/pending", "/api/admin/deposits"] or (parsed.path == "/api/sync" and action == "admin_get_pending"):
+            if not self._is_admin(params):
+                self._error_response("Unauthorized: Administrator credentials required.", status=401)
+                return
+            stats = db.get_total_stats()
+            with db.get_connection() as conn:
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM deposits WHERE status = 'PENDING' ORDER BY created_at DESC")
+                pend_deps = [dict(r) for r in cur.fetchall()]
+                cur.execute("SELECT * FROM withdrawals WHERE status = 'PENDING' ORDER BY created_at DESC")
+                pend_wths = [dict(r) for r in cur.fetchall()]
+            self._json_response({
+                "success": True,
+                "deposits": pend_deps,
+                "withdrawals": pend_wths,
+                "stats": stats
+            })
+            return
+
+        # 2.3 Status Check for Deposit / Withdrawal
+        elif parsed.path in ["/api/sync", "/api/status"] and action in ["check_deposit", "check_withdrawal", "poll_status"]:
+            item_id = params.get("id", [""])[0]
+            if not item_id:
+                self._error_response("Missing ID")
+                return
+            if item_id.startswith("DEP"):
+                dep = db.get_deposit(item_id)
+                self._json_response({"success": True, "deposit": dep})
+                return
+            elif item_id.startswith("WTH"):
+                wth = db.get_withdrawal(item_id)
+                self._json_response({"success": True, "withdrawal": wth})
+                return
+            self._json_response({"success": True, "status": "PENDING"})
             return
 
         # 3. User Bets History
@@ -283,7 +400,42 @@ class GameAPIHandler(BaseHTTPRequestHandler):
             })
             return
 
+        # 5. Serve Static Frontend Web Files (HTML, CSS, JS, Assets)
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        rel_path = parsed.path.lstrip('/') or 'index.html'
+        file_path = os.path.join(root_dir, rel_path)
+
+        if os.path.isfile(file_path):
+            import mimetypes
+            ctype, _ = mimetypes.guess_type(file_path)
+            if not ctype:
+                if file_path.endswith('.js'): ctype = 'application/javascript; charset=utf-8'
+                elif file_path.endswith('.css'): ctype = 'text/css; charset=utf-8'
+                elif file_path.endswith('.json') or file_path.endswith('.webmanifest'): ctype = 'application/json'
+                elif file_path.endswith('.html'): ctype = 'text/html; charset=utf-8'
+                else: ctype = 'application/octet-stream'
+
+            try:
+                with open(file_path, 'rb') as f:
+                    content = f.read()
+                self.send_response(200)
+                self.send_header('Content-Type', ctype)
+                self.send_header('Content-Length', str(len(content)))
+                self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                self.send_header('Pragma', 'no-cache')
+                self.send_header('Expires', '0')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            except Exception as e:
+                self._error_response(f"File read error: {e}", status=500)
+                return
+
         self._error_response("Endpoint not found", status=404)
+
+    def do_HEAD(self):
+        self.do_GET()
 
     def do_POST(self):
         if not self._check_rate_limit():
@@ -857,6 +1009,7 @@ class GameAPIHandler(BaseHTTPRequestHandler):
 
             success, res = db.create_withdrawal_request(withdraw_id, telegram_id, amount, receiver, channel)
             if success:
+                send_telegram_admin_alert(withdraw_id, "WITHDRAWAL", amount, telegram_id, receiver, channel)
                 user = db.get_user(telegram_id)
                 self._json_response({
                     "success": True,
@@ -881,16 +1034,17 @@ class GameAPIHandler(BaseHTTPRequestHandler):
             try: telegram_id = int(telegram_id)
             except: telegram_id = 78912345
 
-            if amount < 100.0:
-                self._error_response("Minimum deposit amount is ₹100.00")
+            if amount < 10.0:
+                self._error_response("Minimum deposit amount is ₹10.00")
                 return
 
-            if not utr or len(utr) < 6:
-                self._error_response("Please provide a valid 12-digit UPI UTR reference number.")
+            if not utr or len(utr) < 4:
+                self._error_response("Please provide a valid UPI UTR / reference number.")
                 return
 
             success, res = db.create_deposit_request(deposit_id, telegram_id, amount, utr, upi_id)
             if success:
+                send_telegram_admin_alert(deposit_id, "DEPOSIT", amount, telegram_id, utr, upi_id)
                 self._json_response({
                     "success": True,
                     "depositId": deposit_id,

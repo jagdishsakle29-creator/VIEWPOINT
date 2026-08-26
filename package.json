@@ -1,7 +1,7 @@
 {
-  "name": "viewpoint-games",
-  "version": "1.0.0",
-  "description": "VIEWPOINT Instant Casino & Arcade Games",
+  "name": "viewpoint-casino",
+  "version": "2.0.0",
+  "description": "VIEWPOINT.DIY - Instant Casino & Arcade Games",
   "private": true,
   "scripts": {
     "cap:sync": "npx cap sync android",

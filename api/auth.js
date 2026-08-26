@@ -54,6 +54,7 @@ export default async function handler(req, res) {
       name: params.name || username,
       address: params.address || '',
       pincode: params.pincode || '',
+      authProvider: params.authProvider || 'mobile',
       createdAt: new Date().toISOString()
     };
 
@@ -72,7 +73,8 @@ export default async function handler(req, res) {
         username,
         phone,
         email,
-        name: userRecord.name
+        name: userRecord.name,
+        authProvider: userRecord.authProvider
       }
     });
   }
@@ -114,7 +116,8 @@ export default async function handler(req, res) {
         userId: user.userId,
         username: user.username,
         phone: user.phone || '',
-        email: user.email || ''
+        email: user.email || '',
+        name: user.name || user.username
       }
     });
   }
@@ -181,6 +184,32 @@ export default async function handler(req, res) {
       activeSessions.delete(token);
     }
     return res.status(200).json({ success: true, message: 'Logged out successfully' });
+  }
+
+  // 7. GET ALL REGISTERED MEMBERS (Admin Protected)
+  if (action === 'get_members' || action === 'list_users') {
+    const adminSecret = process.env.ADMIN_SECRET || 'VP_ADMIN_SECURE_2026';
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7).trim() : '';
+    const secret = params.secret || params.admin_secret || params.adminSecret || '';
+    if (token !== adminSecret && secret !== adminSecret) {
+      return res.status(403).json({ success: false, error: 'Unauthorized: Admin authentication required' });
+    }
+
+    const users = Array.from(registeredUsers.values()).map(u => ({
+      userId: u.userId,
+      username: u.username,
+      name: u.name || u.username,
+      phone: u.phone,
+      email: u.email,
+      address: u.address || '',
+      pincode: u.pincode || '',
+      authProvider: u.authProvider || 'mobile',
+      createdAt: u.createdAt
+    }));
+    const uniqueMap = new Map();
+    users.forEach(u => uniqueMap.set(u.userId, u));
+    return res.status(200).json({ success: true, members: Array.from(uniqueMap.values()) });
   }
 
   return res.status(400).json({ success: false, error: 'Invalid auth action' });
