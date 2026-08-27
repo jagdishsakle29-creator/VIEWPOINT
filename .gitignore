@@ -10,3 +10,4 @@ capacitor.config.json
 venv/
 bot/venv/
 node_modules/
+cloudflared

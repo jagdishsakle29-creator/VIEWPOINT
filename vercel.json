@@ -1,5 +1,26 @@
 {
   "version": 2,
-  "name": "viewpoint-games",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/game/dragontiger/play", "destination": "/api/games.js?action=dt_play" },
+    { "source": "/api/game/color/current", "destination": "/api/games.js?action=color_current" },
+    { "source": "/api/game/color/bet", "destination": "/api/games.js?action=color_bet" },
+    { "source": "/api/game/stock/bet", "destination": "/api/games.js?action=stock_trade" },
+    { "source": "/api/game/crash/bet", "destination": "/api/games.js?action=crash_bet" },
+    { "source": "/api/wallet/deposit", "destination": "/api/wallet.js" },
+    { "source": "/api/wallet/withdraw", "destination": "/api/wallet.js" },
+    { "source": "/api/wallet/(.*)", "destination": "/api/wallet.js" },
+    { "source": "/api/games", "destination": "/api/games.js" },
+    { "source": "/api/(.*)", "destination": "/api/$1.js" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, X-Requested-With" }
+      ]
+    }
+  ]
 }
