@@ -3891,11 +3891,11 @@ class AppController {
 
   // ================= MULTI-PAGE SWITCHER (DEDICATED PAGES) =================
   switchMainPage(pageNumber) {
-    window.soundEngine.playClick();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     this.currentPage = pageNumber;
-    if (this.dom.btnNavPage1) this.dom.btnNavPage1.classList.toggle('active', pageNumber === 1);
-    if (this.dom.btnNavPage2) this.dom.btnNavPage2.classList.toggle('active', pageNumber === 2);
-    if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.toggle('active', pageNumber === 3 || pageNumber === 4);
+    
+    // Ensure mainPage1 is always visible
+    if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
 
     // Sync Bottom Mobile Navigation Bar
     const mNav1 = document.getElementById('mNavOriginals');
@@ -3908,64 +3908,20 @@ class AppController {
     if (mNavLiveBet) mNavLiveBet.classList.toggle('active', pageNumber === 4);
 
     if (pageNumber === 1) {
-      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
-      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
-
-      // Switch to active game within Page 1 (Chicken Road default)
-      if (this.currentGame !== 'chicken' && this.currentGame !== 'chickenmines' && this.currentGame !== 'mines') {
-        this.switchGame('chicken');
-      }
+      this.switchGamePage(1);
+      this.switchGame('dragontiger');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (pageNumber === 2) {
-      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
-      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
-
-      // Switch to active game within Page 2 (Crash default)
-      if (this.currentGame !== 'crash' && this.currentGame !== 'limbo') {
-        this.switchGame('crash');
-      }
-      if (this.crash && this.crash.resizeCanvas) {
-        setTimeout(() => this.crash.resizeCanvas(), 60);
-      }
+      this.switchGamePage(2);
+      this.switchGame('plinko');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (pageNumber === 3) {
-      // DEDICATED CASINO: Dragon Tiger Live VIP Arena
-      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'none';
-      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'block';
-
-      // Ensure Dragon Tiger card is fully visible
-      const dtCard = document.querySelector('.dt-vip-card');
-      if (dtCard) dtCard.style.display = 'block';
-      if (this.dom.dragontigerView) {
-        this.dom.dragontigerView.style.display = 'block';
-        this.dom.dragontigerView.classList.add('active');
-      }
-      this.currentGame = 'dragontiger';
-      this.activeInstance = this.dragontiger;
-
-      if (this.dragontiger) {
-        this.renderDtBeadRoad(this.dragontiger.history);
-      }
+      this.switchGamePage(3);
+      this.switchGame('colortrading');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (pageNumber === 4) {
-      // DEDICATED LIVE BET: Win Go Color Trading & Stock Market BTC
-      if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'none';
-      if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'block';
-
-      const stockCard = document.querySelector('.stock-card');
-      if (stockCard) {
-        stockCard.style.display = 'block';
-        stockCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      if (this.stock) {
-        setTimeout(() => {
-          this.stock.resizeCanvas();
-        }, 80);
-      }
-      this.drawLuckyWheel(this.wheelAngle || 0);
-      this.checkWheelDailyAvailability();
-      this.checkDailyClaimAvailability();
-      this.updateVipRakebackUI();
+      const bottomSec = document.querySelector('.bottom-section');
+      if (bottomSec) bottomSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
