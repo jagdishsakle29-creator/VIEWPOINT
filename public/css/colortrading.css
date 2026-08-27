@@ -1,0 +1,268 @@
+/* ===================================================
+   TIRANGA COLOR TRADING (WIN GO) - ULTRA PREMIUM VIP STYLES
+   =================================================== */
+
+.colortrading-view {
+  display: none;
+  width: 100%;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.colortrading-view.active {
+  display: flex;
+}
+
+/* Tiranga Mode Tabs (30s, 1Min, 3Min, 5Min) */
+.tiranga-modes-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.tiranga-mode-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  padding: 10px 6px;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tiranga-mode-btn:hover {
+  background: var(--bg-hover);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.tiranga-mode-btn.active {
+  background: linear-gradient(135deg, #1b84ff 0%, #00f0ff 100%);
+  color: #ffffff;
+  border-color: #00f0ff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+}
+
+.trading-header-card {
+  background: linear-gradient(135deg, rgba(24, 34, 52, 0.8) 0%, rgba(13, 20, 34, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+}
+
+.trading-period-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trading-period-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.trading-period-id {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 900;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+.trading-timer-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.trading-timer-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.trading-timer-digits {
+  display: flex;
+  gap: 4px;
+}
+
+.time-digit-pill {
+  background: #090e18;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 8px;
+  min-width: 28px;
+  text-align: center;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.time-digit-pill.hurry {
+  color: #ff3366;
+  border-color: #ff3366;
+  box-shadow: 0 0 14px rgba(255, 51, 102, 0.5);
+  animation: pulseHurry 0.6s infinite alternate;
+}
+
+@keyframes pulseHurry {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+/* 3 Primary Colors */
+.color-bet-buttons-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-color-bet {
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 14px 10px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-color-bet:hover { transform: translateY(-3px); }
+.btn-color-bet:active { transform: translateY(1px); }
+
+.btn-green-bet {
+  background: linear-gradient(135deg, #00f59b 0%, #00a86b 100%);
+  box-shadow: 0 6px 18px rgba(0, 245, 155, 0.4);
+  color: #06150e;
+}
+
+.btn-violet-bet {
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  box-shadow: 0 6px 18px rgba(168, 85, 247, 0.4);
+}
+
+.btn-red-bet {
+  background: linear-gradient(135deg, #ff3366 0%, #c9184a 100%);
+  box-shadow: 0 6px 18px rgba(255, 51, 102, 0.4);
+}
+
+.payout-tag {
+  font-size: 11px;
+  opacity: 0.9;
+  font-weight: 800;
+}
+
+/* Numbers 0-9 Keypad Matrix (3 Columns) */
+.numbers-bet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.btn-number-bet {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius-md);
+  padding: 12px 6px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-number-bet:hover { 
+  transform: translateY(-2px) scale(1.02); 
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+.btn-number-bet:active { transform: translateY(1px); }
+
+.btn-number-0 {
+  grid-column: span 3;
+  padding: 12px 6px;
+}
+
+.num-payout {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.95;
+}
+
+.num-red { background: linear-gradient(135deg, #ff3366, #c9184a); }
+.num-green { background: linear-gradient(135deg, #00f59b, #00a86b); color: #06150e; }
+.num-violet-red { background: linear-gradient(135deg, #a855f7 50%, #ff3366 50%); }
+.num-violet-green { background: linear-gradient(135deg, #a855f7 50%, #00f59b 50%); }
+
+/* Big / Small */
+.big-small-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-big-bet {
+  background: linear-gradient(135deg, #ffb703 0%, #fb8500 100%);
+  box-shadow: 0 6px 18px rgba(255, 183, 3, 0.4);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 14px 10px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  color: #0d0700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease;
+}
+
+.btn-small-bet {
+  background: linear-gradient(135deg, #1b84ff 0%, #0056b3 100%);
+  box-shadow: 0 6px 18px rgba(27, 132, 255, 0.4);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 14px 10px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease;
+}
+
+.btn-big-bet:hover, .btn-small-bet:hover { transform: translateY(-2px); }

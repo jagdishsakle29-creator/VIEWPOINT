@@ -1,0 +1,775 @@
+/* ====================================================================
+   DRAGON TIGER - EVOLUTION GAMING LIVE CASINO LUXURY THEME
+   Table Felt, 3D Card Dealing, Roadmaps, Neon Avatars, Chip Stacks
+   ==================================================================== */
+
+.dragontiger-view {
+  display: none;
+  width: 100%;
+  flex-direction: column;
+  gap: 16px;
+  user-select: none;
+}
+
+.dragontiger-view.active {
+  display: flex;
+}
+
+/* Master Live Stage Card */
+.dt-live-stage {
+  background: radial-gradient(ellipse at center 20%, #152433 0%, #0c1622 60%, #070d14 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.35);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dt-live-stage::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Header: Status, Round ID & Timer */
+.dt-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dt-help-btn {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: #fbbf24;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.dt-help-btn:hover {
+  background: #fbbf24;
+  color: #0f172a;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.modal-dt-rules-card {
+  background: linear-gradient(145deg, #131c2c 0%, #0c1420 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.dt-rule-card {
+  background: rgba(10, 16, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.dt-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 14px;
+  border-radius: 30px;
+}
+
+.dt-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #00e701;
+  box-shadow: 0 0 10px #00e701;
+  animation: pulseDot 1.4s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.dt-status-text {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.dt-timer-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  padding: 4px 12px;
+  border-radius: 30px;
+}
+
+.dt-timer-clock {
+  font-size: 14px;
+}
+
+.dt-timer-seconds {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 18px;
+  font-weight: 900;
+  color: #00e5ff;
+  min-width: 22px;
+  text-align: center;
+}
+
+.dt-timer-seconds.hurry {
+  color: #ff3366;
+  animation: timerBlink 0.5s infinite;
+}
+
+@keyframes timerBlink {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* Dealing Table & Card Spots (Left Dragon vs Right Tiger) */
+.dt-arena-table {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 600px) {
+  .dt-arena-table {
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+}
+
+.dt-fighter-pod {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  background: rgba(10, 18, 30, 0.7);
+  border-radius: 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.dt-fighter-pod.dragon {
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: inset 0 0 16px rgba(239, 68, 68, 0.12);
+}
+
+.dt-fighter-pod.dragon.winner {
+  border-color: #ef4444;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.7), inset 0 0 16px rgba(239, 68, 68, 0.4);
+  transform: scale(1.03);
+}
+
+.dt-fighter-pod.tiger {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: inset 0 0 16px rgba(245, 158, 11, 0.12);
+}
+
+.dt-fighter-pod.tiger.winner {
+  border-color: #f59e0b;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.7), inset 0 0 16px rgba(245, 158, 11, 0.4);
+  transform: scale(1.03);
+}
+
+.dt-fighter-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.dt-fighter-badge.dragon {
+  color: #ff4d4d;
+}
+
+.dt-fighter-badge.tiger {
+  color: #fbbf24;
+}
+
+/* 3D Realistic Card Spot & Card Flip (Sleek Compact Size) */
+.dt-card-slot {
+  width: 68px;
+  height: 96px;
+  perspective: 1000px;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .dt-card-slot {
+    width: 54px;
+    height: 76px;
+  }
+}
+
+.dt-card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 6px;
+  will-change: transform;
+}
+
+.dt-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.dt-card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 6px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+/* Card Back (Classic Casino Pattern) */
+.dt-card-back {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  border: 1.5px solid #fbbf24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dt-card-back-pattern {
+  width: 86%;
+  height: 86%;
+  border: 1px dashed rgba(251, 191, 36, 0.5);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, transparent 70%);
+}
+
+.dt-card-back-logo {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 9px;
+  font-weight: 900;
+  color: #fbbf24;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Card Front (Face-Up) */
+.dt-card-front {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  transform: rotateY(180deg);
+  color: #0f172a;
+}
+
+.dt-card-front.red-suit {
+  color: #dc2626;
+}
+
+.dt-card-front.black-suit {
+  color: #0f172a;
+}
+
+.dt-card-corner-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-weight: 900;
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .dt-card-corner-top {
+    font-size: 10px;
+  }
+}
+
+.dt-card-suit-mini {
+  font-size: 9px;
+  margin-top: 1px;
+}
+
+.dt-card-center-suit {
+  align-self: center;
+  font-size: 18px;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .dt-card-center-suit {
+    font-size: 14px;
+  }
+}
+
+.dt-card-corner-bot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-weight: 900;
+  font-size: 12px;
+  transform: rotate(180deg);
+}
+
+@media (max-width: 600px) {
+  .dt-card-corner-bot {
+    font-size: 10px;
+  }
+}
+
+.dt-card-score-pill {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #e2e8f0;
+}
+
+/* Center VS / Tie Arena */
+.dt-center-arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dt-vs-emblem {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 20px;
+  font-weight: 900;
+  color: #94a3b8;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.dt-winner-banner {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  transition: all 0.3s ease;
+}
+
+.dt-winner-banner.dragon-won {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ff4d4d;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+.dt-winner-banner.tiger-won {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #fbbf24;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+}
+
+.dt-winner-banner.tie-won {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #34d399;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+}
+
+/* ================= BETTING SPOTS (EVOLUTION CASINO FELT) ================= */
+.dt-betting-board {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr 2fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+  .dt-betting-board {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+}
+
+.dt-bet-spot {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(10, 15, 26, 0.95) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 80px;
+}
+
+.dt-bet-spot:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dt-bet-spot.dragon-spot {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.dt-bet-spot.dragon-spot:hover, .dt-bet-spot.dragon-spot.has-bet {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(10, 15, 26, 0.95) 100%);
+}
+
+.dt-bet-spot.tiger-spot {
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.dt-bet-spot.tiger-spot:hover, .dt-bet-spot.tiger-spot.has-bet {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(10, 15, 26, 0.95) 100%);
+}
+
+.dt-bet-spot.tie-spot {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.dt-bet-spot.tie-spot:hover, .dt-bet-spot.tie-spot.has-bet {
+  border-color: #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(10, 15, 26, 0.95) 100%);
+}
+
+.dt-bet-spot.suited-tie-spot {
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.dt-bet-spot.suited-tie-spot:hover, .dt-bet-spot.suited-tie-spot.has-bet {
+  border-color: #a855f7;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(10, 15, 26, 0.95) 100%);
+}
+
+.dt-bet-spot-title {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.dt-bet-spot-payout {
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.dt-spot-chip-badge {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  color: #0f172a;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  border: 1px solid #ffffff;
+  display: none;
+}
+
+.dt-bet-spot.has-bet .dt-spot-chip-badge {
+  display: block;
+}
+
+/* Side Bets Row */
+.dt-side-bets-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 600px) {
+  .dt-side-bets-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.dt-side-bet-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.dt-side-bet-btn:hover, .dt-side-bet-btn.has-bet {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.dt-side-bet-btn.has-bet .dt-spot-chip-badge {
+  display: block;
+}
+
+.dt-side-title {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 12px;
+  font-weight: 800;
+  color: #e2e8f0;
+}
+
+.dt-side-mult {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* ================= EVOLUTION LUXURY CASINO CHIP SELECTOR ================= */
+.dt-chips-control-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10, 16, 26, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 10px 14px;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.dt-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dt-casino-chip {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.dt-casino-chip:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+
+.dt-casino-chip.active {
+  transform: translateY(-5px) scale(1.15);
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.8), 0 6px 14px rgba(0, 0, 0, 0.7);
+  border: 2px solid #ffffff;
+}
+
+.dt-casino-chip.chip-10 { background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%); color: #ffffff; }
+.dt-casino-chip.chip-50 { background: radial-gradient(circle, #10b981 0%, #047857 100%); color: #ffffff; }
+.dt-casino-chip.chip-100 { background: radial-gradient(circle, #ef4444 0%, #b91c1c 100%); color: #ffffff; }
+.dt-casino-chip.chip-500 { background: radial-gradient(circle, #8b5cf6 0%, #6d28d9 100%); color: #ffffff; }
+.dt-casino-chip.chip-1000 { background: radial-gradient(circle, #f59e0b 0%, #b45309 100%); color: #0f172a; }
+.dt-casino-chip.chip-5000 { background: radial-gradient(circle, #06b6d4 0%, #0e7490 100%); color: #ffffff; }
+
+.dt-chip-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dt-tool-btn {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.dt-tool-btn:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.dt-tool-btn.btn-clear {
+  color: #f87171;
+}
+
+.dt-tool-btn.btn-double {
+  color: #fbbf24;
+}
+
+.dt-tool-btn.btn-rebet {
+  color: #34d399;
+}
+
+/* ================= SCOREBOARD ROADMAPS (BEAD ROAD & BIG ROAD) ================= */
+.dt-roadmap-card {
+  background: #090e17;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
+.dt-roadmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.dt-roadmap-title {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 12px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dt-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.dt-stat-pill.dragon { color: #ff4d4d; }
+.dt-stat-pill.tiger { color: #fbbf24; }
+.dt-stat-pill.tie { color: #34d399; }
+
+/* Bead Road Grid */
+.dt-bead-road-container {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.dt-bead-road-grid {
+  display: grid;
+  grid-template-rows: repeat(4, 22px);
+  grid-auto-flow: column;
+  grid-auto-columns: 22px;
+  gap: 3px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+  padding: 4px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.dt-bead-cell {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 10px;
+  font-weight: 900;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.dt-bead-cell.d {
+  background: #ef4444;
+}
+
+.dt-bead-cell.t {
+  background: #f59e0b;
+}
+
+.dt-bead-cell.tie {
+  background: #10b981;
+}
+
+/* Active Bets Breakdown Slip */
+.dt-active-slip {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.dt-total-bet-val {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 15px;
+  font-weight: 900;
+  color: #00e701;
+}

@@ -1,0 +1,224 @@
+/* ===================================================
+   STOCK MARKET LIVE TRADING - ULTRA PREMIUM VIP CYBER STYLES
+   =================================================== */
+
+.stock-view,
+.stocktrading-view {
+  display: none;
+  width: 100%;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stock-view.active,
+.stocktrading-view.active {
+  display: flex !important;
+}
+
+.stock-market-header {
+  background: linear-gradient(135deg, rgba(24, 34, 52, 0.8) 0%, rgba(13, 20, 34, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px);
+}
+
+.stock-asset-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stock-asset-select {
+  background: var(--bg-tertiary);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 16px;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.stock-asset-select:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.stock-live-price-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stock-live-price {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  color: #00f59b;
+  letter-spacing: -0.5px;
+  text-shadow: 0 0 12px rgba(0, 245, 155, 0.4);
+  transition: color 0.2s ease;
+}
+
+.stock-live-price.down {
+  color: #ff3366;
+  text-shadow: 0 0 12px rgba(255, 51, 102, 0.4);
+}
+
+.stock-change-tag {
+  font-size: 12px;
+  font-weight: 800;
+  color: #00f59b;
+}
+
+.stock-change-tag.down {
+  color: #ff3366;
+}
+
+/* Candlestick Canvas Container */
+.stock-chart-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: radial-gradient(circle at 50% 100%, #152238 0%, #090e18 100%);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+#stockCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.stock-chart-overlay {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: rgba(13, 20, 34, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 14px;
+  border-radius: var(--border-radius-sm);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-secondary);
+  backdrop-filter: blur(8px);
+}
+
+/* Call / Put Prediction Buttons (Ultra-Classy 3D Tactile Neon) */
+.stock-prediction-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.btn-stock-up {
+  background: linear-gradient(180deg, #00f59b 0%, #00b368 60%, #00874e 100%);
+  color: #032111;
+  border: 1.5px solid #4ade80;
+  border-bottom: 4px solid #005c33;
+  border-radius: 14px;
+  padding: 16px 14px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: 0 8px 24px rgba(0, 245, 155, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-stock-up::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  animation: shineSweep 3s infinite;
+}
+
+.btn-stock-down {
+  background: linear-gradient(180deg, #ff3b69 0%, #dc2626 60%, #991b1b 100%);
+  color: #ffffff;
+  border: 1.5px solid #f87171;
+  border-bottom: 4px solid #7f1d1d;
+  border-radius: 14px;
+  padding: 16px 14px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-stock-down::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  animation: shineSweep 3s infinite 1.5s;
+}
+
+.btn-stock-up:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 245, 155, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  filter: brightness(1.08);
+}
+
+.btn-stock-down:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  filter: brightness(1.08);
+}
+
+.btn-stock-up:active {
+  transform: translateY(2px);
+  border-bottom-width: 1.5px;
+  box-shadow: 0 4px 12px rgba(0, 245, 155, 0.3);
+}
+
+.btn-stock-down:active {
+  transform: translateY(2px);
+  border-bottom-width: 1.5px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+@keyframes shineSweep {
+  0% { left: -100%; }
+  25% { left: 100%; }
+  100% { left: 100%; }
+}

@@ -1,0 +1,2804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f212e">
+  <link rel="icon" type="image/jpeg" href="assets/viewpoint_logo.jpg">
+  <link rel="apple-touch-icon" href="assets/viewpoint_logo.jpg">
+  <link rel="manifest" href="manifest.json">
+  <title>VIEWPOINT.DIY - VIP Crypto & Real Cash Casino | Mines, Crash, Plinko & Dice</title>
+  <meta name="description" content="Play on VIEWPOINT.DIY - Instant Crypto & Real Cash Casino Games: Mines, Crash, Plinko, Limbo, Dice, Dragon Tiger & Color Trading. Provably Fair with instant payouts!">
+  <meta name="keywords" content="viewpoint, viewpoint.diy, viewpoint casino, mines game online, crash game, plinko game, limbo turbo, provably fair gaming, fast upi withdrawal, crypto casino">
+  <meta name="author" content="VIEWPOINT.DIY">
+  <meta name="robots" content="index, follow">
+
+  <!-- OpenGraph Metadata for WhatsApp & Telegram Link Previews -->
+  <meta property="og:title" content="VIEWPOINT.DIY - Instant Win Casino & Arcade Games">
+  <meta property="og:description" content="Join VIEWPOINT.DIY and claim ₹200 Demo Bonus! Play Provably Fair Mines, Crash, Plinko, Limbo & win real cash with instant withdrawal.">
+  <meta property="og:image" content="https://viewpoint.diy/assets/viewpoint_logo.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="VIEWPOINT.DIY">
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="VIEWPOINT.DIY - Crypto & Real Cash Casino">
+  <meta name="twitter:image" content="https://viewpoint.diy/assets/viewpoint_logo.jpg">
+  <meta name="twitter:description" content="Play Mines, Crash, Plinko, Limbo & Dice on VIEWPOINT.DIY. Fast payouts & Provably Fair!">
+
+  <!-- Google Fonts: Inter and Outfit for sleek casino typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Telegram WebApp Official SDK (Non-blocking) -->
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+  
+  <!-- CSS Stylesheets (Cache-Busted v90.0) -->
+  <link rel="stylesheet" href="css/style.css?v=90.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=90.0">
+  <link rel="stylesheet" href="css/mines.css?v=90.0">
+  <link rel="stylesheet" href="css/chicken.css?v=90.0">
+  <link rel="stylesheet" href="css/plinko.css?v=90.0">
+  <link rel="stylesheet" href="css/crash.css?v=90.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=90.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=90.0">
+  <link rel="stylesheet" href="css/dice.css?v=90.0">
+  <link rel="stylesheet" href="css/limbo.css?v=90.0">
+</head>
+<body role="application" translate="no" data-reader-ignore="true">
+
+  <!-- Inline Instant Click Handler (Zero Network Latency / 100% Reliable) -->
+  <script>
+    window.openAuthModal = function(type) {
+      var m = document.getElementById('modalAuth');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+      var isSignup = (type === 'signup' || type === 'register');
+      if (window.switchAuthTab) {
+        window.switchAuthTab(isSignup ? 'signup' : 'login');
+      } else {
+        var tabL = document.getElementById('tabAuthLogin');
+        var tabR = document.getElementById('tabAuthRegister');
+        if (tabL) tabL.classList.toggle('active', !isSignup);
+        if (tabR) tabR.classList.toggle('active', isSignup);
+        ['authNameField', 'authEmailField', 'authAddressField', 'authPincodeField', 'authAgeCheckboxField', 'authWithdrawalNotice'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.style.display = isSignup ? 'block' : 'none';
+        });
+        var btnText = document.getElementById('btnSubmitAuthText');
+        if (btnText) btnText.innerText = isSignup ? 'Create VIP Account & Join' : 'Login to Play';
+        var title = document.getElementById('authModalTitle');
+        if (title) title.innerText = isSignup ? 'Create VIP Account' : 'Member Login';
+      }
+      if (window.app && window.app.openAuthModal) return window.app.openAuthModal(isSignup ? 'signup' : 'login');
+    };
+    window.closeAuthModal = function() {
+      if (window.app && window.app.closeAuthModal) return window.app.closeAuthModal();
+      var m = document.getElementById('modalAuth');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openDepositModal = function() {
+      if (window.app && window.app.openDepositModal) return window.app.openDepositModal();
+      var m = document.getElementById('modalDepositUpi');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeDepositModal = function() {
+      if (window.app && window.app.closeDepositModal) return window.app.closeDepositModal();
+      var m = document.getElementById('modalDepositUpi');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openWithdrawModal = function() {
+      if (window.app && window.app.openWithdrawModal) return window.app.openWithdrawModal();
+      var m = document.getElementById('modalWithdrawUpi');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeWithdrawModal = function() {
+      if (window.app && window.app.closeWithdrawModal) return window.app.closeWithdrawModal();
+      var m = document.getElementById('modalWithdrawUpi');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.switchDepositTab = function(t) {
+      if (window.app && window.app.switchDepositTab) return window.app.switchDepositTab(t);
+      var isForm = (t === 'form');
+      var tf = document.getElementById('tabDepositForm');
+      var th = document.getElementById('tabDepositHistory');
+      var vf = document.getElementById('viewDepositForm');
+      var vh = document.getElementById('viewDepositHistory');
+      if (tf) tf.classList.toggle('active', isForm);
+      if (th) th.classList.toggle('active', !isForm);
+      if (vf) { vf.classList.toggle('active', isForm); vf.style.display = isForm ? 'block' : 'none'; }
+      if (vh) { vh.classList.toggle('active', !isForm); vh.style.display = !isForm ? 'block' : 'none'; }
+      if (!isForm && window.app && window.app.renderDepositHistoryTable) window.app.renderDepositHistoryTable();
+    };
+    window.setDepositAmount = function(amt) {
+      var inp = document.getElementById('depositAmountInput');
+      if (inp) { inp.value = amt; }
+      var chips = document.querySelectorAll('.deposit-quick-chips .chip-btn');
+      chips.forEach(function(c) {
+        c.classList.toggle('active', c.getAttribute('data-amount') === String(amt));
+      });
+      if (window.app && window.app.updateUpiQr) window.app.updateUpiQr();
+    };
+    window.submitDepositUtr = function() {
+      if (window.app && window.app.submitDepositUtr) return window.app.submitDepositUtr();
+    };
+    window.submitWithdrawRequest = function() {
+      if (window.app && window.app.submitWithdrawRequest) return window.app.submitWithdrawRequest();
+    };
+    window.closeWithdrawModal = function() {
+      if (window.app && window.app.closeWithdrawModal) return window.app.closeWithdrawModal();
+      var m = document.getElementById('modalWithdraw');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.switchWithdrawTab = function(t) {
+      if (window.app && window.app.switchWithdrawTab) return window.app.switchWithdrawTab(t);
+      var isForm = (t === 'form');
+      var tf = document.getElementById('tabWithdrawForm');
+      var th = document.getElementById('tabWithdrawHistory');
+      var vf = document.getElementById('viewWithdrawForm');
+      var vh = document.getElementById('viewWithdrawHistory');
+      if (tf) tf.classList.toggle('active', isForm);
+      if (th) th.classList.toggle('active', !isForm);
+      if (vf) { vf.classList.toggle('active', isForm); vf.style.display = isForm ? 'block' : 'none'; }
+      if (vh) { vh.classList.toggle('active', !isForm); vh.style.display = !isForm ? 'block' : 'none'; }
+      if (!isForm && window.app && window.app.renderWithdrawHistoryTable) window.app.renderWithdrawHistoryTable();
+    };
+    window.selectWithdrawMethod = function(method) {
+      if (window.app && window.app.selectWithdrawMethod) return window.app.selectWithdrawMethod(method);
+      var mUpi = document.getElementById('btnMethodUpi');
+      var mBank = document.getElementById('btnMethodBank');
+      var mCrypto = document.getElementById('btnMethodCrypto');
+      if (mUpi) mUpi.classList.toggle('active', method === 'UPI');
+      if (mBank) mBank.classList.toggle('active', method === 'BANK');
+      if (mCrypto) mCrypto.classList.toggle('active', method === 'CRYPTO');
+      var fUpi = document.getElementById('channelUpiFields');
+      var fBank = document.getElementById('channelBankFields');
+      var fCrypto = document.getElementById('channelCryptoFields');
+      if (fUpi) fUpi.style.display = (method === 'UPI') ? 'block' : 'none';
+      if (fBank) fBank.style.display = (method === 'BANK') ? 'block' : 'none';
+      if (fCrypto) fCrypto.style.display = (method === 'CRYPTO') ? 'block' : 'none';
+    };
+    window.openProvablyFairModal = function() {
+      if (window.app && window.app.openProvablyFairModal) return window.app.openProvablyFairModal();
+      var m = document.getElementById('modalProvablyFair');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeProvablyFairModal = function() {
+      var m = document.getElementById('modalProvablyFair');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openRatingModal = function() {
+      if (window.app && window.app.openRatingModal) return window.app.openRatingModal();
+      var m = document.getElementById('modalRating');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeRatingModal = function() {
+      var m = document.getElementById('modalRating');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.closeSupportModal = function() {
+      if (window.app && window.app.closeSupportModal) return window.app.closeSupportModal();
+      var m = document.getElementById('modalLiveSupport');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openTxHistoryModal = function() {
+      if (window.app && window.app.openTxHistoryModal) return window.app.openTxHistoryModal();
+      var m = document.getElementById('modalTxHistory');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.openSupportModal = function() {
+      if (window.app && window.app.openSupportModal) return window.app.openSupportModal();
+      var m = document.getElementById('modalLiveSupport');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.openReferModal = function() {
+      if (window.app && window.app.openReferModal) return window.app.openReferModal();
+      var m = document.getElementById('modalRefer');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeReferModal = function() {
+      if (window.app && window.app.closeReferModal) return window.app.closeReferModal();
+      var m = document.getElementById('modalRefer');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openGoogleAuthModal = function() {
+      if (window.app && window.app.openGoogleAuthModal) return window.app.openGoogleAuthModal();
+      var m = document.getElementById('modalGoogleAuth');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeGoogleAuthModal = function() {
+      var m = document.getElementById('modalGoogleAuth');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openFacebookAuthModal = function() {
+      if (window.app && window.app.openFacebookAuthModal) return window.app.openFacebookAuthModal();
+      var m = document.getElementById('modalFacebookAuth');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeFacebookAuthModal = function() {
+      var m = document.getElementById('modalFacebookAuth');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.switchAuthTab = function(type) {
+      if (window.app && window.app.switchAuthTab) return window.app.switchAuthTab(type);
+      var isSignup = (type === 'register' || type === 'signup');
+      var tabL = document.getElementById('tabAuthLogin');
+      var tabR = document.getElementById('tabAuthRegister');
+      if (tabL) tabL.classList.toggle('active', !isSignup);
+      if (tabR) tabR.classList.toggle('active', isSignup);
+      ['authNameField', 'authEmailField', 'authAddressField', 'authPincodeField', 'authAgeCheckboxField', 'authWithdrawalNotice'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = isSignup ? 'block' : 'none';
+      });
+      var btnText = document.getElementById('btnSubmitAuthText');
+      if (btnText) btnText.innerText = isSignup ? 'Create VIP Account & Join' : 'Login to Play';
+      var title = document.getElementById('authModalTitle');
+      if (title) title.innerText = isSignup ? 'Create VIP Account' : 'Member Login';
+    };
+    window.submitAuthForm = function() {
+      if (window.app && window.app.submitAuthForm) return window.app.submitAuthForm();
+    };
+    window.handleAuthSubmit = function() {
+      if (window.app && window.app.handleAuthSubmit) return window.app.handleAuthSubmit();
+      return window.submitAuthForm();
+    };
+    window.switchGamePage = function(pageNum) {
+      if (window.app && window.app.switchGamePage) return window.app.switchGamePage(pageNum);
+      var p1Btn = document.getElementById('btnGamePage1');
+      var p2Btn = document.getElementById('btnGamePage2');
+      var p3Btn = document.getElementById('btnGamePage3');
+      var g1 = document.getElementById('gamePageGroup1');
+      var g2 = document.getElementById('gamePageGroup2');
+      var g3 = document.getElementById('gamePageGroup3');
+      if (p1Btn) p1Btn.classList.toggle('active', pageNum === 1);
+      if (p2Btn) p2Btn.classList.toggle('active', pageNum === 2);
+      if (p3Btn) p3Btn.classList.toggle('active', pageNum === 3);
+      if (g1) g1.style.display = (pageNum === 1) ? 'flex' : 'none';
+      if (g2) g2.style.display = (pageNum === 2) ? 'flex' : 'none';
+      if (g3) g3.style.display = (pageNum === 3) ? 'flex' : 'none';
+
+      if (pageNum === 1) window.switchGame('mines');
+      else if (pageNum === 2) window.switchGame('plinko');
+      else if (pageNum === 3) window.switchGame('colortrading');
+    };
+
+    window.switchGame = function(g) {
+      if (window.app && window.app.switchGame) return window.app.switchGame(g);
+      // Standalone Instant DOM Fallback
+      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView'];
+      views.forEach(function(vId) {
+        var el = document.getElementById(vId);
+        if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+      });
+      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabPlinko', 'tabDice', 'tabLimbo', 'tabDragonTiger', 'tabColorTrading', 'tabStock'];
+      tabs.forEach(function(tId) {
+        var el = document.getElementById(tId);
+        if (el) el.classList.remove('active');
+      });
+
+      var activeViewId = g + 'View';
+      if (g === 'colortrading') activeViewId = 'colortradingView';
+      if (g === 'stock') activeViewId = 'stockView';
+      var activeTabId = 'tab' + g.charAt(0).toUpperCase() + g.slice(1);
+      if (g === 'colortrading') activeTabId = 'tabColorTrading';
+      if (g === 'stock') activeTabId = 'tabStock';
+      if (g === 'dragontiger') activeTabId = 'tabDragonTiger';
+
+      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'dice');
+      var targetView = document.getElementById(activeViewId);
+      if (targetView) {
+        targetView.classList.add('active');
+        targetView.style.display = isFullWidth ? 'flex' : 'block';
+      }
+      var targetTab = document.getElementById(activeTabId);
+      if (targetTab) targetTab.classList.add('active');
+
+      var cp = document.querySelector('.controls-panel');
+      var ga = document.querySelector('.game-arena');
+      if (cp) cp.style.display = isFullWidth ? 'none' : 'flex';
+      if (ga) {
+        if (isFullWidth) {
+          ga.style.display = 'block';
+          ga.style.gridTemplateColumns = '1fr';
+        } else {
+          ga.style.display = window.innerWidth > 900 ? 'grid' : 'flex';
+          ga.style.gridTemplateColumns = window.innerWidth > 900 ? '310px 1fr' : '1fr';
+        }
+      }
+    };
+
+    window.placeColorBet = function(type, choice, amt) {
+      if (window.app && window.app.placeColorBet) return window.app.placeColorBet(type, choice, amt);
+    };
+    window.handleStockTrade = function(type) {
+      if (window.app && window.app.handleStockTrade) return window.app.handleStockTrade(type);
+    };
+    window.handleDtBetClick = function(spot) {
+      if (window.app && window.app.handleDtBetClick) return window.app.handleDtBetClick(spot);
+    };
+    window.selectDtChip = function(amt) {
+      if (window.app && window.app.selectDtChip) return window.app.selectDtChip(amt);
+    };
+    window.handleDtClearBets = function() {
+      if (window.app && window.app.handleDtClearBets) return window.app.handleDtClearBets();
+    };
+    window.handleDtDoubleBets = function() {
+      if (window.app && window.app.handleDtDoubleBets) return window.app.handleDtDoubleBets();
+    };
+    window.handleDtRebet = function() {
+      if (window.app && window.app.handleDtRebet) return window.app.handleDtRebet();
+    };
+    window.openDtHowToPlayModal = function() {
+      if (window.app && window.app.openDtHowToPlayModal) return window.app.openDtHowToPlayModal();
+      var m = document.getElementById('modalDtHowToPlay');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeDtHowToPlayModal = function() {
+      if (window.app && window.app.closeDtHowToPlayModal) return window.app.closeDtHowToPlayModal();
+      var m = document.getElementById('modalDtHowToPlay');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+
+    window.switchMainPage = function(p) {
+      if (window.app && window.app.switchMainPage) return window.app.switchMainPage(p);
+      if (window.switchGamePage) return window.switchGamePage(p);
+    };
+
+    window.handleSecretLogoClick = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      window._logoClickCount = (window._logoClickCount || 0) + 1;
+      clearTimeout(window._logoClickTimer);
+      window._logoClickTimer = setTimeout(function() { window._logoClickCount = 0; }, 1500);
+      if (window._logoClickCount >= 3) {
+        window._logoClickCount = 0;
+        var pinModal = document.getElementById('modalAdminPinGate');
+        if (pinModal) {
+          pinModal.classList.add('open');
+          pinModal.style.display = 'flex';
+          var inp = document.getElementById('inputAdminPin');
+          if (inp) { inp.value = ''; setTimeout(function() { inp.focus(); }, 200); }
+        }
+      }
+    };
+
+    window.submitAdminPinModal = function() {
+      if (window.app && window.app.submitAdminPinModal) return window.app.submitAdminPinModal();
+    };
+
+    window.switchAdminTab = function(t) {
+      if (window.app && window.app.switchAdminTab) return window.app.switchAdminTab(t);
+      var tabs = ['tabAdminPending', 'tabAdminWithdraw', 'tabAdminAnalytics', 'tabAdminUsers', 'tabAdminUpi', 'tabAdminTelegram', 'tabAdminSms'];
+      tabs.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      var views = ['viewAdminPending', 'viewAdminWithdraw', 'viewAdminAnalytics', 'viewAdminUsers', 'viewAdminUpi', 'viewAdminTelegram', 'viewAdminSms'];
+      views.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+      });
+
+      var map = {
+        pending: ['tabAdminPending', 'viewAdminPending'],
+        withdraw: ['tabAdminWithdraw', 'viewAdminWithdraw'],
+        analytics: ['tabAdminAnalytics', 'viewAdminAnalytics'],
+        users: ['tabAdminUsers', 'viewAdminUsers'],
+        upi: ['tabAdminUpi', 'viewAdminUpi'],
+        telegram: ['tabAdminTelegram', 'viewAdminTelegram'],
+        sms: ['tabAdminSms', 'viewAdminSms']
+      };
+      if (map[t]) {
+        var tabEl = document.getElementById(map[t][0]);
+        if (tabEl) tabEl.classList.add('active');
+        var viewEl = document.getElementById(map[t][1]);
+        if (viewEl) { viewEl.classList.add('active'); viewEl.style.display = 'block'; }
+      }
+    };
+
+    window.closeAdminModal = function() {
+      if (window.app && window.app.closeAdminModal) return window.app.closeAdminModal();
+      var m = document.getElementById('modalUpiSettings');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+
+    window.setBetMode = function(mode) {
+      if (window.app && window.app.setBetMode) return window.app.setBetMode(mode);
+      var btnM = document.getElementById('btnModeManual');
+      var btnA = document.getElementById('btnModeAuto');
+      var panel = document.getElementById('autoPlaySettingsPanel');
+      var btnBet = document.getElementById('btnActionBet');
+      var btnAuto = document.getElementById('btnActionAutoStart');
+      if (btnM) btnM.classList.toggle('active', mode === 'manual');
+      if (btnA) btnA.classList.toggle('active', mode === 'auto');
+      if (panel) panel.style.display = mode === 'auto' ? 'flex' : 'none';
+      if (btnBet) btnBet.style.display = mode === 'auto' ? 'none' : 'flex';
+      if (btnAuto) btnAuto.style.display = mode === 'auto' ? 'flex' : 'none';
+    };
+
+    window.toggleAutoPlay = function() {
+      if (window.app && window.app.toggleAutoPlay) return window.app.toggleAutoPlay();
+    };
+
+    window.setAutoBetRounds = function(n) {
+      if (window.app && window.app.setAutoBetRounds) return window.app.setAutoBetRounds(n);
+      var inp = document.getElementById('autoBetCountInput');
+      if (inp) inp.value = n;
+      var helper = document.getElementById('autoBetCountHelper');
+      if (helper) helper.innerText = (n === 0) ? 'Infinite Rounds' : n + ' Auto Rounds';
+    };
+
+    window.handleBetClick = function() {
+      if (window.app && window.app.handleBetClick) return window.app.handleBetClick();
+    };
+
+    window.handleCashoutClick = function() {
+      if (window.app && window.app.handleCashoutClick) return window.app.handleCashoutClick();
+    };
+
+    window.handleChickenHop = function() {
+      if (window.app && window.app.handleChickenHop) return window.app.handleChickenHop();
+    };
+  </script>
+
+  <!-- Top Navigation Bar (2-Tier Sleek Header) -->
+  <header class="navbar">
+      <!-- Top Row: Logo & Brand + Auth / Profile + Refer Button -->
+      <div class="nav-top-row">
+        <div class="nav-brand" id="navBrandLogo" onclick="window.handleSecretLogoClick(event)" ontouchend="window.handleSecretLogoClick(event)" style="cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; gap: 8px;" title="VIEWPOINT.DIY">
+          <div class="brand-logo-icon" style="width: 36px; height: 36px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: transparent;">
+            <img src="assets/viewpoint_logo.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+          </div>
+          <div class="brand-name" style="font-family: var(--font-display); font-weight: 900; font-size: 18px; letter-spacing: -0.5px;">VIEW<span style="color: #00e701;">POINT.DIY</span></div>
+        </div>
+
+      <div class="nav-top-actions">
+        <!-- Refer & Earn Button -->
+        <button id="btnOpenRefer" class="btn-refer-nav" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          <span>Refer & Earn</span>
+        </button>
+
+        <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
+        <div id="authLoggedOutBox" class="auth-buttons-group">
+          <button id="btnOpenLogin" class="btn-auth-login" onclick="window.openAuthModal ? window.openAuthModal('login') : (window.app && window.app.openAuthModal('login'))">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>Login</span>
+          </button>
+          <button id="btnOpenSignup" class="btn-auth-signup" onclick="window.openAuthModal ? window.openAuthModal('signup') : (window.app && window.app.openAuthModal('signup'))">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            <span>Sign Up</span>
+          </button>
+        </div>
+
+        <div id="authLoggedInBox" class="user-profile-badge" style="display: none;">
+          <span class="user-avatar-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span id="displayUsername" class="display-username">VIP Player</span>
+          <button id="btnLogout" class="btn-logout-mini" title="Logout" onclick="window.app && window.app.logoutUser()">
+            <span>Logout</span>
+          </button>
+        </div>
+
+        <!-- Provably Fair Verifier Icon -->
+        <button id="btnProvablyFair" class="btn-icon-nav" title="Provably Fair Verifier">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Row: Balance + Deposit + Withdraw + Support -->
+    <div class="nav-bottom-row">
+      <!-- Balance Display -->
+      <div class="wallet-badge" title="Demo Money Balance. Real cash payouts ke liye Deposit karein!">
+        <div class="wallet-info">
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span class="wallet-label">Balance</span>
+            <span class="demo-pill-badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 4px; letter-spacing: 0.3px;">🎁 DEMO BONUS</span>
+          </div>
+          <div class="wallet-amount">
+            <span class="currency-symbol" id="currencySymbol">₹</span>
+            <span id="walletBalance">200.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deposit Button -->
+      <button id="btnOpenDeposit" class="btn-deposit-upi" title="Add Money via UPI / QR Code" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Deposit</span>
+      </button>
+
+      <!-- Withdrawal Button -->
+      <button id="btnOpenWithdraw" class="btn-withdraw-nav" title="Withdraw Funds to UPI / Bank" onclick="window.openWithdrawModal ? window.openWithdrawModal() : (window.app && window.app.openWithdrawModal())">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <span>Withdraw</span>
+      </button>
+    </div>
+
+    <!-- Demo Money Notice Strip Bar -->
+    <div class="demo-alert-strip" style="background: linear-gradient(90deg, rgba(245,158,11,0.18) 0%, rgba(15,23,42,0.95) 100%); border-bottom: 1px solid rgba(245,158,11,0.3); padding: 5px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0;">
+      <div>🎁 <strong style="color: #fbbf24;">₹200 Demo Credits</strong>: For practice & gameplay testing only (non-withdrawable). Deposit real funds for instant UPI cashouts!</div>
+      <button type="button" onclick="window.openDepositModal()" style="background: #00e701; color: #000; font-weight: 800; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer;">+ ADD CASH</button>
+    </div>
+  </header>
+
+  <!-- Page 1: Classic Casino Lobby (Mines & Chicken) -->
+  <main id="mainPage1" class="main-layout page-section active">
+    
+    <!-- 3-Page Responsive Pagination Bar (Android / iOS Clean Swipe/Tap) -->
+    <div class="game-pages-nav-bar" id="gamePagesNavBar">
+      <button type="button" id="btnGamePage1" class="btn-game-page-pill active" onclick="window.switchGamePage ? window.switchGamePage(1) : (window.app && window.app.switchGamePage(1))">
+        <span>⚡ PAGE 1</span>
+        <small style="display:block; font-size:10px; opacity:0.8;">Mines & Dragon Tiger</small>
+      </button>
+      <button type="button" id="btnGamePage2" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))">
+        <span>🚀 PAGE 2</span>
+        <small style="display:block; font-size:10px; opacity:0.8;">Plinko & Crash</small>
+      </button>
+      <button type="button" id="btnGamePage3" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(3) : (window.app && window.app.switchGamePage(3))">
+        <span>📈 PAGE 3</span>
+        <small style="display:block; font-size:10px; opacity:0.8;">Trading & Dice</small>
+      </button>
+    </div>
+
+    <!-- Game Tabs Container Organized by Pages -->
+    <div class="game-tabs-wrapper">
+      <!-- Page 1 Group (Games 1-4) -->
+      <div id="gamePageGroup1" class="game-page-group" style="display: flex;">
+        <!-- 1. Mines (Default Active Game) -->
+        <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" style="position:relative;">
+          <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="#ff3b30"/><path d="M12 2v4M12 20v2M2 13h4M18 13h4M5.5 6.5l2.8 2.8M15.7 16.7l2.8 2.8M18.5 6.5l-2.8 2.8M8.3 16.7l-2.8 2.8" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="2" fill="#fff" opacity="0.6"/></svg>
+          <span style="font-weight: 900;">Mines</span>
+        </button>
+
+        <!-- 2. Dragon Tiger -->
+        <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
+          <span style="font-weight: 900;">Dragon Tiger</span>
+        </button>
+
+        <!-- 3. Limbo Turbo -->
+        <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🎯⚡</span>
+          <span style="font-weight: 900;">Limbo Turbo</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #ff007a, #7928ca); color: #fff; font-size:9px; font-weight:900;">1000x</span>
+        </button>
+      </div>
+
+      <!-- Page 2 Group (Games 4-6) -->
+      <div id="gamePageGroup2" class="game-page-group" style="display: none;">
+        <!-- 4. Chicken Road -->
+        <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))" style="position:relative;">
+          <svg class="game-svg-icon" viewBox="0 0 36 36" width="20" height="20">
+            <circle cx="18" cy="22" r="10" fill="#ffffff"/>
+            <path d="M12 11 Q14 6 16 10 Q18 5 20 10 Q22 7 24 12 Z" fill="#ff3366"/>
+            <circle cx="18" cy="14" r="6" fill="#ffffff"/>
+            <polygon points="23,14 28,16 23,18" fill="#f59e0b"/>
+            <circle cx="20" cy="13" r="1.5" fill="#0f172a"/>
+          </svg>
+          <span style="font-weight:900;">🍗 Chicken Road</span>
+          <span class="tab-badge badge-rec" id="badgeRec_chicken" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size:10px; font-weight:900;">270x</span>
+        </button>
+
+        <!-- 5. Plinko -->
+        <button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))" style="position:relative;">
+          <span style="font-size: 17px; line-height: 1;">🔴🔺</span>
+          <span style="font-weight: 900;">Plinko</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #00e5ff, #3b82f6); color: #fff; font-size:9px; font-weight:900;">1000x 🔥</span>
+        </button>
+
+        <!-- 6. Crash Rocket -->
+        <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))" style="position:relative;">
+          <svg class="game-svg-icon" viewBox="0 0 24 24"><path d="M14 2c0 0 6 3 6 10l-4 4-4-4c0-4-3-6-3-6s3-1 5-4z" fill="#00f5d4"/><path d="M12 12l-4 4-4-1 3-3 5 0z" fill="#00b4d8"/><path d="M5 19l2 2-4 1 2-3z" fill="#f59e0b"/><circle cx="15" cy="8" r="1.5" fill="#ffffff"/></svg>
+          <span style="font-weight: 900;">🚀 Crash Rocket</span>
+          <span class="tab-badge badge-rec" id="badgeRec_crash" style="background: linear-gradient(135deg, #00f5d4, #00b4d8); color: #000; font-size:9px; font-weight:900;">LIVE</span>
+        </button>
+      </div>
+
+      <!-- Page 3 Group (Games 7-9) -->
+      <div id="gamePageGroup3" class="game-page-group" style="display: none;">
+        <!-- 7. Win Go 30s -->
+        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🎨</span>
+          <span style="font-weight: 800;">Win Go 30s</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff; font-size:9px; font-weight:900;">9x</span>
+        </button>
+
+        <!-- 8. Stock BTC -->
+        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">📈</span>
+          <span style="font-weight: 800;">Stock BTC</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #f59e0b, #00e701); color: #000; font-size:9px; font-weight:900;">+90%</span>
+        </button>
+
+        <!-- 9. Classic Dice -->
+        <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))" style="position:relative;">
+          <span style="font-size: 17px; line-height: 1;">🎲</span>
+          <span style="font-weight: 900;">Classic Dice</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #10b981, #00e701); color: #000; font-size:9px; font-weight:900;">9900x</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Game Box -->
+    <div class="game-arena">
+      
+      <!-- Left Betting Controls Sidebar -->
+      <section class="controls-panel">
+        
+        <!-- Mode Switcher: Manual vs Auto Play (Mines, Chicken, Crash) -->
+        <div class="bet-mode-toggle-row" id="betModeToggleRow">
+          <button id="btnModeManual" class="btn-mode-tab active" onclick="window.setBetMode ? window.setBetMode('manual') : (window.app && window.app.setBetMode('manual'))">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            <span>Manual</span>
+          </button>
+          <button id="btnModeAuto" class="btn-mode-tab" onclick="window.setBetMode ? window.setBetMode('auto') : (window.app && window.app.setBetMode('auto'))">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
+            <span>Auto Play</span>
+          </button>
+        </div>
+
+        <!-- Auto Play Settings Panel (Visible in Auto Mode) -->
+        <div id="autoPlaySettingsPanel" class="auto-play-settings-panel" style="display: none;">
+          <!-- Number of Bets -->
+          <div class="auto-field-group">
+            <div class="control-header">
+              <label class="control-label">Number of Bets</label>
+              <span class="control-helper" id="autoBetCountHelper">10 Rounds</span>
+            </div>
+            <div class="input-with-actions">
+              <input type="number" id="autoBetCountInput" class="bet-input-field" value="10" min="0" max="1000" step="1" oninput="window.app && window.app.updateAutoBetHelper ? window.app.updateAutoBetHelper() : (document.getElementById('autoBetCountHelper').innerText = this.value + ' Rounds')">
+              <div class="bet-quick-actions">
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(0) : (window.app && window.app.setAutoBetRounds(0))">∞</button>
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(10) : (window.app && window.app.setAutoBetRounds(10))">10</button>
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(25) : (window.app && window.app.setAutoBetRounds(25))">25</button>
+                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(50) : (window.app && window.app.setAutoBetRounds(50))">50</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Auto Picks per Round (For Mines & Chicken) -->
+          <div id="autoPicksGroup" class="auto-field-group">
+            <div class="control-header">
+              <label class="control-label" id="autoPicksLabel">Auto Picks per Round</label>
+              <span class="control-helper">Safe Picks</span>
+            </div>
+            <div class="input-with-actions">
+              <input type="number" id="autoPicksCountInput" class="bet-input-field" value="3" min="1" max="10" step="1">
+              <div class="bet-quick-actions">
+                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='1'">1</button>
+                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='2'">2</button>
+                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='3'">3</button>
+                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='5'">5</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Auto Stats Badge -->
+          <div id="autoPlayLiveStats" class="auto-live-stats" style="display: none;">
+            <span>Rounds: <strong id="autoLiveRoundsText" style="color: #00e5ff;">0 / 10</strong></span>
+            <span>Profit: <strong id="autoLiveProfitText" style="color: #00e701;">+₹0.00</strong></span>
+          </div>
+        </div>
+
+        <!-- Bet Amount Input Group (Top Ergonomic Placement) -->
+        <div class="control-group">
+          <div class="control-header">
+            <label class="control-label">Bet Amount</label>
+            <span class="control-helper">INR (₹)</span>
+          </div>
+          <div class="input-with-actions">
+            <span class="input-currency-prefix" id="inputCurrencyPrefix">₹</span>
+            <input type="number" id="betAmountInput" class="bet-input-field" value="10.00" min="0.10" step="1.00">
+            <div class="bet-quick-actions">
+              <button id="btnHalfBet" class="btn-quick-bet">½</button>
+              <button id="btnDoubleBet" class="btn-quick-bet">2X</button>
+              <button id="btnMaxBet" class="btn-quick-bet">MAX</button>
+            </div>
+          </div>
+          <div class="deposit-quick-chips" style="margin-top: 6px;">
+            <button type="button" class="chip-btn active" onclick="document.getElementById('betAmountInput').value='10'; window.app && window.app.updateBetValue && window.app.updateBetValue(10);">₹10</button>
+            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='50'; window.app && window.app.updateBetValue && window.app.updateBetValue(50);">₹50</button>
+            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='100'; window.app && window.app.updateBetValue && window.app.updateBetValue(100);">₹100</button>
+            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='500'; window.app && window.app.updateBetValue && window.app.updateBetValue(500);">₹500</button>
+            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='1000'; window.app && window.app.updateBetValue && window.app.updateBetValue(1000);">₹1000</button>
+          </div>
+        </div>
+
+        <!-- Main Action Buttons (Placed Right Below Bet Amount for Instant Thumb Reach) -->
+        <div class="action-button-area" id="mainActionArea" style="margin-top: 4px; margin-bottom: 8px;">
+          <button id="btnActionBet" class="btn-stake-primary btn-bet" onclick="window.handleBetClick ? window.handleBetClick() : (window.app && window.app.handleBetClick())">
+            <span>BET</span>
+          </button>
+
+          <button id="btnActionAutoStart" class="btn-stake-primary btn-auto-start" style="display: none;" onclick="window.toggleAutoPlay ? window.toggleAutoPlay() : (window.app && window.app.toggleAutoPlay())">
+            <span id="btnAutoStartText">⚡ START AUTO PLAY</span>
+          </button>
+          
+          <button id="btnActionCashout" class="btn-stake-primary btn-cashout" style="display: none;" onclick="window.handleCashoutClick ? window.handleCashoutClick() : (window.app && window.app.handleCashoutClick())">
+            <span>CASHOUT</span>
+            <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
+          </button>
+        </div>
+
+        <!-- Game Difficulty Mode Selector -->
+        <div class="control-group" id="difficultyControlGroup">
+          <div class="control-header">
+            <label class="control-label">Difficulty Mode</label>
+            <span class="control-helper" id="difficultyLabelHelper">Balanced Mode</span>
+          </div>
+          <div class="difficulty-modes-row">
+            <button id="btnDiffEasy" class="btn-diff-mode" data-diff="easy" onclick="window.app && window.app.setDifficulty('easy')">
+              <span style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #00e701; box-shadow: 0 0 6px #00e701;"></span>
+                <span>Easy</span>
+              </span>
+              <small>Safe Mode</small>
+            </button>
+            <button id="btnDiffMed" class="btn-diff-mode active" data-diff="medium" onclick="window.app && window.app.setDifficulty('medium')">
+              <span style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span>
+                <span>Medium</span>
+              </span>
+              <small>Balanced</small>
+            </button>
+            <button id="btnDiffHard" class="btn-diff-mode" data-diff="hard" onclick="window.app && window.app.setDifficulty('hard')">
+              <span style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #fe2c55; box-shadow: 0 0 6px #fe2c55;"></span>
+                <span>Hard</span>
+              </span>
+              <small>High Win</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mines Difficulty Selector (Visible on Mines Tab) -->
+        <div id="minesSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Mines Count</label>
+            <span class="control-helper">1 - 24 Mines</span>
+          </div>
+          <div class="custom-select-wrapper">
+            <select id="minesCountSelect" class="custom-select">
+              <option value="1">1 Mine (Safe: 24)</option>
+              <option value="2">2 Mines (Safe: 23)</option>
+              <option value="3" selected>3 Mines (Safe: 22)</option>
+              <option value="4">4 Mines (Safe: 21)</option>
+              <option value="5">5 Mines (Safe: 20)</option>
+              <option value="7">7 Mines (Safe: 18)</option>
+              <option value="10">10 Mines (Safe: 15)</option>
+              <option value="15">15 Mines (Safe: 10)</option>
+              <option value="20">20 Mines (Safe: 5)</option>
+              <option value="24">24 Mines (Safe: 1)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Highway Difficulty Selector (Visible on Chicken Tab) -->
+        <div id="chickenSelectGroup" class="control-group" style="display: flex;">
+          <div class="control-header">
+            <label class="control-label">Highway Difficulty</label>
+            <span class="control-helper">Traffic Density</span>
+          </div>
+          <div class="custom-select-wrapper">
+            <select id="bonesCountSelect" class="custom-select" onchange="window.app && window.app.handleChickenDifficultyChange(this.value)">
+              <option value="easy">🟢 Easy (15% Traffic - Safe 85%)</option>
+              <option value="medium" selected>🟡 Medium (25% Traffic - Safe 75%)</option>
+              <option value="hard">🟠 Hard (35% Rush Hour - Safe 65%)</option>
+              <option value="daredevil">🔴 Daredevil (50% Nitro Traffic - Max Multipliers)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Crash Auto Cashout Selector (Visible on Crash Tab) -->
+        <div id="crashSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Auto Cashout</label>
+            <span class="control-helper">Target Multiplier</span>
+          </div>
+          <div class="input-with-actions">
+            <input type="number" id="crashAutoCashoutInput" class="bet-input-field" value="2.00" min="1.01" step="0.10" style="padding-left: 14px;">
+            <div class="bet-quick-actions">
+              <button class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='1.50'">1.5x</button>
+              <button class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='2.00'">2x</button>
+              <button class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='5.00'">5x</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color Trading Contract Chips (Visible on Color Trading Tab) -->
+        <div id="colorTradingSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Quick Bet Amount</label>
+            <span class="control-helper">Tiranga Win Go</span>
+          </div>
+          <div class="deposit-quick-chips">
+            <button class="chip-btn active" onclick="document.getElementById('betAmountInput').value='10'">₹10</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='50'">₹50</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='100'">₹100</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='500'">₹500</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='1000'">₹1000</button>
+            <button class="chip-btn" onclick="document.getElementById('betAmountInput').value='5000'">₹5000</button>
+          </div>
+        </div>
+
+        <!-- Multiplier Preview Card (For Mines & Chicken) -->
+        <div id="multiplierPreviewCard" class="multiplier-preview-card">
+          <div class="preview-row">
+            <span id="previewStepLabel" class="preview-title">Next Diamond Multiplier</span>
+            <span id="previewMultiplier" class="preview-val-multiplier">1.13x</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-title">Potential Profit</span>
+            <span id="previewProfit" class="preview-val-profit">+₹11.30</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Right Main Game Board -->
+      <section class="game-stage">
+        
+        <!-- Multiplier Streak Step Bar (Mines/Chicken) -->
+        <div id="multStreakContainer" class="multiplier-bar-container">
+          <div class="mult-stat">
+            <span class="mult-stat-label">Current</span>
+            <span id="multCurrentVal" class="mult-stat-value highlight">1.00x</span>
+          </div>
+          <div id="multProgressBadges" class="mult-progress-badges">
+            <!-- Progress badges dynamically injected here -->
+          </div>
+          <div class="mult-stat" style="text-align: right;">
+            <span class="mult-stat-label">Next Step</span>
+            <span id="multNextVal" class="mult-stat-value">1.13x</span>
+          </div>
+        </div>
+
+        <!-- Game 1: Mines Grid (5x5 25 Tiles) -->
+        <div id="minesView" class="game-view active">
+          <div id="minesGrid" class="mines-grid">
+            <div class="mine-tile" data-index="0"></div>
+            <div class="mine-tile" data-index="1"></div>
+            <div class="mine-tile" data-index="2"></div>
+            <div class="mine-tile" data-index="3"></div>
+            <div class="mine-tile" data-index="4"></div>
+            <div class="mine-tile" data-index="5"></div>
+            <div class="mine-tile" data-index="6"></div>
+            <div class="mine-tile" data-index="7"></div>
+            <div class="mine-tile" data-index="8"></div>
+            <div class="mine-tile" data-index="9"></div>
+            <div class="mine-tile" data-index="10"></div>
+            <div class="mine-tile" data-index="11"></div>
+            <div class="mine-tile" data-index="12"></div>
+            <div class="mine-tile" data-index="13"></div>
+            <div class="mine-tile" data-index="14"></div>
+            <div class="mine-tile" data-index="15"></div>
+            <div class="mine-tile" data-index="16"></div>
+            <div class="mine-tile" data-index="17"></div>
+            <div class="mine-tile" data-index="18"></div>
+            <div class="mine-tile" data-index="19"></div>
+            <div class="mine-tile" data-index="20"></div>
+            <div class="mine-tile" data-index="21"></div>
+            <div class="mine-tile" data-index="22"></div>
+            <div class="mine-tile" data-index="23"></div>
+            <div class="mine-tile" data-index="24"></div>
+          </div>
+        </div>
+
+        <!-- Game 2: Chicken Road Crossing Highway View -->
+        <div id="chickenView" class="game-view">
+          <div class="chicken-road-arena">
+            
+            <!-- Highway Stadium Container -->
+            <div class="highway-container">
+              <div class="highway-track" id="highwayTrack">
+                
+                <!-- Finish Line Trophy Island (Top) -->
+                <div class="road-finish-line" id="roadFinishLine">
+                  <span>🏆 JACKPOT FINISH LINE</span>
+                  <span id="finishMultiplierTag" style="font-weight:900; color:#ffb703;">1,000x</span>
+                </div>
+
+                <!-- 25 Highway Lanes generated dynamically by app.js -->
+                <div id="highwayLanesContainer" style="display:flex; flex-direction:column; gap:8px; width:100%;"></div>
+
+                <!-- Starting Curb (Bottom) -->
+                <div class="road-start-curb" id="roadStartCurb">
+                  <div style="display:flex; align-items:center; gap:12px;">
+                    <div id="henStartingSprite" class="hen-character">
+                      <svg viewBox="0 0 48 48" width="46" height="46">
+                        <!-- Golden VIP Crown -->
+                        <polygon points="17,6 21,11 25,5 29,11 33,6 31,14 19,14" fill="#ffb703" stroke="#d97706" stroke-width="1"/>
+                        <!-- Red Comb -->
+                        <path d="M16 14 Q19 8 22 13 Q25 7 28 13 Q31 9 34 16 Z" fill="#ff3366"/>
+                        <!-- Hen Body Plump 3D -->
+                        <ellipse cx="24" cy="30" rx="14" ry="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <ellipse cx="24" cy="32" rx="11" ry="8" fill="#f8fafc" opacity="0.9"/>
+                        <!-- Wing -->
+                        <path d="M12 28 Q18 24 22 30 Q16 38 12 30 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+                        <path d="M14 29 Q17 26 20 30" stroke="#d97706" stroke-width="1.5" stroke-linecap="round"/>
+                        <!-- Head -->
+                        <circle cx="28" cy="18" r="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <!-- Eye -->
+                        <circle cx="31" cy="16" r="3.2" fill="#0f172a"/>
+                        <circle cx="32" cy="15" r="1.2" fill="#ffffff"/>
+                        <!-- Beak -->
+                        <polygon points="34,17 44,20 34,23" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
+                        <!-- Wattle -->
+                        <ellipse cx="33" cy="24" rx="2.5" ry="4" fill="#ff3366"/>
+                        <!-- Legs -->
+                        <path d="M20 41 L20 45 M20 45 L17 46 M20 45 L23 46 M28 41 L28 45 M28 45 L25 46 M28 45 L31 46" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <strong style="color: #ffb703; font-size: 13px; display:block;">🚦 STARTING CURB</strong>
+                      <span style="font-size:11px; color:#94a3b8; font-weight:700;">Press Go to hop forward</span>
+                    </div>
+                  </div>
+                  <span class="tab-badge" style="background: rgba(0, 245, 155, 0.2); color: #00f59b; font-size:11px; font-weight:800; border:1px solid rgba(0, 245, 155, 0.4);">READY TO JUMP 🐔</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Direct Jump Control Button for mobile & desktop -->
+            <div class="chicken-action-bar" id="chickenActionBar" style="display:none; margin-top:6px; flex-direction:column; align-items:center;">
+              <button id="btnChickenHop" class="btn-chicken-go" onclick="window.handleChickenHop ? window.handleChickenHop() : (window.app && window.app.handleChickenHop())">
+                <span>🐔 JUMP NEXT LANE ➡️</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Game 3: Crash (Aviator / Rocket) View -->
+        <div id="crashView" class="game-view crash-view">
+          <div class="crash-history-bar" id="crashHistoryBar">
+            <!-- Crash multiplier pills -->
+          </div>
+          <!-- Live Market Volatility & Momentum Hint Bar -->
+          <div class="crash-ai-signal-bar" id="crashAiSignalBar">
+            <div class="ai-signal-badge">
+              <span class="ai-pulse-dot"></span>
+              <span>📈 VOLATILITY INDEX</span>
+            </div>
+            <div class="ai-signal-info">
+              <span class="ai-signal-label">Momentum:</span>
+              <span class="ai-signal-target" id="crashAiPredictedTarget">Dynamic Curve</span>
+              <span class="ai-signal-conf" id="crashAiConfidence">Algorithmic</span>
+            </div>
+          </div>
+          <div class="crash-canvas-wrapper">
+            <canvas id="crashCanvas"></canvas>
+            <div class="crash-multiplier-overlay">
+              <div id="crashMultiplierText" class="crash-big-multiplier">1.00x</div>
+              <div id="crashStatusTag" class="crash-status-tag">FLIGHT READY</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game: Chicken Mines (25 Cloches Dish Game) -->
+        <div id="chickenMinesView" class="game-view chicken-mines-view">
+          <div class="mines-grid" id="chickenMinesGrid">
+            <div class="mine-tile cloche-tile" data-index="0"></div>
+            <div class="mine-tile cloche-tile" data-index="1"></div>
+            <div class="mine-tile cloche-tile" data-index="2"></div>
+            <div class="mine-tile cloche-tile" data-index="3"></div>
+            <div class="mine-tile cloche-tile" data-index="4"></div>
+            <div class="mine-tile cloche-tile" data-index="5"></div>
+            <div class="mine-tile cloche-tile" data-index="6"></div>
+            <div class="mine-tile cloche-tile" data-index="7"></div>
+            <div class="mine-tile cloche-tile" data-index="8"></div>
+            <div class="mine-tile cloche-tile" data-index="9"></div>
+            <div class="mine-tile cloche-tile" data-index="10"></div>
+            <div class="mine-tile cloche-tile" data-index="11"></div>
+            <div class="mine-tile cloche-tile" data-index="12"></div>
+            <div class="mine-tile cloche-tile" data-index="13"></div>
+            <div class="mine-tile cloche-tile" data-index="14"></div>
+            <div class="mine-tile cloche-tile" data-index="15"></div>
+            <div class="mine-tile cloche-tile" data-index="16"></div>
+            <div class="mine-tile cloche-tile" data-index="17"></div>
+            <div class="mine-tile cloche-tile" data-index="18"></div>
+            <div class="mine-tile cloche-tile" data-index="19"></div>
+            <div class="mine-tile cloche-tile" data-index="20"></div>
+            <div class="mine-tile cloche-tile" data-index="21"></div>
+            <div class="mine-tile cloche-tile" data-index="22"></div>
+            <div class="mine-tile cloche-tile" data-index="23"></div>
+            <div class="mine-tile cloche-tile" data-index="24"></div>
+          </div>
+        </div>
+
+        <!-- Game: Stake Plinko View -->
+        <div id="plinkoView" class="game-view plinko-view">
+          <div class="plinko-game-wrapper">
+            <div class="plinko-canvas-container">
+              <canvas id="plinkoCanvas" width="460" height="420"></canvas>
+            </div>
+            <div class="plinko-quick-settings">
+              <div class="plinko-setting-box">
+                <label>Risk Profile</label>
+                <select id="plinkoRiskSelect" onchange="window.app && window.app.setPlinkoRisk(this.value)">
+                  <option value="low">🟢 Low Risk</option>
+                  <option value="medium" selected>🟡 Medium Risk</option>
+                  <option value="hard">🔴 High Risk (1000x)</option>
+                </select>
+              </div>
+              <div class="plinko-setting-box">
+                <label>Pyramid Rows</label>
+                <select id="plinkoRowsSelect" onchange="window.app && window.app.setPlinkoRows(this.value)">
+                  <option value="8">8 Rows</option>
+                  <option value="10">10 Rows</option>
+                  <option value="12" selected>12 Rows</option>
+                  <option value="14">14 Rows</option>
+                  <option value="16">16 Rows (Max)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game: Stake Classic Dice View -->
+        <div id="diceView" class="game-view dice-view">
+          <div class="dice-game-wrapper">
+            <div class="dice-history-row" id="diceHistoryList"></div>
+            <div id="diceResultCard" class="dice-result-card">
+              <div class="dice-roll-number" id="diceRollResult">50.00</div>
+              <div style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-top: 4px;">Rolled Number</div>
+            </div>
+            
+            <div class="dice-slider-container">
+              <div class="dice-slider-track">
+                <div id="diceSliderFill" class="dice-slider-fill"></div>
+                <div id="diceSliderIndicator" class="dice-slider-indicator" style="left: 50%;"></div>
+              </div>
+              <input type="range" id="diceTargetSlider" class="dice-range-input" min="2" max="98" step="0.5" value="50.5">
+            </div>
+
+            <div class="dice-stats-grid">
+              <div class="dice-stat-box">
+                <div class="dice-stat-label">Multiplier</div>
+                <div class="dice-stat-val" id="diceMultiplierDisplay" style="color: #00e701;">1.9800x</div>
+              </div>
+              <div class="dice-stat-box">
+                <div class="dice-stat-label">Roll Target</div>
+                <button type="button" id="btnDiceRollMode" style="margin-top: 2px; font-size: 11px; padding: 2px 6px; background: rgba(0,229,255,0.15); color: #00e5ff; border: 1px solid #00e5ff; border-radius: 4px; font-weight: 800; cursor: pointer;" onclick="window.app && window.app.toggleDiceMode()">Roll Under &lt;</button>
+                <div class="dice-stat-val" id="diceTargetDisplay">50.50</div>
+              </div>
+              <div class="dice-stat-box">
+                <div class="dice-stat-label">Win Chance</div>
+                <div class="dice-stat-val" id="diceWinChanceDisplay" style="color: #00e5ff;">50.00%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game: Stake Limbo Turbo Multiplier View -->
+        <div id="limboView" class="game-view limbo-view">
+          <div class="limbo-game-wrapper">
+            <div class="limbo-history-row" id="limboHistoryList"></div>
+            <div id="limboResultContainer" class="limbo-display-container">
+              <div id="limboResultDisplay" class="limbo-multiplier-text">1.00x</div>
+              <div style="font-size: 11px; color: #94a3b8; font-weight: 800; text-transform: uppercase; margin-top: 4px;">Multiplier Burst</div>
+            </div>
+            <div class="limbo-controls-grid">
+              <div class="limbo-control-card">
+                <label class="control-label">Target Multiplier:</label>
+                <div class="input-with-actions" style="margin-top: 4px;">
+                  <input type="number" id="limboTargetInput" class="bet-input-field" value="2.00" min="1.01" max="1000000" step="0.10">
+                </div>
+                <div class="limbo-quick-targets">
+                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(1.5)">1.5x</button>
+                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(2.0)">2x</button>
+                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(5.0)">5x</button>
+                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(10.0)">10x</button>
+                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(100.0)">100x</button>
+                </div>
+              </div>
+              <div class="limbo-control-card">
+                <label class="control-label">Win Chance (%):</label>
+                <div id="limboWinChanceDisplay" style="padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; font-weight: 900; color: #00e5ff; text-align: center; font-size: 20px; font-family: Outfit, sans-serif; margin-top: 4px;">49.50%</div>
+                <div style="font-size: 10px; color: #64748b; margin-top: 6px; text-align: center;">Payout: Target × Bet Amount</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 8: Dragon Tiger Live VIP Arena -->
+        <div id="dragontigerView" class="game-view dragontiger-view">
+          <div class="dt-live-stage">
+            <div class="dt-header-bar">
+              <div class="dt-status-pill">
+                <span class="dt-live-dot"></span>
+                <span id="dtStatusText" class="dt-status-text">PLACE YOUR BETS</span>
+              </div>
+              <button id="btnDtHowToPlay" class="dt-help-btn" onclick="window.app && window.app.openDtHowToPlayModal()" title="How to Play Dragon Tiger">
+                <span>📖 How to Play</span>
+              </button>
+              <div style="font-family: var(--font-display); font-size: 11px; font-weight: 800; color: #94a3b8;" id="dtRoundIdTag">DT-0001</div>
+              <div class="dt-timer-container">
+                <span class="dt-timer-clock">⏱️</span>
+                <span id="dtTimerSeconds" class="dt-timer-seconds">15</span>
+              </div>
+            </div>
+
+            <div class="dt-arena-table">
+              <div class="dt-fighter-pod dragon" id="dtDragonPod">
+                <div class="dt-fighter-badge dragon">
+                  <span>🐉</span>
+                  <span>DRAGON</span>
+                </div>
+                <div class="dt-card-slot">
+                  <div class="dt-card-inner" id="dtDragonCardInner">
+                    <div class="dt-card-face dt-card-back">
+                      <div class="dt-card-back-pattern">
+                        <div class="dt-card-back-logo">🐉<br>DRAGON</div>
+                      </div>
+                    </div>
+                    <div class="dt-card-face dt-card-front" id="dtDragonCardFront">
+                      <div class="dt-card-corner-top">
+                        <span id="dtDragonRankTop">K</span>
+                        <span class="dt-card-suit-mini" id="dtDragonSuitTop">♠</span>
+                      </div>
+                      <div class="dt-card-center-suit" id="dtDragonSuitCenter">♠</div>
+                      <div class="dt-card-corner-bot">
+                        <span id="dtDragonRankBot">K</span>
+                        <span class="dt-card-suit-mini" id="dtDragonSuitBot">♠</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dt-card-score-pill" id="dtDragonScorePill">--</div>
+              </div>
+
+              <div class="dt-center-arena">
+                <div class="dt-vs-emblem">VS</div>
+                <div id="dtWinnerBanner" class="dt-winner-banner">READY</div>
+              </div>
+
+              <div class="dt-fighter-pod tiger" id="dtTigerPod">
+                <div class="dt-fighter-badge tiger">
+                  <span>🐯</span>
+                  <span>TIGER</span>
+                </div>
+                <div class="dt-card-slot">
+                  <div class="dt-card-inner" id="dtTigerCardInner">
+                    <div class="dt-card-face dt-card-back" style="border-color: #f59e0b;">
+                      <div class="dt-card-back-pattern">
+                        <div class="dt-card-back-logo" style="color: #f59e0b;">🐯<br>TIGER</div>
+                      </div>
+                    </div>
+                    <div class="dt-card-face dt-card-front" id="dtTigerCardFront">
+                      <div class="dt-card-corner-top">
+                        <span id="dtTigerRankTop">A</span>
+                        <span class="dt-card-suit-mini" id="dtTigerSuitTop">♥</span>
+                      </div>
+                      <div class="dt-card-center-suit" id="dtTigerSuitCenter">♥</div>
+                      <div class="dt-card-corner-bot">
+                        <span id="dtTigerRankBot">A</span>
+                        <span class="dt-card-suit-mini" id="dtTigerSuitBot">♥</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="dt-card-score-pill" id="dtTigerScorePill">--</div>
+              </div>
+            </div>
+
+            <div class="dt-betting-board">
+              <div class="dt-bet-spot dragon-spot" data-spot="dragon" onclick="window.app && window.app.handleDtBetClick('dragon')">
+                <div class="dt-bet-spot-title" style="color: #ff4d4d;">🐉 DRAGON</div>
+                <div class="dt-bet-spot-payout">1 : 1 (2.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon">₹0</div>
+              </div>
+              <div class="dt-bet-spot tie-spot" data-spot="tie" onclick="window.app && window.app.handleDtBetClick('tie')">
+                <div class="dt-bet-spot-title" style="color: #10b981;">🟢 TIE</div>
+                <div class="dt-bet-spot-payout">11 : 1 (12.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_tie">₹0</div>
+              </div>
+              <div class="dt-bet-spot suited-tie-spot" data-spot="suited_tie" onclick="window.app && window.app.handleDtBetClick('suited_tie')">
+                <div class="dt-bet-spot-title" style="color: #c084fc;">💎 SUITED TIE</div>
+                <div class="dt-bet-spot-payout">50 : 1 (51.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_suited_tie">₹0</div>
+              </div>
+              <div class="dt-bet-spot tiger-spot" data-spot="tiger" onclick="window.app && window.app.handleDtBetClick('tiger')">
+                <div class="dt-bet-spot-title" style="color: #fbbf24;">🐯 TIGER</div>
+                <div class="dt-bet-spot-payout">1 : 1 (2.0x)</div>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger">₹0</div>
+              </div>
+            </div>
+
+            <div class="dt-side-bets-row">
+              <div class="dt-side-bet-btn" data-spot="dragon_big" onclick="window.app && window.app.handleDtBetClick('dragon_big')">
+                <span class="dt-side-title">🐉 Dragon Big (8-K)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_big">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="dragon_small" onclick="window.app && window.app.handleDtBetClick('dragon_small')">
+                <span class="dt-side-title">🐉 Dragon Small (A-6)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_small">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_big" onclick="window.app && window.app.handleDtBetClick('tiger_big')">
+                <span class="dt-side-title">🐯 Tiger Big (8-K)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_big">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_small" onclick="window.app && window.app.handleDtBetClick('tiger_small')">
+                <span class="dt-side-title">🐯 Tiger Small (A-6)</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_small">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="dragon_red" onclick="window.app && window.app.handleDtBetClick('dragon_red')">
+                <span class="dt-side-title" style="color:#ef4444;">🐉 Dragon Red ♥️♦️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_red">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="dragon_black" onclick="window.app && window.app.handleDtBetClick('dragon_black')">
+                <span class="dt-side-title">🐉 Dragon Black ♠️♣️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_dragon_black">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_red" onclick="window.app && window.app.handleDtBetClick('tiger_red')">
+                <span class="dt-side-title" style="color:#ef4444;">🐯 Tiger Red ♥️♦️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_red">₹0</div>
+              </div>
+              <div class="dt-side-bet-btn" data-spot="tiger_black" onclick="window.app && window.app.handleDtBetClick('tiger_black')">
+                <span class="dt-side-title">🐯 Tiger Black ♠️♣️</span>
+                <span class="dt-side-mult">1:1</span>
+                <div class="dt-spot-chip-badge" id="dtChip_tiger_black">₹0</div>
+              </div>
+            </div>
+
+            <div class="dt-chips-control-bar">
+              <div class="dt-chips-row">
+                <div class="dt-casino-chip chip-10 active" data-chip="10" onclick="window.app && window.app.selectDtChip(10)">₹10</div>
+                <div class="dt-casino-chip chip-50" data-chip="50" onclick="window.app && window.app.selectDtChip(50)">₹50</div>
+                <div class="dt-casino-chip chip-100" data-chip="100" onclick="window.app && window.app.selectDtChip(100)">₹100</div>
+                <div class="dt-casino-chip chip-500" data-chip="500" onclick="window.app && window.app.selectDtChip(500)">₹500</div>
+                <div class="dt-casino-chip chip-1000" data-chip="1000" onclick="window.app && window.app.selectDtChip(1000)">₹1K</div>
+                <div class="dt-casino-chip chip-5000" data-chip="5000" onclick="window.app && window.app.selectDtChip(5000)">₹5K</div>
+              </div>
+              <div class="dt-chip-tools">
+                <button class="dt-tool-btn btn-clear" onclick="window.app && window.app.handleDtClearBets()">✕ Clear</button>
+                <button class="dt-tool-btn btn-double" onclick="window.app && window.app.handleDtDoubleBets()">2X Double</button>
+                <button class="dt-tool-btn btn-rebet" onclick="window.app && window.app.handleDtRebet()">↺ Rebet</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="dt-active-slip">
+            <span>Your Total Round Stake:</span>
+            <span class="dt-total-bet-val" id="dtTotalBetDisplay">₹0.00</span>
+          </div>
+
+          <div class="dt-roadmap-card">
+            <div class="dt-roadmap-header">
+              <span class="dt-roadmap-title">📊 Bead Road Streak History</span>
+              <div class="dt-stats-row">
+                <span class="dt-stat-pill dragon" id="dtStatDragon">🐉 D: 45%</span>
+                <span class="dt-stat-pill tiger" id="dtStatTiger">🐯 T: 45%</span>
+                <span class="dt-stat-pill tie" id="dtStatTie">🟢 Tie: 10%</span>
+              </div>
+            </div>
+            <div class="dt-bead-road-container">
+              <div class="dt-bead-road-grid" id="dtBeadRoadGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 7: Win Go 30s Color Trading View -->
+        <div id="colortradingView" class="game-view colortrading-view">
+          <!-- Tiranga Modes / Intervals -->
+          <div class="tiranga-modes-row">
+            <button class="tiranga-mode-btn active" data-duration="30">
+              <span>Win Go 30s</span>
+              <span style="font-size:10px; color:#10b981;">⚡ Fast</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="60">
+              <span>Win Go 1Min</span>
+              <span style="font-size:10px; opacity:0.8;">Popular</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="180">
+              <span>Win Go 3Min</span>
+              <span style="font-size:10px; opacity:0.8;">Standard</span>
+            </button>
+            <button class="tiranga-mode-btn" data-duration="300">
+              <span>Win Go 5Min</span>
+              <span style="font-size:10px; opacity:0.8;">Classic</span>
+            </button>
+          </div>
+
+          <!-- Win Go Period & Timer Header -->
+          <div class="trading-header-card">
+            <div class="trading-period-badge">
+              <span class="trading-period-label">Period ID</span>
+              <span id="tradingPeriodId" class="trading-period-id">--</span>
+            </div>
+            <div class="trading-timer-box">
+              <span class="trading-timer-label">Time Remaining</span>
+              <div class="trading-timer-digits">
+                <span class="time-digit-pill">0</span>
+                <span class="time-digit-pill">0</span>
+                <span style="font-size:20px; font-weight:800; color:#fff; align-self:center;">:</span>
+                <span id="timerDigit1" class="time-digit-pill">3</span>
+                <span id="timerDigit2" class="time-digit-pill">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Bet Buttons -->
+          <div class="color-bet-buttons-row">
+            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green" onclick="window.app && window.app.placeColorBet('color', 'green')">
+              <span>🟢 Join Green</span>
+              <span class="payout-tag">2x (1.5x on 5)</span>
+            </button>
+            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet" onclick="window.app && window.app.placeColorBet('color', 'violet')">
+              <span>🟣 Join Violet</span>
+              <span class="payout-tag">4.5x (on 0, 5)</span>
+            </button>
+            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red" onclick="window.app && window.app.placeColorBet('color', 'red')">
+              <span>🔴 Join Red</span>
+              <span class="payout-tag">2x (1.5x on 0)</span>
+            </button>
+          </div>
+
+          <!-- Numbers 0-9 Keypad Matrix -->
+          <div class="numbers-bet-grid">
+            <button class="btn-number-bet num-green" data-number="1" onclick="window.app && window.app.placeColorBet('number', 1)">1 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="2" onclick="window.app && window.app.placeColorBet('number', 2)">2 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="3" onclick="window.app && window.app.placeColorBet('number', 3)">3 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="4" onclick="window.app && window.app.placeColorBet('number', 4)">4 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-violet-green" data-number="5" onclick="window.app && window.app.placeColorBet('number', 5)">5 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="6" onclick="window.app && window.app.placeColorBet('number', 6)">6 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="7" onclick="window.app && window.app.placeColorBet('number', 7)">7 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="8" onclick="window.app && window.app.placeColorBet('number', 8)">8 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="9" onclick="window.app && window.app.placeColorBet('number', 9)">9 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0" onclick="window.app && window.app.placeColorBet('number', 0)">0 <span class="num-payout">9x Jackpot</span></button>
+          </div>
+
+          <!-- Big / Small Buttons -->
+          <div class="big-small-row">
+            <button id="btnBetBig" class="btn-big-bet" data-choice="big" onclick="window.app && window.app.placeColorBet('size', 'big')">
+              <span>🟡 Big (5 - 9)</span>
+              <span class="payout-tag">2x Payout</span>
+            </button>
+            <button id="btnBetSmall" class="btn-small-bet" data-choice="small" onclick="window.app && window.app.placeColorBet('size', 'small')">
+              <span>🔵 Small (0 - 4)</span>
+              <span class="payout-tag">2x Payout</span>
+            </button>
+          </div>
+
+          <!-- Active Bets In Round -->
+          <div id="tradingActiveBetsSlip" class="trading-active-bets" style="display: none;">
+            <strong>Your Active Bets This Round:</strong>
+            <div id="activeBetsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+          </div>
+
+          <!-- Recent Trend Balls -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes & Trends:</span>
+            <div class="trend-balls-row" id="trendBallsRow"></div>
+          </div>
+        </div>
+
+        <!-- Game 8: Stock Market Live Candlestick Trading View -->
+        <div id="stockView" class="game-view stock-view">
+          <div class="stock-market-header" style="margin-bottom: 12px;">
+            <div class="stock-asset-info">
+              <select id="stockAssetSelect" class="stock-asset-select">
+                <option value="BTC/INR">BTC / INR (Bitcoin)</option>
+                <option value="ETH/INR">ETH / INR (Ethereum)</option>
+                <option value="NIFTY 50">NIFTY 50 (Index)</option>
+                <option value="GOLD/INR">GOLD / INR (Commodity)</option>
+              </select>
+              <div class="stock-live-price-box">
+                <div id="stockLivePrice" class="stock-live-price">₹7,845,000.00</div>
+                <div id="stockChangeTag" class="stock-change-tag">+0.42% Today</div>
+              </div>
+            </div>
+            <div class="stock-chart-overlay">
+              <div class="live-indicator-dot"></div>
+              <span>LIVE 1-SEC TICKS</span>
+            </div>
+          </div>
+
+          <div class="stock-chart-container" style="height: 320px; margin-bottom: 14px;">
+            <canvas id="stockCanvas"></canvas>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
+            <div>
+              <label class="control-label" style="margin-bottom: 6px; display:block;">Trade Expiry:</label>
+              <div class="deposit-quick-chips">
+                <button class="chip-btn active" id="btnExpiry30s">30s</button>
+                <button class="chip-btn" id="btnExpiry60s">60s</button>
+                <button class="chip-btn" id="btnExpiry2m">2m</button>
+              </div>
+            </div>
+            <div>
+              <label class="control-label" style="margin-bottom: 6px; display:block;">Investment Amount:</label>
+              <div class="input-with-actions">
+                <span class="input-currency-prefix">₹</span>
+                <input type="number" id="stockBetAmountInput" class="bet-input-field" value="50" min="10" max="50000" step="10">
+              </div>
+            </div>
+          </div>
+
+          <div class="stock-action-buttons-row">
+            <button id="btnStockCall" class="btn-stock-trade btn-stock-call" onclick="window.app && window.app.handleStockTrade('call')">
+              <span>🟢 CALL / UP ⬆</span>
+              <span class="trade-payout-label">+90% Profit (1.90x)</span>
+            </button>
+            <button id="btnStockPut" class="btn-stock-trade btn-stock-put" onclick="window.app && window.app.handleStockTrade('put')">
+              <span>🔴 PUT / DOWN ⬇</span>
+              <span class="trade-payout-label">+90% Profit (1.90x)</span>
+            </button>
+          </div>
+
+          <div id="stockActiveTradesCard" class="stock-active-trades-card" style="display: none; margin-top: 12px;">
+            <strong style="font-size: 13px; color: var(--text-secondary);">Your Open Positions:</strong>
+            <div id="stockActiveTradesList" style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;"></div>
+          </div>
+        </div>
+
+        <!-- Result Toast Popup -->
+        <div id="roundResultToast" class="round-result-toast">
+          <div id="toastMultiplier" class="toast-multiplier">2.45x</div>
+          <div id="toastPayout" class="toast-payout">+₹24.50</div>
+          <div id="toastTagline" class="toast-tagline">CASHOUT SUCCESSFUL! 💰</div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- Bottom Live Community Wins & Personal Bet History Section -->
+    <section class="bottom-section">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="community-history-tabs">
+          <button id="tabCommunityWins" class="tab-history-pill active">
+            <span class="pulse-dot" style="background:#00e701;"></span>
+            <span>🔥 Live Community Wins</span>
+          </button>
+          <button id="tabMyBets" class="tab-history-pill">
+            <span>👤 My Bets History</span>
+          </button>
+        </div>
+
+        <div style="font-size:12px; font-weight:700; color:var(--text-muted);">
+          <span>● Live Feed Active</span>
+        </div>
+      </div>
+
+      <!-- Live Community Winners Stream Table View -->
+      <div id="viewCommunityWins" class="history-table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Player</th>
+              <th>Bet Amount</th>
+              <th>Multiplier</th>
+              <th>Payout</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="communityBetsTableBody">
+            <!-- Dynamically injected live stream -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Personal My Bets Table View -->
+      <div id="viewMyBets" class="history-table-container" style="display: none;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Bet Amount</th>
+              <th>Multiplier</th>
+              <th>Payout</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Personal history dynamically injected -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Floating Live Win Toast (Bottom-Left) -->
+    <div id="liveWinFloatingToast" class="live-win-floating-toast" style="display:none;">
+      <div class="win-toast-icon">⚡</div>
+      <div class="win-toast-info">
+        <span id="winToastUser" class="win-toast-user">Player***</span>
+        <span id="winToastPayout" class="win-toast-payout">Live Win</span>
+      </div>
+    </div>
+
+    <!-- Fixed Bottom-Right Corner Quick Action Dock (1cm Size): Online + Rating + Insta + Settings -->
+    <div class="bottom-corner-dock">
+      <!-- 1cm Mini Live Online Counter -->
+      <div class="btn-corner-pill online" title="Live Players Online">
+        <div class="status-dot live"></div>
+        <span id="liveOnlineUsersCounter">5.4k</span>
+      </div>
+
+      <!-- Rating Button -->
+      <button id="btnOpenRating" class="btn-corner-pill rating" title="Rate Us & Reviews" onclick="window.app && window.app.openRatingModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>4.3 ★</span>
+      </button>
+
+      <!-- Telegram Official Channel Button (Compact Pill) -->
+      <a href="https://t.me/viewpointios" target="_blank" class="btn-corner-pill telegram" title="Official Telegram @viewpointios" style="background: linear-gradient(135deg, #0088cc, #00b4d8); color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        <span>Telegram @viewpointios</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Auth Modal: Login / Register / Guest Access -->
+  <div id="modalAuth" class="modal-backdrop">
+    <div class="modal-card modal-auth-card" style="max-width: 420px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 1 1 4 0v2"/></svg>
+          <h3 class="modal-title" id="authModalTitle">Player Account</h3>
+        </div>
+        <button id="btnCloseAuthModal" class="modal-close-btn" onclick="window.closeAuthModal ? window.closeAuthModal() : (window.app && window.app.closeAuthModal())">&times;</button>
+      </div>
+
+      <!-- Auth Tabs: Login vs Register -->
+      <div class="auth-tabs">
+        <button id="tabAuthLogin" class="auth-tab-btn active" onclick="window.switchAuthTab ? window.switchAuthTab('login') : (window.app && window.app.switchAuthTab('login'))">Login</button>
+        <button id="tabAuthRegister" class="auth-tab-btn" onclick="window.switchAuthTab ? window.switchAuthTab('register') : (window.app && window.app.switchAuthTab('register'))">Sign Up</button>
+      </div>
+
+      <!-- Inline Error Banner -->
+      <div id="authErrorBanner" style="display: none; background: rgba(239, 68, 68, 0.18); border: 1px solid #ef4444; color: #fca5a5; padding: 9px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; margin: 10px 0 4px; text-align: center; line-height: 1.4;"></div>
+
+      <!-- English Withdrawal OTP Warning Notice -->
+      <div id="authWithdrawalNotice" class="auth-withdrawal-warning" style="background: rgba(254, 44, 85, 0.1); border: 1px solid rgba(254, 44, 85, 0.4); border-radius: 8px; padding: 10px 12px; margin: 12px 0 6px; display: none;">
+        <div style="display: flex; gap: 8px; align-items: flex-start;">
+          <span style="font-size: 16px; line-height: 1;">⚠️</span>
+          <p style="font-size: 11.5px; color: #ff859d; line-height: 1.45; margin: 0; font-weight: 500;">
+            <strong style="color: #ffffff; text-transform: uppercase;">Important Notice:</strong> Enter your real Active Mobile Number & Email ID. OTP verification is strictly required during cash withdrawals. Fake or wrong details will permanently block your withdrawals!
+          </p>
+        </div>
+      </div>
+
+      <!-- Auth Form -->
+      <div class="auth-form-body">
+        <div class="auth-field" id="authNameField" style="display: none;">
+          <label class="control-label">Full Name:</label>
+          <input type="text" id="authInputName" class="custom-select" placeholder="Enter your full name" autocomplete="name">
+        </div>
+
+        <div class="auth-field" id="authEmailField" style="display: none;">
+          <label class="control-label">Email Address (For OTP Verification):</label>
+          <input type="email" id="authInputEmail" class="custom-select" placeholder="e.g. yourname@gmail.com" autocomplete="email">
+        </div>
+
+        <div class="auth-field" id="authAddressField" style="display: none;">
+          <label class="control-label">Full Residential Address / City:</label>
+          <input type="text" id="authInputAddress" class="custom-select" placeholder="e.g. Flat 402, Royal Enclave, Jaipur" autocomplete="street-address">
+        </div>
+
+        <div class="auth-field" id="authPincodeField" style="display: none;">
+          <label class="control-label">Postal PIN Code (6 Digits):</label>
+          <input type="text" id="authInputPincode" class="custom-select" placeholder="e.g. 302001" maxlength="6" autocomplete="postal-code" style="font-family: monospace;">
+        </div>
+
+        <div class="auth-field">
+          <label class="control-label">Mobile Number (Login ID):</label>
+          <div style="display: flex; gap: 6px;">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="authInputPhone" class="custom-select" placeholder="10-digit mobile number" maxlength="10" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="control-label">Password:</label>
+          <input type="password" id="authInputPassword" class="custom-select" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <!-- 18+ Age & Responsible Gaming Verification Checkbox (Visible in Registration Mode) -->
+        <div class="auth-field" id="authAgeCheckboxField" style="display: none; margin-top: 4px; margin-bottom: 8px;">
+          <div style="display: flex; align-items: flex-start; gap: 8px; background: rgba(0, 231, 1, 0.06); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(0, 231, 1, 0.2);">
+            <input type="checkbox" id="chkAuthAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: var(--accent-green);" checked>
+            <label for="chkAuthAge18" style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.35; cursor: pointer;">
+              🔞 <strong>I certify that I am 18 years of age or older</strong> and agree to the Terms of Service & Fair Play Rules.
+            </label>
+          </div>
+        </div>
+
+        <button type="button" id="btnSubmitAuth" class="btn-action-primary" style="margin-top: 6px; height: 46px;" onclick="window.app && window.app.handleAuthSubmit()">
+          <span id="btnSubmitAuthText">Login to Play</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="auth-gate-divider" style="margin: 12px 0;">
+          <span>OR CONNECT WITH</span>
+        </div>
+
+        <!-- Social Login: Google & Facebook -->
+        <div class="social-login-grid" style="margin-bottom: 6px;">
+          <button type="button" class="btn-social-auth btn-social-google" onclick="window.openGoogleAuthModal ? window.openGoogleAuthModal() : (window.app && window.app.openGoogleAuthModal())">
+            <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+            <span>Google Account</span>
+          </button>
+          <button type="button" class="btn-social-auth btn-social-facebook" onclick="window.openFacebookAuthModal ? window.openFacebookAuthModal() : (window.app && window.app.openFacebookAuthModal())">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <span>Facebook</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Authentication Dialog Modal -->
+  <div id="modalGoogleAuth" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 400px; background: #131b2a; border: 1px solid rgba(66, 133, 244, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+          <h3 class="modal-title" style="color: #fff;">Sign in with Google</h3>
+        </div>
+        <button class="modal-close-btn" onclick="window.closeGoogleAuthModal ? window.closeGoogleAuthModal() : (document.getElementById('modalGoogleAuth').classList.remove('open'), document.getElementById('modalGoogleAuth').style.display='none')">&times;</button>
+      </div>
+      <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label class="control-label">Google Account Email:</label>
+          <input type="email" id="googleAuthEmail" class="custom-select" placeholder="your.name@gmail.com">
+        </div>
+        <div>
+          <label class="control-label">Mobile Number (For SMS Security & KYC):</label>
+          <div style="display: flex; gap: 6px;">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="googleAuthPhone" class="custom-select" placeholder="10-digit mobile number" maxlength="10">
+          </div>
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 8px; margin: 4px 0 6px;">
+          <input type="checkbox" id="chkGoogleAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: #4285f4;" checked>
+          <label for="chkGoogleAge18" style="font-size: 11px; color: #a0aec0; line-height: 1.35; cursor: pointer;">
+            🔞 <strong>I certify that I am 18+ years of age</strong> and accept platform terms & responsible gaming policies.
+          </label>
+        </div>
+        <div style="background: rgba(66, 133, 244, 0.08); border-left: 3px solid #4285f4; padding: 8px 10px; border-radius: 4px;">
+          <p style="font-size: 11px; color: #a0aec0; margin: 0; line-height: 1.4;">
+            🔒 Secure OAuth Sign-in: End-to-end encrypted session authorization.
+          </p>
+        </div>
+        <button type="button" class="btn-action-primary" style="background: #4285f4; color: #fff; height: 44px;" onclick="window.app && window.app.submitGoogleAuth()">
+          <span>✓ Authorize Google Account</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facebook Authentication Dialog Modal -->
+  <div id="modalFacebookAuth" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 400px; background: #111a2d; border: 1px solid rgba(24, 119, 242, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <h3 class="modal-title" style="color: #fff;">Connect with Facebook</h3>
+        </div>
+        <button class="modal-close-btn" onclick="window.closeFacebookAuthModal ? window.closeFacebookAuthModal() : (document.getElementById('modalFacebookAuth').classList.remove('open'), document.getElementById('modalFacebookAuth').style.display='none')">&times;</button>
+      </div>
+      <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label class="control-label">Facebook Profile Name / User Name:</label>
+          <input type="text" id="fbAuthName" class="custom-select" placeholder="e.g. Aman Verma" value="FB Player">
+        </div>
+        <div>
+          <label class="control-label">Email / Facebook ID:</label>
+          <input type="email" id="fbAuthEmail" class="custom-select" placeholder="e.g. player@facebook.com">
+        </div>
+        <div>
+          <label class="control-label">Mobile Number (For Withdrawal OTP):</label>
+          <div style="display: flex; gap: 6px;">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="fbAuthPhone" class="custom-select" placeholder="10-digit mobile number" maxlength="10">
+          </div>
+        </div>
+        <div>
+          <label class="control-label">Residential Address & City:</label>
+          <input type="text" id="fbAuthAddress" class="custom-select" placeholder="e.g. Sector 18, Noida">
+        </div>
+        <div>
+          <label class="control-label">Postal PIN Code (6 Digits):</label>
+          <input type="text" id="fbAuthPincode" class="custom-select" placeholder="e.g. 201301" maxlength="6" style="font-family: monospace;">
+        </div>
+        <div style="display: flex; align-items: flex-start; gap: 8px; margin: 2px 0 4px;">
+          <input type="checkbox" id="chkFbAge18" style="width: 17px; height: 17px; margin-top: 2px; cursor: pointer; accent-color: #1877f2;" checked>
+          <label for="chkFbAge18" style="font-size: 11px; color: #a0aec0; line-height: 1.35; cursor: pointer;">
+            🔞 <strong>I certify that I am 18+ years of age</strong> and accept platform terms.
+          </label>
+        </div>
+        <button type="button" class="btn-action-primary" style="background: #1877f2; color: #fff; height: 44px; margin-top: 6px;" onclick="window.app && window.app.submitFacebookAuth()">
+          <span>✓ Connect & Enter Casino</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mandatory 6-Digit SMS / Email OTP Verification Modal -->
+  <div id="modalOtpVerification" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 380px; text-align: center; padding: 26px 20px;">
+      <div style="font-size: 38px; margin-bottom: 6px;">📲</div>
+      <h3 style="font-size: 19px; font-weight: 900; margin-bottom: 4px; color: #fff;">Verify Security OTP</h3>
+      <p id="otpDestinationText" style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+        A 6-digit OTP has been sent to your Mobile / Email.
+      </p>
+
+      <div style="margin-bottom: 16px;">
+        <input type="text" id="inputLoginOtp" maxlength="6" placeholder="000000" style="width: 100%; height: 50px; text-align: center; font-size: 26px; letter-spacing: 10px; font-weight: 900; background: var(--bg-primary); border: 2px solid var(--accent-green); border-radius: 12px; color: var(--accent-green); outline: none; font-family: monospace;">
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); margin-bottom: 16px; padding: 0 4px;">
+        <span>Expires in: <strong id="otpTimerCountdown" style="color: #ffb703; font-family: monospace;">00:59</strong></span>
+        <button id="btnResendOtp" style="background: none; border: none; color: var(--accent-cyan); font-weight: 700; cursor: pointer; text-decoration: underline;" onclick="window.app && window.app.resendLoginOtp()">Resend Code</button>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-cancel-mini" style="flex: 1; height: 44px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 700; cursor: pointer;" onclick="document.getElementById('modalOtpVerification').classList.remove('open')">Cancel</button>
+        <button id="btnVerifyLoginOtp" class="btn-action-primary" style="flex: 2; height: 44px; font-size: 14px; font-weight: 800; border-radius: 10px;" onclick="window.app && window.app.verifyLoginOtp()">Verify & Login ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New User ₹200 Signup Bonus Celebration Modal -->
+  <div id="modalWelcomeBonus" class="modal-backdrop" style="z-index: 100000;">
+    <div class="modal-card" style="max-width: 380px; text-align: center; background: linear-gradient(180deg, #151f30 0%, #0d1422 100%); border: 2px solid #00e701; box-shadow: 0 0 40px rgba(0, 231, 1, 0.35); padding: 26px 20px;">
+      <div style="font-size: 48px; margin-bottom: 10px; animation: bounce 1s infinite alternate;">🎁</div>
+      <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 6px;">Welcome to VIEWPOINT!</h3>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 14px;">
+        Congratulations on joining! You've unlocked your exclusive new player reward:
+      </p>
+      <div style="background: rgba(0, 231, 1, 0.12); border: 1px dashed #00e701; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+        <span style="font-size: 12px; text-transform: uppercase; color: #8fa0b5; font-weight: 700; letter-spacing: 1px;">Instant Signup Reward</span>
+        <div style="font-size: 32px; font-weight: 900; color: #00e701; margin-top: 4px;">+₹200.00</div>
+      </div>
+      <div style="font-size: 11.5px; color: #fbbf24; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 7px 10px; margin-bottom: 16px; font-weight: 700; line-height: 1.35;">
+        ⚠️ This is Demo Money for practice only (non-withdrawable). Add funds to unlock real cash withdrawals!
+      </div>
+      <button id="btnClaimWelcomeBonus" class="btn-action-primary" style="width: 100%; height: 48px; font-size: 15px; font-weight: 800; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); box-shadow: 0 4px 15px rgba(0,231,1,0.4);" onclick="window.app && window.app.claimWelcomeBonus()">
+        <span>🎉 CLAIM ₹200 BONUS NOW</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Promo Video & Win Creator Rewards Modal -->
+  <div id="modalPromoVideo" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🎬</span>
+          <h3 class="modal-title">Promo Video & Win</h3>
+        </div>
+        <button class="modal-close-btn" onclick="window.app && window.app.closePromoVideoModal()">&times;</button>
+      </div>
+
+      <div class="refer-hero-banner" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(239, 68, 68, 0.3);">
+        <strong style="color: #ff4757; font-size: 14px; display:block;">Watch Promo & Win Real Bonus Cash</strong>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+          Watch game guides, enter promotional codes, or submit your YouTube/Reels gameplay link to claim exclusive cash rewards!
+        </p>
+      </div>
+
+      <!-- Redeem Promo Code Box -->
+      <div style="margin-top: 14px;">
+        <label class="control-label">Redeem Secret Promo Code:</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="inputPromoCode" class="custom-select" placeholder="Enter code (e.g. VP100)" style="text-transform: uppercase;">
+          <button id="btnRedeemPromoCode" class="btn-action-primary" style="white-space: nowrap; padding: 0 16px;" onclick="window.app && window.app.redeemPromoCode()">
+            <span>🎁 Redeem</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit Gameplay Video Link -->
+      <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+        <label class="control-label">Submit YouTube / Reel Link (Win ₹100-₹500):</label>
+        <input type="url" id="inputPromoVideoLink" class="custom-select" placeholder="https://youtube.com/shorts/... or instagram.com/reel/..." style="margin-bottom: 8px;">
+        <button id="btnSubmitPromoVideo" class="btn-action-withdraw" style="width: 100%; height: 42px;" onclick="window.app && window.app.submitPromoVideoLink()">
+          <span>📹 Submit Video Link for Bonus</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="modalRefer" class="modal-backdrop">
+    <div class="modal-card modal-refer-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🤝</span>
+          <h3 class="modal-title">Affiliate & Referral Program</h3>
+        </div>
+        <button id="btnCloseReferModal" class="modal-close-btn" onclick="window.closeReferModal ? window.closeReferModal() : (window.app && window.app.closeReferModal())">&times;</button>
+      </div>
+
+      <div class="refer-hero-banner">
+        <strong style="color: #00e701; font-size: 14px; display:block;">Earn 2.0% Lifetime Commission on All Friend Bets</strong>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+          Share your personal referral link. Whenever friends join and play, 2.0% of every bet is credited directly to your affiliate wallet in real time.
+        </p>
+      </div>
+
+      <!-- Referral Link & Code Box -->
+      <label class="control-label">Your Unique Referral Link:</label>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <input type="text" id="referralLinkInput" class="custom-select" value="https://viewpoint.diy/?ref=VP7821" readonly style="font-family: monospace; font-size: 13px;">
+        <button id="btnCopyReferLink" class="btn-action-primary" style="white-space: nowrap; padding: 0 14px;" onclick="window.app && window.app.copyReferralLink()">
+          <span>📋 Copy</span>
+        </button>
+        <button id="btnShareWhatsapp" class="btn-action-primary" style="white-space: nowrap; padding: 0 12px; background: #25D366; color: #fff;" onclick="window.app && window.app.shareReferralWhatsapp()">
+          <span>💬 Share</span>
+        </button>
+      </div>
+
+      <!-- Referral Stats Cards -->
+      <div class="refer-stats-grid">
+        <div class="refer-stat-card">
+          <span class="stat-label">Friends Invited</span>
+          <strong id="referTotalInvites" style="font-size: 18px; color: #00e5ff;">0</strong>
+        </div>
+        <div class="refer-stat-card">
+          <span class="stat-label">Total Commission</span>
+          <strong id="referTotalEarned" style="font-size: 18px; color: #00e701;">₹0.00</strong>
+        </div>
+        <div class="refer-stat-card">
+          <span class="stat-label">Unclaimed Balance</span>
+          <strong id="referUnclaimedBonus" style="font-size: 18px; color: #f59e0b;">₹0.00</strong>
+        </div>
+      </div>
+
+      <button id="btnClaimReferBonus" class="btn-action-withdraw" style="margin-top: 14px; height: 44px; opacity: 0.6; cursor: not-allowed;" onclick="window.app && window.app.claimReferralBonus()" disabled>
+        <span>💰 No Unclaimed Commission (Min ₹10.00)</span>
+      </button>
+
+      <div style="margin-top: 14px; padding: 10px 12px; background: var(--bg-primary); border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-secondary); line-height: 1.5;">
+        <strong style="color: var(--text-primary); display:block; margin-bottom: 3px;">How It Works:</strong>
+        1. Share your personal invite link on WhatsApp / Telegram.<br>
+        2. When friends register & place bets, you earn 2.0% turnover commission instantly.<br>
+        3. Withdraw or transfer earnings anytime with 0 wagering restrictions.
+      </div>
+    </div>
+  </div>
+
+  <!-- Dragon Tiger How to Play Guide Modal -->
+  <div id="modalDtHowToPlay" class="modal-backdrop">
+    <div class="modal-card modal-dt-rules-card" style="max-width: 540px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🐉🐯</span>
+          <h3 class="modal-title">Dragon Tiger - Rules & How to Play</h3>
+        </div>
+        <button id="btnCloseDtRulesModal" class="modal-close-btn" onclick="window.app && window.app.closeDtHowToPlayModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body dt-rules-body" style="max-height: 70vh; overflow-y: auto; padding-right: 4px;">
+        <div class="dt-rule-card">
+          <h4 style="color: #fbbf24; margin-bottom: 6px; font-size: 14px;">🎯 Game Objective</h4>
+          <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin: 0;">Two cards are dealt from a 52-card shoe: one to <strong>Dragon (🐉)</strong> and one to <strong>Tiger (🐯)</strong>. The side that receives the higher value card wins the round!</p>
+        </div>
+
+        <div class="dt-rule-card" style="margin-top: 10px;">
+          <h4 style="color: #38bdf8; margin-bottom: 6px; font-size: 14px;">🎴 Card Rank Hierarchy</h4>
+          <div style="background: rgba(15, 23, 42, 0.6); padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; color: #f8fafc; text-align: center;">
+            <span style="color:#00e5ff;">K (13)</span> &gt; <span style="color:#00e5ff;">Q (12)</span> &gt; <span style="color:#00e5ff;">J (11)</span> &gt; 10 &gt; 9 &gt; 8 &gt; 7 &gt; 6 &gt; 5 &gt; 4 &gt; 3 &gt; 2 &gt; <span style="color:#ef4444;">A (1, Lowest)</span>
+          </div>
+          <p style="font-size: 11px; color: #94a3b8; margin-top: 4px; margin-bottom: 0;">*Suits (♠, ♥, ♦, ♣) do not affect main card ranking.</p>
+        </div>
+
+        <div class="dt-rule-card" style="margin-top: 10px;">
+          <h4 style="color: #00e701; margin-bottom: 8px; font-size: 14px;">💰 Bets & Payout Table</h4>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #ff4d4d;">🐉 Dragon Bet</span>
+              <span style="font-weight: 800; color: #fff;">1 : 1 (2.0x) • 50% refund on Tie</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #fbbf24;">🐯 Tiger Bet</span>
+              <span style="font-weight: 800; color: #fff;">1 : 1 (2.0x) • 50% refund on Tie</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #34d399;">🟢 Tie Bet (Same Rank)</span>
+              <span style="font-weight: 800; color: #00e701;">11 : 1 (12.0x)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #c084fc;">💎 Suited Tie (Same Rank & Suit)</span>
+              <span style="font-weight: 800; color: #e879f9;">50 : 1 (51.0x)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 6px 10px; border-radius: 6px;">
+              <span style="font-weight: 800; color: #38bdf8;">🎯 Side Bets (Big/Small, Red/Black)</span>
+              <span style="font-weight: 800; color: #fff;">1 : 1 (2.0x)</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-action-primary" style="margin-top: 14px; width: 100%; height: 44px;" onclick="window.app && window.app.closeDtHowToPlayModal()">
+          <span>✅ Got It! Let's Play</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Provably Fair Modal -->
+  <div id="modalProvablyFair" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-title-row">
+        <h3 class="modal-title">🛡️ Provably Fair Verification</h3>
+        <button id="btnCloseFairModal" class="modal-close-btn" onclick="window.closeProvablyFairModal ? window.closeProvablyFairModal() : (document.getElementById('modalProvablyFair').classList.remove('open'), document.getElementById('modalProvablyFair').style.display='none')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>VIEWPOINT games use deterministic SHA-256 cryptographic hashing to guarantee that all round outcomes and multipliers are mathematically predetermined and impossible to alter.</p>
+        
+        <label class="control-label">Active Server Seed (SHA-256 Hash):</label>
+        <div id="serverSeedHash" class="seed-box" style="word-break: break-all; font-size: 12px;">--</div>
+
+        <label class="control-label">Client Seed (Customizable):</label>
+        <input type="text" id="clientSeedInput" class="custom-select" style="font-family: monospace;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <span class="control-label">Nonce: <strong id="nonceVal" style="color: #fff;">1</strong></span>
+          <button id="btnRotateSeed" class="btn-reset-wallet" onclick="window.app && window.app.rotateServerSeed()">🔄 Rotate Server Seed</button>
+        </div>
+
+        <!-- Interactive Verification Box -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-top: 10px;">
+          <strong style="font-size: 12px; color: #00e5ff; display: block; margin-bottom: 6px;">🔍 Independent Round Verifier:</strong>
+          <input type="text" id="verifyServerSeedInput" class="custom-select" placeholder="Paste Past Server Seed (Hex 64)" style="font-family: monospace; font-size: 11px; margin-bottom: 6px;">
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 6px; margin-bottom: 8px;">
+            <input type="text" id="verifyClientSeedInput" class="custom-select" placeholder="Client Seed" style="font-family: monospace; font-size: 11px;">
+            <input type="number" id="verifyNonceInput" class="custom-select" placeholder="Nonce" value="1" style="font-size: 11px;">
+          </div>
+          <button type="button" class="btn-action-primary" style="height: 34px; font-size: 11px;" onclick="window.app && window.app.verifyProvablyFairRound()">Validate Hash & Mines</button>
+          <div id="verifyResultDisplay" style="margin-top: 8px; font-size: 11px; color: #a0aec0; display: none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPI Deposit Modal -->
+  <div id="modalDepositUpi" class="modal-backdrop">
+    <div class="modal-card modal-deposit-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge">⚡</div>
+          <h3 class="modal-title">Add Funds via UPI / QR Code</h3>
+        </div>
+        <button id="btnCloseDepositModal" class="modal-close-btn" onclick="window.closeDepositModal ? window.closeDepositModal() : (document.getElementById('modalDepositUpi').classList.remove('open'), document.getElementById('modalDepositUpi').style.display='none')">&times;</button>
+      </div>
+
+      <div class="deposit-nav-tabs">
+        <button id="tabDepositForm" class="dep-tab-btn active" onclick="window.switchDepositTab ? window.switchDepositTab('form') : (window.app && window.app.switchDepositTab('form'))">💸 Deposit Online</button>
+        <button id="tabDepositHistory" class="dep-tab-btn" onclick="window.switchDepositTab ? window.switchDepositTab('history') : (window.app && window.app.switchDepositTab('history'))">📜 Deposit History</button>
+      </div>
+
+      <!-- Deposit Online View -->
+      <div id="viewDepositForm" class="deposit-tab-view active">
+        <!-- Step 1: Quick Amount Selector (Odd Amounts for Instant UTR Matching) -->
+        <div class="deposit-section">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="control-label">1. Select Deposit Amount:</label>
+            <span style="font-size:11px; font-weight:700; color:var(--accent-green);">Instant Auto Match Enabled ⚡</span>
+          </div>
+          <div class="deposit-quick-chips">
+            <button type="button" class="chip-btn active" data-amount="199" onclick="window.setDepositAmount ? window.setDepositAmount(199) : (document.getElementById('depositAmountInput').value='199', window.app && window.app.updateUpiQr())">₹199</button>
+            <button type="button" class="chip-btn" data-amount="499" onclick="window.setDepositAmount ? window.setDepositAmount(499) : (document.getElementById('depositAmountInput').value='499', window.app && window.app.updateUpiQr())">₹499</button>
+            <button type="button" class="chip-btn" data-amount="999" onclick="window.setDepositAmount ? window.setDepositAmount(999) : (document.getElementById('depositAmountInput').value='999', window.app && window.app.updateUpiQr())">₹999</button>
+            <button type="button" class="chip-btn" data-amount="1999" onclick="window.setDepositAmount ? window.setDepositAmount(1999) : (document.getElementById('depositAmountInput').value='1999', window.app && window.app.updateUpiQr())">₹1,999</button>
+            <button type="button" class="chip-btn" data-amount="4999" onclick="window.setDepositAmount ? window.setDepositAmount(4999) : (document.getElementById('depositAmountInput').value='4999', window.app && window.app.updateUpiQr())">₹4,999</button>
+            <button type="button" class="chip-btn" data-amount="9999" onclick="window.setDepositAmount ? window.setDepositAmount(9999) : (document.getElementById('depositAmountInput').value='9999', window.app && window.app.updateUpiQr())">₹9,999</button>
+            <button type="button" class="chip-btn" data-amount="14999" onclick="window.setDepositAmount ? window.setDepositAmount(14999) : (document.getElementById('depositAmountInput').value='14999', window.app && window.app.updateUpiQr())">₹14,999</button>
+            <button type="button" class="chip-btn" data-amount="29999" onclick="window.setDepositAmount ? window.setDepositAmount(29999) : (document.getElementById('depositAmountInput').value='29999', window.app && window.app.updateUpiQr())">₹29,999</button>
+            <button type="button" class="chip-btn" data-amount="35999" onclick="window.setDepositAmount ? window.setDepositAmount(35999) : (document.getElementById('depositAmountInput').value='35999', window.app && window.app.updateUpiQr())">₹35,999</button>
+          </div>
+          <div class="custom-amount-row">
+            <span class="curr-prefix" id="depCurrPrefix">₹</span>
+            <input type="number" id="depositAmountInput" class="custom-select dep-input" value="199" min="10" max="50000" step="10" oninput="window.app && window.app.updateUpiQr()">
+          </div>
+        </div>
+
+        <!-- Step 2: UPI Details & Dynamic QR Code -->
+        <div class="deposit-section qr-payment-box">
+          <div class="qr-code-wrapper">
+            <img id="upiQrCodeImg" class="upi-qr-image" src="" alt="Scan UPI QR Code">
+            <div class="qr-overlay-brand">
+              <span id="qrAmountTag">₹199</span>
+            </div>
+          </div>
+
+          <div class="qr-instructions">
+            <div class="merchant-info-row">
+              <span class="merchant-label">Merchant / Payee:</span>
+              <strong id="displayPayeeName" class="merchant-val">VIEWPOINT Official</strong>
+            </div>
+
+            <div class="merchant-info-row">
+              <span class="merchant-label">UPI ID:</span>
+              <div class="upi-id-copy-row" onclick="window.app && window.app.copyUpiId()" title="Click to copy UPI ID" style="cursor: pointer;">
+                <code id="displayUpiId" class="upi-id-code">adrenox1@axl</code>
+                <button type="button" id="btnCopyUpiId" class="btn-copy-upi" title="Copy UPI ID" onclick="event.stopPropagation(); window.app && window.app.copyUpiId()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span id="copyBtnText">Copy</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- UPI App Fast Links for Mobile -->
+            <div class="upi-apps-row">
+              <a id="linkGPay" href="#" class="upi-app-btn gpay" target="_blank">
+                <span>GPay</span>
+              </a>
+              <a id="linkPhonePe" href="#" class="upi-app-btn phonepe" target="_blank">
+                <span>PhonePe</span>
+              </a>
+              <a id="linkPaytm" href="#" class="upi-app-btn paytm" target="_blank">
+                <span>Paytm</span>
+              </a>
+              <a id="linkAnyUpi" href="#" class="upi-app-btn other-upi" target="_blank">
+                <span>Other UPI</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Enter 12-Digit UTR -->
+        <div class="deposit-section">
+          <label class="control-label" style="display: flex; align-items: center; justify-content: space-between;">
+            <span>2. Enter 12-Digit UTR / Transaction ID:</span>
+            <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 800;">● Instant Verification</span>
+          </label>
+          <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423456789012" maxlength="16" style="font-family: monospace; font-size: 16px; letter-spacing: 1.5px; text-align: center; font-weight: 800; background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(0, 231, 1, 0.4); color: #00e701;">
+          <p class="utr-hint" style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">📌 Payment app (GPay/PhonePe/Paytm) ki "Transaction History" me se 12-digit UTR number copy karke yahan paste karein.</p>
+          
+          <button id="btnSubmitDeposit" class="btn-action-primary" style="margin-top: 10px; height: 50px; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; box-shadow: 0 6px 24px rgba(0, 231, 1, 0.45); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer;">
+            <span style="font-size: 18px;">⚡</span>
+            <span>SUBMIT DEPOSIT REQUEST</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Deposit History View -->
+      <div id="viewDepositHistory" class="deposit-tab-view" style="display: none;">
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Amount</th>
+                <th>UTR</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="depositHistoryTableBody">
+              <tr><td colspan="4" class="empty-state">No deposit records yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Withdrawal Modal -->
+  <div id="modalWithdraw" class="modal-backdrop">
+    <div class="modal-card modal-deposit-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: linear-gradient(135deg, #00e5ff, #0077ff); color: #fff;">💸</div>
+          <h3 class="modal-title">Withdraw Funds</h3>
+        </div>
+        <button id="btnCloseWithdrawModal" class="modal-close-btn" onclick="window.closeWithdrawModal ? window.closeWithdrawModal() : (document.getElementById('modalWithdraw').classList.remove('open'), document.getElementById('modalWithdraw').style.display='none')">&times;</button>
+      </div>
+
+      <div class="deposit-tabs-row">
+        <button id="tabWithdrawForm" class="dep-tab-btn active" onclick="window.switchWithdrawTab ? window.switchWithdrawTab('form') : (window.app && window.app.switchWithdrawTab('form'))">⚡ Request Payout</button>
+        <button id="tabWithdrawHistory" class="dep-tab-btn" onclick="window.switchWithdrawTab ? window.switchWithdrawTab('history') : (window.app && window.app.switchWithdrawTab('history'))">📜 Payout History & Receipts</button>
+      </div>
+
+      <!-- Tab 1: Withdrawal Form -->
+      <div id="viewWithdrawForm" class="deposit-tab-view active">
+        
+        <!-- Balance & Daily Limit Status Bar -->
+        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 12px 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 12px; color: var(--text-secondary);">Withdrawable Main Balance:</span>
+            <strong id="withdrawAvailableBal" style="font-size: 17px; color: #00e701; font-family: var(--font-display);">₹0.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
+            <span>Daily Limit Remaining:</span>
+            <span id="withdrawDailyRemainingText" style="color: #00e5ff; font-weight: 700;">₹1,00,000.00 / ₹1,00,000.00</span>
+          </div>
+          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+            <div id="withdrawLimitProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #00e701, #00e5ff);"></div>
+          </div>
+        </div>
+
+        <!-- Payout Method Selector -->
+        <label class="control-label">1. Choose Payout Channel:</label>
+        <div class="withdraw-methods-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+          <button type="button" class="withdraw-method-btn active" id="btnMethodUpi" data-method="UPI" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('UPI') : (window.app && window.app.selectWithdrawMethod('UPI'))">
+            <span style="font-size: 18px;">⚡</span>
+            <div style="text-align: left;">
+              <strong style="display:block; font-size:12px;">Instant UPI</strong>
+              <span style="font-size:10px; color:#00e701;">5-15 Mins</span>
+            </div>
+          </button>
+          <button type="button" class="withdraw-method-btn" id="btnMethodBank" data-method="BANK" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('BANK') : (window.app && window.app.selectWithdrawMethod('BANK'))">
+            <span style="font-size: 18px;">🏦</span>
+            <div style="text-align: left;">
+              <strong style="display:block; font-size:12px;">Bank IMPS</strong>
+              <span style="font-size:10px; color:#00e5ff;">15-30 Mins</span>
+            </div>
+          </button>
+          <button type="button" class="withdraw-method-btn" id="btnMethodCrypto" data-method="CRYPTO" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('CRYPTO') : (window.app && window.app.selectWithdrawMethod('CRYPTO'))">
+            <span style="font-size: 18px;">🪙</span>
+            <div style="text-align: left;">
+              <strong style="display:block; font-size:12px;">USDT TRC20</strong>
+              <span style="font-size:10px; color:#f59e0b;">Automated</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Amount Input -->
+        <label class="control-label">2. Enter Withdrawal Amount (Min ₹300 to ₹50,000):</label>
+        <div class="deposit-amount-row" style="margin-bottom: 8px;">
+          <span class="currency-prefix">₹</span>
+          <input type="number" id="withdrawAmountInput" class="custom-select dep-input" value="500" min="300" max="50000" step="50">
+        </div>
+
+        <!-- Quick Amount Selection Chips -->
+        <div class="deposit-quick-chips" style="margin-bottom: 14px;">
+          <button type="button" class="chip-btn" data-amount="500">₹500</button>
+          <button type="button" class="chip-btn" data-amount="1000">₹1,000</button>
+          <button type="button" class="chip-btn" data-amount="2500">₹2,500</button>
+          <button type="button" class="chip-btn" data-amount="5000">₹5,000</button>
+          <button type="button" class="chip-btn" id="btnWithdrawMax">Max All</button>
+        </div>
+
+        <!-- Channel Specific Inputs: 1. UPI Mode -->
+        <div id="channelUpiFields">
+          <label class="control-label">3. Receiver UPI ID (GPay / PhonePe / Paytm / BHIM):</label>
+          <input type="text" id="withdrawUpiInput" class="custom-select dep-input" placeholder="e.g. yourname@okhdfcbank, 9876543210@paytm" style="font-family: monospace; font-size: 14px; margin-bottom: 8px;">
+          
+          <label class="control-label">4. Account Holder Name:</label>
+          <input type="text" id="withdrawNameInput" class="custom-select dep-input" placeholder="e.g. Rahul Sharma" style="margin-bottom: 10px;">
+        </div>
+
+        <!-- Channel Specific Inputs: 2. Bank IMPS Mode -->
+        <div id="channelBankFields" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+            <div>
+              <label class="control-label">Bank Account Number:</label>
+              <input type="text" id="withdrawBankAccInput" class="custom-select dep-input" placeholder="e.g. 50100234567890" style="font-family: monospace;">
+            </div>
+            <div>
+              <label class="control-label">IFSC Code (11 Digits):</label>
+              <input type="text" id="withdrawBankIfscInput" class="custom-select dep-input" placeholder="e.g. HDFC0000123" style="text-transform: uppercase; font-family: monospace;">
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label class="control-label">Bank Name:</label>
+              <input type="text" id="withdrawBankNameInput" class="custom-select dep-input" placeholder="e.g. HDFC Bank, SBI">
+            </div>
+            <div>
+              <label class="control-label">Account Holder Name:</label>
+              <input type="text" id="withdrawBankHolderInput" class="custom-select dep-input" placeholder="e.g. Rahul Sharma">
+            </div>
+          </div>
+        </div>
+
+        <!-- Channel Specific Inputs: 3. Crypto USDT Mode -->
+        <div id="channelCryptoFields" style="display: none;">
+          <label class="control-label">3. Receiver USDT TRC-20 Wallet Address:</label>
+          <input type="text" id="withdrawCryptoAddress" class="custom-select dep-input" placeholder="e.g. TXyz... (Tron TRC-20 network)" style="font-family: monospace; font-size: 13px; margin-bottom: 8px;">
+          <div style="font-size: 11px; color: #f59e0b; margin-bottom: 10px;">
+            ⚠️ Only TRC-20 USDT is supported. Sending to wrong address cannot be reversed.
+          </div>
+        </div>
+
+        <!-- Live Payout & Fee Calculation Breakdown Card -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 12px; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-secondary);">
+            <span>Gross Withdrawal Amount:</span>
+            <span id="calcGrossAmount" style="color: #fff; font-weight:700;">₹500.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-secondary);">
+            <span>Platform Service Fee (8%):</span>
+            <span id="calcPlatformFee" style="color: #f59e0b; font-weight:700;">-₹40.00 (8%)</span>
+          </div>
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #fff; font-size: 13px; display:block;">Net Payout To Receive:</strong>
+              <span style="font-size: 10px; color: var(--text-muted);">Amount credited directly to your UPI/Bank</span>
+            </div>
+            <strong id="calcNetAmount" style="color: #00e701; font-size: 17px; font-family: var(--font-display);">₹460.00</strong>
+          </div>
+        </div>
+
+        <!-- Strict Non-Refundable Account Warning Notice -->
+        <div style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid #ef4444; border-radius: var(--border-radius-md); padding: 10px 12px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <span style="font-size: 18px; line-height: 1;">⚠️</span>
+            <div style="font-size: 11.5px; line-height: 1.45; color: #ff8585;">
+              <strong style="color: #ff4757; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 2px;">
+                🚨 STRICT NOTICE: Double Check Your UPI / Bank Account Details!
+              </strong>
+              Please carefully verify and provide your <strong>authentic, correct UPI ID and Bank Account details</strong>. If an incorrect UPI ID or Account Number is provided and payout funds are transferred, <strong>NO REFUND OR COMPENSATION WILL BE ISSUED</strong>. Payouts cannot be reversed once dispatched.
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Account Checkbox -->
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 14px;">
+          <input type="checkbox" id="chkSaveWithdrawDetails" style="width:16px; height:16px; cursor:pointer;" checked>
+          <label for="chkSaveWithdrawDetails" style="font-size:12px; color: var(--text-secondary); cursor:pointer;">
+            💾 Save these account details for future instant 1-click payouts
+          </label>
+        </div>
+
+        <!-- Done / Submit Withdrawal Action Button -->
+        <button type="button" id="btnSubmitWithdraw" class="btn-action-withdraw" style="height: 50px; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; width: 100%; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.45); border-radius: 10px;">
+          <span style="font-size: 18px;">✅</span>
+          <span>DONE & CONFIRM WITHDRAWAL</span>
+        </button>
+
+        <!-- Guarantee Note & Direct Telegram Contact -->
+        <div style="margin-top: 12px; padding: 10px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
+            ⚡ Average payout dispatch time: <strong>5 - 15 minutes</strong>.<br>
+            Any emergency or payout query?
+          </div>
+          <a href="https://t.me/viewpointios" target="_blank" class="btn-insta-follow" style="background: #0088cc; color: #fff; padding: 5px 10px; font-size: 11px;">
+            Telegram @viewpointios ↗
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Tab 2: Withdrawal History -->
+      <div id="viewWithdrawHistory" class="deposit-tab-view">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Channel</th>
+              <th>Amount</th>
+              <th>Receiver Info</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="withdrawHistoryTableBody">
+            <!-- Dynamically rendered -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Dedicated Withdrawal OTP Verification Modal -->
+  <div id="modalWithdrawOtp" class="modal-backdrop">
+    <div class="modal-card modal-otp-card" style="max-width: 440px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(0, 231, 1, 0.12); border: 1px solid rgba(0, 231, 1, 0.3); display: flex; align-items: center; justify-content: center;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><rect x="9" y="11" width="6" height="5" rx="1"/><path d="M10 11V9a2 2 0 1 1 4 0v2"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title" style="font-size: 17px;">Withdrawal OTP Verification</h3>
+            <span style="font-size: 11px; color: #00e701; font-weight: 700;">Security Code Required</span>
+          </div>
+        </div>
+        <button id="btnCloseWithdrawOtpModal" class="modal-close-btn" onclick="window.app && window.app.closeWithdrawOtpModal()">&times;</button>
+      </div>
+
+      <div class="otp-modal-body" style="padding: 10px 0;">
+        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 12px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+            <span style="color: var(--text-secondary);">Payout Amount:</span>
+            <strong id="otpPayoutAmount" style="color: #00e701; font-size: 16px; font-family: var(--font-display);">₹500.00</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+            <span>Destination:</span>
+            <strong id="otpPayoutDestination" style="color: #fff; font-family: monospace; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">UPI: rahul@okhdfcbank</strong>
+          </div>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 12px; line-height: 1.4;">
+          A 4-digit security OTP has been dispatched to your mobile number <strong id="otpMaskedPhone" style="color: #00e5ff;">+91 98****3210</strong>
+        </p>
+
+        <!-- 4-Digit OTP Inputs -->
+        <div class="otp-inputs-row" style="display: flex; justify-content: center; gap: 12px; margin: 16px 0;">
+          <input type="tel" id="otpDigit1" class="otp-digit-input" maxlength="1" autofocus autocomplete="one-time-code" oninput="window.app && window.app.handleOtpDigitInput(1, this)">
+          <input type="tel" id="otpDigit2" class="otp-digit-input" maxlength="1" oninput="window.app && window.app.handleOtpDigitInput(2, this)">
+          <input type="tel" id="otpDigit3" class="otp-digit-input" maxlength="1" oninput="window.app && window.app.handleOtpDigitInput(3, this)">
+          <input type="tel" id="otpDigit4" class="otp-digit-input" maxlength="1" oninput="window.app && window.app.handleOtpDigitInput(4, this)">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 16px;">
+          <span style="color: var(--text-muted);">Didn't receive SMS?</span>
+          <button type="button" id="btnResendWithdrawOtp" class="btn-resend-otp" onclick="window.app && window.app.resendWithdrawOtp()" style="background: none; border: none; color: #00e5ff; font-weight: 700; cursor: pointer;">
+            Resend OTP (<span id="otpCountdownTimer">45</span>s)
+          </button>
+        </div>
+
+        <button type="button" id="btnVerifyWithdrawOtp" class="btn-stake-primary" style="width: 100%; height: 48px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701, #00b301); border: none; border-radius: 8px; color: #0f212e; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.app && window.app.verifyWithdrawOtpAndSubmit()">
+          <span>🛡️ VERIFY OTP & COMPLETE PAYOUT</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 24/7 Live Support Bot Modal -->
+  <div id="modalLiveSupport" class="modal-backdrop">
+    <div class="modal-card chat-bot-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: rgba(0, 229, 255, 0.2); color: #00e5ff;">🤖</div>
+          <div>
+            <h3 class="modal-title" style="font-size: 16px;">VIEWPOINT Live Support Bot</h3>
+            <span style="font-size: 11px; color: #00e701; font-weight: 700;">● Online 24/7 (Instant Help)</span>
+          </div>
+        </div>
+        <button id="btnCloseSupportModal" class="modal-close-btn" onclick="window.closeSupportModal ? window.closeSupportModal() : (document.getElementById('modalLiveSupport').classList.remove('open'), document.getElementById('modalLiveSupport').style.display='none')">&times;</button>
+      </div>
+
+      <!-- Chat Messages Scroll Area -->
+      <div id="chatMessagesContainer" class="chat-messages-container">
+        <div class="chat-msg bot">
+          <div class="chat-bubble">
+            Namaste! 👋 Main VIEWPOINT 24/7 Live Support Bot hoon. Main aapki kya madad kar sakta hoon?
+          </div>
+          <span class="chat-time">Just now</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Question Chips -->
+      <div class="chat-quick-actions">
+        <button class="chip-chat-quick" data-query="check_deposit">🔍 Check My Deposit Status</button>
+        <button class="chip-chat-quick" data-query="how_to_add">💳 How to Add Money</button>
+        <button class="chip-chat-quick" data-query="game_rules">📜 Game Rules & Tips</button>
+        <button class="chip-chat-quick" data-query="human_agent">👨‍💼 Contact Admin</button>
+      </div>
+
+      <!-- Chat Input Field -->
+      <div class="chat-input-row">
+        <input type="text" id="chatInputField" class="chat-input-field" placeholder="Apna sawaal yahan likhein...">
+        <button id="btnSendChat" class="btn-send-chat" onclick="window.app && window.app.handleUserChatMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating & Reviews Modal -->
+  <div id="modalRating" class="modal-backdrop">
+    <div class="modal-card rating-card">
+      <div class="modal-title-row">
+        <h3 class="modal-title">⭐ Rate Your Experience</h3>
+        <button id="btnCloseRatingModal" class="modal-close-btn" onclick="window.closeRatingModal ? window.closeRatingModal() : (document.getElementById('modalRating').classList.remove('open'), document.getElementById('modalRating').style.display='none')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size: 14px; color: var(--text-secondary);">
+          VIEWPOINT platform kaisa laga? Apni rating aur feedback dein:
+        </p>
+
+        <!-- Star Rating Buttons -->
+        <div class="rating-stars-row" id="starRatingRow">
+          <button class="star-rating-btn active" data-rating="1">★</button>
+          <button class="star-rating-btn active" data-rating="2">★</button>
+          <button class="star-rating-btn active" data-rating="3">★</button>
+          <button class="star-rating-btn active" data-rating="4">★</button>
+          <button class="star-rating-btn active" data-rating="5">★</button>
+        </div>
+        <div id="ratingTextFeedback" style="font-weight: 800; color: #fbbf24; font-size: 15px; margin-bottom: 12px;">5.0 / 5.0 - Excellent & Super Fast!</div>
+
+        <textarea id="ratingCommentInput" class="custom-select" rows="3" placeholder="Apna review likhein (e.g. Best Color Trading and Crash game!)..."></textarea>
+
+        <button id="btnSubmitRating" class="btn-action-primary" style="margin-top: 12px; height: 44px;">
+          <span>Submit Review</span>
+        </button>
+
+        <!-- Community Live Stats Box -->
+        <div class="community-rating-box">
+          <div>
+            <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">4.8 / 5.0 ⭐</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Player Rating</div>
+          </div>
+          <div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e701;" id="verifiedReviewsCount">Verified</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Fair RTP Audited</div>
+          </div>
+          <div>
+            <div style="font-size: 20px; font-weight: 900; color: #00e5ff;">100%</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Provably Fair</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction & Bet History Modal -->
+  <div id="modalTxHistory" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 540px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: rgba(0, 245, 155, 0.2); color: #00f59b;">📜</div>
+          <h3 class="modal-title">Transaction & Bet History</h3>
+        </div>
+        <button id="btnCloseTxHistoryModal" class="modal-close-btn" onclick="window.app && window.app.closeTxHistoryModal()">&times;</button>
+      </div>
+
+      <!-- History Navigation Tabs -->
+      <div class="admin-nav-tabs" style="margin: 14px 0 12px 0;">
+        <button id="tabTxDeposits" class="admin-tab-btn active" onclick="window.app && window.app.switchTxHistoryTab('deposits')">
+          <span>💰 Deposits</span>
+        </button>
+        <button id="tabTxWithdrawals" class="admin-tab-btn" onclick="window.app && window.app.switchTxHistoryTab('withdrawals')">
+          <span>💸 Withdrawals</span>
+        </button>
+        <button id="tabTxBets" class="admin-tab-btn" onclick="window.app && window.app.switchTxHistoryTab('bets')">
+          <span>🎮 Game Bets</span>
+        </button>
+      </div>
+
+      <!-- Tab View: Deposits -->
+      <div id="viewTxDeposits" class="tx-history-tab-view" style="display: block; overflow-y: auto; max-height: 380px;">
+        <div id="txDepositsList"></div>
+      </div>
+
+      <!-- Tab View: Withdrawals -->
+      <div id="viewTxWithdrawals" class="tx-history-tab-view" style="display: none; overflow-y: auto; max-height: 380px;">
+        <div id="txWithdrawalsList"></div>
+      </div>
+
+      <!-- Tab View: Game Bets -->
+      <div id="viewTxBets" class="tx-history-tab-view" style="display: none; overflow-y: auto; max-height: 380px;">
+        <div id="txBetsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Security PIN Gate Modal (No Default Passcode Text!) -->
+  <div id="modalAdminPinGate" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 360px; text-align: center; padding: 26px 20px;">
+      <div style="font-size: 36px; margin-bottom: 6px;">🔐</div>
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 4px; color: var(--text-primary);">Security Passcode</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Enter your secret PIN to access settings:</p>
+      
+      <div style="margin-bottom: 16px;">
+        <input type="password" id="inputAdminPin" maxlength="8" placeholder="••••" style="width: 100%; height: 48px; text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 900; background: var(--bg-primary); border: 2px solid var(--border-color); border-radius: 12px; color: var(--accent-green); outline: none;">
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-cancel-mini" style="flex: 1; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-muted); font-weight: 700; cursor: pointer;" onclick="document.getElementById('modalAdminPinGate').classList.remove('open'); document.getElementById('modalAdminPinGate').style.display='none';">Cancel</button>
+        <button id="btnSubmitAdminPin" class="btn-action-primary" style="flex: 2; height: 42px; font-size: 14px; font-weight: 800; border-radius: 10px;" onclick="window.submitAdminPinModal ? window.submitAdminPinModal() : (window.app && window.app.submitAdminPinModal())">Verify & Enter ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin / UPI & Deposit Approval Settings Modal -->
+  <div id="modalUpiSettings" class="modal-backdrop">
+    <div class="modal-card admin-modal-card">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: rgba(20, 117, 225, 0.2); color: #1475e1;">⚙️</div>
+          <h3 class="modal-title">Admin Management & Deposit Approval</h3>
+        </div>
+        <button id="btnCloseAdminModal" class="modal-close-btn" onclick="window.closeAdminModal ? window.closeAdminModal() : (window.app && window.app.closeAdminModal())">&times;</button>
+      </div>
+
+      <!-- Admin Navigation Tabs -->
+      <div class="admin-nav-tabs">
+        <button id="tabAdminPending" class="admin-tab-btn active" onclick="window.switchAdminTab ? window.switchAdminTab('pending') : (window.app && window.app.switchAdminTab('pending'))">
+          <span>⚡ Deposits</span>
+          <span id="adminPendingBadge" class="admin-badge-count">0</span>
+        </button>
+        <button id="tabAdminWithdraw" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('withdraw') : (window.app && window.app.switchAdminTab('withdraw'))">
+          <span>💸 Withdrawals</span>
+          <span id="adminWithdrawBadge" class="admin-badge-count" style="background:#f59e0b;">0</span>
+        </button>
+        <button id="tabAdminAnalytics" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('analytics') : (window.app && window.app.switchAdminTab('analytics'))">
+          <span>📊 6-Month Ledger</span>
+        </button>
+        <button id="tabAdminUsers" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('users') : (window.app && window.app.switchAdminTab('users'))">
+          <span>👥 Members</span>
+          <span id="adminUsersBadge" class="admin-badge-count" style="background:#3b82f6;">0</span>
+        </button>
+        <button id="tabAdminUpi" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('upi') : (window.app && window.app.switchAdminTab('upi'))">
+          <span>💳 UPI Config</span>
+        </button>
+        <button id="tabAdminTelegram" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('telegram') : (window.app && window.app.switchAdminTab('telegram'))">
+          <span>🤖 Telegram</span>
+        </button>
+        <button id="tabAdminSms" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('sms') : (window.app && window.app.switchAdminTab('sms'))">
+          <span>📲 SMS & Email API</span>
+        </button>
+      </div>
+
+      <!-- View 1: Pending Deposits Live Approval Queue -->
+      <div id="viewAdminPending" class="admin-tab-view active">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:13px; font-weight:700; color:var(--text-secondary);">Live Player Deposit Requests:</span>
+          <span style="font-size:11px; color:var(--accent-green);">● Real-time Sync</span>
+        </div>
+        <div id="adminPendingListContainer">
+          <!-- Dynamically populated pending deposit requests -->
+        </div>
+      </div>
+
+      <!-- View 2: Pending Withdrawals Approval Queue -->
+      <div id="viewAdminWithdraw" class="admin-tab-view">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:13px; font-weight:700; color:var(--text-secondary);">Live Withdrawal Payout Requests:</span>
+          <span style="font-size:11px; color:#f59e0b;">● Pending Payouts</span>
+        </div>
+        <div id="adminWithdrawListContainer">
+          <!-- Dynamically populated withdrawal requests with Paid/Reject buttons -->
+        </div>
+      </div>
+
+      <!-- View 3: UPI Account Settings -->
+      <div id="viewAdminUpi" class="admin-tab-view">
+        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+          Set your receiver **UPI ID** and **Payee Name** here so when players scan the QR code, payments go directly to your bank account.
+        </p>
+
+        <label class="control-label">Your UPI ID (Receiver):</label>
+        <input type="text" id="settingUpiIdInput" class="custom-select" placeholder="e.g. adrenox1@axl, 9876543210@paytm" style="font-family: monospace; font-size: 15px;">
+
+        <label class="control-label">Payee / Account Name:</label>
+        <input type="text" id="settingPayeeNameInput" class="custom-select" placeholder="e.g. VIEWPOINT Games / Your Name">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label class="control-label">Currency Symbol:</label>
+            <select id="settingCurrencySelect" class="custom-select">
+              <option value="₹">₹ INR (Rupees)</option>
+              <option value="$">$ USD (Dollars)</option>
+            </select>
+          </div>
+          <div>
+            <label class="control-label">Min Deposit Amount:</label>
+            <input type="number" id="settingMinDepositInput" class="custom-select" value="200">
+          </div>
+        </div>
+
+        <button id="btnSaveUpiSettings" class="btn-action-primary" style="margin-top: 14px; height: 46px;">
+          <span>💾 Save & Apply UPI Settings</span>
+        </button>
+      </div>
+
+      <!-- View 4: Telegram Bot Alerts Setup -->
+      <div id="viewAdminTelegram" class="admin-tab-view">
+        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 12px;">
+          Configure Telegram webhook alerts for deposits and withdrawals:
+        </p>
+
+        <label class="control-label">Telegram Bot Token (From @BotFather):</label>
+        <input type="password" id="settingTgBotToken" class="custom-select" placeholder="Enter Bot Token securely">
+
+        <label class="control-label">Your Telegram Chat ID (From @userinfobot):</label>
+        <input type="text" id="settingTgChatId" class="custom-select" placeholder="Enter Admin Chat ID">
+
+        <div style="display:flex; align-items:center; gap:8px; margin: 12px 0;">
+          <input type="checkbox" id="settingTgEnabled" style="width:18px; height:18px; cursor:pointer;">
+          <label for="settingTgEnabled" style="font-size:13px; font-weight:700; color:#fff; cursor:pointer;">Enable Instant Telegram Deposit & Payout Alerts</label>
+        </div>
+
+        <button id="btnSaveTelegramSettings" class="btn-action-primary" style="height: 46px;">
+          <span>🔔 Save Telegram Alert Settings</span>
+        </button>
+      </div>
+
+      <!-- View: SMS & Gateway API -->
+      <div id="viewAdminSms" class="admin-tab-view">
+        <div style="background: rgba(0, 245, 155, 0.1); border: 1px solid rgba(0, 245, 155, 0.3); border-radius: var(--border-radius-md); padding: 12px; margin-bottom: 14px;">
+          <div style="font-size: 12px; font-weight: 800; color: #00f59b;">📲 SMS & OTP Dispatch Configuration</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">Configure external SMS/Email gateway for real OTP verification.</div>
+        </div>
+
+        <label class="control-label">SMS Gateway API Key (Fast2SMS / 2Factor):</label>
+        <input type="password" id="settingFast2SmsKey" class="custom-select" placeholder="Enter SMS Gateway Key" style="font-family: monospace;">
+
+        <label class="control-label" style="margin-top: 10px;">Email Service ID:</label>
+        <input type="text" id="settingEmailJsService" class="custom-select" placeholder="Enter Email Service ID" style="font-family: monospace;">
+
+        <label class="control-label" style="margin-top: 10px;">Email Public Key / API Key:</label>
+        <input type="password" id="settingEmailJsKey" class="custom-select" placeholder="Enter Public Key" style="font-family: monospace;">
+
+        <button type="button" class="btn-action-primary" style="margin-top: 14px; height: 44px;" onclick="window.app && window.app.saveSmsGatewaySettings()">
+          <span>💾 Save Gateway API Keys</span>
+        </button>
+      </div>
+
+      <!-- View: 6-Month Financial Ledger & Monthly Revenue -->
+      <div id="viewAdminAnalytics" class="admin-tab-view">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 14px;">
+          <div style="background: rgba(0, 231, 1, 0.1); border: 1px solid rgba(0, 231, 1, 0.3); border-radius: 12px; padding: 12px; text-align: center;">
+            <div style="font-size: 11px; color: var(--accent-green); font-weight: 800; text-transform: uppercase;">This Month Deposits</div>
+            <div style="font-size: 18px; font-weight: 900; color: #fff; margin-top: 4px;" id="adminThisMonthDep">₹0.00</div>
+          </div>
+          <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 12px; text-align: center;">
+            <div style="font-size: 11px; color: #f87171; font-weight: 800; text-transform: uppercase;">This Month Payouts</div>
+            <div style="font-size: 18px; font-weight: 900; color: #fff; margin-top: 4px;" id="adminThisMonthWth">₹0.00</div>
+          </div>
+          <div style="background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 12px; padding: 12px; text-align: center;">
+            <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase;">Net Profit (GGR)</div>
+            <div style="font-size: 18px; font-weight: 900; color: #00e701; margin-top: 4px;" id="adminThisMonthProfit">₹0.00</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <strong style="font-size:13px; color:#fff;">📜 6-Month Rolling Financial Ledger:</strong>
+          <button type="button" class="btn-action-primary" style="height:30px; padding:0 10px; font-size:11px;" onclick="window.app && window.app.exportFinancialLedger()">📥 Export CSV</button>
+        </div>
+
+        <div style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 10px;">
+          <table class="history-table" style="width:100%; font-size:12px; margin:0;">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Deposits (₹)</th>
+                <th>Payouts (₹)</th>
+                <th>Net Revenue</th>
+                <th>Margin</th>
+              </tr>
+            </thead>
+            <tbody id="adminLedgerTableBody">
+              <!-- Dynamically populated 6 months data -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- View 5: Members & Facebook Logins Management -->
+      <div id="viewAdminUsers" class="admin-tab-view">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px;">
+          <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 10px; text-align: center;">
+            <div style="font-size: 10.5px; color: #60a5fa; font-weight: 800; text-transform: uppercase;">Total Members</div>
+            <div style="font-size: 17px; font-weight: 900; color: #fff; margin-top: 2px;" id="adminUsersCountCard">0</div>
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 10px; text-align: center;">
+            <div style="font-size: 10.5px; color: #34d399; font-weight: 800; text-transform: uppercase;">Total Balances</div>
+            <div style="font-size: 17px; font-weight: 900; color: #00e701; margin-top: 2px;" id="adminTotalUserBalanceCard">₹0.00</div>
+          </div>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 10px; text-align: center;">
+            <div style="font-size: 10.5px; color: #fbbf24; font-weight: 800; text-transform: uppercase;">Live Status</div>
+            <div style="font-size: 15px; font-weight: 900; color: #fbbf24; margin-top: 2px;">🟢 ONLINE</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#fff;">Registered Players & Login Accounts</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Live member support, phone records & login timestamps</div>
+          </div>
+          <button type="button" class="btn-action-primary" style="height:32px; padding:0 12px; font-size:12px; background:#1877f2;" onclick="window.app && window.app.exportMemberDetails()">📥 Download Backup</button>
+        </div>
+        <div id="adminUsersListContainer" style="max-height: 380px; overflow-y: auto;">
+          <!-- Dynamically populated member accounts and FB logins -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Standalone Creator Video Recording Studio Modal (Zero Admin/Financial Authority) -->
+  <div id="modalCreatorStudio" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🎬</span>
+          <h3 class="modal-title">Creator Video Recording Studio</h3>
+        </div>
+        <button class="modal-close-btn" onclick="window.app && window.app.closeCreatorStudioModal()">&times;</button>
+      </div>
+
+      <div class="refer-hero-banner" style="background: linear-gradient(135deg, rgba(255, 71, 87, 0.15), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(255, 71, 87, 0.3); margin-bottom: 14px;">
+        <strong style="color: #ff4757; font-size: 14px; display:block;">🎬 Gameplay Video Creation Mode</strong>
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+          Load high demo balances instantly to record high-multiplier gameplay highlights for YouTube Shorts, Reels, and Telegram channels.
+        </p>
+      </div>
+
+      <label class="control-label">Load Video Demo Recording Balance:</label>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;">
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(0, 231, 1, 0.2); border: 1px solid #00e701; color: #00e701;" onclick="window.app && window.app.setVideoDemoBalance(10000)">+₹10,000</button>
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(0, 229, 255, 0.2); border: 1px solid #00e5ff; color: #00e5ff;" onclick="window.app && window.app.setVideoDemoBalance(50000)">+₹50,000</button>
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #f59e0b;" onclick="window.app && window.app.setVideoDemoBalance(100000)">+₹1,00,000</button>
+        <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444;" onclick="window.app && window.app.setVideoDemoBalance(500000)">+₹5,00,000</button>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <label class="control-label">Custom Video Balance Amount:</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="number" id="inputCustomVideoBal" class="custom-select" placeholder="Enter amount (e.g. 25000)">
+          <button type="button" class="btn-action-primary" style="white-space: nowrap; padding: 0 16px;" onclick="window.app && window.app.applyCustomVideoBalance()">
+            <span>⚡ Set Balance</span>
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; padding: 12px; background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+        <strong style="color: #00e5ff; display:block; margin-bottom: 4px;">📹 Video Creation Instructions:</strong>
+        1. Set your desired demo recording balance above.<br>
+        2. Close this modal and start screen recording (OBS, iOS Screen Record, or AZ Screen Recorder).<br>
+        3. Record high-multiplier rounds in Mines, Chicken Road, or Crash.<br>
+        4. Publish on YouTube Shorts & Reels with your <strong>2% Referral Link</strong>!
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed Mobile Bottom Navigation Bar (Ultra Classy VIP App Experience) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <button class="mobile-nav-item active" id="mNavOriginals" onclick="window.switchMainPage ? window.switchMainPage(1) : (window.app && window.app.switchMainPage(1)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
+      <span class="m-nav-icon">💣</span>
+      <span class="m-nav-label">Originals</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavCrash" onclick="window.switchMainPage ? window.switchMainPage(2) : (window.app && window.app.switchMainPage(2)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
+      <span class="m-nav-icon">🚀</span>
+      <span class="m-nav-label">Crash</span>
+    </button>
+    <button class="mobile-nav-item highlight-deposit" id="mNavDeposit" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
+      <div class="m-nav-deposit-bubble">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <span class="m-nav-label" style="color: #00f59b; font-weight: 900;">Deposit</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavCasino" onclick="window.switchMainPage ? window.switchMainPage(3) : (window.app && window.app.switchMainPage(3)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
+      <span class="m-nav-icon">🐉</span>
+      <span class="m-nav-label">Casino</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavLiveBet" onclick="window.switchMainPage ? window.switchMainPage(4) : (window.app && window.app.switchMainPage(4)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
+      <span class="m-nav-icon">📊</span>
+      <span class="m-nav-label">Live Bet</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavHistory" onclick="window.openTxHistoryModal ? window.openTxHistoryModal() : (window.app && window.app.openTxHistoryModal())">
+      <span class="m-nav-icon">📜</span>
+      <span class="m-nav-label">History</span>
+    </button>
+    <button class="mobile-nav-item" id="mNavSupport" onclick="window.openSupportModal ? window.openSupportModal() : (window.app && window.app.openSupportModal())">
+      <span class="m-nav-icon">💬</span>
+      <span class="m-nav-label">Support</span>
+    </button>
+  </nav>
+
+  <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
+  <script src="js/config.js?v=90.0"></script>
+  <script src="js/security.js?v=90.0"></script>
+  <script src="js/audio.js?v=90.0"></script>
+  <script src="js/wallet.js?v=90.0"></script>
+  <script src="js/provablyFair.js?v=90.0"></script>
+  <script src="js/dragontiger.js?v=90.0"></script>
+  <script src="js/mines.js?v=90.0"></script>
+  <script src="js/limbo.js?v=90.0"></script>
+  <script src="js/chicken.js?v=90.0"></script>
+  <script src="js/plinko.js?v=90.0"></script>
+  <script src="js/crash.js?v=90.0"></script>
+  <script src="js/colortrading.js?v=90.0"></script>
+  <script src="js/stocktrading.js?v=90.0"></script>
+  <script src="js/dice.js?v=90.0"></script>
+  <script src="js/app.js?v=90.0"></script>
+
+  <!-- Non-Blocking Optional Third-Party Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+</body>
+</html>
