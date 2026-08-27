@@ -394,6 +394,39 @@ class CasinoWallet {
           serverSynced = true;
         }
       }
+
+      // Direct Telegram Alert Dispatch (guarantees immediate notification to Telegram Admin)
+      const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
+      const adminChatId = "6527377657";
+      const webOrigin = window.location.origin;
+      const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
+      const msgText = `🔔 <b>NEW DEPOSIT SUBMITTED</b> 🔔\n\n` +
+        `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+        `💰 <b>Amount:</b> <b>₹${amount.toFixed(2)}</b>\n` +
+        `🧾 <b>UTR Reference:</b> <code>${utrVal}</code>\n` +
+        `💳 <b>Paid via UPI:</b> <code>${upiVal}</code>\n` +
+        `⏰ <b>Time:</b> ${localRequest.time}\n` +
+        `🆔 <b>Deposit ID:</b> <code>${depId}</code>`;
+
+      const tgMarkup = {
+        inline_keyboard: [
+          [
+            { text: `✅ Approve (+₹${amount.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(amount)}` },
+            { text: "❌ Reject", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}` }
+          ]
+        ]
+      };
+
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: adminChatId,
+          text: msgText,
+          parse_mode: 'HTML',
+          reply_markup: tgMarkup
+        })
+      }).catch(() => {});
     } catch (err) {
       console.warn("Server deposit dispatch warn:", err);
     }
@@ -727,6 +760,41 @@ class CasinoWallet {
           this.notify();
         }
       }
+
+      // Direct Telegram Alert Dispatch for Withdrawal
+      const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
+      const adminChatId = "6527377657";
+      const webOrigin = window.location.origin;
+      const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
+      const wthMsg = `💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n` +
+        `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+        `💰 <b>Gross Amount:</b> ₹${amount.toFixed(2)}\n` +
+        `🏷️ <b>Platform Fee (8%):</b> -₹${fee.toFixed(2)}\n` +
+        `✅ <b>Net Payout to Send:</b> <b>₹${netPayout.toFixed(2)}</b>\n\n` +
+        `💳 <b>Receiver UPI:</b> <code>${receiver}</code>\n` +
+        `📡 <b>Channel:</b> ${channel}\n` +
+        `⏰ <b>Time:</b> ${localReq.time}\n` +
+        `🆔 <b>Withdrawal ID:</b> <code>${wthId}</code>`;
+
+      const wthMarkup = {
+        inline_keyboard: [
+          [
+            { text: `✅ Mark Paid (₹${netPayout.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(netPayout)}` },
+            { text: "❌ Reject & Refund", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}` }
+          ]
+        ]
+      };
+
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: adminChatId,
+          text: wthMsg,
+          parse_mode: 'HTML',
+          reply_markup: wthMarkup
+        })
+      }).catch(() => {});
     } catch (err) {}
 
     return { success: true, withdrawal: localReq, message: "Withdrawal request submitted successfully." };

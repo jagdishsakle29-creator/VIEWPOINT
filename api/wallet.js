@@ -258,8 +258,8 @@ async function dispatchServerTelegramAlert(item, type) {
   dispatchedAlerts.add(item.id);
   setTimeout(() => dispatchedAlerts.delete(item.id), 60000);
 
-  const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(',')[0] : process.env.TELEGRAM_CHAT_ID;
+  const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
+  const chatId = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(',')[0] : (process.env.TELEGRAM_CHAT_ID || '6527377657');
 
   if (!token || !chatId) return;
 

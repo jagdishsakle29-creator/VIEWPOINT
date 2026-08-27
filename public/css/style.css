@@ -1419,8 +1419,13 @@ body {
 }
 
 .payout-green {
-  color: var(--accent-green);
-  font-weight: 700;
+  color: #00e701 !important;
+  font-weight: 800;
+}
+
+.payout-red {
+  color: #ef4444 !important;
+  font-weight: 800;
 }
 
 .payout-gray {

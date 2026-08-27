@@ -62,10 +62,14 @@ class CasinoLimbo {
     const btnBet = document.getElementById('btnActionBet');
     if (btnBet) btnBet.disabled = true;
 
-    // Generate Provably Fair Crashed Multiplier
-    // 99% / random uniform
+    // Generate Provably Fair Crashed Multiplier with 96% RTP Casino Edge
     const r = Math.random();
-    let crashMult = Math.floor((99.0 / (1.0 - r + 0.00001)) * 100) / 10000;
+    let crashMult = 1.00;
+    if (r < 0.035) {
+      crashMult = 1.00; // Instant house crash
+    } else {
+      crashMult = Math.floor((96.0 / (1.0 - r + 0.00001)) * 100) / 10000;
+    }
     crashMult = Math.max(1.00, Math.min(1000000.0, crashMult));
 
     if (this.resultContainer) {

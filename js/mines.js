@@ -204,81 +204,49 @@ class MinesGame {
     return false;
   }
 
-  async revealTile(index) {
+  revealTile(index) {
     if (!this.isPlaying) {
-      const started = await this.startGame();
-      if (!started) return;
+      this.startGame();
+      return;
     }
     if (this.revealedIndices.has(index)) return;
 
     this.revealedIndices.add(index);
-    const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
 
-    // 1. Check Server-Side authoritative reveal
-    let serverHandled = false;
+    // Instant local evaluation (0ms lag - always triggers loss on bomb hit)
+    if (this.secretBombs.includes(index)) {
+      this.isPlaying = false;
+      this.handleBombHit(index, this.secretBombs);
+      return;
+    }
+
+    this.revealedCount++;
+    this.currentMultiplier = this.calculateMultiplier(this.revealedCount);
+    window.soundEngine && window.soundEngine.playGem && window.soundEngine.playGem(this.revealedCount);
+    if (this.ui && this.ui.onTileReveal) {
+      this.ui.onTileReveal(index, 'gem', false);
+    }
+    this.updateNextMultiplierPreview();
+    this.saveActiveRoundSession();
+
+    if (this.totalTiles - this.mineCount - this.revealedCount === 0) {
+      this.handleMaxWin(Math.floor(this.betAmount * this.currentMultiplier * 100) / 100, this.secretBombs);
+    }
+
+    // Background server sync without blocking rendering
     try {
-      const res = await fetch(`${this.apiBaseUrl}/api/games?action=mines_reveal`, {
+      const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
+      fetch(`${this.apiBaseUrl}/api/games?action=mines_reveal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-User-Id': String(uid) },
         body: JSON.stringify({
           action: 'mines_reveal',
           round_id: this.roundId,
-          roundId: this.roundId,
           tile_index: index,
-          tileIndex: index,
           userId: uid
         })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          serverHandled = true;
-          if (data.isBomb || data.is_bomb) {
-            this.isPlaying = false;
-            this.handleBombHit(index, data.secretIndices || data.secret_indices || this.secretBombs);
-            return;
-          }
-
-          this.revealedCount++;
-          this.currentMultiplier = data.currentMultiplier || data.current_multiplier || this.calculateMultiplier(this.revealedCount);
-          window.soundEngine && window.soundEngine.playGem && window.soundEngine.playGem(this.revealedCount);
-
-          if (this.ui && this.ui.onTileReveal) {
-            this.ui.onTileReveal(index, 'gem', false);
-          }
-          this.updateNextMultiplierPreview();
-          this.saveActiveRoundSession();
-
-          if (data.isMaxWin || data.is_max_win || (this.totalTiles - this.mineCount - this.revealedCount === 0)) {
-            this.handleMaxWin(data.payout || (this.betAmount * this.currentMultiplier), data.secretIndices || data.secret_indices || this.secretBombs);
-          }
-          return;
-        }
-      }
+      }).catch(() => {});
     } catch (e) {}
-
-    // 2. Reliable Local Logic (Always triggers real loss when hitting a secret bomb)
-    if (!serverHandled) {
-      if (this.secretBombs.includes(index)) {
-        this.isPlaying = false;
-        this.handleBombHit(index, this.secretBombs);
-        return;
-      }
-
-      this.revealedCount++;
-      this.currentMultiplier = this.calculateMultiplier(this.revealedCount);
-      window.soundEngine && window.soundEngine.playGem && window.soundEngine.playGem(this.revealedCount);
-      if (this.ui && this.ui.onTileReveal) {
-        this.ui.onTileReveal(index, 'gem', false);
-      }
-      this.updateNextMultiplierPreview();
-      this.saveActiveRoundSession();
-
-      if (this.totalTiles - this.mineCount - this.revealedCount === 0) {
-        this.handleMaxWin(Math.floor(this.betAmount * this.currentMultiplier * 100) / 100, this.secretBombs);
-      }
-    }
   }
 
   handleBombHit(index, secretIndices = []) {

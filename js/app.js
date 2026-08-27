@@ -3757,16 +3757,21 @@ class AppController {
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
-          if (this.dom.referCount) this.dom.referCount.innerText = data.referralCount || 0;
-          if (this.dom.referEarnings) this.dom.referEarnings.innerText = `${window.wallet.currency}${(data.totalEarnings || 0).toFixed(2)}`;
-          if (this.dom.referUnclaimedBonus) this.dom.referUnclaimedBonus.innerText = `${window.wallet.currency}${(data.unclaimedCommission || 0).toFixed(2)}`;
+          const referCountEl = this.dom.referTotalInvites || document.getElementById('referTotalInvites');
+          const referEarningsEl = this.dom.referTotalEarned || document.getElementById('referTotalEarned');
+          const referUnclaimedEl = this.dom.referUnclaimedBonus || document.getElementById('referUnclaimedBonus');
+          const btnClaim = this.dom.btnClaimReferBonus || document.getElementById('btnClaimReferBonus');
+
+          if (referCountEl) referCountEl.innerText = data.referralCount || 0;
+          if (referEarningsEl) referEarningsEl.innerText = `${window.wallet.currency}${(data.totalEarnings || 0).toFixed(2)}`;
+          if (referUnclaimedEl) referUnclaimedEl.innerText = `${window.wallet.currency}${(data.unclaimedCommission || 0).toFixed(2)}`;
           
           const unclaimed = parseFloat(data.unclaimedCommission || 0);
-          if (unclaimed >= 10 && this.dom.btnClaimReferBonus) {
-            this.dom.btnClaimReferBonus.disabled = false;
-            this.dom.btnClaimReferBonus.innerText = `💰 Claim ${window.wallet.currency}${unclaimed.toFixed(2)} Commission`;
-            this.dom.btnClaimReferBonus.style.opacity = '1';
-            this.dom.btnClaimReferBonus.style.cursor = 'pointer';
+          if (unclaimed >= 10 && btnClaim) {
+            btnClaim.disabled = false;
+            btnClaim.innerHTML = `<span>💰 Claim ${window.wallet.currency}${unclaimed.toFixed(2)} Commission</span>`;
+            btnClaim.style.opacity = '1';
+            btnClaim.style.cursor = 'pointer';
           }
         }
       }
@@ -3877,7 +3882,9 @@ class AppController {
       'VP100': 100.0,
       'VIEWPOINT': 50.0,
       'CASINO200': 200.0,
-      'VIRAL50': 50.0
+      'VIRAL50': 50.0,
+      '9191': 100.0,
+      '9630': 200.0
     };
 
     if (promoCodes[code]) {
@@ -4690,8 +4697,8 @@ class AppController {
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock, Dice) hide left controls sidebar and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'dice');
+    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock) hide left controls sidebar and take 100% width
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
@@ -6271,7 +6278,7 @@ class AppController {
     }
     if (this.plinko) {
       this.plinko.setBetAmount(betAmount);
-      this.plinko.dropBall();
+      this.plinko.dropBall(betAmount);
     }
     const timer = setTimeout(() => {
       if (!this.isAutoPlaying) return;
@@ -6285,9 +6292,9 @@ class AppController {
       }
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 30);
+      }, 150);
       this.autoStepTimers.push(nextTimer);
-    }, 80);
+    }, 250);
     this.autoStepTimers.push(timer);
   }
 
@@ -6296,8 +6303,7 @@ class AppController {
       this.dice = new window.CasinoDice('diceView');
     }
     if (this.dice) {
-      this.dice.setBetAmount(betAmount);
-      this.dice.rollDice();
+      this.dice.roll(betAmount);
     }
     const timer = setTimeout(() => {
       if (!this.isAutoPlaying) return;
@@ -6311,9 +6317,9 @@ class AppController {
       }
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 30);
+      }, 120);
       this.autoStepTimers.push(nextTimer);
-    }, 60);
+    }, 280);
     this.autoStepTimers.push(timer);
   }
 
@@ -6730,6 +6736,11 @@ class AppController {
       const multVal = item.multiplier !== undefined ? item.multiplier : (item.mult || 0);
       const payoutVal = item.payout !== undefined ? item.payout : (item.profit || 0);
 
+      const isWin = !!item.won && payoutVal > 0;
+      const payoutHtml = isWin
+        ? `<span class="payout-green">+${window.wallet.currency}${payoutVal.toFixed(2)}</span>`
+        : `<span class="payout-red">-${window.wallet.currency}${betVal.toFixed(2)}</span>`;
+
       return `
         <tr>
           <td>
@@ -6738,9 +6749,9 @@ class AppController {
             </span>
           </td>
           <td>${window.wallet.currency}${betVal.toFixed(2)}</td>
-          <td><strong>${multVal > 0 ? multVal.toFixed(2) + 'x' : '0.00x'}</strong></td>
-          <td class="${item.won ? 'payout-green' : 'payout-gray'}">
-            ${item.won ? '+' + window.wallet.currency + payoutVal.toFixed(2) : window.wallet.currency + '0.00'}
+          <td><strong style="color: ${isWin ? '#00e701' : '#ef4444'};">${multVal > 0 ? multVal.toFixed(2) + 'x' : '0.00x'}</strong></td>
+          <td>
+            ${payoutHtml}
           </td>
           <td>${item.time}</td>
         </tr>
