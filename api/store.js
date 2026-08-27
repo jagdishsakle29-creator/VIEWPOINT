@@ -1,10 +1,10 @@
-// /api/store.js - Shared Persistent Storage for SHASAH Casino Functions
+// /api/store.js - Shared Persistent Storage for VIEWPOINT Casino Functions
 // Uses /tmp JSON persistence with fast in-memory caching to survive serverless scale & cold starts.
 
 const fs = require('fs');
 const path = require('path');
 
-const STORE_PATH = path.join('/tmp', 'shasah_state.json');
+const STORE_PATH = path.join('/tmp', 'viewpoint_state.json');
 
 let inMemoryCache = null;
 
@@ -41,11 +41,11 @@ function saveStore() {
 
 function getWallet(userId) {
   const store = loadStore();
-  const uid = String(userId || 'guest_default').trim();
+  const uid = String(userId || 'user_default').trim();
   if (!store.wallets[uid]) {
     store.wallets[uid] = {
       userId: uid,
-      balance: 1000.00,
+      balance: 200.00,
       totalDeposited: 0.00,
       totalWithdrawn: 0.00,
       currency: '₹',

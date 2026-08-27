@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SHASAH Local Development & API Server
+VIEWPOINT Local Development & API Server
 Serves static assets and provides API endpoints for wallet, deposits, and game sync.
 """
 import os
@@ -102,6 +102,6 @@ class DevServerHandler(SimpleHTTPRequestHandler):
         self._send_json({"success": True})
 
 if __name__ == '__main__':
-    print(f"🚀 Starting SHASAH Local Dev Server on http://localhost:{PORT}")
+    print(f"🚀 Starting VIEWPOINT Local Dev Server on http://localhost:{PORT}")
     server = HTTPServer(('0.0.0.0', PORT), DevServerHandler)
     server.serve_forever()

@@ -125,7 +125,7 @@ export default async function handler(req, res) {
       userId: String(userId),
       amount: amount,
       utr: utr,
-      upiId: String(params.upiId || 'official@shasah'),
+      upiId: String(params.upiId || 'adrenox1@axl'),
       status: 'PENDING',
       time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }),
       date: new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }),

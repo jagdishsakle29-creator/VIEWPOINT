@@ -67,17 +67,20 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     bot_info = await context.bot.get_me()
     welcome_text = (
-        f"💎 *WELCOME TO SHASAH CASINO & GAMING PLATFORM* 💎\n\n"
+        f"💎 *WELCOME TO VIEWPOINT CASINO & GAMING PLATFORM* 💎\n\n"
         f"👋 Namaste *{user.first_name}*!\n\n"
         f"Premier Provably Fair casino & skill gaming experience inside Telegram:\n"
+        f"• 🐉 *Dragon Tiger* (Live Casino VIP Table)\n"
         f"• 💣 *Mines* (Up to 10,000x multiplier)\n"
+        f"• 🎯 *Limbo Turbo* (1,000,000x Multiplier)\n"
+        f"• 🍗 *Chicken Road* (270x Lane Walker)\n"
+        f"• 🔴 *Plinko* (1,000x Pin Drop)\n"
         f"• 🚀 *Crash* (Aviator Rocket flight)\n"
-        f"• ⚪ *Plinko & Limbo* (Turbo Multipliers)\n"
-        f"• 🍗 *Chicken* (Mystake Cloche hunt)\n"
-        f"• 🎨 *Color Trading* (Win Go 30s)\n"
-        f"• 📈 *Stock Market Trading* (Call/Put)\n\n"
+        f"• 🎨 *Win Go 30s* (Color Trading)\n"
+        f"• 📈 *Stock BTC* (Real-Time Candlestick)\n"
+        f"• 🎲 *Classic Dice* (9900x Roll)\n\n"
         f"💰 *Current Balance:* ₹{db_user['balance']:,.2f}\n"
-        f"🎁 *Starting Demo Funds:* ₹1,000.00 Credited\n\n"
+        f"🎁 *₹200 Demo Money Credited* (Non-withdrawable, for gameplay)\n\n"
         f"Click the button below to start playing instantly inside Telegram Mini App! 👇"
     )
 
@@ -104,7 +107,7 @@ async def play_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     bot_info = await context.bot.get_me()
     await update.message.reply_text(
-        "🎮 Click below to launch **SHASAH Casino Mini App**:",
+        "🎮 Click below to launch **VIEWPOINT Casino Mini App**:",
         reply_markup=get_main_menu_keyboard(bot_info.username, user.id),
         parse_mode="Markdown"
     )

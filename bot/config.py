@@ -28,7 +28,7 @@ admin_ids_raw = os.getenv("ADMIN_IDS", "").strip()
 ADMIN_IDS = [int(i.strip()) for i in admin_ids_raw.split(",") if i.strip().isdigit()]
 
 # WebApp URL
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://shasah.com").strip()
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://viewpoint.diy").strip()
 
 # Support & Channels
 SUPPORT_CHANNEL = os.getenv("SUPPORT_CHANNEL", "@viewpointios").strip()

@@ -129,7 +129,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Deposit Approved - SHASAH</title>
+        <title>Deposit Approved - VIEWPOINT</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #00e701; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(0, 231, 1, 0.25); }
@@ -163,7 +163,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Deposit Rejected - SHASAH</title>
+        <title>Deposit Rejected - VIEWPOINT</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #ef4444; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(239, 68, 68, 0.25); }
@@ -217,7 +217,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Withdrawal Approved - SHASAH</title>
+        <title>Withdrawal Approved - VIEWPOINT</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #00e701; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(0, 231, 1, 0.25); }
@@ -251,7 +251,7 @@ export default async function handler(req, res) {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Withdrawal Rejected - SHASAH</title>
+        <title>Withdrawal Rejected - VIEWPOINT</title>
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
           .card { background: #151d30; border: 2px solid #ef4444; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(239, 68, 68, 0.25); }

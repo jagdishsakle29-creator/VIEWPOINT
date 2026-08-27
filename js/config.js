@@ -1,16 +1,16 @@
 /**
- * SHASAH Production Web & API Configuration
- * Handles seamless endpoint resolution for https://shasah.com and local dev servers.
+ * VIEWPOINT Production Web & API Configuration
+ * Handles seamless endpoint resolution for https://viewpoint.diy and local dev servers.
  */
 (function () {
-  const PRODUCTION_DOMAIN = 'https://shasah.com';
-  const VERCEL_FALLBACK_DOMAIN = 'https://shasah.vercel.app';
+  const PRODUCTION_DOMAIN = 'https://viewpoint.diy';
+  const VERCEL_FALLBACK_DOMAIN = 'https://viewpoint.diy';
 
   const isLocalDev = window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1';
 
   window.APP_CONFIG = {
-    appName: 'SHASAH',
+    appName: 'VIEWPOINT',
     version: '1.0.0',
     productionDomain: PRODUCTION_DOMAIN,
     vercelFallbackDomain: VERCEL_FALLBACK_DOMAIN,
@@ -19,7 +19,7 @@
     /**
      * Resolves the authoritative API Base URL:
      * - In Local Development: routes to local server
-     * - In Production (https://shasah.com): routes to current window.location.origin
+     * - In Production (https://viewpoint.diy): routes to current window.location.origin
      */
     getApiBaseUrl: function () {
       if (window.CUSTOM_API_BASE_URL) {
@@ -32,6 +32,6 @@
     }
   };
 
-  console.log(`[SHASAH Casino] Environment: ${isLocalDev ? 'Local Development' : 'Production Web (' + PRODUCTION_DOMAIN + ')'} | API: ${window.APP_CONFIG.getApiBaseUrl()}`);
+  console.log(`[VIEWPOINT Casino] Environment: ${isLocalDev ? 'Local Development' : 'Production Web (' + PRODUCTION_DOMAIN + ')'} | API: ${window.APP_CONFIG.getApiBaseUrl()}`);
 })();
 

@@ -4,7 +4,7 @@
  */
 class CasinoWallet {
   constructor() {
-    this.DEFAULT_BALANCE = 1000.00;
+    this.DEFAULT_BALANCE = 200.00;
     this.apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.getApiBaseUrl)
       ? window.APP_CONFIG.getApiBaseUrl()
       : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8000' : window.location.origin);

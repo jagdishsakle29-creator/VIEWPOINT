@@ -8,22 +8,22 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0f212e">
   <link rel="manifest" href="manifest.json">
-  <title>SHASAH - Crypto & Real Cash Casino | Mines, Crash, Plinko & Dice</title>
-  <meta name="description" content="Play on SHASAH.COM - Instant Crypto & Real Cash Casino Games: Mines, Crash, Plinko, Limbo, Dice, Dragon Tiger & Color Trading. Provably Fair with instant payouts!">
-  <meta name="keywords" content="shasah casino, mines game online, crash game, plinko game, limbo turbo, provably fair gaming, fast upi withdrawal, crypto casino, shasah.com">
-  <meta name="author" content="SHASAH">
+  <title>VIEWPOINT - Crypto & Real Cash Casino | Mines, Crash, Plinko & Dice</title>
+  <meta name="description" content="Play on VIEWPOINT.DIY - Instant Crypto & Real Cash Casino Games: Mines, Crash, Plinko, Limbo, Dice, Dragon Tiger & Color Trading. Provably Fair with instant payouts!">
+  <meta name="keywords" content="viewpoint casino, mines game online, crash game, plinko game, limbo turbo, provably fair gaming, fast upi withdrawal, crypto casino, viewpoint.diy">
+  <meta name="author" content="VIEWPOINT">
   <meta name="robots" content="index, follow">
 
   <!-- OpenGraph Metadata for WhatsApp & Telegram Link Previews -->
-  <meta property="og:title" content="SHASAH - Instant Win Casino & Arcade Games">
-  <meta property="og:description" content="Join SHASAH.COM and claim ₹200 / $10 Welcome Bonus! Play Provably Fair Mines, Crash, Plinko, Limbo & win real cash with instant withdrawal.">
+  <meta property="og:title" content="VIEWPOINT - Instant Win Casino & Arcade Games">
+  <meta property="og:description" content="Join VIEWPOINT.DIY and claim ₹200 Demo Bonus! Play Provably Fair Mines, Crash, Plinko, Limbo & win real cash with instant withdrawal.">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="SHASAH Games">
+  <meta property="og:site_name" content="VIEWPOINT Games">
 
   <!-- Twitter Card Metadata -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SHASAH - Crypto & Real Cash Casino">
-  <meta name="twitter:description" content="Play Mines, Crash, Plinko, Limbo & Dice on SHASAH.COM. Fast payouts & Provably Fair!">
+  <meta name="twitter:title" content="VIEWPOINT - Crypto & Real Cash Casino">
+  <meta name="twitter:description" content="Play Mines, Crash, Plinko, Limbo & Dice on VIEWPOINT.DIY. Fast payouts & Provably Fair!">
 
   <!-- Google Fonts: Inter and Outfit for sleek casino typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,25 +34,39 @@
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=34.0">
-  <link rel="stylesheet" href="css/mines.css?v=34.0">
-  <link rel="stylesheet" href="css/chicken.css?v=34.0">
-  <link rel="stylesheet" href="css/crash.css?v=34.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=34.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=34.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=34.0">
-  <link rel="stylesheet" href="css/plinko.css?v=34.0">
-  <link rel="stylesheet" href="css/dice.css?v=34.0">
-  <link rel="stylesheet" href="css/limbo.css?v=34.0">
+  <link rel="stylesheet" href="css/style.css?v=35.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=35.0">
+  <link rel="stylesheet" href="css/mines.css?v=35.0">
+  <link rel="stylesheet" href="css/chicken.css?v=35.0">
+  <link rel="stylesheet" href="css/plinko.css?v=35.0">
+  <link rel="stylesheet" href="css/crash.css?v=35.0">
+  <link rel="stylesheet" href="css/dice.css?v=35.0">
+  <link rel="stylesheet" href="css/limbo.css?v=35.0">
 </head>
 <body>
 
   <!-- Inline Instant Click Handler (Zero Network Latency / 100% Reliable) -->
-  <script>
     window.openAuthModal = function(type) {
-      if (window.app && window.app.openAuthModal) return window.app.openAuthModal(type);
       var m = document.getElementById('modalAuth');
       if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+      var isSignup = (type === 'signup' || type === 'register');
+      if (window.switchAuthTab) {
+        window.switchAuthTab(isSignup ? 'signup' : 'login');
+      } else {
+        var tabL = document.getElementById('tabAuthLogin');
+        var tabR = document.getElementById('tabAuthRegister');
+        if (tabL) tabL.classList.toggle('active', !isSignup);
+        if (tabR) tabR.classList.toggle('active', isSignup);
+        ['authNameField', 'authEmailField', 'authAddressField', 'authPincodeField', 'authAgeCheckboxField', 'authWithdrawalNotice'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.style.display = isSignup ? 'block' : 'none';
+        });
+        var btnText = document.getElementById('btnSubmitAuthText');
+        if (btnText) btnText.innerText = isSignup ? 'Create VIP Account & Join' : 'Login to Play';
+        var title = document.getElementById('authModalTitle');
+        if (title) title.innerText = isSignup ? 'Create VIP Account' : 'Member Login';
+      }
+      if (window.app && window.app.openAuthModal) return window.app.openAuthModal(isSignup ? 'signup' : 'login');
     };
     window.closeAuthModal = function() {
       if (window.app && window.app.closeAuthModal) return window.app.closeAuthModal();
@@ -217,12 +231,12 @@
     window.switchGame = function(g) {
       if (window.app && window.app.switchGame) return window.app.switchGame(g);
       // Standalone Instant DOM Fallback
-      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView'];
+      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView'];
       views.forEach(function(vId) {
         var el = document.getElementById(vId);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
       });
-      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabPlinko', 'tabDice', 'tabLimbo', 'tabDragonTiger', 'tabColorTrading', 'tabStock'];
+      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabPlinko', 'tabDice', 'tabLimbo', 'tabDragonTiger'];
       tabs.forEach(function(tId) {
         var el = document.getElementById(tId);
         if (el) el.classList.remove('active');
@@ -345,14 +359,14 @@
   <header class="navbar">
       <!-- Top Row: Logo & Brand + Auth / Profile + Refer Button -->
       <div class="nav-top-row">
-        <div class="nav-brand" id="navBrandLogo" onclick="window.handleSecretLogoClick(event)" ontouchend="window.handleSecretLogoClick(event)" style="cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;" title="SHASAH">
+        <div class="nav-brand" id="navBrandLogo" onclick="window.handleSecretLogoClick(event)" ontouchend="window.handleSecretLogoClick(event)" style="cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;" title="VIEWPOINT">
           <div class="brand-logo-icon">
             <svg viewBox="0 0 24 24">
               <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" fill="none" stroke="#0f212e" stroke-width="2.5"/>
               <circle cx="12" cy="12" r="4" fill="#0f212e"/>
             </svg>
           </div>
-          <div class="brand-name">SHA<span>SAH</span></div>
+          <div class="brand-name">VIEW<span>POINT</span></div>
         </div>
 
       <div class="nav-top-actions">
@@ -394,15 +408,15 @@
     <!-- Bottom Row: Balance + Deposit + Withdraw + Support -->
     <div class="nav-bottom-row">
       <!-- Balance Display -->
-      <div class="wallet-badge" title="Demo Practice Balance. Deposit real cash to win & withdraw!">
+      <div class="wallet-badge" title="Demo Money Balance. Real cash payouts ke liye Deposit karein!">
         <div class="wallet-info">
           <div style="display: flex; align-items: center; gap: 5px;">
             <span class="wallet-label">Balance</span>
-            <span class="demo-pill-badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 4px; letter-spacing: 0.3px;">⚡ DEMO (₹0 REAL)</span>
+            <span class="demo-pill-badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 4px; letter-spacing: 0.3px;">🎁 DEMO BONUS</span>
           </div>
           <div class="wallet-amount">
             <span class="currency-symbol" id="currencySymbol">₹</span>
-            <span id="walletBalance">0.00</span>
+            <span id="walletBalance">200.00</span>
           </div>
         </div>
       </div>
@@ -420,9 +434,9 @@
       </button>
     </div>
 
-    <!-- Demo Notice Strip Bar -->
-    <div class="demo-alert-strip" style="background: linear-gradient(90deg, rgba(245,158,11,0.15) 0%, rgba(15,23,42,0.9) 100%); border-bottom: 1px solid rgba(245,158,11,0.25); padding: 5px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #e2e8f0;">
-      <div>⚡ <strong style="color: #fbbf24;">Demo Practice Balance</strong>: Real cash payouts & withdrawals ke liye balance add karein!</div>
+    <!-- Demo Money Notice Strip Bar -->
+    <div class="demo-alert-strip" style="background: linear-gradient(90deg, rgba(245,158,11,0.18) 0%, rgba(15,23,42,0.95) 100%); border-bottom: 1px solid rgba(245,158,11,0.3); padding: 5px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #e2e8f0;">
+      <div>🎁 <strong style="color: #fbbf24;">₹200 Demo Money</strong>: इसे withdraw नहीं कर सकते हैं, केवल खेलने के लिए है। Real cash payout ke liye balance add karein!</div>
       <button type="button" onclick="window.openDepositModal()" style="background: #00e701; color: #000; font-weight: 800; border: none; border-radius: 4px; padding: 2px 8px; font-size: 10px; cursor: pointer;">+ ADD CASH</button>
     </div>
   </header>
@@ -479,19 +493,7 @@
           <span class="tab-badge badge-rec" id="badgeRec_crash" style="background: linear-gradient(135deg, #00f5d4, #00b4d8); color: #000; font-size:9px; font-weight:900;">LIVE</span>
         </button>
 
-        <!-- 7. Win Go 30s -->
-        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🎨</span>
-          <span style="font-weight: 800;">Win Go 30s</span>
-        </button>
-
-        <!-- 8. Stock BTC -->
-        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">📈</span>
-          <span style="font-weight: 800;">Stock BTC</span>
-        </button>
-
-        <!-- 9. Classic Dice -->
+        <!-- 7. Classic Dice -->
         <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))" style="position:relative;">
           <span style="font-size: 17px; line-height: 1;">🎲</span>
           <span style="font-weight: 900;">Classic Dice</span>
@@ -974,7 +976,6 @@
                   <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(5.0)">5x</button>
                   <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(10.0)">10x</button>
                   <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(100.0)">100x</button>
-                </div>
               </div>
               <div class="limbo-control-card">
                 <label class="control-label">Win Chance (%):</label>
@@ -982,108 +983,6 @@
                 <div style="font-size: 10px; color: #64748b; margin-top: 6px; text-align: center;">Payout: Target × Bet Amount</div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Game 5: Tiranga Color Trading (Win Go) View -->
-        <div id="colortradingView" class="game-view colortrading-view">
-          <!-- Tiranga Intervals -->
-          <div class="tiranga-modes-row">
-            <button class="tiranga-mode-btn active" data-duration="30">
-              <span>Win Go 30s</span>
-              <span style="font-size:10px; color:#10b981;">⚡ Fast</span>
-            </button>
-            <button class="tiranga-mode-btn" data-duration="60">
-              <span>Win Go 1Min</span>
-              <span style="font-size:10px; opacity:0.8;">Popular</span>
-            </button>
-            <button class="tiranga-mode-btn" data-duration="180">
-              <span>Win Go 3Min</span>
-              <span style="font-size:10px; opacity:0.8;">Standard</span>
-            </button>
-            <button class="tiranga-mode-btn" data-duration="300">
-              <span>Win Go 5Min</span>
-              <span style="font-size:10px; opacity:0.8;">Classic</span>
-            </button>
-          </div>
-
-          <!-- Win Go Period & Timer Header -->
-          <div class="trading-header-card">
-            <div class="trading-period-badge">
-              <span class="trading-period-label">Period ID</span>
-              <span id="tradingPeriodId" class="trading-period-id">--</span>
-            </div>
-            <div class="trading-timer-box">
-              <span class="trading-timer-label">Time Remaining</span>
-              <div class="trading-timer-digits">
-                <span class="time-digit-pill">0</span>
-                <span class="time-digit-pill">0</span>
-                <span style="font-size:20px; font-weight:800; color:#fff; align-self:center;">:</span>
-                <span id="timerDigit1" class="time-digit-pill">3</span>
-                <span id="timerDigit2" class="time-digit-pill">0</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Color Bet Buttons -->
-          <div class="color-bet-buttons-row">
-            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green">
-              <span>🟢 Join Green</span>
-              <span class="payout-tag">2x (1.5x on 5)</span>
-            </button>
-            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet">
-              <span>🟣 Join Violet</span>
-              <span class="payout-tag">4.5x (on 0, 5)</span>
-            </button>
-            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red">
-              <span>🔴 Join Red</span>
-              <span class="payout-tag">2x (1.5x on 0)</span>
-            </button>
-          </div>
-
-          <!-- Numbers 0-9 Keypad Matrix (3 Lines) -->
-          <div class="numbers-bet-grid">
-            <!-- Line 1: 1, 2, 3 -->
-            <button class="btn-number-bet num-green" data-number="1">1 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="2">2 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="3">3 <span class="num-payout">9x</span></button>
-            
-            <!-- Line 2: 4, 5, 6 -->
-            <button class="btn-number-bet num-red" data-number="4">4 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-violet-green" data-number="5">5 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="6">6 <span class="num-payout">9x</span></button>
-            
-            <!-- Line 3: 7, 8, 9 -->
-            <button class="btn-number-bet num-green" data-number="7">7 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="8">8 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="9">9 <span class="num-payout">9x</span></button>
-
-            <!-- Line 4: 0 (Violet/Red) -->
-            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0">0 <span class="num-payout">9x Jackpot (Violet/Red)</span></button>
-          </div>
-
-          <!-- Big / Small Buttons -->
-          <div class="big-small-row">
-            <button id="btnBetBig" class="btn-big-bet" data-choice="big">
-              <span>🟡 Big (5 - 9)</span>
-              <span class="payout-tag">2x Payout</span>
-            </button>
-            <button id="btnBetSmall" class="btn-small-bet" data-choice="small">
-              <span>🔵 Small (0 - 4)</span>
-              <span class="payout-tag">2x Payout</span>
-            </button>
-          </div>
-
-          <!-- Active Bets In Round -->
-          <div id="tradingActiveBetsSlip" class="trading-active-bets" style="display: none;">
-            <strong>Your Active Bets This Round:</strong>
-            <div id="activeBetsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
-          </div>
-
-          <!-- Recent Trend Balls -->
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes & Trends:</span>
-            <div class="trend-balls-row" id="trendBallsRow"></div>
           </div>
         </div>
 
@@ -1268,66 +1167,6 @@
             <div class="dt-bead-road-container">
               <div class="dt-bead-road-grid" id="dtBeadRoadGrid"></div>
             </div>
-          </div>
-        </div>
-
-        <!-- Game 9: Stock Market Live Trading View -->
-        <div id="stockView" class="game-view stock-view" style="display:none; width:100%;">
-          <div class="stock-market-header" style="margin-bottom: 12px;">
-            <div class="stock-asset-info">
-              <select id="stockAssetSelect" class="stock-asset-select">
-                <option value="BTC/INR">BTC / INR (Bitcoin)</option>
-                <option value="ETH/INR">ETH / INR (Ethereum)</option>
-                <option value="NIFTY 50">NIFTY 50 (Index)</option>
-                <option value="GOLD/INR">GOLD / INR (Commodity)</option>
-              </select>
-              <div class="stock-live-price-box">
-                <div id="stockLivePrice" class="stock-live-price">₹7,845,000.00</div>
-                <div id="stockChangeTag" class="stock-change-tag">+0.42% Today</div>
-              </div>
-            </div>
-            <div class="stock-chart-overlay">
-              <div class="live-indicator-dot"></div>
-              <span>LIVE 1-SEC TICKS</span>
-            </div>
-          </div>
-
-          <div class="stock-chart-container" style="height: 320px; margin-bottom: 14px;">
-            <canvas id="stockCanvas"></canvas>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px;">
-            <div>
-              <label class="control-label" style="margin-bottom: 6px; display:block;">Trade Expiry:</label>
-              <div class="deposit-quick-chips">
-                <button class="chip-btn active" id="btnExpiry30s">30s</button>
-                <button class="chip-btn" id="btnExpiry60s">60s</button>
-                <button class="chip-btn" id="btnExpiry2m">2m</button>
-              </div>
-            </div>
-            <div>
-              <label class="control-label" style="margin-bottom: 6px; display:block;">Investment Amount:</label>
-              <div class="input-with-actions">
-                <span class="input-currency-prefix">₹</span>
-                <input type="number" id="stockBetAmountInput" class="bet-input-field" value="50" min="10" max="50000" step="10">
-              </div>
-            </div>
-          </div>
-
-          <div class="stock-action-buttons-row">
-            <button id="btnStockCall" class="btn-stock-trade btn-stock-call" onclick="window.app && window.app.handleStockTrade('call')">
-              <span>🟢 CALL / UP ⬆</span>
-              <span class="trade-payout-label">+90% Profit (1.90x)</span>
-            </button>
-            <button id="btnStockPut" class="btn-stock-trade btn-stock-put" onclick="window.app && window.app.handleStockTrade('put')">
-              <span>🔴 PUT / DOWN ⬇</span>
-              <span class="trade-payout-label">+90% Profit (1.90x)</span>
-            </button>
-          </div>
-
-          <div id="stockActiveTradesCard" class="stock-active-trades-card" style="display: none; margin-top: 12px;">
-            <strong style="font-size: 13px; color: var(--text-secondary);">Your Open Positions:</strong>
-            <div id="stockActiveTradesList" style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;"></div>
           </div>
         </div>
 
@@ -1848,6 +1687,9 @@
         <button id="tabAuthRegister" class="auth-tab-btn" onclick="window.switchAuthTab ? window.switchAuthTab('register') : (window.app && window.app.switchAuthTab('register'))">Sign Up</button>
       </div>
 
+      <!-- Inline Error Banner -->
+      <div id="authErrorBanner" style="display: none; background: rgba(239, 68, 68, 0.18); border: 1px solid #ef4444; color: #fca5a5; padding: 9px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; margin: 10px 0 4px; text-align: center; line-height: 1.4;"></div>
+
       <!-- English Withdrawal OTP Warning Notice -->
       <div id="authWithdrawalNotice" class="auth-withdrawal-warning" style="background: rgba(254, 44, 85, 0.1); border: 1px solid rgba(254, 44, 85, 0.4); border-radius: 8px; padding: 10px 12px; margin: 12px 0 6px; display: none;">
         <div style="display: flex; gap: 8px; align-items: flex-start;">
@@ -1913,7 +1755,7 @@
         </div>
 
         <!-- Social Login: Google & Facebook -->
-        <div class="social-login-grid" style="margin-bottom: 10px;">
+        <div class="social-login-grid" style="margin-bottom: 6px;">
           <button type="button" class="btn-social-auth btn-social-google" onclick="window.openGoogleAuthModal ? window.openGoogleAuthModal() : (window.app && window.app.openGoogleAuthModal())">
             <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
             <span>Google Account</span>
@@ -1923,10 +1765,6 @@
             <span>Facebook</span>
           </button>
         </div>
-
-        <button type="button" class="btn-guest-login" onclick="window.app && window.app.handleGuestLogin()">
-          <span>⚡ Instant 1-Click Guest Play</span>
-        </button>
       </div>
     </div>
   </div>
@@ -2047,13 +1885,16 @@
   <div id="modalWelcomeBonus" class="modal-backdrop" style="z-index: 100000;">
     <div class="modal-card" style="max-width: 380px; text-align: center; background: linear-gradient(180deg, #151f30 0%, #0d1422 100%); border: 2px solid #00e701; box-shadow: 0 0 40px rgba(0, 231, 1, 0.35); padding: 26px 20px;">
       <div style="font-size: 48px; margin-bottom: 10px; animation: bounce 1s infinite alternate;">🎁</div>
-      <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 6px;">Welcome to SHASAH!</h3>
-      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 18px;">
+      <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 6px;">Welcome to VIEWPOINT!</h3>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 14px;">
         Congratulations on joining! You've unlocked your exclusive new player reward:
       </p>
-      <div style="background: rgba(0, 231, 1, 0.12); border: 1px dashed #00e701; border-radius: 12px; padding: 14px; margin-bottom: 20px;">
+      <div style="background: rgba(0, 231, 1, 0.12); border: 1px dashed #00e701; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
         <span style="font-size: 12px; text-transform: uppercase; color: #8fa0b5; font-weight: 700; letter-spacing: 1px;">Instant Signup Reward</span>
         <div style="font-size: 32px; font-weight: 900; color: #00e701; margin-top: 4px;">+₹200.00</div>
+      </div>
+      <div style="font-size: 11.5px; color: #fbbf24; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 7px 10px; margin-bottom: 16px; font-weight: 700; line-height: 1.35;">
+        ⚠️ यह Demo Money है - इसे withdraw नहीं कर सकते हैं, केवल गेम्स खेलने और प्रैक्टिस के लिए है।
       </div>
       <button id="btnClaimWelcomeBonus" class="btn-action-primary" style="width: 100%; height: 48px; font-size: 15px; font-weight: 800; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); box-shadow: 0 4px 15px rgba(0,231,1,0.4);" onclick="window.app && window.app.claimWelcomeBonus()">
         <span>🎉 CLAIM ₹200 BONUS NOW</span>
@@ -2120,7 +1961,7 @@
       <!-- Referral Link & Code Box -->
       <label class="control-label">Your Unique Referral Link:</label>
       <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <input type="text" id="referralLinkInput" class="custom-select" value="https://shasah.com/?ref=SH7821" readonly style="font-family: monospace; font-size: 13px;">
+        <input type="text" id="referralLinkInput" class="custom-select" value="https://viewpoint.diy/?ref=VP7821" readonly style="font-family: monospace; font-size: 13px;">
         <button id="btnCopyReferLink" class="btn-action-primary" style="white-space: nowrap; padding: 0 14px;" onclick="window.app && window.app.copyReferralLink()">
           <span>📋 Copy</span>
         </button>
@@ -2224,7 +2065,7 @@
         <button id="btnCloseFairModal" class="modal-close-btn" onclick="window.closeProvablyFairModal ? window.closeProvablyFairModal() : (document.getElementById('modalProvablyFair').classList.remove('open'), document.getElementById('modalProvablyFair').style.display='none')">&times;</button>
       </div>
       <div class="modal-body">
-        <p>SHASAH games use deterministic SHA-256 cryptographic hashing to guarantee that all round outcomes and multipliers are mathematically predetermined and impossible to alter.</p>
+        <p>VIEWPOINT games use deterministic SHA-256 cryptographic hashing to guarantee that all round outcomes and multipliers are mathematically predetermined and impossible to alter.</p>
         
         <label class="control-label">Active Server Seed (SHA-256 Hash):</label>
         <div id="serverSeedHash" class="seed-box" style="word-break: break-all; font-size: 12px;">--</div>
@@ -2305,7 +2146,7 @@
           <div class="qr-instructions">
             <div class="merchant-info-row">
               <span class="merchant-label">Merchant / Payee:</span>
-              <strong id="displayPayeeName" class="merchant-val">SHASAH Official</strong>
+              <strong id="displayPayeeName" class="merchant-val">VIEWPOINT Official</strong>
             </div>
 
             <div class="merchant-info-row">
@@ -2633,7 +2474,7 @@
         <div style="display: flex; align-items: center; gap: 8px;">
           <div class="deposit-icon-badge" style="background: rgba(0, 229, 255, 0.2); color: #00e5ff;">🤖</div>
           <div>
-            <h3 class="modal-title" style="font-size: 16px;">SHASAH Live Support Bot</h3>
+            <h3 class="modal-title" style="font-size: 16px;">VIEWPOINT Live Support Bot</h3>
             <span style="font-size: 11px; color: #00e701; font-weight: 700;">● Online 24/7 (Instant Help)</span>
           </div>
         </div>
@@ -2644,7 +2485,7 @@
       <div id="chatMessagesContainer" class="chat-messages-container">
         <div class="chat-msg bot">
           <div class="chat-bubble">
-            Namaste! 👋 Main SHASAH 24/7 Live Support Bot hoon. Main aapki kya madad kar sakta hoon?
+            Namaste! 👋 Main VIEWPOINT 24/7 Live Support Bot hoon. Main aapki kya madad kar sakta hoon?
           </div>
           <span class="chat-time">Just now</span>
         </div>
@@ -2676,7 +2517,7 @@
 
       <div class="modal-body">
         <p style="font-size: 14px; color: var(--text-secondary);">
-          SHASAH platform kaisa laga? Apni rating aur feedback dein:
+          VIEWPOINT platform kaisa laga? Apni rating aur feedback dein:
         </p>
 
         <!-- Star Rating Buttons -->
@@ -2844,7 +2685,7 @@
         <input type="text" id="settingUpiIdInput" class="custom-select" placeholder="e.g. adrenox1@axl, 9876543210@paytm" style="font-family: monospace; font-size: 15px;">
 
         <label class="control-label">Payee / Account Name:</label>
-        <input type="text" id="settingPayeeNameInput" class="custom-select" placeholder="e.g. SHASAH Games / Your Name">
+        <input type="text" id="settingPayeeNameInput" class="custom-select" placeholder="e.g. VIEWPOINT Games / Your Name">
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div>
@@ -3061,21 +2902,19 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/config.js?v=34.0"></script>
-  <script src="js/security.js?v=34.0"></script>
-  <script src="js/audio.js?v=34.0"></script>
-  <script src="js/wallet.js?v=34.0"></script>
-  <script src="js/provablyFair.js?v=34.0"></script>
-  <script src="js/plinko.js?v=34.0"></script>
-  <script src="js/dice.js?v=34.0"></script>
-  <script src="js/limbo.js?v=34.0"></script>
-  <script src="js/mines.js?v=34.0"></script>
-  <script src="js/chicken.js?v=34.0"></script>
-  <script src="js/crash.js?v=34.0"></script>
-  <script src="js/dragontiger.js?v=34.0"></script>
-  <script src="js/colortrading.js?v=34.0"></script>
-  <script src="js/stocktrading.js?v=34.0"></script>
-  <script src="js/app.js?v=34.0"></script>
+  <script src="js/config.js?v=35.0"></script>
+  <script src="js/security.js?v=35.0"></script>
+  <script src="js/audio.js?v=35.0"></script>
+  <script src="js/wallet.js?v=35.0"></script>
+  <script src="js/provablyFair.js?v=35.0"></script>
+  <script src="js/dragontiger.js?v=35.0"></script>
+  <script src="js/mines.js?v=35.0"></script>
+  <script src="js/limbo.js?v=35.0"></script>
+  <script src="js/chicken.js?v=35.0"></script>
+  <script src="js/plinko.js?v=35.0"></script>
+  <script src="js/crash.js?v=35.0"></script>
+  <script src="js/dice.js?v=35.0"></script>
+  <script src="js/app.js?v=35.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>

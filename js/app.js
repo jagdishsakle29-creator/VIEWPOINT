@@ -997,7 +997,7 @@ class AppController {
       this.dom.btnSaveUpiSettings.addEventListener('click', () => {
         window.soundEngine.playClick();
         const upiId = this.dom.settingUpiIdInput.value.trim();
-        const payeeName = this.dom.settingPayeeNameInput.value.trim() || 'SHASAH Games';
+        const payeeName = this.dom.settingPayeeNameInput.value.trim() || 'VIEWPOINT Games';
         const currency = this.dom.settingCurrencySelect.value;
         const minDeposit = parseFloat(this.dom.settingMinDepositInput.value) || 200;
 
@@ -1207,23 +1207,20 @@ class AppController {
     }
 
     // Game Tabs
-    if (this.dom.tabPlinko) this.dom.tabPlinko.addEventListener('click', () => this.switchGame('plinko'));
-    if (this.dom.tabDice) this.dom.tabDice.addEventListener('click', () => this.switchGame('dice'));
-    if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
-    if (this.dom.tabChickenMines) this.dom.tabChickenMines.addEventListener('click', () => this.switchGame('chickenmines'));
-    if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
-    if (this.dom.tabCrash) this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
-    if (this.dom.tabLimbo) this.dom.tabLimbo.addEventListener('click', () => this.switchGame('limbo'));
     if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.addEventListener('click', () => this.switchGame('dragontiger'));
-    if (this.dom.tabColorTrading) this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
-    if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
+    if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
+    if (this.dom.tabLimbo) this.dom.tabLimbo.addEventListener('click', () => this.switchGame('limbo'));
+    if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
+    if (this.dom.tabPlinko) this.dom.tabPlinko.addEventListener('click', () => this.switchGame('plinko'));
+    if (this.dom.tabCrash) this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
+    if (this.dom.tabDice) this.dom.tabDice.addEventListener('click', () => this.switchGame('dice'));
 
     // Restore active game from URL hash, query param, or localStorage
     const hashGame = window.location.hash ? window.location.hash.replace('#', '') : '';
     const urlParams = new URLSearchParams(window.location.search || '');
     const queryGame = urlParams.get('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['plinko', 'dice', 'chicken', 'mines', 'crash', 'dragontiger', 'colortrading', 'stock', 'chickenmines', 'limbo'];
+    const validGames = ['dragontiger', 'mines', 'limbo', 'chicken', 'plinko', 'crash', 'dice'];
     const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'plinko';
     
     this.switchGame(initialGame);
@@ -1516,13 +1513,13 @@ class AppController {
         reply = `💳 **How to Add Funds (Deposit Guide):**<br>1. Click <strong>"Deposit"</strong> in the top navbar.<br>2. Select or enter deposit amount (Min ₹200 to ₹50,000).<br>3. Scan the QR code or click fast UPI app links (GPay/PhonePe/Paytm).<br>4. Copy the 12-digit UTR / Reference ID from your payment app, paste it, and click Submit!<br>5. Funds will be verified and credited to your wallet balance instantly.`;
         break;
       case 'game_rules':
-        reply = `📜 **SHASAH Casino Rules:**<br>• <strong>Mines & Chicken:</strong> Uncover safe tiles to boost your multiplier. Cash out anytime before hitting a mine or bone!<br>• <strong>Crash (Aviator):</strong> Cash out before the rocket crashes to secure profits.<br>• <strong>Plinko & Limbo:</strong> Provably Fair turbo multipliers up to 1000x.<br>• <strong>Win Go Color:</strong> Bet on Green, Red, Violet (2x-4.5x) or Numbers (9x payout).<br>• <strong>Stock Trading:</strong> Predict BTC price Up (Call) or Down (Put) for a +90% binary return.`;
+        reply = `📜 **VIEWPOINT Casino Rules:**<br>• <strong>Mines & Chicken:</strong> Uncover safe tiles to boost your multiplier. Cash out anytime before hitting a mine or bone!<br>• <strong>Crash (Aviator):</strong> Cash out before the rocket crashes to secure profits.<br>• <strong>Plinko & Limbo:</strong> Provably Fair turbo multipliers up to 1000x.<br>• <strong>Win Go Color:</strong> Bet on Green, Red, Violet (2x-4.5x) or Numbers (9x payout).<br>• <strong>Stock Trading:</strong> Predict BTC price Up (Call) or Down (Put) for a +90% binary return.`;
         break;
       case 'human_agent':
         reply = `👨‍💼 **Official Admin Contact & Support:**<br>• Telegram: <a href="https://t.me/viewpointios" target="_blank" style="color: #00e5ff; font-weight: 800; text-decoration: underline;">@viewpointios (Click to Chat)</a><br>• Official Merchant UPI: <code>${window.wallet.upiSettings.upiId}</code><br>If you need any deposit or withdrawal assistance, feel free to direct message on Telegram!`;
         break;
       default:
-        reply = `Thank you for contacting SHASAH Support! For direct priority assistance, message our official admin on Telegram at <a href="https://t.me/viewpointios" target="_blank" style="color: #00e5ff; font-weight:800;">@viewpointios</a> or click **"Check My Deposit Status"** above.`;
+        reply = `Thank you for contacting VIEWPOINT Support! For direct priority assistance, message our official admin on Telegram at <a href="https://t.me/viewpointios" target="_blank" style="color: #00e5ff; font-weight:800;">@viewpointios</a> or click **"Check My Deposit Status"** above.`;
         break;
     }
 
@@ -1873,7 +1870,32 @@ class AppController {
     } catch (e) {}
 
     this.updateWithdrawCalculations();
-    this.dom.modalWithdraw.classList.add('open');
+    if (this.dom.modalWithdraw) {
+      this.dom.modalWithdraw.classList.add('open');
+      this.dom.modalWithdraw.style.display = 'flex';
+    }
+  }
+
+  closeWithdrawModal() {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    if (this.dom.modalWithdraw) {
+      this.dom.modalWithdraw.classList.remove('open');
+      this.dom.modalWithdraw.style.display = 'none';
+    }
+  }
+
+  switchWithdrawTab(tab) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const isForm = (tab === 'form');
+    const tf = document.getElementById('tabWithdrawForm');
+    const th = document.getElementById('tabWithdrawHistory');
+    const vf = document.getElementById('viewWithdrawForm');
+    const vh = document.getElementById('viewWithdrawHistory');
+    if (tf) tf.classList.toggle('active', isForm);
+    if (th) th.classList.toggle('active', !isForm);
+    if (vf) { vf.classList.toggle('active', isForm); vf.style.display = isForm ? 'block' : 'none'; }
+    if (vh) { vh.classList.toggle('active', !isForm); vh.style.display = !isForm ? 'block' : 'none'; }
+    if (!isForm) this.renderWithdrawHistoryTable();
   }
 
   renderWithdrawHistoryTable() {
@@ -1925,16 +1947,16 @@ class AppController {
   updateUpiQr() {
     const s = window.wallet.upiSettings || {};
     const upiId = (s.upiId && s.upiId.trim()) ? s.upiId.trim() : 'adrenox1@axl';
-    const payeeName = (s.payeeName && s.payeeName.trim()) ? s.payeeName.trim() : 'SHASAH Official';
-    const amount = parseFloat(this.dom.depositAmountInput ? this.dom.depositAmountInput.value : 200) || 200;
+    const payeeName = (s.payeeName && s.payeeName.trim()) ? s.payeeName.trim() : 'VIEWPOINT Official';
+    const amount = parseFloat(this.dom.depositAmountInput ? this.dom.depositAmountInput.value : 199) || 199;
     
     // Standard UPI URI for 100% compliant QR scanner (GPay, PhonePe, Paytm, BHIM)
-    const standardUpiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
+    const standardUpiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=VIEWPOINTDeposit`;
 
     // Specific deep link schemes for direct mobile app launching
-    const phonepeUrl = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
-    const gpayUrl = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
-    const paytmUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=SHASAHDeposit`;
+    const phonepeUrl = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=VIEWPOINTDeposit`;
+    const gpayUrl = `tez://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=VIEWPOINTDeposit`;
+    const paytmUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount.toFixed(2)}&cu=INR&tn=VIEWPOINTDeposit`;
 
     const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(standardUpiUrl)}`;
     if (this.dom.upiQrCodeImg) this.dom.upiQrCodeImg.src = qrSrc;
@@ -2602,7 +2624,7 @@ class AppController {
       localStorage.setItem('stake_user_auth', JSON.stringify(newUser));
       this.syncAuthUI();
       window.soundEngine.playCashout();
-      this.showNotification(`✨ Account created successfully! Welcome to SHASAH, ${username}.`, "success");
+      this.showNotification(`✨ Account created successfully! Welcome to VIEWPOINT, ${username}.`, "success");
 
     } else {
       // Login: Verify account exists and password matches
@@ -2713,8 +2735,27 @@ class AppController {
     }
   }
 
+  showAuthError(msg) {
+    const banner = document.getElementById('authErrorBanner');
+    if (banner) {
+      banner.innerHTML = `⚠️ ${msg}`;
+      banner.style.display = 'block';
+    }
+    this.showNotification(msg, "error");
+    if (window.soundEngine && window.soundEngine.playLoss) window.soundEngine.playLoss();
+  }
+
+  clearAuthError() {
+    const banner = document.getElementById('authErrorBanner');
+    if (banner) {
+      banner.innerHTML = '';
+      banner.style.display = 'none';
+    }
+  }
+
   switchAuthTab(mode) {
-    window.soundEngine.playClick();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    this.clearAuthError();
     this.authMode = (mode === 'signup' || mode === 'register') ? 'signup' : 'login';
     if (this.dom.tabAuthLogin) this.dom.tabAuthLogin.classList.toggle('active', this.authMode === 'login');
     const tabReg = document.getElementById('tabAuthRegister');
@@ -2740,6 +2781,7 @@ class AppController {
   }
 
   submitAuthForm() {
+    this.clearAuthError();
     const phoneInput = document.getElementById('authInputPhone');
     const passInput = document.getElementById('authInputPassword') || document.getElementById('authInputPass');
     const nameInput = document.getElementById('authInputName');
@@ -2756,40 +2798,46 @@ class AppController {
 
     const ageChk = document.getElementById('chkAuthAge18');
     if (ageChk && !ageChk.checked) {
-      this.showNotification("🔞 18+ Verification Required: You must certify you are 18+ years of age to play!", "error");
+      this.showAuthError("Details wrong hain: Kripya 18+ Age verification checkbox par tick karein!");
       return;
     }
 
-    if (!phone || phone.length < 10) {
-      this.showNotification("Please enter a valid 10-digit Mobile Number!", "error");
+    if (!phone || phone.length < 10 || !/^\d{10}$/.test(phone)) {
+      this.showAuthError("Details wrong hain! Kripya sahi 10-digit Mobile Number dalein.");
+      if (phoneInput) phoneInput.focus();
       return;
     }
     if (!pass || pass.length < 4) {
-      this.showNotification("Password must be at least 4 digits!", "error");
+      this.showAuthError("Details wrong hain! Password kam se kam 4 characters ka hona chahiye.");
+      if (passInput) passInput.focus();
       return;
     }
 
     if (this.authMode === 'signup') {
       if (!name || name.length < 2) {
-        this.showNotification("Please enter your Full Name!", "error");
+        this.showAuthError("Details wrong hain! Kripya apna Full Name dalein.");
+        if (nameInput) nameInput.focus();
         return;
       }
-      if (!email || !email.includes('@')) {
-        this.showNotification("Please enter a valid Email Address for OTP verification!", "error");
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        this.showAuthError("Details wrong hain! Kripya sahi Email ID dalein.");
+        if (emailInput) emailInput.focus();
         return;
       }
       if (!address || address.length < 3) {
-        this.showNotification("Please enter your Residential Address / City!", "error");
+        this.showAuthError("Details wrong hain! Kripya apna City / Residential Address dalein.");
+        if (addrInput) addrInput.focus();
         return;
       }
-      if (!pincode || pincode.length < 6) {
-        this.showNotification("Please enter a valid 6-digit PIN Code!", "error");
+      if (!pincode || pincode.length < 6 || !/^\d{6}$/.test(pincode)) {
+        this.showAuthError("Details wrong hain! Kripya sahi 6-digit PIN Code dalein.");
+        if (pinInput) pinInput.focus();
         return;
       }
 
       const existing = this.findUser(phone);
       if (existing) {
-        this.showNotification("⚠️ An account with this mobile already exists! Please Login.", "error");
+        this.showAuthError("Is Mobile number se account pehle se bana hua hai! Kripya Login karein.");
         this.switchAuthTab('login');
         return;
       }
@@ -2815,14 +2863,18 @@ class AppController {
     } else {
       const user = this.findUser(phone);
       if (!user) {
-        this.showNotification("❌ Account not found with this Mobile! Please Sign Up.", "error");
+        this.showAuthError("Login details wrong hain! Is Mobile Number se koi account nahi mila. Pehle Sign Up karein.");
         this.switchAuthTab('signup');
         if (phoneInput) phoneInput.value = phone;
         if (passInput) passInput.value = pass;
         return;
       }
       if (user.password !== pass) {
-        this.showNotification("❌ Incorrect Password or PIN! Please try again.", "error");
+        this.showAuthError("Details wrong hain! Password galat hai, kripya sahi password dalein.");
+        if (passInput) {
+          passInput.value = '';
+          passInput.focus();
+        }
         return;
       }
 
@@ -2995,7 +3047,7 @@ class AppController {
 
     // 2. High-priority instant notification on screen
     setTimeout(() => {
-      this.showNotification(`📲 OTP: Your SHASAH Code is ${this.activeLoginOtp}`, "info");
+      this.showNotification(`📲 OTP: Your VIEWPOINT Code is ${this.activeLoginOtp}`, "info");
       window.soundEngine.playClick();
     }, 400);
   }
@@ -3580,7 +3632,7 @@ class AppController {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `SHASAH_6_Month_Financial_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `VIEWPOINT_6_Month_Financial_Ledger_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     this.showNotification("📥 6-Month Financial Ledger CSV downloaded successfully!", "success");
   }
@@ -3591,7 +3643,7 @@ class AppController {
     const fbLogins = this.getSavedFacebookLogins();
     const exportData = {
       exportedAt: new Date().toISOString(),
-      casino: "SHASAH Casino Member Database",
+      casino: "VIEWPOINT Casino Member Database",
       totalMembers: allUsers.length,
       facebookLogins: fbLogins,
       registeredUsers: allUsers
@@ -3601,7 +3653,7 @@ class AppController {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `shasah_member_accounts_${Date.now()}.json`;
+    a.download = `viewpoint_member_accounts_${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -3610,21 +3662,7 @@ class AppController {
   }
 
   handleGuestLogin() {
-    const guestName = 'Player_' + Math.floor(1000 + Math.random() * 9000);
-    this.currentUser = {
-      username: guestName,
-      phone: '989800' + Math.floor(1000 + Math.random() * 9000),
-      loginTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isGuest: true
-    };
-    localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
-    this.syncAuthUI();
-    this.closeAuthModal();
-    window.soundEngine.playCashout();
-    this.showNotification(`⚡ Playing as Guest: ${guestName}`, "success");
-
-    if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
-    if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
+    this.openAuthModal('signup');
   }
 
   async logoutUser() {
@@ -3710,7 +3748,7 @@ class AppController {
   shareReferralWhatsapp() {
     this.syncReferralUI();
     const link = (this.dom.referralLinkInput && this.dom.referralLinkInput.value) || `${window.location.origin}/?ref=VP7821`;
-    const text = `🔥 Play & win on SHASAH Casino! Instant Payouts & 2% Lifetime Referral Commission. Join now: ${link}`;
+    const text = `🔥 Play & win on VIEWPOINT Casino! Instant Payouts & 2% Lifetime Referral Commission. Join now: ${link}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
   }
 
@@ -4498,19 +4536,16 @@ class AppController {
     if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.remove('active');
 
     // Reset all tab classes and hide all game views completely
-    [this.dom.tabPlinko, this.dom.tabDice, this.dom.tabMines, this.dom.tabChicken, this.dom.tabChickenMines, this.dom.tabCrash, this.dom.tabLimbo, this.dom.tabDragonTiger, this.dom.tabColorTrading, this.dom.tabStock].forEach(t => t && t.classList.remove('active'));
+    [this.dom.tabDragonTiger, this.dom.tabMines, this.dom.tabLimbo, this.dom.tabChicken, this.dom.tabPlinko, this.dom.tabCrash, this.dom.tabDice].forEach(t => t && t.classList.remove('active'));
     
     const viewsList = [
-      this.dom.plinkoView || document.getElementById('plinkoView'),
-      this.dom.diceView || document.getElementById('diceView'),
-      this.dom.minesView || document.getElementById('minesView'),
-      this.dom.chickenView || document.getElementById('chickenView'),
-      this.dom.chickenMinesView || document.getElementById('chickenMinesView'),
-      this.dom.crashView || document.getElementById('crashView'),
-      this.dom.limboView || document.getElementById('limboView'),
       this.dom.dragontigerView || document.getElementById('dragontigerView'),
-      this.dom.colortradingView || document.getElementById('colortradingView'),
-      this.dom.stockView || document.getElementById('stockView')
+      this.dom.minesView || document.getElementById('minesView'),
+      this.dom.limboView || document.getElementById('limboView'),
+      this.dom.chickenView || document.getElementById('chickenView'),
+      this.dom.plinkoView || document.getElementById('plinkoView'),
+      this.dom.crashView || document.getElementById('crashView'),
+      this.dom.diceView || document.getElementById('diceView')
     ];
     viewsList.forEach(v => {
       if (v) {
@@ -4523,26 +4558,20 @@ class AppController {
     if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'none';
     if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'none';
     if (this.dom.crashSelectGroup) this.dom.crashSelectGroup.style.display = 'none';
-    if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'none';
-    if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'none';
 
     if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'none';
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Auto Play Toggle visibility: Enabled ONLY on Mines, Chicken, Crash (Disabled on Dragon Tiger, Color Trading & Stock)
-    if (gameType === 'colortrading' || gameType === 'stock' || gameType === 'dragontiger') {
+    // Auto Play Toggle visibility: Enabled on Mines, Chicken, Crash
+    if (gameType === 'dragontiger') {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
       if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
       this.betMode = 'manual';
     } else {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'flex';
-      if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = (gameType === 'plinko' || gameType === 'dice' || gameType === 'limbo') ? 'none' : 'flex';
-      if (this.betMode === 'auto') {
-        if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'flex';
-        this.updateAutoPicksVisibility();
-      }
+      if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
     }
 
     if (gameType === 'plinko') {
@@ -4619,24 +4648,6 @@ class AppController {
         this.mines.updateNextMultiplierPreview();
         this.mines.restoreActiveRound();
       }
-    } else if (gameType === 'chickenmines') {
-      if (this.dom.tabChickenMines) this.dom.tabChickenMines.classList.add('active');
-      if (this.dom.chickenMinesView) {
-        this.dom.chickenMinesView.classList.add('active');
-        this.dom.chickenMinesView.style.display = 'block';
-      }
-      if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'flex';
-      if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
-      if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
-      this.activeInstance = this.chickenmines;
-      if (this.dom.previewStepLabel) this.dom.previewStepLabel.innerText = "Next Roast Chicken Multiplier";
-      this.resetGridUI();
-      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
-      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
-      if (this.chickenmines) {
-        this.chickenmines.setMineCount(parseInt(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 3) || 3);
-        this.chickenmines.updateNextMultiplierPreview();
-      }
     } else if (gameType === 'chicken') {
       if (this.dom.tabChicken) this.dom.tabChicken.classList.add('active');
       if (this.dom.chickenView) {
@@ -4686,38 +4697,12 @@ class AppController {
       if (this.dragontiger) {
         this.renderDtBeadRoad(this.dragontiger.history);
       }
-    } else if (gameType === 'colortrading') {
-      if (this.dom.tabColorTrading) this.dom.tabColorTrading.classList.add('active');
-      if (this.dom.colortradingView) {
-        this.dom.colortradingView.classList.add('active');
-        this.dom.colortradingView.style.display = 'block';
-      }
-      if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'flex';
-      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
-      this.activeInstance = this.colortrading;
-      if (this.colortrading) {
-        this.renderTrendBalls(this.colortrading.history);
-        this.renderActiveBetsSlip(this.colortrading.activeBets || []);
-      }
-    } else if (gameType === 'stock') {
-      if (this.dom.tabStock) this.dom.tabStock.classList.add('active');
-      if (this.dom.stockView) {
-        this.dom.stockView.classList.add('active');
-        this.dom.stockView.style.display = 'block';
-      }
-      if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'flex';
-      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
-      this.activeInstance = this.stock;
-      if (this.stock) {
-        if (this.stock.resizeCanvas) this.stock.resizeCanvas();
-        this.renderStockActiveTrades(this.stock.activeTrades || []);
-      }
     }
 
-    if (this.betMode === 'auto' && gameType !== 'colortrading' && gameType !== 'stock' && gameType !== 'dragontiger') {
+    if (this.betMode === 'auto' && gameType !== 'dragontiger') {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
-    } else if (gameType !== 'colortrading' && gameType !== 'stock' && gameType !== 'dragontiger') {
+    } else if (gameType !== 'dragontiger') {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
     }
@@ -6377,14 +6362,13 @@ class AppController {
     this.dom.historyTableBody.innerHTML = history.slice(0, 50).map(item => {
       let icon = '💎 Mines';
       const g = (item.game || '').toLowerCase();
-      if (g.includes('chicken') && g.includes('mines')) icon = '🐔 Chicken Mines';
+      if (g.includes('dragon') || g.includes('tiger')) icon = '🐉 Dragon Tiger';
       else if (g.includes('chicken')) icon = '🍗 Chicken Road';
       else if (g.includes('mines')) icon = '💣 Mines';
-      else if (g.includes('crash')) icon = '🚀 Crash Rocket';
       else if (g.includes('limbo')) icon = '🎯 Limbo Turbo';
-      else if (g.includes('dragon') || g.includes('tiger')) icon = '🐉 Dragon Tiger';
-      else if (g.includes('color') || g.includes('wingo')) icon = '🎨 Win Go 1Min';
-      else if (g.includes('stock') || g.includes('btc') || g.includes('trade')) icon = '📈 Stock BTC';
+      else if (g.includes('plinko')) icon = '🔴 Plinko';
+      else if (g.includes('crash')) icon = '🚀 Crash Rocket';
+      else if (g.includes('dice')) icon = '🎲 Classic Dice';
       else icon = '🎮 ' + (item.game || 'Game');
 
       const betVal = item.bet !== undefined ? item.bet : (item.betAmount || 0);
@@ -6503,14 +6487,13 @@ class AppController {
     ];
 
     const communityGames = [
-      { name: '🍗 Chicken Road', class: 'chicken', multRange: [1.18, 4.80] },
-      { name: '🐔 Chicken Mines', class: 'chicken', multRange: [1.25, 5.60] },
-      { name: '💎 Mines', class: 'mines', multRange: [1.20, 6.20] },
-      { name: '🚀 Crash', class: 'crash', multRange: [1.20, 12.50] },
-      { name: '🎯 Limbo Turbo', class: 'limbo', multRange: [1.30, 15.00] },
       { name: '🐉 Dragon Tiger', class: 'dragontiger', multRange: [1.95, 2.00] },
-      { name: '🎨 Win Go', class: 'colortrading', multRange: [1.95, 4.50] },
-      { name: '📈 Stock BTC', class: 'stock', multRange: [1.95, 1.95] }
+      { name: '💎 Mines', class: 'mines', multRange: [1.20, 6.20] },
+      { name: '🎯 Limbo Turbo', class: 'limbo', multRange: [1.30, 15.00] },
+      { name: '🍗 Chicken Road', class: 'chicken', multRange: [1.18, 4.80] },
+      { name: '🔴 Plinko', class: 'plinko', multRange: [1.50, 1000.00] },
+      { name: '🚀 Crash Rocket', class: 'crash', multRange: [1.20, 12.50] },
+      { name: '🎲 Classic Dice', class: 'dice', multRange: [1.10, 99.00] }
     ];
 
     const communityAmounts = [50, 100, 200, 300, 500, 1000, 1500, 2000];
