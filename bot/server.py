@@ -458,8 +458,9 @@ class GameAPIHandler(BaseHTTPRequestHandler):
         # -------------------------------------------------------------
         # MINES & CHICKEN GAME ENGINES (Server-Side Secret Bomb Placement)
         # -------------------------------------------------------------
-        if parsed.path in ["/api/game/mines/start", "/api/game/chicken/start", "/api/games/mines/start", "/api/games/chicken/start"]:
-            game_type = "mines" if "mines" in parsed.path else "chicken"
+        action = params.get("action", [None])[0]
+        if parsed.path in ["/api/game/mines/start", "/api/game/chicken/start", "/api/games/mines/start", "/api/games/chicken/start"] or (parsed.path == "/api/games" and action in ["chicken_start", "mines_start", "start"]):
+            game_type = "mines" if ("mines" in parsed.path or action == "mines_start") else "chicken"
             telegram_id = body.get("telegram_id") or body.get("userId") or 78912345
             bet_amount = float(body.get("bet_amount") or body.get("amount") or 0)
             hazard_count = int(body.get("hazard_count") or body.get("mine_count") or body.get("bone_count") or 3)
@@ -518,7 +519,7 @@ class GameAPIHandler(BaseHTTPRequestHandler):
             })
             return
 
-        elif parsed.path in ["/api/game/mines/reveal", "/api/game/chicken/reveal", "/api/games/mines/reveal", "/api/games/chicken/reveal"]:
+        elif parsed.path in ["/api/game/mines/reveal", "/api/game/chicken/reveal", "/api/games/mines/reveal", "/api/games/chicken/reveal"] or (parsed.path == "/api/games" and action in ["chicken_reveal", "mines_reveal", "reveal"]):
             round_id = body.get("round_id") or body.get("roundId")
             tile_index = body.get("tile_index") if body.get("tile_index") is not None else body.get("tileIndex")
 
@@ -619,7 +620,7 @@ class GameAPIHandler(BaseHTTPRequestHandler):
             })
             return
 
-        elif parsed.path in ["/api/game/mines/cashout", "/api/game/chicken/cashout", "/api/games/mines/cashout", "/api/games/chicken/cashout"]:
+        elif parsed.path in ["/api/game/mines/cashout", "/api/game/chicken/cashout", "/api/games/mines/cashout", "/api/games/chicken/cashout"] or (parsed.path == "/api/games" and action in ["chicken_cashout", "mines_cashout", "cashout"]):
             round_id = body.get("round_id") or body.get("roundId")
             if not round_id:
                 self._error_response("Missing round_id")
