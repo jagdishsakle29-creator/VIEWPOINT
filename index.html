@@ -1298,15 +1298,15 @@
 
           <!-- Color Bet Buttons -->
           <div class="color-bet-buttons-row">
-            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green">
+            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green" onclick="window.app && window.app.placeColorBet('color', 'green')">
               <span>🟢 Join Green</span>
               <span class="payout-tag">2x (1.5x on 5)</span>
             </button>
-            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet">
+            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet" onclick="window.app && window.app.placeColorBet('color', 'violet')">
               <span>🟣 Join Violet</span>
               <span class="payout-tag">4.5x (on 0, 5)</span>
             </button>
-            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red">
+            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red" onclick="window.app && window.app.placeColorBet('color', 'red')">
               <span>🔴 Join Red</span>
               <span class="payout-tag">2x (1.5x on 0)</span>
             </button>
@@ -1314,25 +1314,25 @@
 
           <!-- Numbers 0-9 Keypad Matrix -->
           <div class="numbers-bet-grid">
-            <button class="btn-number-bet num-green" data-number="1">1 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="2">2 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="3">3 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="4">4 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-violet-green" data-number="5">5 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="6">6 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="7">7 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="8">8 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="9">9 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0">0 <span class="num-payout">9x Jackpot</span></button>
+            <button class="btn-number-bet num-green" data-number="1" onclick="window.app && window.app.placeColorBet('number', 1)">1 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="2" onclick="window.app && window.app.placeColorBet('number', 2)">2 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="3" onclick="window.app && window.app.placeColorBet('number', 3)">3 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="4" onclick="window.app && window.app.placeColorBet('number', 4)">4 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-violet-green" data-number="5" onclick="window.app && window.app.placeColorBet('number', 5)">5 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="6" onclick="window.app && window.app.placeColorBet('number', 6)">6 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="7" onclick="window.app && window.app.placeColorBet('number', 7)">7 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-red" data-number="8" onclick="window.app && window.app.placeColorBet('number', 8)">8 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-green" data-number="9" onclick="window.app && window.app.placeColorBet('number', 9)">9 <span class="num-payout">9x</span></button>
+            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0" onclick="window.app && window.app.placeColorBet('number', 0)">0 <span class="num-payout">9x Jackpot</span></button>
           </div>
 
           <!-- Big / Small Buttons -->
           <div class="big-small-row">
-            <button id="btnBetBig" class="btn-big-bet" data-choice="big">
+            <button id="btnBetBig" class="btn-big-bet" data-choice="big" onclick="window.app && window.app.placeColorBet('size', 'big')">
               <span>🟡 Big (5 - 9)</span>
               <span class="payout-tag">2x Payout</span>
             </button>
-            <button id="btnBetSmall" class="btn-small-bet" data-choice="small">
+            <button id="btnBetSmall" class="btn-small-bet" data-choice="small" onclick="window.app && window.app.placeColorBet('size', 'small')">
               <span>🔵 Small (0 - 4)</span>
               <span class="payout-tag">2x Payout</span>
             </button>

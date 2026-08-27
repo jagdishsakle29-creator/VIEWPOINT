@@ -3955,9 +3955,25 @@ class AppController {
   handleStockTrade(type) {
     const stockInput = document.getElementById('stockBetAmountInput');
     const amount = parseFloat(stockInput ? stockInput.value : 50) || 50;
+    if (!this.stock && window.StockTradingGame && (document.getElementById('stockCanvas') || this.dom.stockCanvas)) {
+      this.stock = new window.StockTradingGame(this.dom.stockCanvas || document.getElementById('stockCanvas'));
+    }
     if (this.stock) {
       const res = this.stock.placeTrade(type === 'call' ? 'CALL' : 'PUT', amount, this.stockDurationSec || 30);
       if (!res.success) this.showNotification(res.msg, 'error');
+    }
+  }
+
+  placeColorBet(type, choice, customAmt) {
+    if (!this.colortrading && window.ColorTradingGame) {
+      this.colortrading = new window.ColorTradingGame();
+    }
+    if (!this.colortrading) return;
+    const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
+    const betVal = customAmt || parseFloat(betInput ? betInput.value : 10) || 10;
+    const res = this.colortrading.placeBet(type, choice, betVal);
+    if (!res.success) {
+      this.showNotification(res.msg, 'error');
     }
   }
 
