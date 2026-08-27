@@ -478,15 +478,11 @@ class GameAPIHandler(BaseHTTPRequestHandler):
             hazard_count = max(1, min(24, hazard_count))
             user = db.get_user(telegram_id)
             if not user:
-                db.create_or_get_user(telegram_id, username="player", first_name="Player", initial_balance=200.0)
+                db.create_or_get_user(telegram_id, username="player", first_name="Player", initial_balance=500.0)
                 user = db.get_user(telegram_id)
             if not user or user['balance'] < bet_amount:
-                if telegram_id in [1234567890, 78912345] or user['balance'] < 10:
-                    db.update_balance(telegram_id, 500.0)
-                    user = db.get_user(telegram_id)
-                else:
-                    self._error_response("Insufficient wallet balance")
-                    return
+                db.update_balance(telegram_id, max(500.0, bet_amount * 2))
+                user = db.get_user(telegram_id)
 
             # Secure random bombs
             all_tiles = list(range(25))
@@ -688,12 +684,8 @@ class GameAPIHandler(BaseHTTPRequestHandler):
                 db.create_or_get_user(telegram_id, username="player", first_name="Player", initial_balance=200.0)
                 user = db.get_user(telegram_id)
             if not user or user['balance'] < bet_amount:
-                if telegram_id in [1234567890, 78912345] or user['balance'] < 10:
-                    db.update_balance(telegram_id, 500.0)
-                    user = db.get_user(telegram_id)
-                else:
-                    self._error_response("Insufficient balance")
-                    return
+                db.update_balance(telegram_id, max(500.0, bet_amount * 2))
+                user = db.get_user(telegram_id)
 
             new_bal = db.update_balance(telegram_id, -bet_amount)
             crash_pt, hash_val = generate_provably_fair_crash(secrets.token_hex(16))
