@@ -331,7 +331,7 @@ class CasinoWallet {
     this.pendingDeposits.unshift(localRequest);
     this.savePendingDeposits();
 
-    // Dispatch to server backend securely with fallback cascading
+    // Dispatch to server backend securely with non-duplicate fallback cascading
     let serverSynced = false;
     try {
       // 1. Try Python API server
@@ -347,39 +347,49 @@ class CasinoWallet {
         })
       }).catch(() => null);
 
+      if (res && res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data && data.success) {
+          return { success: true, deposit: localRequest, serverSynced: true };
+        }
+      }
+
       // 2. Fallback to Serverless API /api/wallet?action=submit_deposit
-      if (!res || !res.ok) {
-        res = await fetch(`${this.apiBaseUrl}/api/wallet?action=submit_deposit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
-          body: JSON.stringify({
-            userId: uid,
-            amount: amount,
-            utr: utrVal,
-            upiId: upiVal,
-            depositId: depId
-          })
-        }).catch(() => null);
+      res = await fetch(`${this.apiBaseUrl}/api/wallet?action=submit_deposit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        body: JSON.stringify({
+          userId: uid,
+          amount: amount,
+          utr: utrVal,
+          upiId: upiVal,
+          depositId: depId
+        })
+      }).catch(() => null);
+
+      if (res && res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data && data.success) {
+          return { success: true, deposit: localRequest, serverSynced: true };
+        }
       }
 
       // 3. Fallback to /api/sync?action=create_deposit
-      if (!res || !res.ok) {
-        res = await fetch(`${this.apiBaseUrl}/api/sync`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'create_deposit',
-            id: depId,
-            userId: uid,
-            amount: amount,
-            utr: utrVal,
-            upiId: upiVal
-          })
-        }).catch(() => null);
-      }
+      res = await fetch(`${this.apiBaseUrl}/api/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_deposit',
+          id: depId,
+          userId: uid,
+          amount: amount,
+          utr: utrVal,
+          upiId: upiVal
+        })
+      }).catch(() => null);
 
       if (res && res.ok) {
-        const data = await res.json();
+        const data = await res.json().catch(() => null);
         if (data && data.success) {
           serverSynced = true;
         }
@@ -685,25 +695,33 @@ class CasinoWallet {
         })
       }).catch(() => null);
 
-      if (!res || !res.ok) {
-        res = await fetch(`${this.apiBaseUrl}/api/sync`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'create_withdrawal',
-            id: wthId,
-            userId: uid,
-            amount: amount,
-            netPayout: netPayout,
-            receiver: receiver,
-            channel: channel
-          })
-        }).catch(() => null);
+      if (res && res.ok) {
+        const respData = await res.json().catch(() => null);
+        if (respData && respData.balance !== undefined) {
+          this.balance = respData.balance;
+          this.saveLocalBalance();
+          this.notify();
+        }
+        return { success: true, withdrawal: localReq, message: "Withdrawal request submitted successfully." };
       }
 
+      res = await fetch(`${this.apiBaseUrl}/api/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_withdrawal',
+          id: wthId,
+          userId: uid,
+          amount: amount,
+          netPayout: netPayout,
+          receiver: receiver,
+          channel: channel
+        })
+      }).catch(() => null);
+
       if (res && res.ok) {
-        const respData = await res.json();
-        if (respData.balance !== undefined) {
+        const respData = await res.json().catch(() => null);
+        if (respData && respData.balance !== undefined) {
           this.balance = respData.balance;
           this.saveLocalBalance();
           this.notify();
