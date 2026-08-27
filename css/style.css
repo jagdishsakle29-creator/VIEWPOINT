@@ -1244,7 +1244,8 @@ body {
 
 .game-stage:has(.dragontiger-view.active),
 .game-stage:has(.colortrading-view.active),
-.game-stage:has(.stock-view.active) {
+.game-stage:has(.stock-view.active),
+.game-stage:has(.dice-view.active) {
   padding: 8px 4px !important;
   width: 100% !important;
   max-width: 100% !important;
@@ -1255,7 +1256,8 @@ body {
 
 .game-arena:has(.dragontiger-view.active),
 .game-arena:has(.colortrading-view.active),
-.game-arena:has(.stock-view.active) {
+.game-arena:has(.stock-view.active),
+.game-arena:has(.dice-view.active) {
   display: block !important;
   grid-template-columns: 1fr !important;
   width: 100% !important;
@@ -1263,7 +1265,8 @@ body {
 
 .game-arena:has(.dragontiger-view.active) .controls-panel,
 .game-arena:has(.colortrading-view.active) .controls-panel,
-.game-arena:has(.stock-view.active) .controls-panel {
+.game-arena:has(.stock-view.active) .controls-panel,
+.game-arena:has(.dice-view.active) .controls-panel {
   display: none !important;
 }
 

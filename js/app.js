@@ -4690,8 +4690,8 @@ class AppController {
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock) hide left controls sidebar and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock');
+    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock, Dice) hide left controls sidebar and take 100% width
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'dice');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
