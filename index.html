@@ -271,6 +271,7 @@
       var activeTabId = 'tab' + g.charAt(0).toUpperCase() + g.slice(1);
       if (g === 'colortrading') activeTabId = 'tabColorTrading';
       if (g === 'stock') activeTabId = 'tabStock';
+      if (g === 'dragontiger') activeTabId = 'tabDragonTiger';
 
       var targetView = document.getElementById(activeViewId);
       if (targetView) {
@@ -279,6 +280,20 @@
       }
       var targetTab = document.getElementById(activeTabId);
       if (targetTab) targetTab.classList.add('active');
+
+      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock');
+      var cp = document.querySelector('.controls-panel');
+      var ga = document.querySelector('.game-arena');
+      if (cp) cp.style.display = isFullWidth ? 'none' : 'flex';
+      if (ga) {
+        if (isFullWidth) {
+          ga.style.display = 'block';
+          ga.style.gridTemplateColumns = '1fr';
+        } else {
+          ga.style.display = window.innerWidth > 900 ? 'grid' : 'flex';
+          ga.style.gridTemplateColumns = window.innerWidth > 900 ? '310px 1fr' : '1fr';
+        }
+      }
     };
 
     window.switchMainPage = function(p) {

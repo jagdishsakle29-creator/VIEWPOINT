@@ -4665,8 +4665,23 @@ class AppController {
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
+    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock) hide left controls sidebar and take 100% width
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock');
+    const cp = document.querySelector('.controls-panel');
+    const ga = document.querySelector('.game-arena');
+    if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
+    if (ga) {
+      if (isFullWidthGame) {
+        ga.style.display = 'block';
+        ga.style.gridTemplateColumns = '1fr';
+      } else {
+        ga.style.display = window.innerWidth > 900 ? 'grid' : 'flex';
+        ga.style.gridTemplateColumns = window.innerWidth > 900 ? '310px 1fr' : '1fr';
+      }
+    }
+
     // Auto Play Toggle visibility: Enabled on Mines, Chicken, Crash
-    if (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock') {
+    if (isFullWidthGame) {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
       if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
@@ -4790,8 +4805,8 @@ class AppController {
       if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
-      if (!this.colortrading && window.CasinoColorTrading) {
-        this.colortrading = new window.CasinoColorTrading();
+      if (!this.colortrading && window.ColorTradingGame) {
+        this.colortrading = new window.ColorTradingGame();
       }
       this.activeInstance = this.colortrading;
       if (this.colortrading) {
@@ -4805,8 +4820,8 @@ class AppController {
       if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
-      if (!this.stock && window.CasinoStockTrading && (document.getElementById('stockCanvas') || this.dom.stockCanvas)) {
-        this.stock = new window.CasinoStockTrading('stockCanvas');
+      if (!this.stock && window.StockTradingGame && (document.getElementById('stockCanvas') || this.dom.stockCanvas)) {
+        this.stock = new window.StockTradingGame(this.dom.stockCanvas || document.getElementById('stockCanvas'));
       }
       this.activeInstance = this.stock;
       if (this.stock) {
@@ -4815,10 +4830,10 @@ class AppController {
       }
     }
 
-    if (this.betMode === 'auto' && gameType !== 'dragontiger' && gameType !== 'colortrading' && gameType !== 'stock') {
+    if (this.betMode === 'auto' && !isFullWidthGame) {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
-    } else if (gameType !== 'dragontiger' && gameType !== 'colortrading' && gameType !== 'stock') {
+    } else if (!isFullWidthGame) {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
     }
