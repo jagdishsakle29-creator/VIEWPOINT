@@ -103,9 +103,6 @@ class ChickenGame {
   }
 
   async startGame() {
-    if (Date.now() - this.lastActionTime < 350) return false;
-    this.lastActionTime = Date.now();
-
     if (this.isPlaying) this.reset();
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui && this.ui.onError) this.ui.onError("Insufficient balance! Please deposit to play.");

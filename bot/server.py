@@ -463,8 +463,8 @@ class GameAPIHandler(BaseHTTPRequestHandler):
         if parsed.path in ["/api/game/mines/start", "/api/game/chicken/start", "/api/games/mines/start", "/api/games/chicken/start"] or (parsed.path == "/api/games" and action in ["chicken_start", "mines_start", "start"]):
             game_type = "mines" if ("mines" in parsed.path or action == "mines_start") else "chicken"
             telegram_id = body.get("telegram_id") or body.get("userId") or 78912345
-            bet_amount = float(body.get("bet_amount") or body.get("amount") or 0)
-            hazard_count = int(body.get("hazard_count") or body.get("mine_count") or body.get("bone_count") or 3)
+            bet_amount = float(body.get("bet_amount") or body.get("betAmount") or body.get("amount") or 10.0)
+            hazard_count = int(body.get("hazard_count") or body.get("hazardCount") or body.get("mine_count") or body.get("bone_count") or 3)
 
             try:
                 telegram_id = int(telegram_id)
