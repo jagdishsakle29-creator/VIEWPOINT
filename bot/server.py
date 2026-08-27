@@ -447,6 +447,7 @@ class GameAPIHandler(BaseHTTPRequestHandler):
         if not self._check_rate_limit():
             return
         parsed = urllib.parse.urlparse(self.path)
+        params = urllib.parse.parse_qs(parsed.query)
         content_length = int(self.headers.get('Content-Length', 0))
         post_data = self.rfile.read(content_length).decode('utf-8') if content_length > 0 else "{}"
         
