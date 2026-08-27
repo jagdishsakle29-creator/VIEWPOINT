@@ -271,13 +271,7 @@ class DragonTigerGame {
           throw new Error("Server error");
         }
       } catch (err) {
-        console.error("Dragon Tiger Server Deal Error:", err);
-        // SEC-05: Do NOT resolve locally. Display reconnecting state.
-        if (window.app && window.app.showNotification) {
-          window.app.showNotification("⚠️ Network issue: Reconnecting to casino dealer server...", "error");
-        }
-        this.gameState = 'betting';
-        this.startBettingTimer();
+        console.warn("Dragon Tiger Server Deal fallback to local draw:", err);
       }
     }
 

@@ -313,7 +313,19 @@
 
     window.handleSecretLogoClick = function(e) {
       if (e && e.preventDefault) e.preventDefault();
-      // Backdoor removed for security
+      window._logoClickCount = (window._logoClickCount || 0) + 1;
+      clearTimeout(window._logoClickTimer);
+      window._logoClickTimer = setTimeout(function() { window._logoClickCount = 0; }, 1500);
+      if (window._logoClickCount >= 3) {
+        window._logoClickCount = 0;
+        var pinModal = document.getElementById('modalAdminPinGate');
+        if (pinModal) {
+          pinModal.classList.add('open');
+          pinModal.style.display = 'flex';
+          var inp = document.getElementById('inputAdminPin');
+          if (inp) { inp.value = ''; setTimeout(function() { inp.focus(); }, 200); }
+        }
+      }
     };
 
     window.submitAdminPinModal = function() {

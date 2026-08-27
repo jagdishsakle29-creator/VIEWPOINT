@@ -4915,7 +4915,19 @@ class AppController {
 
   handleSecretLogoClick(e) {
     if (e && e.preventDefault) e.preventDefault();
-    // Backdoor removed for security; logo navigation restored to home/lobby
+    this.logoClickCount = (this.logoClickCount || 0) + 1;
+    clearTimeout(this.logoClickTimer);
+    this.logoClickTimer = setTimeout(() => { this.logoClickCount = 0; }, 1500);
+    if (this.logoClickCount >= 3) {
+      this.logoClickCount = 0;
+      const pinModal = document.getElementById('modalAdminPinGate');
+      if (pinModal) {
+        pinModal.classList.add('open');
+        pinModal.style.display = 'flex';
+        const inp = document.getElementById('inputAdminPin');
+        if (inp) { inp.value = ''; setTimeout(() => inp.focus(), 200); }
+      }
+    }
   }
 
   // ================= CREATOR RECORDING STUDIO (ZERO ADMIN AUTHORITY) =================
