@@ -1211,11 +1211,20 @@ body {
 .game-view {
   display: none;
   width: 100%;
-  max-width: 540px;
+  max-width: 580px;
 }
 
 .game-view.active {
-  display: block;
+  display: block !important;
+}
+
+.dragontiger-view.active,
+.colortrading-view.active,
+.stock-view.active {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* ================= WIN / LOSS OVERLAY MODAL (Sleek & Compact) ================= */
