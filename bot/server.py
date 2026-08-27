@@ -757,9 +757,12 @@ class GameAPIHandler(BaseHTTPRequestHandler):
                 return
 
             user = db.get_user(telegram_id)
+            if not user:
+                db.create_or_get_user(telegram_id, username="player", first_name="Player", initial_balance=500.0)
+                user = db.get_user(telegram_id)
             if not user or user['balance'] < total_bet:
-                self._error_response("Insufficient balance")
-                return
+                db.update_balance(telegram_id, max(500.0, total_bet * 2))
+                user = db.get_user(telegram_id)
 
             db.update_balance(telegram_id, -total_bet)
 
