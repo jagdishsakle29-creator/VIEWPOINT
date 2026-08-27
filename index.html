@@ -37,17 +37,17 @@
   <!-- Telegram WebApp Official SDK (Non-blocking) -->
   <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
   
-  <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=39.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=39.0">
-  <link rel="stylesheet" href="css/mines.css?v=39.0">
-  <link rel="stylesheet" href="css/chicken.css?v=39.0">
-  <link rel="stylesheet" href="css/plinko.css?v=39.0">
-  <link rel="stylesheet" href="css/crash.css?v=39.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=39.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=39.0">
-  <link rel="stylesheet" href="css/dice.css?v=39.0">
-  <link rel="stylesheet" href="css/limbo.css?v=39.0">
+  <!-- CSS Stylesheets (Cache-Busted v45.0) -->
+  <link rel="stylesheet" href="css/style.css?v=45.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=45.0">
+  <link rel="stylesheet" href="css/mines.css?v=45.0">
+  <link rel="stylesheet" href="css/chicken.css?v=45.0">
+  <link rel="stylesheet" href="css/plinko.css?v=45.0">
+  <link rel="stylesheet" href="css/crash.css?v=45.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=45.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=45.0">
+  <link rel="stylesheet" href="css/dice.css?v=45.0">
+  <link rel="stylesheet" href="css/limbo.css?v=45.0">
 </head>
 <body role="application" translate="no" data-reader-ignore="true">
 
@@ -259,6 +259,10 @@
       if (g1) g1.style.display = (pageNum === 1) ? 'flex' : 'none';
       if (g2) g2.style.display = (pageNum === 2) ? 'flex' : 'none';
       if (g3) g3.style.display = (pageNum === 3) ? 'flex' : 'none';
+
+      if (pageNum === 1) window.switchGame('mines');
+      else if (pageNum === 2) window.switchGame('plinko');
+      else if (pageNum === 3) window.switchGame('colortrading');
     };
 
     window.switchGame = function(g) {
@@ -283,15 +287,15 @@
       if (g === 'stock') activeTabId = 'tabStock';
       if (g === 'dragontiger') activeTabId = 'tabDragonTiger';
 
+      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock');
       var targetView = document.getElementById(activeViewId);
       if (targetView) {
         targetView.classList.add('active');
-        targetView.style.display = 'block';
+        targetView.style.display = isFullWidth ? 'flex' : 'block';
       }
       var targetTab = document.getElementById(activeTabId);
       if (targetTab) targetTab.classList.add('active');
 
-      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock');
       var cp = document.querySelector('.controls-panel');
       var ga = document.querySelector('.game-arena');
       if (cp) cp.style.display = isFullWidth ? 'none' : 'flex';
@@ -304,6 +308,38 @@
           ga.style.gridTemplateColumns = window.innerWidth > 900 ? '310px 1fr' : '1fr';
         }
       }
+    };
+
+    window.placeColorBet = function(type, choice, amt) {
+      if (window.app && window.app.placeColorBet) return window.app.placeColorBet(type, choice, amt);
+    };
+    window.handleStockTrade = function(type) {
+      if (window.app && window.app.handleStockTrade) return window.app.handleStockTrade(type);
+    };
+    window.handleDtBetClick = function(spot) {
+      if (window.app && window.app.handleDtBetClick) return window.app.handleDtBetClick(spot);
+    };
+    window.selectDtChip = function(amt) {
+      if (window.app && window.app.selectDtChip) return window.app.selectDtChip(amt);
+    };
+    window.handleDtClearBets = function() {
+      if (window.app && window.app.handleDtClearBets) return window.app.handleDtClearBets();
+    };
+    window.handleDtDoubleBets = function() {
+      if (window.app && window.app.handleDtDoubleBets) return window.app.handleDtDoubleBets();
+    };
+    window.handleDtRebet = function() {
+      if (window.app && window.app.handleDtRebet) return window.app.handleDtRebet();
+    };
+    window.openDtHowToPlayModal = function() {
+      if (window.app && window.app.openDtHowToPlayModal) return window.app.openDtHowToPlayModal();
+      var m = document.getElementById('modalDtHowToPlay');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closeDtHowToPlayModal = function() {
+      if (window.app && window.app.closeDtHowToPlayModal) return window.app.closeDtHowToPlayModal();
+      var m = document.getElementById('modalDtHowToPlay');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
     };
 
     window.switchMainPage = function(p) {
@@ -2745,21 +2781,21 @@
   </nav>
 
   <!-- Core Casino JavaScript Modules (High Priority Local Execution) -->
-  <script src="js/config.js?v=41.0"></script>
-  <script src="js/security.js?v=41.0"></script>
-  <script src="js/audio.js?v=41.0"></script>
-  <script src="js/wallet.js?v=41.0"></script>
-  <script src="js/provablyFair.js?v=41.0"></script>
-  <script src="js/dragontiger.js?v=41.0"></script>
-  <script src="js/mines.js?v=41.0"></script>
-  <script src="js/limbo.js?v=41.0"></script>
-  <script src="js/chicken.js?v=41.0"></script>
-  <script src="js/plinko.js?v=41.0"></script>
-  <script src="js/crash.js?v=41.0"></script>
-  <script src="js/colortrading.js?v=41.0"></script>
-  <script src="js/stocktrading.js?v=41.0"></script>
-  <script src="js/dice.js?v=41.0"></script>
-  <script src="js/app.js?v=41.0"></script>
+  <script src="js/config.js?v=45.0"></script>
+  <script src="js/security.js?v=45.0"></script>
+  <script src="js/audio.js?v=45.0"></script>
+  <script src="js/wallet.js?v=45.0"></script>
+  <script src="js/provablyFair.js?v=45.0"></script>
+  <script src="js/dragontiger.js?v=45.0"></script>
+  <script src="js/mines.js?v=45.0"></script>
+  <script src="js/limbo.js?v=45.0"></script>
+  <script src="js/chicken.js?v=45.0"></script>
+  <script src="js/plinko.js?v=45.0"></script>
+  <script src="js/crash.js?v=45.0"></script>
+  <script src="js/colortrading.js?v=45.0"></script>
+  <script src="js/stocktrading.js?v=45.0"></script>
+  <script src="js/dice.js?v=45.0"></script>
+  <script src="js/app.js?v=45.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
