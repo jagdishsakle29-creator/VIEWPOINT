@@ -4817,8 +4817,49 @@ class AppController {
       const tab = this.dom.tabDragonTiger || document.getElementById('tabDragonTiger');
       if (tab) tab.classList.add('active');
       const v = this.dom.dragontigerView || document.getElementById('dragontigerView');
-      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (v) { v.classList.add('active'); v.style.display = 'flex'; }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
+      if (!this.dragontiger && window.DragonTigerGame) {
+        this.dragontiger = new window.DragonTigerGame({
+          onTimerTick: (data) => {
+            const rTag = this.dom.dtRoundIdTag || document.getElementById('dtRoundIdTag');
+            const tSec = this.dom.dtTimerSeconds || document.getElementById('dtTimerSeconds');
+            const sText = this.dom.dtStatusText || document.getElementById('dtStatusText');
+            if (rTag) rTag.innerText = data.roundId;
+            if (tSec) {
+              tSec.innerText = data.timeLeft;
+              tSec.classList.toggle('hurry', data.timeLeft <= 3);
+            }
+            if (sText && data.state === 'betting') {
+              sText.innerText = data.timeLeft <= 3 ? "BETS CLOSING..." : "PLACE YOUR BETS";
+              sText.style.color = data.timeLeft <= 3 ? "#ff3366" : "#fbbf24";
+            }
+          },
+          onDealingStart: () => {
+            const sText = this.dom.dtStatusText || document.getElementById('dtStatusText');
+            if (sText) {
+              sText.innerText = "DEALING CARDS...";
+              sText.style.color = "#00e5ff";
+            }
+            this.resetDtTableVisuals();
+          },
+          onDragonCardReveal: (card) => this.revealDtCard('dragon', card),
+          onTigerCardReveal: (card) => this.revealDtCard('tiger', card),
+          onRoundSettled: (res) => this.handleDtRoundSettled(res),
+          onNewRoundReady: (data) => {
+            this.resetDtTableVisuals();
+            const sText = this.dom.dtStatusText || document.getElementById('dtStatusText');
+            const rTag = this.dom.dtRoundIdTag || document.getElementById('dtRoundIdTag');
+            if (sText) {
+              sText.innerText = "PLACE YOUR BETS";
+              sText.style.color = "#fbbf24";
+            }
+            if (rTag) rTag.innerText = data.roundId;
+            this.renderDtBeadRoad(data.history);
+          },
+          onBetsUpdated: (bets, total) => this.updateDtChipBadges(bets, total)
+        });
+      }
       this.activeInstance = this.dragontiger;
       if (this.dragontiger) {
         this.renderDtBeadRoad(this.dragontiger.history);
@@ -4827,7 +4868,7 @@ class AppController {
       const tab = this.dom.tabColorTrading || document.getElementById('tabColorTrading');
       if (tab) tab.classList.add('active');
       const v = this.dom.colortradingView || document.getElementById('colortradingView');
-      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (v) { v.classList.add('active'); v.style.display = 'flex'; }
       if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       if (!this.colortrading && window.ColorTradingGame) {
@@ -4842,7 +4883,7 @@ class AppController {
       const tab = this.dom.tabStock || document.getElementById('tabStock');
       if (tab) tab.classList.add('active');
       const v = this.dom.stockView || document.getElementById('stockView');
-      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (v) { v.classList.add('active'); v.style.display = 'flex'; }
       if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       if (!this.stock && window.StockTradingGame && (document.getElementById('stockCanvas') || this.dom.stockCanvas)) {
@@ -7175,7 +7216,27 @@ window.openReferModal = function() {
   if (m) { m.classList.add('open'); m.style.display = 'flex'; }
 };
 
-
-
-
-
+window.switchGame = function(gameType) {
+  if (window.app && window.app.switchGame) return window.app.switchGame(gameType);
+};
+window.switchGamePage = function(pageNum) {
+  if (window.app && window.app.switchGamePage) return window.app.switchGamePage(pageNum);
+};
+window.switchMainPage = function(pageNum) {
+  if (window.app && window.app.switchMainPage) return window.app.switchMainPage(pageNum);
+};
+window.placeColorBet = function(type, choice, customAmt) {
+  if (window.app && window.app.placeColorBet) return window.app.placeColorBet(type, choice, customAmt);
+};
+window.handleStockTrade = function(type) {
+  if (window.app && window.app.handleStockTrade) return window.app.handleStockTrade(type);
+};
+window.handleDtBetClick = function(spotId) {
+  if (window.app && window.app.handleDtBetClick) return window.app.handleDtBetClick(spotId);
+};
+window.openDtHowToPlayModal = function() {
+  if (window.app && window.app.openDtHowToPlayModal) return window.app.openDtHowToPlayModal();
+};
+window.closeDtHowToPlayModal = function() {
+  if (window.app && window.app.closeDtHowToPlayModal) return window.app.closeDtHowToPlayModal();
+};

@@ -2,6 +2,7 @@
    STOCK MARKET LIVE TRADING - ULTRA PREMIUM VIP CYBER STYLES
    =================================================== */
 
+.stock-view,
 .stocktrading-view {
   display: none;
   width: 100%;
@@ -9,8 +10,9 @@
   gap: 16px;
 }
 
+.stock-view.active,
 .stocktrading-view.active {
-  display: flex;
+  display: flex !important;
 }
 
 .stock-market-header {
