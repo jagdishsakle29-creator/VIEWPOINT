@@ -736,6 +736,18 @@ body {
     min-height: auto;
     border-radius: 16px;
   }
+  .game-stage {
+    order: 1;
+    width: 100%;
+  }
+  .controls-panel {
+    order: 2;
+    border-right: none;
+    border-top: 1px solid var(--border-color);
+    padding: 14px 12px;
+    gap: 10px;
+    width: 100%;
+  }
 }
 
 /* ================= CONTROLS PANEL ================= */
@@ -747,15 +759,6 @@ body {
   flex-direction: column;
   gap: 12px;
   justify-content: flex-start;
-}
-
-@media (max-width: 900px) {
-  .controls-panel {
-    border-right: none;
-    border-top: 1px solid var(--border-color);
-    padding: 14px 12px;
-    gap: 10px;
-  }
 }
 
 .control-group {

@@ -226,6 +226,11 @@ class ColorTradingGame {
 
     this.activeBets = [];
   }
+
+  isGameVisible() {
+    if (typeof document !== 'undefined' && document.hidden) return false;
+    return !!(window.app && window.app.currentGame === 'colortrading');
+  }
 }
 
 window.ColorTradingGame = ColorTradingGame;

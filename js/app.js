@@ -2903,6 +2903,15 @@ class AppController {
     }
   }
 
+  setCurrentUser(user) {
+    if (!user) return;
+    this.currentUser = user;
+    localStorage.setItem('stake_user_auth', JSON.stringify(user));
+    this.syncAuthUI();
+    this.switchGamePage(1);
+    this.switchGame('dragontiger');
+  }
+
   handleAuthSubmit() {
     return this.submitAuthForm();
   }
@@ -3176,6 +3185,10 @@ class AppController {
       this.syncAuthUI();
       window.soundEngine.playCashout();
       this.showNotification(`✅ OTP Verified! Welcome ${user.username}.`, "success");
+
+      // Auto switch to Page 1 & Premier Game upon Login
+      this.switchGamePage(1);
+      this.switchGame('dragontiger');
 
       // Show welcome bonus modal if new
       this.checkAndShowWelcomeBonus(user);

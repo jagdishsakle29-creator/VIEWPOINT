@@ -5,8 +5,8 @@
 class StockTradingGame {
   constructor(canvasElement, uiCallbacks) {
     this.canvas = canvasElement;
-    this.ctx = canvasElement.getContext('2d');
-    this.ui = uiCallbacks;
+    this.ctx = canvasElement ? canvasElement.getContext('2d') : null;
+    this.ui = uiCallbacks || {};
 
     this.assets = {
       'BTC/INR': { name: 'Bitcoin / INR', price: 7845000, volatility: 350, decimal: 2 },
