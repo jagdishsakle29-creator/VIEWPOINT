@@ -1223,8 +1223,9 @@ class AppController {
     const queryGame = urlParams.get('game');
     const savedGame = localStorage.getItem('stake_active_game');
     const validGames = ['dragontiger', 'mines', 'limbo', 'chicken', 'plinko', 'crash', 'colortrading', 'stock', 'dice'];
-    const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'plinko';
+    const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'dragontiger';
     
+    this.switchGamePage(1);
     this.switchGame(initialGame);
 
     if (hashGame === '7400' || hashGame === 'creator') {
