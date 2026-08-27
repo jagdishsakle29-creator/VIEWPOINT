@@ -674,22 +674,26 @@ class AppController {
     if (window.DragonTigerGame) {
       this.dragontiger = new window.DragonTigerGame({
         onTimerTick: (data) => {
-          if (this.dom.dtRoundIdTag) this.dom.dtRoundIdTag.innerText = data.roundId;
-          if (this.dom.dtTimerSeconds) {
-            this.dom.dtTimerSeconds.innerText = data.timeLeft;
-            this.dom.dtTimerSeconds.classList.toggle('hurry', data.timeLeft <= 3);
+          const rTag = this.dom.dtRoundIdTag || document.getElementById('dtRoundIdTag');
+          const tSec = this.dom.dtTimerSeconds || document.getElementById('dtTimerSeconds');
+          const sText = this.dom.dtStatusText || document.getElementById('dtStatusText');
+          if (rTag) rTag.innerText = data.roundId;
+          if (tSec) {
+            tSec.innerText = data.timeLeft;
+            tSec.classList.toggle('hurry', data.timeLeft <= 3);
           }
-          if (this.dom.dtStatusText) {
+          if (sText) {
             if (data.state === 'betting') {
-              this.dom.dtStatusText.innerText = data.timeLeft <= 3 ? "BETS CLOSING..." : "PLACE YOUR BETS";
-              this.dom.dtStatusText.style.color = data.timeLeft <= 3 ? "#ff3366" : "#fbbf24";
+              sText.innerText = data.timeLeft <= 3 ? "BETS CLOSING..." : "PLACE YOUR BETS";
+              sText.style.color = data.timeLeft <= 3 ? "#ff3366" : "#fbbf24";
             }
           }
         },
         onDealingStart: (data) => {
-          if (this.dom.dtStatusText) {
-            this.dom.dtStatusText.innerText = "DEALING CARDS...";
-            this.dom.dtStatusText.style.color = "#00e5ff";
+          const sText = this.dom.dtStatusText || document.getElementById('dtStatusText');
+          if (sText) {
+            sText.innerText = "DEALING CARDS...";
+            sText.style.color = "#00e5ff";
           }
           this.resetDtTableVisuals();
         },
@@ -704,11 +708,13 @@ class AppController {
         },
         onNewRoundReady: (data) => {
           this.resetDtTableVisuals();
-          if (this.dom.dtStatusText) {
-            this.dom.dtStatusText.innerText = "PLACE YOUR BETS";
-            this.dom.dtStatusText.style.color = "#fbbf24";
+          const sText = this.dom.dtStatusText || document.getElementById('dtStatusText');
+          const rTag = this.dom.dtRoundIdTag || document.getElementById('dtRoundIdTag');
+          if (sText) {
+            sText.innerText = "PLACE YOUR BETS";
+            sText.style.color = "#fbbf24";
           }
-          if (this.dom.dtRoundIdTag) this.dom.dtRoundIdTag.innerText = data.roundId;
+          if (rTag) rTag.innerText = data.roundId;
           this.renderDtBeadRoad(data.history);
         },
         onBetsUpdated: (bets, total) => {
@@ -722,14 +728,17 @@ class AppController {
     if (window.ColorTradingGame) {
       this.colortrading = new window.ColorTradingGame({
         onTimerTick: (data) => {
-          if (this.dom.tradingPeriodId) this.dom.tradingPeriodId.innerText = data.periodId;
+          const pId = this.dom.tradingPeriodId || document.getElementById('tradingPeriodId');
+          const d1 = this.dom.timerDigit1 || document.getElementById('timerDigit1');
+          const d2 = this.dom.timerDigit2 || document.getElementById('timerDigit2');
+          if (pId) pId.innerText = data.periodId;
           const tens = Math.floor(data.timeLeft / 10);
           const ones = data.timeLeft % 10;
-          if (this.dom.timerDigit1) this.dom.timerDigit1.innerText = tens;
-          if (this.dom.timerDigit2) this.dom.timerDigit2.innerText = ones;
+          if (d1) d1.innerText = tens;
+          if (d2) d2.innerText = ones;
           const isHurry = data.timeLeft <= 5;
-          if (this.dom.timerDigit1) this.dom.timerDigit1.classList.toggle('hurry', isHurry);
-          if (this.dom.timerDigit2) this.dom.timerDigit2.classList.toggle('hurry', isHurry);
+          if (d1) d1.classList.toggle('hurry', isHurry);
+          if (d2) d2.classList.toggle('hurry', isHurry);
         },
         onBetPlaced: (bets) => {
           this.renderActiveBetsSlip(bets);
@@ -744,20 +753,28 @@ class AppController {
           this.renderHistoryTable();
         }
       });
-      if (this.dom.tradingPeriodId && this.colortrading.periodId) {
-        this.dom.tradingPeriodId.innerText = this.colortrading.periodId;
+      const pId = this.dom.tradingPeriodId || document.getElementById('tradingPeriodId');
+      if (pId && this.colortrading.periodId) {
+        pId.innerText = this.colortrading.periodId;
       }
       this.renderTrendBalls(this.colortrading.history);
     }
 
-    // 5. Stock Market Live Trading Instance
-    if (window.StockTradingGame && this.dom.stockCanvas) {
-      this.stock = new window.StockTradingGame(this.dom.stockCanvas, {
+    // 6. Stock Market Live Trading Instance
+    const sCanvas = this.dom.stockCanvas || document.getElementById('stockCanvas');
+    if (window.StockTradingGame && sCanvas) {
+      this.stock = new window.StockTradingGame(sCanvas, {
         onPriceTick: (data) => {
-          this.dom.stockLivePrice.innerText = `${window.wallet.currency}${data.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-          this.dom.stockLivePrice.className = data.isUp ? 'stock-live-price' : 'stock-live-price down';
-          this.dom.stockChangeTag.innerText = `${data.isUp ? '+' : ''}${data.changePercent.toFixed(2)}% Today`;
-          this.dom.stockChangeTag.className = data.isUp ? 'stock-change-tag' : 'stock-change-tag down';
+          const lp = this.dom.stockLivePrice || document.getElementById('stockLivePrice');
+          const ct = this.dom.stockChangeTag || document.getElementById('stockChangeTag');
+          if (lp) {
+            lp.innerText = `${window.wallet.currency}${data.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            lp.className = data.isUp ? 'stock-live-price' : 'stock-live-price down';
+          }
+          if (ct) {
+            ct.innerText = `${data.isUp ? '+' : ''}${data.changePercent.toFixed(2)}% Today`;
+            ct.className = data.isUp ? 'stock-change-tag' : 'stock-change-tag down';
+          }
         },
         onTradePlaced: (trades) => {
           this.renderStockActiveTrades(trades);
@@ -4004,11 +4021,17 @@ class AppController {
     const won = rolled >= target;
 
     // Fast Ticker Animation
-    const displayEls = [this.dom.p1LimboMultiplierDisplay, this.dom.limboMultiplierDisplay].filter(Boolean);
+    const mainLimboDisp = document.getElementById('limboResultDisplay');
+    const mainLimboCont = document.getElementById('limboResultContainer');
+    const displayEls = [mainLimboDisp, this.dom.p1LimboMultiplierDisplay, this.dom.limboMultiplierDisplay].filter(Boolean);
     const tagEls = [this.dom.p1LimboResultTag, this.dom.limboResultTag].filter(Boolean);
 
+    if (mainLimboCont) {
+      mainLimboCont.className = 'limbo-display-container';
+    }
+
     displayEls.forEach(el => {
-      el.className = 'limbo-big-multiplier rolling';
+      el.className = 'limbo-multiplier-text rolling';
     });
     tagEls.forEach(el => {
       el.innerText = 'ROLLING... ⚡';
@@ -4016,14 +4039,13 @@ class AppController {
     });
 
     const startTime = performance.now();
-    const duration = 420; // 420ms ultra smooth casino roll
+    const duration = this.isLimboAutoPlaying ? 220 : 320; // Super fast responsive roll
 
     const animateRoll = (now) => {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
       
-      // Dynamic non-linear easing for authentic casino feel
-      const easeProgress = Math.pow(progress, 2.2);
+      const easeProgress = Math.pow(progress, 2.0);
       const currentTick = 1.00 + (rolled - 1.00) * easeProgress;
 
       displayEls.forEach(el => {
@@ -4036,13 +4058,28 @@ class AppController {
         // Final landing
         displayEls.forEach(el => {
           el.innerText = `${rolled.toFixed(2)}x`;
-          el.className = won ? 'limbo-big-multiplier win-pop' : 'limbo-big-multiplier loss-shake';
+          el.className = 'limbo-multiplier-text';
         });
+
+        if (mainLimboCont) {
+          mainLimboCont.className = won ? 'limbo-display-container win' : 'limbo-display-container loss';
+        }
 
         tagEls.forEach(el => {
           el.innerText = won ? `TARGET REACHED (${target.toFixed(2)}x) 🎉` : `MISSED TARGET (${target.toFixed(2)}x) 💥`;
           el.style.color = won ? '#00e701' : '#fe2c55';
         });
+
+        // Add to Limbo history row
+        const historyList = document.getElementById('limboHistoryList');
+        if (historyList) {
+          const pill = document.createElement('span');
+          pill.className = `history-pill ${won ? 'win' : 'loss'}`;
+          pill.innerText = `${rolled.toFixed(2)}x`;
+          pill.style.cssText = `padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 800; background: ${won ? 'rgba(0,231,1,0.2)' : 'rgba(254,44,85,0.2)'}; color: ${won ? '#00e701' : '#fe2c55'}; border: 1px solid ${won ? '#00e701' : '#fe2c55'};`;
+          historyList.insertBefore(pill, historyList.firstChild);
+          if (historyList.children.length > 8) historyList.removeChild(historyList.lastChild);
+        }
 
         this.isLimboRolling = false;
 
@@ -4057,7 +4094,9 @@ class AppController {
             payout: payout,
             won: true
           });
-          this.showNotification(`🎉 Limbo Hit ${rolled.toFixed(2)}x! Won ${window.wallet.currency}${payout.toFixed(2)}`, "success");
+          if (!this.isLimboAutoPlaying) {
+            this.showNotification(`🎉 Limbo Hit ${rolled.toFixed(2)}x! Won ${window.wallet.currency}${payout.toFixed(2)}`, "success");
+          }
         } else {
           window.soundEngine.playBomb();
           window.wallet.recordBet({
