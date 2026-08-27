@@ -5,8 +5,7 @@
   "private": true,
   "scripts": {
     "cap:sync": "npx cap sync android",
-    "cap:open": "npx cap open android",
-    "build": "echo 'Static web assets ready'"
+    "cap:open": "npx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",
