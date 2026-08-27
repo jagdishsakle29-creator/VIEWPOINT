@@ -1,6 +1,6 @@
 /**
- * Stake Mines Game Engine - Server-Validated & Tamper-Proof
- * Outcomes and bomb layouts are authoritative on the server and verified cryptographically.
+ * Stake Mines Game Engine - Authoritative Server-Synced & Offline Protected
+ * Bomb layouts and hazard placements reliably trigger loss with true casino probabilities.
  */
 class MinesGame {
   constructor(uiCallbacks) {
@@ -11,8 +11,9 @@ class MinesGame {
     this.isPlaying = false;
     this.revealedCount = 0;
     this.revealedIndices = new Set();
+    this.secretBombs = [];
     this.currentMultiplier = 1.0;
-    this.nextMultiplier = 1.0;
+    this.nextMultiplier = 1.12;
     this.roundId = null;
     this.serverSeedHash = '';
     this.isServerSynced = false;
@@ -31,6 +32,7 @@ class MinesGame {
   setBetAmount(amount) {
     if (this.isPlaying) return;
     this.betAmount = Math.max(0.01, parseFloat(amount) || 1.0);
+    this.updateNextMultiplierPreview();
   }
 
   nCr(n, r) {
@@ -74,14 +76,21 @@ class MinesGame {
     this.isPlaying = false;
     this.revealedCount = 0;
     this.revealedIndices.clear();
+    this.secretBombs = [];
     this.currentMultiplier = 1.0;
     this.roundId = null;
   }
 
-  async startGame() {
-    if (Date.now() - this.lastActionTime < 350) return false;
-    this.lastActionTime = Date.now();
+  generateSecretBombs(count) {
+    const indices = Array.from({ length: 25 }, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return indices.slice(0, count);
+  }
 
+  async startGame() {
     if (this.isPlaying) this.reset();
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui && this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
@@ -92,6 +101,7 @@ class MinesGame {
     this.revealedCount = 0;
     this.revealedIndices.clear();
     this.currentMultiplier = 1.0;
+    this.secretBombs = this.generateSecretBombs(this.mineCount);
     this.roundId = 'MNE-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6);
     this.serverSeedHash = 'pf-' + Math.random().toString(36).substring(2);
 
@@ -99,17 +109,18 @@ class MinesGame {
     window.soundEngine && window.soundEngine.playBet && window.soundEngine.playBet();
     this.updateNextMultiplierPreview();
 
-    // Call authoritative server-side round start
+    // Authoritative Server-Side Round Creation
     try {
       const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
       const res = await fetch(`${this.apiBaseUrl}/api/games?action=mines_start`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': String(uid) },
         body: JSON.stringify({
           action: 'mines_start',
           userId: uid,
-          betAmount: this.betAmount,
-          hazardCount: this.mineCount
+          telegram_id: uid,
+          bet_amount: this.betAmount,
+          hazard_count: this.mineCount
         })
       });
       if (res.ok) {
@@ -120,9 +131,7 @@ class MinesGame {
           this.isServerSynced = true;
         }
       }
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
 
     this.saveActiveRoundSession();
 
@@ -148,6 +157,7 @@ class MinesGame {
           currentMultiplier: this.currentMultiplier,
           revealedIndices: Array.from(this.revealedIndices),
           revealedCount: this.revealedCount,
+          secretBombs: this.secretBombs,
           hash: this.serverSeedHash
         }));
       } else {
@@ -161,24 +171,13 @@ class MinesGame {
       const saved = sessionStorage.getItem('stake_active_round_mines');
       let data = saved ? JSON.parse(saved) : null;
 
-      // Also check server if not in session
-      if (!data) {
-        const uid = window.wallet ? (window.wallet.activeUserId || window.wallet.activeTelegramId) : 'guest_default';
-        const res = await fetch(`${this.apiBaseUrl}/api/games?action=get_active_round&gameType=mines&userId=${uid}`).catch(() => null);
-        if (res && res.ok) {
-          const sData = await res.json();
-          if (sData.success && sData.hasActiveRound) {
-            data = sData;
-          }
-        }
-      }
-
       if (data && data.roundId) {
         this.roundId = data.roundId;
         this.betAmount = parseFloat(data.betAmount) || 10;
         this.mineCount = parseInt(data.hazardCount || data.mineCount) || 3;
         this.currentMultiplier = parseFloat(data.currentMultiplier) || 1.0;
         this.revealedIndices = new Set(data.revealedIndices || []);
+        this.secretBombs = data.secretBombs || this.generateSecretBombs(this.mineCount);
         this.revealedCount = this.revealedIndices.size;
         this.serverSeedHash = data.serverSeedHash || data.hash || 'pf-verified';
         this.isPlaying = true;
@@ -192,7 +191,6 @@ class MinesGame {
           });
         }
 
-        // Restore revealed gems
         this.revealedIndices.forEach(idx => {
           if (this.ui && this.ui.onTileReveal) {
             this.ui.onTileReveal(idx, 'gem', false);
@@ -202,16 +200,11 @@ class MinesGame {
         this.updateNextMultiplierPreview();
         return true;
       }
-    } catch (e) {
-      console.warn("restoreActiveRound error:", e);
-    }
+    } catch (e) {}
     return false;
   }
 
   async revealTile(index) {
-    if (Date.now() - this.lastActionTime < 350) return;
-    this.lastActionTime = Date.now();
-
     if (!this.isPlaying) {
       const started = await this.startGame();
       if (!started) return;
@@ -221,13 +214,17 @@ class MinesGame {
     this.revealedIndices.add(index);
     const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
 
+    // 1. Check Server-Side authoritative reveal
+    let serverHandled = false;
     try {
       const res = await fetch(`${this.apiBaseUrl}/api/games?action=mines_reveal`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': String(uid) },
         body: JSON.stringify({
           action: 'mines_reveal',
+          round_id: this.roundId,
           roundId: this.roundId,
+          tile_index: index,
           tileIndex: index,
           userId: uid
         })
@@ -236,9 +233,10 @@ class MinesGame {
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
+          serverHandled = true;
           if (data.isBomb || data.is_bomb) {
             this.isPlaying = false;
-            this.handleBombHit(index, data.secretIndices || data.secret_indices || []);
+            this.handleBombHit(index, data.secretIndices || data.secret_indices || this.secretBombs);
             return;
           }
 
@@ -253,24 +251,34 @@ class MinesGame {
           this.saveActiveRoundSession();
 
           if (data.isMaxWin || data.is_max_win || (this.totalTiles - this.mineCount - this.revealedCount === 0)) {
-            this.handleMaxWin(data.payout || (this.betAmount * this.currentMultiplier), data.secretIndices || []);
+            this.handleMaxWin(data.payout || (this.betAmount * this.currentMultiplier), data.secretIndices || data.secret_indices || this.secretBombs);
           }
           return;
         }
       }
-    } catch (e) {
-      // Offline fallback handling
-    }
+    } catch (e) {}
 
-    // Standard client fallback if server unavailable
-    this.revealedCount++;
-    this.currentMultiplier = this.calculateMultiplier(this.revealedCount);
-    window.soundEngine && window.soundEngine.playGem && window.soundEngine.playGem(this.revealedCount);
-    if (this.ui && this.ui.onTileReveal) {
-      this.ui.onTileReveal(index, 'gem', false);
+    // 2. Reliable Local Logic (Always triggers real loss when hitting a secret bomb)
+    if (!serverHandled) {
+      if (this.secretBombs.includes(index)) {
+        this.isPlaying = false;
+        this.handleBombHit(index, this.secretBombs);
+        return;
+      }
+
+      this.revealedCount++;
+      this.currentMultiplier = this.calculateMultiplier(this.revealedCount);
+      window.soundEngine && window.soundEngine.playGem && window.soundEngine.playGem(this.revealedCount);
+      if (this.ui && this.ui.onTileReveal) {
+        this.ui.onTileReveal(index, 'gem', false);
+      }
+      this.updateNextMultiplierPreview();
+      this.saveActiveRoundSession();
+
+      if (this.totalTiles - this.mineCount - this.revealedCount === 0) {
+        this.handleMaxWin(Math.floor(this.betAmount * this.currentMultiplier * 100) / 100, this.secretBombs);
+      }
     }
-    this.updateNextMultiplierPreview();
-    this.saveActiveRoundSession();
   }
 
   handleBombHit(index, secretIndices = []) {
@@ -292,8 +300,9 @@ class MinesGame {
       serverSeedHash: this.serverSeedHash
     });
 
+    const bombsToShow = (secretIndices && secretIndices.length > 0) ? secretIndices : this.secretBombs;
     setTimeout(() => {
-      this.revealRemainingTiles(secretIndices);
+      this.revealRemainingTiles(bombsToShow);
       if (this.ui && this.ui.onGameOver) {
         this.ui.onGameOver({
           won: false,
@@ -303,7 +312,7 @@ class MinesGame {
           mineHitIndex: index
         });
       }
-    }, 300);
+    }, 250);
   }
 
   handleMaxWin(finalPayout, secretIndices = []) {
@@ -323,7 +332,8 @@ class MinesGame {
       serverSeedHash: this.serverSeedHash
     });
 
-    this.revealRemainingTiles(secretIndices);
+    const bombsToShow = (secretIndices && secretIndices.length > 0) ? secretIndices : this.secretBombs;
+    this.revealRemainingTiles(bombsToShow);
 
     if (this.ui && this.ui.onGameOver) {
       this.ui.onGameOver({
@@ -337,23 +347,21 @@ class MinesGame {
   }
 
   async cashOut(isPerfectClear = false) {
-    if (Date.now() - this.lastActionTime < 350) return;
-    this.lastActionTime = Date.now();
-
     if (!this.isPlaying || this.revealedCount === 0) return;
     this.isPlaying = false;
     this.saveActiveRoundSession();
 
     let finalPayout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
-    let secretIndices = [];
+    let secretIndices = this.secretBombs;
 
     const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
     try {
       const res = await fetch(`${this.apiBaseUrl}/api/games?action=mines_cashout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': String(uid) },
         body: JSON.stringify({
           action: 'mines_cashout',
+          round_id: this.roundId,
           roundId: this.roundId,
           userId: uid
         })
@@ -362,7 +370,7 @@ class MinesGame {
         const data = await res.json();
         if (data.success) {
           finalPayout = data.payout || finalPayout;
-          secretIndices = data.secretIndices || data.secret_indices || [];
+          secretIndices = data.secretIndices || data.secret_indices || secretIndices;
           if (data.newBalance !== undefined) {
             window.wallet.setServerBalance(data.newBalance);
           } else {

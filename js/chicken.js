@@ -223,8 +223,6 @@ class ChickenGame {
 
   async hopForward() {
     if (!this.isPlaying) return;
-    if (Date.now() - this.lastActionTime < 350) return;
-    this.lastActionTime = Date.now();
 
     const nextStep = this.currentStep + 1;
     if (nextStep > this.totalLanes) return;
