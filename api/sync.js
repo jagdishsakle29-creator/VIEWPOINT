@@ -11,10 +11,16 @@ function verifyAdminAuth(req, params) {
   return token === adminSecret || secret === adminSecret;
 }
 
+const sentSyncAlerts = new Set();
+
 async function dispatchTelegramSyncAlert(item, type) {
   const token = process.env.BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
   const adminIds = (process.env.ADMIN_IDS || '6527377657').split(',');
-  if (!token || !adminIds.length) return;
+  if (!token || !adminIds.length || !item || !item.id) return;
+
+  const dedupKey = `${type}_${item.id}`;
+  if (sentSyncAlerts.has(dedupKey)) return;
+  sentSyncAlerts.add(dedupKey);
 
   const origin = process.env.WEBAPP_URL || 'https://viewpoint.diy';
   const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';

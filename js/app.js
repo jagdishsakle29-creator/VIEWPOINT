@@ -1213,6 +1213,8 @@ class AppController {
     if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
     if (this.dom.tabPlinko) this.dom.tabPlinko.addEventListener('click', () => this.switchGame('plinko'));
     if (this.dom.tabCrash) this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
+    if (this.dom.tabColorTrading) this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
+    if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
     if (this.dom.tabDice) this.dom.tabDice.addEventListener('click', () => this.switchGame('dice'));
 
     // Restore active game from URL hash, query param, or localStorage
@@ -1220,7 +1222,7 @@ class AppController {
     const urlParams = new URLSearchParams(window.location.search || '');
     const queryGame = urlParams.get('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['dragontiger', 'mines', 'limbo', 'chicken', 'plinko', 'crash', 'dice'];
+    const validGames = ['dragontiger', 'mines', 'limbo', 'chicken', 'plinko', 'crash', 'colortrading', 'stock', 'dice'];
     const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'plinko';
     
     this.switchGame(initialGame);
@@ -1909,28 +1911,46 @@ class AppController {
       return;
     }
 
-    this.dom.withdrawHistoryTableBody.innerHTML = list.map(w => {
+    const hasRejected = list.some(w => (w.status || '').toUpperCase() === 'REJECTED' || (w.status || '').toUpperCase() === 'REFUNDED');
+    let rejectionNotice = '';
+    if (hasRejected) {
+      rejectionNotice = `
+        <tr style="background: rgba(239, 68, 68, 0.12); border-left: 4px solid #ef4444;">
+          <td colspan="5" style="padding: 12px 14px; color: #ff6b6b; font-size: 12px; font-weight: 800; text-align: left;">
+            <div style="display:flex; align-items:center; gap: 8px;">
+              <span style="font-size: 20px;">⚠️</span>
+              <div>
+                <strong style="font-size: 13px; color: #ef4444; display:block;">WITHDRAWAL REJECTED / REFUNDED</strong>
+                <span>Aapka withdrawal request decline ho gaya hai aur paise wallet balance me refund kar diye gaye hain. Kripya correct UPI details check karke dobara request karein.</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    this.dom.withdrawHistoryTableBody.innerHTML = rejectionNotice + list.map(w => {
       const st = (w.status || 'PENDING').toUpperCase();
       const isApproved = (st === 'APPROVED' || st === 'PAID' || st === 'SUCCESS');
       const isRejected = (st === 'REJECTED' || st === 'REFUNDED');
       const color = isApproved ? '#00f59b' : isRejected ? '#ef4444' : '#f59e0b';
-      const bg = isApproved ? 'rgba(0, 245, 155, 0.15)' : isRejected ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
-      const statusLabel = isApproved ? 'APPROVED' : isRejected ? 'REJECTED' : 'PENDING';
+      const bg = isApproved ? 'rgba(0, 245, 155, 0.15)' : isRejected ? 'rgba(239, 68, 68, 0.25)' : 'rgba(245, 158, 11, 0.15)';
+      const statusLabel = isApproved ? 'APPROVED' : isRejected ? '❌ REJECTED' : 'PENDING';
       const channel = w.channel || 'UPI';
       const channelClass = channel.toLowerCase();
       const receiver = w.receiver || w.upiId || 'N/A';
       const fee = w.fee !== undefined ? w.fee : (Math.round(w.amount * 0.08 * 100) / 100);
       const net = w.netPayout !== undefined ? w.netPayout : (Math.round((w.amount - fee) * 100) / 100);
       return `
-        <tr>
+        <tr style="${isRejected ? 'background: rgba(239,68,68,0.06);' : ''}">
           <td>${w.time}</td>
           <td><span class="channel-tag ${channelClass}">${channel}</span></td>
-          <td style="color: ${isApproved ? '#00f59b' : isRejected ? '#ef4444' : '#f59e0b'}; font-weight: 800;">
+          <td style="color: ${color}; font-weight: 800;">
             ${window.wallet.currency}${net.toFixed(2)}
             <div style="font-size:10px; color:var(--text-muted); font-weight:normal;">Gross: ${window.wallet.currency}${w.amount.toFixed(2)} (8% fee)</div>
           </td>
-          <td><code style="font-size: 11px; color: var(--accent-cyan); font-family: monospace;">${receiver}</code></td>
-          <td><span style="background: ${bg}; color: ${color}; border: 1px solid ${color}; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase;">${statusLabel}</span></td>
+          <td><code style="font-size: 11px; color: ${isRejected ? '#ff6b6b' : 'var(--accent-cyan)'}; font-family: monospace;">${receiver}</code></td>
+          <td><span style="background: ${bg}; color: ${color}; border: 1.5px solid ${color}; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase;">${statusLabel}</span></td>
         </tr>
       `;
     }).join('');
@@ -4353,20 +4373,38 @@ class AppController {
       return;
     }
 
-    this.dom.depositHistoryTableBody.innerHTML = deposits.map(d => {
+    const hasRejected = deposits.some(d => d.status === 'REJECTED');
+    let rejectionNotice = '';
+    if (hasRejected) {
+      rejectionNotice = `
+        <tr style="background: rgba(239, 68, 68, 0.12); border-left: 4px solid #ef4444;">
+          <td colspan="4" style="padding: 12px 14px; color: #ff6b6b; font-size: 12px; font-weight: 800; text-align: left;">
+            <div style="display:flex; align-items:center; gap: 8px;">
+              <span style="font-size: 20px;">⚠️</span>
+              <div>
+                <strong style="font-size: 13px; color: #ef4444; display:block;">DEPOSIT REJECTED / DECLINED</strong>
+                <span>Aapka deposit transaction galat UTR / Receipt ki wajah se reject ho gaya hai. Kripya sahi UTR ke sath dobara deposit karein.</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    this.dom.depositHistoryTableBody.innerHTML = rejectionNotice + deposits.map(d => {
       let badge = '';
       if (d.status === 'SUCCESS') {
-        badge = `<span style="background: rgba(0,231,1,0.15); color: #00e701; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #00e701;">SUCCESS</span>`;
+        badge = `<span style="background: rgba(0,231,1,0.15); color: #00e701; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; border: 1px solid #00e701;">SUCCESS</span>`;
       } else if (d.status === 'REJECTED') {
-        badge = `<span style="background: rgba(239,68,68,0.15); color: #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #ef4444;">REJECTED</span>`;
+        badge = `<span style="background: rgba(239,68,68,0.25); color: #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 900; border: 1.5px solid #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.3);">❌ REJECTED</span>`;
       } else {
-        badge = `<span style="background: rgba(245,158,11,0.15); color: #f59e0b; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #f59e0b;">PENDING</span>`;
+        badge = `<span style="background: rgba(245,158,11,0.15); color: #f59e0b; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; border: 1px solid #f59e0b;">PENDING</span>`;
       }
       return `
-      <tr>
+      <tr style="${d.status === 'REJECTED' ? 'background: rgba(239,68,68,0.06);' : ''}">
         <td>${d.time || 'Recent'}</td>
-        <td style="color: ${d.status === 'REJECTED' ? '#ef4444' : 'var(--accent-green)'}; font-weight: 700;">+${window.wallet.currency}${d.amount.toFixed(2)}</td>
-        <td><code style="font-size: 11px; color: var(--accent-cyan);">${d.utr}</code></td>
+        <td style="color: ${d.status === 'REJECTED' ? '#ef4444' : 'var(--accent-green)'}; font-weight: 800;">+${window.wallet.currency}${d.amount.toFixed(2)}</td>
+        <td><code style="font-size: 11px; color: ${d.status === 'REJECTED' ? '#ff6b6b' : 'var(--accent-cyan)'};">${d.utr}</code></td>
         <td>${badge}</td>
       </tr>
       `;
@@ -4512,6 +4550,34 @@ class AppController {
     }
   }
 
+  switchGamePage(pageNum) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const p1Btn = document.getElementById('btnGamePage1');
+    const p2Btn = document.getElementById('btnGamePage2');
+    const p3Btn = document.getElementById('btnGamePage3');
+    const g1 = document.getElementById('gamePageGroup1');
+    const g2 = document.getElementById('gamePageGroup2');
+    const g3 = document.getElementById('gamePageGroup3');
+
+    if (p1Btn) p1Btn.classList.toggle('active', pageNum === 1);
+    if (p2Btn) p2Btn.classList.toggle('active', pageNum === 2);
+    if (p3Btn) p3Btn.classList.toggle('active', pageNum === 3);
+
+    if (g1) g1.style.display = (pageNum === 1) ? 'flex' : 'none';
+    if (g2) g2.style.display = (pageNum === 2) ? 'flex' : 'none';
+    if (g3) g3.style.display = (pageNum === 3) ? 'flex' : 'none';
+
+    // Auto-select first game of page if current game not on page
+    const pageGames = {
+      1: ['dragontiger', 'mines', 'limbo'],
+      2: ['chicken', 'plinko', 'crash'],
+      3: ['colortrading', 'stock', 'dice']
+    };
+    if (!pageGames[pageNum].includes(this.currentGame)) {
+      this.switchGame(pageGames[pageNum][0]);
+    }
+  }
+
   switchGame(gameType) {
     window.soundEngine.playClick();
     if (this.isAutoPlaying) {
@@ -4519,6 +4585,27 @@ class AppController {
     }
     this.currentGame = gameType;
     this.hideToast();
+
+    // Auto switch page group based on game
+    let targetPage = 2;
+    if (['dragontiger', 'mines', 'limbo'].includes(gameType)) targetPage = 1;
+    else if (['chicken', 'plinko', 'crash'].includes(gameType)) targetPage = 2;
+    else if (['colortrading', 'stock', 'dice'].includes(gameType)) targetPage = 3;
+
+    const p1Btn = document.getElementById('btnGamePage1');
+    const p2Btn = document.getElementById('btnGamePage2');
+    const p3Btn = document.getElementById('btnGamePage3');
+    const g1 = document.getElementById('gamePageGroup1');
+    const g2 = document.getElementById('gamePageGroup2');
+    const g3 = document.getElementById('gamePageGroup3');
+
+    if (p1Btn) p1Btn.classList.toggle('active', targetPage === 1);
+    if (p2Btn) p2Btn.classList.toggle('active', targetPage === 2);
+    if (p3Btn) p3Btn.classList.toggle('active', targetPage === 3);
+
+    if (g1) g1.style.display = (targetPage === 1) ? 'flex' : 'none';
+    if (g2) g2.style.display = (targetPage === 2) ? 'flex' : 'none';
+    if (g3) g3.style.display = (targetPage === 3) ? 'flex' : 'none';
 
     // Persist game in URL hash and local storage
     try {
@@ -4536,7 +4623,18 @@ class AppController {
     if (this.dom.btnNavPage3) this.dom.btnNavPage3.classList.remove('active');
 
     // Reset all tab classes and hide all game views completely
-    [this.dom.tabDragonTiger, this.dom.tabMines, this.dom.tabLimbo, this.dom.tabChicken, this.dom.tabPlinko, this.dom.tabCrash, this.dom.tabDice].forEach(t => t && t.classList.remove('active'));
+    const allTabs = [
+      this.dom.tabDragonTiger || document.getElementById('tabDragonTiger'),
+      this.dom.tabMines || document.getElementById('tabMines'),
+      this.dom.tabLimbo || document.getElementById('tabLimbo'),
+      this.dom.tabChicken || document.getElementById('tabChicken'),
+      this.dom.tabPlinko || document.getElementById('tabPlinko'),
+      this.dom.tabCrash || document.getElementById('tabCrash'),
+      this.dom.tabColorTrading || document.getElementById('tabColorTrading'),
+      this.dom.tabStock || document.getElementById('tabStock'),
+      this.dom.tabDice || document.getElementById('tabDice')
+    ];
+    allTabs.forEach(t => t && t.classList.remove('active'));
     
     const viewsList = [
       this.dom.dragontigerView || document.getElementById('dragontigerView'),
@@ -4545,6 +4643,8 @@ class AppController {
       this.dom.chickenView || document.getElementById('chickenView'),
       this.dom.plinkoView || document.getElementById('plinkoView'),
       this.dom.crashView || document.getElementById('crashView'),
+      this.dom.colortradingView || document.getElementById('colortradingView'),
+      this.dom.stockView || document.getElementById('stockView'),
       this.dom.diceView || document.getElementById('diceView')
     ];
     viewsList.forEach(v => {
@@ -4558,13 +4658,15 @@ class AppController {
     if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'none';
     if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'none';
     if (this.dom.crashSelectGroup) this.dom.crashSelectGroup.style.display = 'none';
+    if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'none';
+    if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'none';
 
     if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'none';
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
     // Auto Play Toggle visibility: Enabled on Mines, Chicken, Crash
-    if (gameType === 'dragontiger') {
+    if (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock') {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
       if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
@@ -4575,66 +4677,53 @@ class AppController {
     }
 
     if (gameType === 'plinko') {
-      if (this.dom.tabPlinko) this.dom.tabPlinko.classList.add('active');
-      if (this.dom.plinkoView) {
-        this.dom.plinkoView.classList.add('active');
-        this.dom.plinkoView.style.display = 'block';
-      }
+      const tab = this.dom.tabPlinko || document.getElementById('tabPlinko');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.plinkoView || document.getElementById('plinkoView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (!this.plinko && window.CasinoPlinko && (document.getElementById('plinkoCanvas') || this.dom.plinkoCanvas)) {
         this.plinko = new window.CasinoPlinko('plinkoCanvas');
       }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.plinko;
-      if (this.dom.btnActionBet) {
-        this.dom.btnActionBet.style.display = 'flex';
-        this.dom.btnActionBet.disabled = false;
-      }
+      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
       if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
       if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
       if (this.plinko && this.plinko.initCanvas) this.plinko.initCanvas();
     } else if (gameType === 'dice') {
-      if (this.dom.tabDice) this.dom.tabDice.classList.add('active');
-      if (this.dom.diceView) {
-        this.dom.diceView.classList.add('active');
-        this.dom.diceView.style.display = 'block';
-      }
+      const tab = this.dom.tabDice || document.getElementById('tabDice');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.diceView || document.getElementById('diceView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (!this.dice && window.CasinoDice && (document.getElementById('diceView') || this.dom.diceView)) {
         this.dice = new window.CasinoDice('diceView');
       }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.dice;
-      if (this.dom.btnActionBet) {
-        this.dom.btnActionBet.style.display = 'flex';
-        this.dom.btnActionBet.disabled = false;
-      }
+      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
       if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
       if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
     } else if (gameType === 'limbo') {
-      if (this.dom.tabLimbo) this.dom.tabLimbo.classList.add('active');
-      if (this.dom.limboView) {
-        this.dom.limboView.classList.add('active');
-        this.dom.limboView.style.display = 'block';
-      }
+      const tab = this.dom.tabLimbo || document.getElementById('tabLimbo');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.limboView || document.getElementById('limboView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (!this.limbo && window.CasinoLimbo && (document.getElementById('limboView') || this.dom.limboView)) {
         this.limbo = new window.CasinoLimbo('limboView');
       }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.limbo;
-      if (this.dom.btnActionBet) {
-        this.dom.btnActionBet.style.display = 'flex';
-        this.dom.btnActionBet.disabled = false;
-      }
+      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
       if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
       if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
     } else if (gameType === 'mines') {
-      if (this.dom.tabMines) this.dom.tabMines.classList.add('active');
-      if (this.dom.minesView) {
-        this.dom.minesView.classList.add('active');
-        this.dom.minesView.style.display = 'block';
-      }
+      const tab = this.dom.tabMines || document.getElementById('tabMines');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.minesView || document.getElementById('minesView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (this.dom.minesSelectGroup) this.dom.minesSelectGroup.style.display = 'flex';
       if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
       if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
@@ -4649,11 +4738,10 @@ class AppController {
         this.mines.restoreActiveRound();
       }
     } else if (gameType === 'chicken') {
-      if (this.dom.tabChicken) this.dom.tabChicken.classList.add('active');
-      if (this.dom.chickenView) {
-        this.dom.chickenView.classList.add('active');
-        this.dom.chickenView.style.display = 'block';
-      }
+      const tab = this.dom.tabChicken || document.getElementById('tabChicken');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.chickenView || document.getElementById('chickenView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'flex';
       if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
       if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
@@ -4669,11 +4757,10 @@ class AppController {
         this.chicken.restoreActiveRound();
       }
     } else if (gameType === 'crash') {
-      if (this.dom.tabCrash) this.dom.tabCrash.classList.add('active');
-      if (this.dom.crashView) {
-        this.dom.crashView.classList.add('active');
-        this.dom.crashView.style.display = 'block';
-      }
+      const tab = this.dom.tabCrash || document.getElementById('tabCrash');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.crashView || document.getElementById('crashView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (this.dom.crashSelectGroup) this.dom.crashSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.crash;
@@ -4687,22 +4774,51 @@ class AppController {
         this.renderCrashHistory();
       }
     } else if (gameType === 'dragontiger') {
-      if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.classList.add('active');
-      if (this.dom.dragontigerView) {
-        this.dom.dragontigerView.classList.add('active');
-        this.dom.dragontigerView.style.display = 'block';
-      }
+      const tab = this.dom.tabDragonTiger || document.getElementById('tabDragonTiger');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.dragontigerView || document.getElementById('dragontigerView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       this.activeInstance = this.dragontiger;
       if (this.dragontiger) {
         this.renderDtBeadRoad(this.dragontiger.history);
       }
+    } else if (gameType === 'colortrading') {
+      const tab = this.dom.tabColorTrading || document.getElementById('tabColorTrading');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.colortradingView || document.getElementById('colortradingView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'flex';
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
+      if (!this.colortrading && window.CasinoColorTrading) {
+        this.colortrading = new window.CasinoColorTrading();
+      }
+      this.activeInstance = this.colortrading;
+      if (this.colortrading) {
+        this.renderTrendBalls(this.colortrading.history);
+        this.renderActiveBetsSlip(this.colortrading.activeBets || []);
+      }
+    } else if (gameType === 'stock') {
+      const tab = this.dom.tabStock || document.getElementById('tabStock');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.stockView || document.getElementById('stockView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'flex';
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
+      if (!this.stock && window.CasinoStockTrading && (document.getElementById('stockCanvas') || this.dom.stockCanvas)) {
+        this.stock = new window.CasinoStockTrading('stockCanvas');
+      }
+      this.activeInstance = this.stock;
+      if (this.stock) {
+        if (this.stock.resizeCanvas) this.stock.resizeCanvas();
+        this.renderStockActiveTrades(this.stock.activeTrades || []);
+      }
     }
 
-    if (this.betMode === 'auto' && gameType !== 'dragontiger') {
+    if (this.betMode === 'auto' && gameType !== 'dragontiger' && gameType !== 'colortrading' && gameType !== 'stock') {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
-    } else if (gameType !== 'dragontiger') {
+    } else if (gameType !== 'dragontiger' && gameType !== 'colortrading' && gameType !== 'stock') {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
     }
@@ -6368,6 +6484,8 @@ class AppController {
       else if (g.includes('limbo')) icon = '🎯 Limbo Turbo';
       else if (g.includes('plinko')) icon = '🔴 Plinko';
       else if (g.includes('crash')) icon = '🚀 Crash Rocket';
+      else if (g.includes('color') || g.includes('wingo')) icon = '🎨 Win Go 30s';
+      else if (g.includes('stock') || g.includes('btc') || g.includes('trade')) icon = '📈 Stock BTC';
       else if (g.includes('dice')) icon = '🎲 Classic Dice';
       else icon = '🎮 ' + (item.game || 'Game');
 
@@ -6493,6 +6611,8 @@ class AppController {
       { name: '🍗 Chicken Road', class: 'chicken', multRange: [1.18, 4.80] },
       { name: '🔴 Plinko', class: 'plinko', multRange: [1.50, 1000.00] },
       { name: '🚀 Crash Rocket', class: 'crash', multRange: [1.20, 12.50] },
+      { name: '🎨 Win Go 30s', class: 'colortrading', multRange: [1.95, 9.00] },
+      { name: '📈 Stock BTC', class: 'stock', multRange: [1.90, 1.90] },
       { name: '🎲 Classic Dice', class: 'dice', multRange: [1.10, 99.00] }
     ];
 

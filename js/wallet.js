@@ -381,34 +381,6 @@ class CasinoWallet {
       console.warn("Server deposit dispatch warn:", err);
     }
 
-    // Try direct Telegram Alert dispatch if configured in localStorage or Bot token
-    try {
-      const tgToken = localStorage.getItem('stake_tg_bot_token') || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
-      const tgChat = localStorage.getItem('stake_tg_admin_chat') || '6527377657';
-      if (tgToken && tgChat) {
-        const origin = window.location.origin || 'https://viewpoint.diy';
-        const adminSecret = 'VIEWPOINT_ADMIN_SECRET_2026';
-        const alertMsg = `🔔 <b>NEW DEPOSIT REQUEST</b> 🔔\n\n👤 <b>Player ID:</b> <code>${uid}</code>\n💰 <b>Amount:</b> <b>₹${amount.toFixed(2)}</b>\n🧾 <b>UTR:</b> <code>${utrVal}</code>\n💳 <b>UPI:</b> <code>${upiVal}</code>\n🆔 <b>ID:</b> <code>${depId}</code>`;
-        fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: tgChat,
-            text: alertMsg,
-            parse_mode: 'HTML',
-            reply_markup: {
-              inline_keyboard: [
-                [
-                  { text: `✅ Approve (+₹${amount.toFixed(0)})`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(amount)}` },
-                  { text: "❌ Reject", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}` }
-                ]
-              ]
-            }
-          })
-        }).catch(() => {});
-      }
-    } catch(e) {}
-
     return { success: true, deposit: localRequest, serverSynced };
   }
 
@@ -731,24 +703,6 @@ class CasinoWallet {
         }
       }
     } catch (err) {}
-
-    // Dispatch Telegram Alert
-    try {
-      const tgToken = localStorage.getItem('stake_tg_bot_token') || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
-      const tgChat = localStorage.getItem('stake_tg_admin_chat') || '6527377657';
-      if (tgToken && tgChat) {
-        const alertMsg = `💸 *NEW WITHDRAWAL REQUEST*\n\n💰 *Amount:* ₹${amount.toFixed(2)}\n💵 *Net Payout:* *₹${netPayout.toFixed(2)}* (8% fee deducted)\n💳 *Send To:* \`${receiver}\`\n👤 *Player ID:* \`${uid}\`\n🆔 *Order:* \`${wthId}\``;
-        fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: tgChat,
-            text: alertMsg,
-            parse_mode: 'Markdown'
-          })
-        }).catch(() => {});
-      }
-    } catch(e) {}
 
     return { success: true, withdrawal: localReq, message: "Withdrawal request submitted successfully." };
   }

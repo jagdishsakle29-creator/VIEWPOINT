@@ -144,9 +144,15 @@ def is_rate_limited(client_id, max_reqs=20, window=1.0):
     return False
 
 ADMIN_SESSIONS = set()
+SENT_TELEGRAM_ALERTS = set()
 
 def send_telegram_admin_alert(item_id, item_type, amount, user_id, utr_or_receiver, upi_id=""):
     try:
+        dedup_key = f"{item_type}_{item_id}"
+        if dedup_key in SENT_TELEGRAM_ALERTS:
+            return
+        SENT_TELEGRAM_ALERTS.add(dedup_key)
+
         from config import BOT_TOKEN, ADMIN_IDS, WEBAPP_URL, ADMIN_SECRET
         if not BOT_TOKEN or not ADMIN_IDS:
             return
