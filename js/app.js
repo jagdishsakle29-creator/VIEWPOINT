@@ -1239,8 +1239,8 @@ class AppController {
     const urlParams = new URLSearchParams(window.location.search || '');
     const queryGame = urlParams.get('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['dragontiger', 'mines', 'limbo', 'chicken', 'plinko', 'crash', 'colortrading', 'stock', 'dice'];
-    const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'dragontiger';
+    const validGames = ['mines', 'dragontiger', 'limbo', 'chicken', 'plinko', 'crash', 'colortrading', 'stock', 'dice'];
+    const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'mines';
     
     this.switchGamePage(1);
     this.switchGame(initialGame);
@@ -4578,7 +4578,7 @@ class AppController {
 
     // Auto-select first game of page if current game not on page
     const pageGames = {
-      1: ['dragontiger', 'mines', 'limbo'],
+      1: ['mines', 'dragontiger', 'limbo'],
       2: ['chicken', 'plinko', 'crash'],
       3: ['colortrading', 'stock', 'dice']
     };
@@ -4597,7 +4597,7 @@ class AppController {
 
     // Auto switch page group based on game
     let targetPage = 2;
-    if (['dragontiger', 'mines', 'limbo'].includes(gameType)) targetPage = 1;
+    if (['mines', 'dragontiger', 'limbo'].includes(gameType)) targetPage = 1;
     else if (['chicken', 'plinko', 'crash'].includes(gameType)) targetPage = 2;
     else if (['colortrading', 'stock', 'dice'].includes(gameType)) targetPage = 3;
 
@@ -6032,11 +6032,7 @@ class AppController {
   }
 
   startAutoPlay() {
-    if (!this.currentGame) this.currentGame = 'chicken';
-    if (this.currentGame === 'colortrading' || this.currentGame === 'stock' || this.currentGame === 'dragontiger') {
-      this.showNotification("Auto Play is only available for Chicken Road, Chicken Mines, Mines, Crash & Limbo!", "error");
-      return;
-    }
+    if (!this.currentGame) this.currentGame = 'mines';
 
     const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
     const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
@@ -6158,9 +6154,108 @@ class AppController {
       this.runCrashAutoRound(betAmount);
     } else if (this.currentGame === 'limbo') {
       this.runLimboAutoRound(betAmount);
+    } else if (this.currentGame === 'plinko') {
+      this.runPlinkoAutoRound(betAmount);
+    } else if (this.currentGame === 'dice') {
+      this.runDiceAutoRound(betAmount);
+    } else if (this.currentGame === 'dragontiger') {
+      this.runDragonTigerAutoRound(betAmount);
+    } else if (this.currentGame === 'colortrading') {
+      this.runColorTradingAutoRound(betAmount);
     } else {
-      this.runChickenAutoRound(betAmount);
+      this.runMinesAutoRound(betAmount);
     }
+  }
+
+  runPlinkoAutoRound(betAmount) {
+    if (!this.plinko && window.CasinoPlinko && (document.getElementById('plinkoCanvas') || this.dom.plinkoCanvas)) {
+      this.plinko = new window.CasinoPlinko('plinkoCanvas');
+    }
+    if (this.plinko) {
+      this.plinko.setBetAmount(betAmount);
+      this.plinko.dropBall();
+    }
+    const timer = setTimeout(() => {
+      if (!this.isAutoPlaying) return;
+      this.autoRoundsCompleted++;
+      if (this.dom.btnAutoStartText) {
+        this.dom.btnAutoStartText.innerText = `⏹️ STOP AUTO (${this.autoRoundsCompleted} / ${this.autoRoundsTotal || '∞'})`;
+      }
+      if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+        this.stopAutoPlay(`Completed ${this.autoRoundsTotal} rounds!`);
+        return;
+      }
+      const nextTimer = setTimeout(() => {
+        this.runNextAutoRound();
+      }, 150);
+      this.autoStepTimers.push(nextTimer);
+    }, 400);
+    this.autoStepTimers.push(timer);
+  }
+
+  runDiceAutoRound(betAmount) {
+    if (!this.dice && window.CasinoDice && (document.getElementById('diceView') || this.dom.diceView)) {
+      this.dice = new window.CasinoDice('diceView');
+    }
+    if (this.dice) {
+      this.dice.setBetAmount(betAmount);
+      this.dice.rollDice();
+    }
+    const timer = setTimeout(() => {
+      if (!this.isAutoPlaying) return;
+      this.autoRoundsCompleted++;
+      if (this.dom.btnAutoStartText) {
+        this.dom.btnAutoStartText.innerText = `⏹️ STOP AUTO (${this.autoRoundsCompleted} / ${this.autoRoundsTotal || '∞'})`;
+      }
+      if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+        this.stopAutoPlay(`Completed ${this.autoRoundsTotal} rounds!`);
+        return;
+      }
+      const nextTimer = setTimeout(() => {
+        this.runNextAutoRound();
+      }, 150);
+      this.autoStepTimers.push(nextTimer);
+    }, 380);
+    this.autoStepTimers.push(timer);
+  }
+
+  runDragonTigerAutoRound(betAmount) {
+    if (this.dragontiger && this.dragontiger.gameState === 'betting' && this.dragontiger.timeLeft > 3) {
+      this.dragontiger.setSelectedChip(betAmount);
+      this.handleDtBetClick('dragon');
+    }
+    const timer = setTimeout(() => {
+      if (!this.isAutoPlaying) return;
+      this.autoRoundsCompleted++;
+      if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+        this.stopAutoPlay(`Completed ${this.autoRoundsTotal} rounds!`);
+        return;
+      }
+      const nextTimer = setTimeout(() => {
+        this.runNextAutoRound();
+      }, 3000);
+      this.autoStepTimers.push(nextTimer);
+    }, 15000);
+    this.autoStepTimers.push(timer);
+  }
+
+  runColorTradingAutoRound(betAmount) {
+    if (this.colortrading && this.colortrading.timeLeft > 5) {
+      this.placeColorBet('green', betAmount);
+    }
+    const timer = setTimeout(() => {
+      if (!this.isAutoPlaying) return;
+      this.autoRoundsCompleted++;
+      if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+        this.stopAutoPlay(`Completed ${this.autoRoundsTotal} rounds!`);
+        return;
+      }
+      const nextTimer = setTimeout(() => {
+        this.runNextAutoRound();
+      }, 2000);
+      this.autoStepTimers.push(nextTimer);
+    }, 30000);
+    this.autoStepTimers.push(timer);
   }
 
   getChickenMineCount() {

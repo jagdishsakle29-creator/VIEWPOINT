@@ -495,11 +495,11 @@
     
     <!-- 3-Page Responsive Pagination Bar (Android / iOS Clean Swipe/Tap) -->
     <div class="game-pages-nav-bar" id="gamePagesNavBar">
-      <button type="button" id="btnGamePage1" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(1) : (window.app && window.app.switchGamePage(1))">
+      <button type="button" id="btnGamePage1" class="btn-game-page-pill active" onclick="window.switchGamePage ? window.switchGamePage(1) : (window.app && window.app.switchGamePage(1))">
         <span>⚡ PAGE 1</span>
-        <small style="display:block; font-size:10px; opacity:0.8;">VIP & Mines</small>
+        <small style="display:block; font-size:10px; opacity:0.8;">Mines & Dragon Tiger</small>
       </button>
-      <button type="button" id="btnGamePage2" class="btn-game-page-pill active" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))">
+      <button type="button" id="btnGamePage2" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))">
         <span>🚀 PAGE 2</span>
         <small style="display:block; font-size:10px; opacity:0.8;">Plinko & Crash</small>
       </button>
@@ -511,30 +511,30 @@
 
     <!-- Game Tabs Container Organized by Pages -->
     <div class="game-tabs-wrapper">
-      <!-- Page 1 Group (Games 1-3) -->
-      <div id="gamePageGroup1" class="game-page-group" style="display: none;">
-        <!-- 1. Dragon Tiger -->
+      <!-- Page 1 Group (Games 1-4) -->
+      <div id="gamePageGroup1" class="game-page-group" style="display: flex;">
+        <!-- 1. Mines (Default Active Game) -->
+        <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" style="position:relative;">
+          <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="#ff3b30"/><path d="M12 2v4M12 20v2M2 13h4M18 13h4M5.5 6.5l2.8 2.8M15.7 16.7l2.8 2.8M18.5 6.5l-2.8 2.8M8.3 16.7l-2.8 2.8" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="2" fill="#fff" opacity="0.6"/></svg>
+          <span style="font-weight: 900;">Mines</span>
+        </button>
+
+        <!-- 2. Dragon Tiger -->
         <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
           <span style="font-weight: 900;">Dragon Tiger</span>
-        </button>
-
-        <!-- 2. Mines -->
-        <button id="tabMines" class="tab-btn" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" style="position:relative;">
-          <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="#ff3b30"/><path d="M12 2v4M12 20v2M2 13h4M18 13h4M5.5 6.5l2.8 2.8M15.7 16.7l2.8 2.8M18.5 6.5l-2.8 2.8M8.3 16.7l-2.8 2.8" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="2" fill="#fff" opacity="0.6"/></svg>
-          <span>Mines</span>
         </button>
 
         <!-- 3. Limbo Turbo -->
         <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎯⚡</span>
           <span style="font-weight: 900;">Limbo Turbo</span>
-          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #ff007a, #7928ca); color: #fff; font-size:9px; font-weight:900;">1,000,000x</span>
+          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #ff007a, #7928ca); color: #fff; font-size:9px; font-weight:900;">1000x</span>
         </button>
       </div>
 
       <!-- Page 2 Group (Games 4-6) -->
-      <div id="gamePageGroup2" class="game-page-group" style="display: flex;">
+      <div id="gamePageGroup2" class="game-page-group" style="display: none;">
         <!-- 4. Chicken Road -->
         <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))" style="position:relative;">
           <svg class="game-svg-icon" viewBox="0 0 36 36" width="20" height="20">
@@ -548,8 +548,8 @@
           <span class="tab-badge badge-rec" id="badgeRec_chicken" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size:10px; font-weight:900;">270x</span>
         </button>
 
-        <!-- 5. Plinko (Default Landing Game) -->
-        <button id="tabPlinko" class="tab-btn active" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))" style="position:relative;">
+        <!-- 5. Plinko -->
+        <button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))" style="position:relative;">
           <span style="font-size: 17px; line-height: 1;">🔴🔺</span>
           <span style="font-weight: 900;">Plinko</span>
           <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #00e5ff, #3b82f6); color: #fff; font-size:9px; font-weight:900;">1000x 🔥</span>
