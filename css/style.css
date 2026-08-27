@@ -1130,13 +1130,15 @@ body {
 /* ================= RIGHT GAME BOARD STAGE ================= */
 .game-stage {
   background: var(--bg-primary);
-  padding: 30px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: flex-start;
   position: relative;
-  overflow: hidden;
+  width: 100%;
+  min-height: 480px;
+  overflow: visible;
 }
 
 /* Multiplier Step Progress Bar */
@@ -1211,16 +1213,27 @@ body {
 .game-view {
   display: none;
   width: 100%;
-  max-width: 580px;
+  max-width: 100%;
 }
 
 .game-view.active {
-  display: block !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .dragontiger-view.active,
 .colortrading-view.active,
-.stock-view.active {
+.stock-view.active,
+.dice-view.active,
+.plinko-view.active,
+.crash-view.active,
+.limbo-view.active,
+.chicken-view.active,
+.mines-view.active {
   display: flex !important;
   flex-direction: column !important;
   width: 100% !important;

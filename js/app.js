@@ -4872,7 +4872,33 @@ class AppController {
       if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       if (!this.colortrading && window.ColorTradingGame) {
-        this.colortrading = new window.ColorTradingGame();
+        this.colortrading = new window.ColorTradingGame({
+          onTimerTick: (data) => {
+            const pId = this.dom.tradingPeriodId || document.getElementById('tradingPeriodId');
+            const d1 = this.dom.timerDigit1 || document.getElementById('timerDigit1');
+            const d2 = this.dom.timerDigit2 || document.getElementById('timerDigit2');
+            if (pId) pId.innerText = data.periodId;
+            const tens = Math.floor(data.timeLeft / 10);
+            const ones = data.timeLeft % 10;
+            if (d1) d1.innerText = tens;
+            if (d2) d2.innerText = ones;
+            const isHurry = data.timeLeft <= 5;
+            if (d1) d1.classList.toggle('hurry', isHurry);
+            if (d2) d2.classList.toggle('hurry', isHurry);
+          },
+          onBetPlaced: (bets) => {
+            this.renderActiveBetsSlip(bets);
+            this.showNotification("✅ Bet placed for current period!", "success");
+          },
+          onRoundSettled: (res) => {
+            this.renderTrendBalls(res.history);
+            this.renderActiveBetsSlip([]);
+            if (res.totalWin > 0) {
+              this.showNotification(`🎉 You won ${window.wallet.currency}${res.totalWin.toFixed(2)} in Color Trading!`, "success");
+            }
+            this.renderHistoryTable();
+          }
+        });
       }
       this.activeInstance = this.colortrading;
       if (this.colortrading) {
@@ -4887,7 +4913,22 @@ class AppController {
       if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'flex';
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'none';
       if (!this.stock && window.StockTradingGame && (document.getElementById('stockCanvas') || this.dom.stockCanvas)) {
-        this.stock = new window.StockTradingGame(this.dom.stockCanvas || document.getElementById('stockCanvas'));
+        this.stock = new window.StockTradingGame(this.dom.stockCanvas || document.getElementById('stockCanvas'), {
+          onPriceUpdate: (data) => {
+            const priceEl = document.getElementById('stockLivePrice');
+            if (priceEl) {
+              priceEl.innerText = `₹${data.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+              priceEl.classList.toggle('down', data.change < 0);
+            }
+          },
+          onTradeSettled: (res) => {
+            if (this.renderStockActiveTrades) this.renderStockActiveTrades(this.stock.activeTrades || []);
+            if (res.won) {
+              this.showNotification(`📈 Trade Won! Profit: +${window.wallet.currency}${res.payout.toFixed(2)}`, "success");
+            }
+            this.renderHistoryTable();
+          }
+        });
       }
       this.activeInstance = this.stock;
       if (this.stock) {
