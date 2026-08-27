@@ -6201,32 +6201,31 @@ class AppController {
 
       if (this.chickenmines.isPlaying) {
         if (pickIndex < picksCount) {
-          const t = setTimeout(revealNext, 280);
+          const t = setTimeout(revealNext, 180);
           this.autoStepTimers.push(t);
         } else {
           const cashoutTimer = setTimeout(() => {
             if (this.isAutoPlaying && this.chickenmines.isPlaying) {
               this.chickenmines.cashOut();
             }
-          }, 200);
+          }, 140);
           this.autoStepTimers.push(cashoutTimer);
         }
       }
     };
 
-    const firstTimer = setTimeout(revealNext, 250);
+    const firstTimer = setTimeout(revealNext, 140);
     this.autoStepTimers.push(firstTimer);
   }
 
   runLimboAutoRound(betAmount) {
     this.rollLimbo();
 
-    // After roll animation completes (420ms animation + 250ms pause), proceed to next round
     const timer = setTimeout(() => {
       if (!this.isAutoPlaying) return;
       this.autoRoundsCompleted++;
 
-      const lastBet = window.wallet.history[0];
+      const lastBet = (window.wallet && window.wallet.history) ? window.wallet.history[0] : null;
       const won = lastBet ? lastBet.won : false;
       const payout = lastBet ? lastBet.payout : 0;
       const roundProfit = won ? (payout - betAmount) : -betAmount;
@@ -6251,9 +6250,9 @@ class AppController {
 
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 500);
+      }, 280);
       this.autoStepTimers.push(nextTimer);
-    }, 700);
+    }, 380);
 
     this.autoStepTimers.push(timer);
   }
@@ -6284,20 +6283,20 @@ class AppController {
 
       if (this.mines.isPlaying) {
         if (pickIndex < picksCount) {
-          const t = setTimeout(revealNext, 280);
+          const t = setTimeout(revealNext, 180);
           this.autoStepTimers.push(t);
         } else {
           const cashoutTimer = setTimeout(() => {
             if (this.isAutoPlaying && this.mines.isPlaying) {
               this.mines.cashOut();
             }
-          }, 200);
+          }, 140);
           this.autoStepTimers.push(cashoutTimer);
         }
       }
     };
 
-    const firstTimer = setTimeout(revealNext, 250);
+    const firstTimer = setTimeout(revealNext, 140);
     this.autoStepTimers.push(firstTimer);
   }
 
@@ -6309,7 +6308,6 @@ class AppController {
       return;
     }
 
-    // Number of lanes to jump automatically (1 to 25)
     const targetHops = Math.min(25, Math.max(1, parseInt(this.dom.autoPicksCountInput ? this.dom.autoPicksCountInput.value : 3) || 3));
     let currentHop = 0;
 
@@ -6323,20 +6321,20 @@ class AppController {
 
       if (this.chicken.isPlaying) {
         if (currentHop < targetHops && this.chicken.currentStep < 25) {
-          const nextHopTimer = setTimeout(performNextHop, 350);
+          const nextHopTimer = setTimeout(performNextHop, 220);
           this.autoStepTimers.push(nextHopTimer);
         } else if (this.chicken.currentStep > 0) {
           const cashoutTimer = setTimeout(() => {
             if (this.isAutoPlaying && this.chicken.isPlaying) {
               this.handleCashoutClick();
             }
-          }, 220);
+          }, 160);
           this.autoStepTimers.push(cashoutTimer);
         }
       }
     };
 
-    const firstHopTimer = setTimeout(performNextHop, 280);
+    const firstHopTimer = setTimeout(performNextHop, 180);
     this.autoStepTimers.push(firstHopTimer);
   }
 

@@ -664,7 +664,7 @@ class GameAPIHandler(BaseHTTPRequestHandler):
         # -------------------------------------------------------------
         # CRASH (AVIATOR)
         # -------------------------------------------------------------
-        elif parsed.path in ["/api/game/crash/bet", "/api/games/crash/bet"]:
+        elif parsed.path in ["/api/game/crash/bet", "/api/games/crash/bet"] or (parsed.path == "/api/games" and action in ["crash_bet"]):
             telegram_id = body.get("telegram_id") or body.get("userId") or 78912345
             bet_amount = float(body.get("bet_amount") or body.get("amount") or 0)
             try:
@@ -702,7 +702,7 @@ class GameAPIHandler(BaseHTTPRequestHandler):
             })
             return
 
-        elif parsed.path in ["/api/game/crash/cashout", "/api/games/crash/cashout"]:
+        elif parsed.path in ["/api/game/crash/cashout", "/api/games/crash/cashout"] or (parsed.path == "/api/games" and action in ["crash_cashout"]):
             round_id = body.get("round_id") or body.get("roundId")
             telegram_id = body.get("telegram_id") or body.get("userId") or 78912345
             multiplier = float(body.get("multiplier", 1.0))
