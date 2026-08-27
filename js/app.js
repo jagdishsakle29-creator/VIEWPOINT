@@ -6203,9 +6203,9 @@ class AppController {
       }
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 150);
+      }, 70);
       this.autoStepTimers.push(nextTimer);
-    }, 400);
+    }, 220);
     this.autoStepTimers.push(timer);
   }
 
@@ -6229,9 +6229,9 @@ class AppController {
       }
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 150);
+      }, 70);
       this.autoStepTimers.push(nextTimer);
-    }, 380);
+    }, 160);
     this.autoStepTimers.push(timer);
   }
 
@@ -6249,7 +6249,7 @@ class AppController {
       }
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 3000);
+      }, 2000);
       this.autoStepTimers.push(nextTimer);
     }, 15000);
     this.autoStepTimers.push(timer);
@@ -6257,7 +6257,7 @@ class AppController {
 
   runColorTradingAutoRound(betAmount) {
     if (this.colortrading && this.colortrading.timeLeft > 5) {
-      this.placeColorBet('green', betAmount);
+      this.placeColorBet('color', 'green', betAmount);
     }
     const timer = setTimeout(() => {
       if (!this.isAutoPlaying) return;
@@ -6268,7 +6268,7 @@ class AppController {
       }
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 2000);
+      }, 1500);
       this.autoStepTimers.push(nextTimer);
     }, 30000);
     this.autoStepTimers.push(timer);
@@ -6312,20 +6312,20 @@ class AppController {
 
       if (this.chickenmines.isPlaying) {
         if (pickIndex < picksCount) {
-          const t = setTimeout(revealNext, 180);
+          const t = setTimeout(revealNext, 90);
           this.autoStepTimers.push(t);
         } else {
           const cashoutTimer = setTimeout(() => {
             if (this.isAutoPlaying && this.chickenmines.isPlaying) {
               this.chickenmines.cashOut();
             }
-          }, 140);
+          }, 70);
           this.autoStepTimers.push(cashoutTimer);
         }
       }
     };
 
-    const firstTimer = setTimeout(revealNext, 140);
+    const firstTimer = setTimeout(revealNext, 70);
     this.autoStepTimers.push(firstTimer);
   }
 
@@ -6361,9 +6361,9 @@ class AppController {
 
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 280);
+      }, 90);
       this.autoStepTimers.push(nextTimer);
-    }, 380);
+    }, 200);
 
     this.autoStepTimers.push(timer);
   }
@@ -6394,20 +6394,20 @@ class AppController {
 
       if (this.mines.isPlaying) {
         if (pickIndex < picksCount) {
-          const t = setTimeout(revealNext, 180);
+          const t = setTimeout(revealNext, 90);
           this.autoStepTimers.push(t);
         } else {
           const cashoutTimer = setTimeout(() => {
             if (this.isAutoPlaying && this.mines.isPlaying) {
               this.mines.cashOut();
             }
-          }, 140);
+          }, 70);
           this.autoStepTimers.push(cashoutTimer);
         }
       }
     };
 
-    const firstTimer = setTimeout(revealNext, 140);
+    const firstTimer = setTimeout(revealNext, 70);
     this.autoStepTimers.push(firstTimer);
   }
 
@@ -6432,20 +6432,20 @@ class AppController {
 
       if (this.chicken.isPlaying) {
         if (currentHop < targetHops && this.chicken.currentStep < 25) {
-          const nextHopTimer = setTimeout(performNextHop, 220);
+          const nextHopTimer = setTimeout(performNextHop, 100);
           this.autoStepTimers.push(nextHopTimer);
         } else if (this.chicken.currentStep > 0) {
           const cashoutTimer = setTimeout(() => {
             if (this.isAutoPlaying && this.chicken.isPlaying) {
               this.handleCashoutClick();
             }
-          }, 160);
+          }, 80);
           this.autoStepTimers.push(cashoutTimer);
         }
       }
     };
 
-    const firstHopTimer = setTimeout(performNextHop, 180);
+    const firstHopTimer = setTimeout(performNextHop, 80);
     this.autoStepTimers.push(firstHopTimer);
   }
 
