@@ -1225,6 +1225,33 @@ body {
   flex-direction: column !important;
   width: 100% !important;
   max-width: 100% !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.game-stage:has(.dragontiger-view.active),
+.game-stage:has(.colortrading-view.active),
+.game-stage:has(.stock-view.active) {
+  padding: 8px 4px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+.game-arena:has(.dragontiger-view.active),
+.game-arena:has(.colortrading-view.active),
+.game-arena:has(.stock-view.active) {
+  display: block !important;
+  grid-template-columns: 1fr !important;
+  width: 100% !important;
+}
+
+.game-arena:has(.dragontiger-view.active) .controls-panel,
+.game-arena:has(.colortrading-view.active) .controls-panel,
+.game-arena:has(.stock-view.active) .controls-panel {
+  display: none !important;
 }
 
 /* ================= WIN / LOSS OVERLAY MODAL (Sleek & Compact) ================= */
