@@ -125,7 +125,7 @@ class Database:
             """)
             conn.commit()
 
-    def get_or_create_user(self, telegram_id, username="", first_name="", referrer_id=None):
+    def get_or_create_user(self, telegram_id, username="", first_name="", referrer_id=None, initial_balance=1000.0):
         now = datetime.datetime.utcnow().isoformat()
         with self.get_connection() as conn:
             cursor = conn.cursor()
@@ -149,11 +149,11 @@ class Database:
                 if cursor.fetchone():
                     valid_referrer = referrer_id
 
-            initial_balance = 1000.0  # Starting demo/welcome balance
+            start_balance = float(initial_balance or 1000.0)
             cursor.execute("""
                 INSERT INTO users (telegram_id, username, first_name, balance, referred_by, joined_at)
                 VALUES (?, ?, ?, ?, ?, ?)
-            """, (telegram_id, username, first_name, initial_balance, valid_referrer, now))
+            """, (telegram_id, username, first_name, start_balance, valid_referrer, now))
             
             # Reward referrer if exists
             if valid_referrer:
@@ -168,6 +168,8 @@ class Database:
             cursor.execute("SELECT * FROM users WHERE telegram_id = ?", (telegram_id,))
             new_user = cursor.fetchone()
             return dict(new_user), True
+
+    create_or_get_user = get_or_create_user
 
     def get_user(self, telegram_id):
         with self.get_connection() as conn:

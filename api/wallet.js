@@ -137,8 +137,8 @@ export default async function handler(req, res) {
     const history = getUserHistory(userId);
     history.unshift(depRecord);
 
-    // Secure server-side telegram alert if configured in env
-    await dispatchServerTelegramAlert(depRecord, 'DEPOSIT');
+    // Secure server-side telegram alert if configured in env (non-blocking async)
+    dispatchServerTelegramAlert(depRecord, 'DEPOSIT').catch(() => {});
 
     return res.status(200).json({
       success: true,
@@ -205,7 +205,8 @@ export default async function handler(req, res) {
     const history = getUserHistory(userId);
     history.unshift(wthRecord);
 
-    await dispatchServerTelegramAlert(wthRecord, 'WITHDRAWAL');
+    // Non-blocking async Telegram alert
+    dispatchServerTelegramAlert(wthRecord, 'WITHDRAWAL').catch(() => {});
 
     return res.status(200).json({
       success: true,

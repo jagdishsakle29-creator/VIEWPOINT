@@ -17,6 +17,8 @@ import hashlib
 import time
 import datetime
 import urllib.parse
+import urllib.request
+import threading
 import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from database import db
@@ -147,75 +149,78 @@ ADMIN_SESSIONS = set()
 SENT_TELEGRAM_ALERTS = set()
 
 def send_telegram_admin_alert(item_id, item_type, amount, user_id, utr_or_receiver, upi_id=""):
-    try:
-        dedup_key = f"{item_type}_{item_id}"
-        if dedup_key in SENT_TELEGRAM_ALERTS:
-            return
-        SENT_TELEGRAM_ALERTS.add(dedup_key)
+    dedup_key = f"{item_type}_{item_id}"
+    if dedup_key in SENT_TELEGRAM_ALERTS:
+        return
+    SENT_TELEGRAM_ALERTS.add(dedup_key)
 
-        from config import BOT_TOKEN, ADMIN_IDS, WEBAPP_URL, ADMIN_SECRET
-        if not BOT_TOKEN or not ADMIN_IDS:
-            return
-        
-        origin = WEBAPP_URL or "https://viewpoint.diy"
-        if item_type == "DEPOSIT":
-            text = (
-                f"🔔 <b>NEW DEPOSIT REQUEST</b> 🔔\n\n"
-                f"👤 <b>Player ID:</b> <code>{user_id}</code>\n"
-                f"💰 <b>Amount:</b> <b>₹{amount:,.2f}</b>\n"
-                f"🧾 <b>UTR / Ref:</b> <code>{utr_or_receiver}</code>\n"
-                f"💳 <b>UPI:</b> <code>{upi_id}</code>\n"
-                f"🆔 <b>Request ID:</b> <code>{item_id}</code>\n\n"
-                f"<i>Tap below to approve or reject instantly:</i>"
-            )
-            markup = {
-                "inline_keyboard": [
-                    [
-                        {"text": f"✅ Approve (+₹{amount:.0f})", "callback_data": f"appr_dep_{item_id}"},
-                        {"text": "❌ Reject", "callback_data": f"rejc_dep_{item_id}"}
-                    ]
-                ]
-            }
-        else:
-            fee = round(amount * 0.08, 2)
-            net = round(amount - fee, 2)
-            text = (
-                f"💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n"
-                f"👤 <b>Player ID:</b> <code>{user_id}</code>\n"
-                f"💰 <b>Gross:</b> ₹{amount:,.2f}\n"
-                f"⚡ <b>Fee (8%):</b> -₹{fee:,.2f}\n"
-                f"💵 <b>Net Payout:</b> <b>₹{net:,.2f}</b>\n"
-                f"🏦 <b>Transfer To UPI:</b> <code>{utr_or_receiver}</code>\n"
-                f"🆔 <b>Request ID:</b> <code>{item_id}</code>\n\n"
-                f"<i>Tap below to mark as paid or reject:</i>"
-            )
-            markup = {
-                "inline_keyboard": [
-                    [
-                        {"text": f"✅ Mark Paid (₹{net:.0f})", "callback_data": f"appr_wth_{item_id}"},
-                        {"text": "❌ Reject & Refund", "callback_data": f"rejc_wth_{item_id}"}
-                    ]
-                ]
-            }
-
-        for admin_id in ADMIN_IDS:
-            try:
-                payload = json.dumps({
-                    "chat_id": admin_id,
-                    "text": text,
-                    "parse_mode": "HTML",
-                    "reply_markup": markup
-                }).encode("utf-8")
-                req = urllib.request.Request(
-                    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-                    data=payload,
-                    headers={"Content-Type": "application/json"}
+    def _worker():
+        try:
+            from config import BOT_TOKEN, ADMIN_IDS, WEBAPP_URL, ADMIN_SECRET
+            if not BOT_TOKEN or not ADMIN_IDS:
+                return
+            
+            origin = WEBAPP_URL or "https://viewpoint.diy"
+            if item_type == "DEPOSIT":
+                text = (
+                    f"🔔 <b>NEW DEPOSIT REQUEST</b> 🔔\n\n"
+                    f"👤 <b>Player ID:</b> <code>{user_id}</code>\n"
+                    f"💰 <b>Amount:</b> <b>₹{amount:,.2f}</b>\n"
+                    f"🧾 <b>UTR / Ref:</b> <code>{utr_or_receiver}</code>\n"
+                    f"💳 <b>UPI:</b> <code>{upi_id}</code>\n"
+                    f"🆔 <b>Request ID:</b> <code>{item_id}</code>\n\n"
+                    f"<i>Tap below to approve or reject instantly:</i>"
                 )
-                urllib.request.urlopen(req, timeout=3)
-            except Exception as e:
-                print(f"Telegram dispatch error for admin {admin_id}:", e)
-    except Exception as e:
-        print("send_telegram_admin_alert exception:", e)
+                markup = {
+                    "inline_keyboard": [
+                        [
+                            {"text": f"✅ Approve (+₹{amount:.0f})", "callback_data": f"appr_dep_{item_id}"},
+                            {"text": "❌ Reject", "callback_data": f"rejc_dep_{item_id}"}
+                        ]
+                    ]
+                }
+            else:
+                fee = round(amount * 0.08, 2)
+                net = round(amount - fee, 2)
+                text = (
+                    f"💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n"
+                    f"👤 <b>Player ID:</b> <code>{user_id}</code>\n"
+                    f"💰 <b>Gross:</b> ₹{amount:,.2f}\n"
+                    f"⚡ <b>Fee (8%):</b> -₹{fee:,.2f}\n"
+                    f"💵 <b>Net Payout:</b> <b>₹{net:,.2f}</b>\n"
+                    f"🏦 <b>Transfer To UPI:</b> <code>{utr_or_receiver}</code>\n"
+                    f"🆔 <b>Request ID:</b> <code>{item_id}</code>\n\n"
+                    f"<i>Tap below to mark as paid or reject:</i>"
+                )
+                markup = {
+                    "inline_keyboard": [
+                        [
+                            {"text": f"✅ Mark Paid (₹{net:.0f})", "callback_data": f"appr_wth_{item_id}"},
+                            {"text": "❌ Reject & Refund", "callback_data": f"rejc_wth_{item_id}"}
+                        ]
+                    ]
+                }
+
+            for admin_id in ADMIN_IDS:
+                try:
+                    payload = json.dumps({
+                        "chat_id": admin_id,
+                        "text": text,
+                        "parse_mode": "HTML",
+                        "reply_markup": markup
+                    }).encode("utf-8")
+                    req = urllib.request.Request(
+                        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                        data=payload,
+                        headers={"Content-Type": "application/json"}
+                    )
+                    urllib.request.urlopen(req, timeout=5)
+                except Exception as e:
+                    print(f"Telegram dispatch error for admin {admin_id}:", e)
+        except Exception as e:
+            print("send_telegram_admin_alert exception:", e)
+
+    threading.Thread(target=_worker, daemon=True).start()
 
 class GameAPIHandler(BaseHTTPRequestHandler):
     def _send_cors_headers(self):
@@ -1066,6 +1071,7 @@ class GameAPIHandler(BaseHTTPRequestHandler):
                 self._error_response("Please provide a valid UPI UTR / reference number.")
                 return
 
+            db.create_or_get_user(telegram_id, username="player", first_name="Player", initial_balance=500.0)
             success, res = db.create_deposit_request(deposit_id, telegram_id, amount, utr, upi_id)
             if success:
                 send_telegram_admin_alert(deposit_id, "DEPOSIT", amount, telegram_id, utr, upi_id)

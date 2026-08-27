@@ -444,7 +444,7 @@ export default async function handler(req, res) {
   // ----------------------------------------------------------------
   // 5. DRAGON TIGER: 52-CARD DEAL & MULTI-SPOT SETTLEMENT
   // ----------------------------------------------------------------
-  if (action === 'dragontiger_play') {
+  if (action === 'dragontiger_play' || action === 'dt_play' || action === 'dragontiger_bet' || action === 'dt_bet') {
     const bets = params.bets || {}; // e.g. { dragon: 50, tiger: 0, tie: 10 }
     let totalBet = 0;
     for (const k in bets) {
@@ -542,7 +542,23 @@ export default async function handler(req, res) {
   // ----------------------------------------------------------------
   // 6. COLOR TRADING (WIN GO 30s)
   // ----------------------------------------------------------------
-  if (action === 'colortrading_bet') {
+  if (action === 'color_current' || action === 'get_color_current' || action === 'colortrading_current') {
+    const d = new Date();
+    const periodIndex = (d.getHours() * 60 + d.getMinutes()) * 2 + Math.floor(d.getSeconds() / 30) + 1;
+    const dateStr = d.getFullYear().toString() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+    const periodId = `${dateStr}${String(periodIndex).padStart(4, '0')}`;
+    const timeLeft = 30 - (d.getSeconds() % 30);
+    return res.status(200).json({
+      success: true,
+      period_id: periodId,
+      periodId: periodId,
+      time_left: timeLeft,
+      timeLeft: timeLeft,
+      history: colorHistory.slice(-10)
+    });
+  }
+
+  if (action === 'colortrading_bet' || action === 'color_bet' || action === 'wingo_bet') {
     const choice = String(params.choice || '').toLowerCase();
     const amount = parseFloat(params.amount || 0);
 
@@ -596,7 +612,7 @@ export default async function handler(req, res) {
   // ----------------------------------------------------------------
   // 7. STOCK TRADING (BINARY OPTIONS)
   // ----------------------------------------------------------------
-  if (action === 'stock_bet') {
+  if (action === 'stock_bet' || action === 'stock_trade') {
     const direction = String(params.direction || 'call').toLowerCase();
     const amount = parseFloat(params.amount || 0);
     const entryPrice = parseFloat(params.entryPrice || 100.0);
@@ -631,5 +647,52 @@ export default async function handler(req, res) {
     });
   }
 
+  // ----------------------------------------------------------------
+  // 8. CLASSIC DICE (ROLL UNDER / OVER)
+  // ----------------------------------------------------------------
+  if (action === 'dice_roll' || action === 'dice_bet' || action === 'roll_dice') {
+    const amount = parseFloat(params.amount || params.betAmount || 0);
+    const target = parseFloat(params.target || params.targetNumber || 50.5);
+    const mode = String(params.mode || params.rollMode || 'under').toLowerCase();
+
+    if (isNaN(amount) || amount < 1.0) {
+      return res.status(400).json({ success: false, error: 'Invalid bet amount' });
+    }
+
+    const bal = getUserBalance(userId);
+    if (bal < amount) {
+      return res.status(400).json({ success: false, error: 'Insufficient balance' });
+    }
+
+    updateUserBalance(userId, -amount);
+
+    const roll = Math.floor(Math.random() * 10000) / 100; // 0.00 to 99.99
+    let won = false;
+    let winChance = 49.5;
+    if (mode === 'under') {
+      won = roll < target;
+      winChance = Math.max(0.01, Math.min(98.0, target));
+    } else {
+      won = roll > target;
+      winChance = Math.max(0.01, Math.min(98.0, 100.0 - target));
+    }
+
+    const mult = roundTwo(99.0 / winChance);
+    const payout = won ? roundTwo(amount * mult) : 0.0;
+    const newBal = updateUserBalance(userId, payout);
+
+    return res.status(200).json({
+      success: true,
+      won,
+      roll,
+      target,
+      mode,
+      multiplier: mult,
+      payout,
+      balance: newBal
+    });
+  }
+
   return res.status(400).json({ success: false, error: 'Unknown game action' });
 }
+
