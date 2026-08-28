@@ -249,66 +249,85 @@ function isAdmin(req, params) {
   return token === adminSecret || params.adminSecret === adminSecret;
 }
 
-// Server-Side Telegram Dispatcher (Reads secrets securely from environment with deduplication)
+// Server-Side Telegram Dispatcher (HTML parse mode, robust delivery, non-blocking)
 const dispatchedAlerts = new Set();
 
 async function dispatchServerTelegramAlert(item, type) {
   if (!item || !item.id) return;
-  if (dispatchedAlerts.has(item.id)) return; // Prevent duplicate Telegram message
+  if (dispatchedAlerts.has(item.id)) return;
   dispatchedAlerts.add(item.id);
   setTimeout(() => dispatchedAlerts.delete(item.id), 60000);
 
   const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
-  const chatId = process.env.ADMIN_IDS ? process.env.ADMIN_IDS.split(',')[0] : (process.env.TELEGRAM_CHAT_ID || '6527377657');
+  const rawAdminIds = process.env.ADMIN_IDS || process.env.TELEGRAM_CHAT_ID || '6527377657';
+  const adminIds = rawAdminIds.split(',').map(s => s.trim()).filter(Boolean);
 
-  if (!token || !chatId) return;
+  if (!token || !adminIds.length) return;
 
-  try {
-    let msg = '';
-    const origin = process.env.WEBAPP_URL || 'https://viewpoint.diy';
-    const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';
+  const origin = process.env.WEBAPP_URL || 'https://viewpoint.diy';
+  const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';
 
-    if (type === 'DEPOSIT') {
-      msg = `🔔 *NEW UPI DEPOSIT RECORD* 🔔\n\n` +
-        `👤 *Player ID:* \`${item.userId}\`\n` +
-        `💰 *Amount:* ₹${item.amount.toFixed(2)}\n` +
-        `🧾 *UTR:* \`${item.utr}\`\n` +
-        `💳 *Receiver UPI:* \`${item.upiId}\`\n` +
-        `⏰ *Time:* ${item.time}\n` +
-        `🆔 *Deposit ID:* \`${item.id}\``;
-    } else {
-      msg = `💸 *NEW WITHDRAWAL REQUEST (8% Fee)* 💸\n\n` +
-        `👤 *Player ID:* \`${item.userId}\`\n` +
-        `💰 *Gross Amount:* ₹${item.amount.toFixed(2)}\n` +
-        `🏷️ *Platform Fee (8%):* -₹${item.fee.toFixed(2)}\n` +
-        `✅ *Net Payout to Send:* *₹${item.netPayout.toFixed(2)}*\n\n` +
-        `💳 *Receiver Info:* \`${item.receiver}\`\n` +
-        `👤 *Name:* ${item.accountName}\n` +
-        `📡 *Channel:* ${item.channel}\n` +
-        `⏰ *Time:* ${item.time}\n` +
-        `🆔 *Withdrawal ID:* \`${item.id}\``;
-    }
+  let msg = '';
+  let replyMarkup = {};
 
-    const replyMarkup = {
+  if (type === 'DEPOSIT') {
+    const amt = parseFloat(item.amount || 0);
+    msg = `🔔 <b>NEW UPI DEPOSIT RECORD</b> 🔔\n\n` +
+      `👤 <b>Player ID:</b> <code>${item.userId || 'guest'}</code>\n` +
+      `💰 <b>Amount:</b> <b>₹${amt.toFixed(2)}</b>\n` +
+      `🧾 <b>UTR:</b> <code>${item.utr || 'N/A'}</code>\n` +
+      `💳 <b>Receiver UPI:</b> <code>${item.upiId || 'N/A'}</code>\n` +
+      `⏰ <b>Time:</b> ${item.time || new Date().toLocaleTimeString()}\n` +
+      `🆔 <b>Deposit ID:</b> <code>${item.id}</code>`;
+
+    replyMarkup = {
       inline_keyboard: [
         [
-          { text: type === 'DEPOSIT' ? `✅ Approve (+₹${item.amount.toFixed(0)})` : `✅ Approve Payout`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=${type === 'DEPOSIT' ? 'approve_dep' : 'approve_wth'}&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}&amt=${encodeURIComponent(item.amount)}` },
-          { text: "❌ Reject", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=${type === 'DEPOSIT' ? 'reject_dep' : 'reject_wth'}&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}` }
+          { text: `✅ Approve (+₹${amt.toFixed(0)})`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_dep&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}&amt=${encodeURIComponent(amt)}` },
+          { text: "❌ Reject", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_dep&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}` }
         ]
       ]
     };
+  } else {
+    const gross = parseFloat(item.amount || 0);
+    const fee = parseFloat(item.fee !== undefined ? item.fee : (gross * 0.08));
+    const net = parseFloat(item.netPayout !== undefined ? item.netPayout : (gross - fee));
 
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: msg,
-        parse_mode: 'Markdown',
-        reply_markup: replyMarkup
-      })
-    });
-  } catch (err) {
-    // Non-blocking
+    msg = `💸 <b>NEW WITHDRAWAL REQUEST (8% Fee)</b> 💸\n\n` +
+      `👤 <b>Player ID:</b> <code>${item.userId || 'guest'}</code>\n` +
+      `💰 <b>Gross Amount:</b> ₹${gross.toFixed(2)}\n` +
+      `🏷️ <b>Platform Fee (8%):</b> -₹${fee.toFixed(2)}\n` +
+      `✅ <b>Net Payout to Send:</b> <b>₹${net.toFixed(2)}</b>\n\n` +
+      `💳 <b>Receiver Info:</b> <code>${item.receiver || 'UPI'}</code>\n` +
+      `👤 <b>Name:</b> ${item.accountName || 'N/A'}\n` +
+      `📡 <b>Channel:</b> ${item.channel || 'UPI'}\n` +
+      `⏰ <b>Time:</b> ${item.time || new Date().toLocaleTimeString()}\n` +
+      `🆔 <b>Withdrawal ID:</b> <code>${item.id}</code>`;
+
+    replyMarkup = {
+      inline_keyboard: [
+        [
+          { text: `✅ Approve Payout (₹${net.toFixed(0)})`, url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_wth&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}&amt=${encodeURIComponent(net)}` },
+          { text: "❌ Reject & Refund", url: `${origin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_wth&id=${encodeURIComponent(item.id)}&userId=${encodeURIComponent(item.userId)}` }
+        ]
+      ]
+    };
+  }
+
+  for (const chatId of adminIds) {
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: msg,
+          parse_mode: 'HTML',
+          reply_markup: replyMarkup
+        })
+      });
+    } catch (e) {
+      console.warn("Telegram dispatch warn for chat:", chatId, e.message);
+    }
   }
 }

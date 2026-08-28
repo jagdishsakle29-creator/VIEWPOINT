@@ -228,6 +228,9 @@ class AppController {
       tabDragonTiger: document.getElementById('tabDragonTiger'),
       tabColorTrading: document.getElementById('tabColorTrading'),
       tabStock: document.getElementById('tabStock'),
+      tabPump: document.getElementById('tabPump'),
+      tabMoles: document.getElementById('tabMoles'),
+      tabTower: document.getElementById('tabTower'),
 
       // Game Stage Views
       plinkoView: document.getElementById('plinkoView'),
@@ -241,6 +244,9 @@ class AppController {
       dragontigerView: document.getElementById('dragontigerView'),
       colortradingView: document.getElementById('colortradingView'),
       stockView: document.getElementById('stockView'),
+      pumpView: document.getElementById('pumpView'),
+      molesView: document.getElementById('molesView'),
+      towerView: document.getElementById('towerView'),
 
       // Mines & Chicken Grids
       minesGrid: document.getElementById('minesGrid'),
@@ -824,6 +830,33 @@ class AppController {
       console.warn("Limbo init error:", e);
     }
 
+    // 9. Stake Pump Engine
+    try {
+      if (window.CasinoPump && (document.getElementById('pumpView') || this.dom.pumpView)) {
+        this.pump = new window.CasinoPump('pumpView');
+      }
+    } catch (e) {
+      console.warn("Pump init error:", e);
+    }
+
+    // 10. Stake Moles Engine
+    try {
+      if (window.CasinoMoles && (document.getElementById('molesView') || this.dom.molesView)) {
+        this.moles = new window.CasinoMoles('molesView');
+      }
+    } catch (e) {
+      console.warn("Moles init error:", e);
+    }
+
+    // 11. Stake Tower Legend Engine
+    try {
+      if (window.CasinoTower && (document.getElementById('towerView') || this.dom.towerView)) {
+        this.tower = new window.CasinoTower('towerView');
+      }
+    } catch (e) {
+      console.warn("Tower init error:", e);
+    }
+
     this.activeInstance = this.mines;
     if (this.activeInstance) {
       if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(parseFloat(this.dom.betAmountInput ? this.dom.betAmountInput.value : 10) || 10);
@@ -1227,19 +1260,22 @@ class AppController {
     if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.addEventListener('click', () => this.switchGame('dragontiger'));
     if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
     if (this.dom.tabLimbo) this.dom.tabLimbo.addEventListener('click', () => this.switchGame('limbo'));
+    if (this.dom.tabPump) this.dom.tabPump.addEventListener('click', () => this.switchGame('pump'));
     if (this.dom.tabChicken) this.dom.tabChicken.addEventListener('click', () => this.switchGame('chicken'));
     if (this.dom.tabPlinko) this.dom.tabPlinko.addEventListener('click', () => this.switchGame('plinko'));
     if (this.dom.tabCrash) this.dom.tabCrash.addEventListener('click', () => this.switchGame('crash'));
+    if (this.dom.tabMoles) this.dom.tabMoles.addEventListener('click', () => this.switchGame('moles'));
     if (this.dom.tabColorTrading) this.dom.tabColorTrading.addEventListener('click', () => this.switchGame('colortrading'));
     if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
     if (this.dom.tabDice) this.dom.tabDice.addEventListener('click', () => this.switchGame('dice'));
+    if (this.dom.tabTower) this.dom.tabTower.addEventListener('click', () => this.switchGame('tower'));
 
     // Restore active game from URL hash, query param, or localStorage
     const hashGame = window.location.hash ? window.location.hash.replace('#', '') : '';
     const urlParams = new URLSearchParams(window.location.search || '');
     const queryGame = urlParams.get('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['mines', 'dragontiger', 'limbo', 'chicken', 'plinko', 'crash', 'colortrading', 'stock', 'dice'];
+    const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower'];
     const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'mines';
     
     this.switchGamePage(1);
@@ -4601,9 +4637,9 @@ class AppController {
 
     // Auto-select first game of page if current game not on page
     const pageGames = {
-      1: ['mines', 'dragontiger', 'limbo'],
-      2: ['chicken', 'plinko', 'crash'],
-      3: ['colortrading', 'stock', 'dice']
+      1: ['mines', 'dragontiger', 'limbo', 'pump'],
+      2: ['chicken', 'plinko', 'crash', 'moles'],
+      3: ['colortrading', 'stock', 'dice', 'tower']
     };
     if (!pageGames[pageNum].includes(this.currentGame)) {
       this.switchGame(pageGames[pageNum][0]);
@@ -4620,9 +4656,9 @@ class AppController {
 
     // Auto switch page group based on game
     let targetPage = 2;
-    if (['mines', 'dragontiger', 'limbo'].includes(gameType)) targetPage = 1;
-    else if (['chicken', 'plinko', 'crash'].includes(gameType)) targetPage = 2;
-    else if (['colortrading', 'stock', 'dice'].includes(gameType)) targetPage = 3;
+    if (['mines', 'dragontiger', 'limbo', 'pump'].includes(gameType)) targetPage = 1;
+    else if (['chicken', 'plinko', 'crash', 'moles'].includes(gameType)) targetPage = 2;
+    else if (['colortrading', 'stock', 'dice', 'tower'].includes(gameType)) targetPage = 3;
 
     const p1Btn = document.getElementById('btnGamePage1');
     const p2Btn = document.getElementById('btnGamePage2');
@@ -4659,12 +4695,15 @@ class AppController {
       this.dom.tabDragonTiger || document.getElementById('tabDragonTiger'),
       this.dom.tabMines || document.getElementById('tabMines'),
       this.dom.tabLimbo || document.getElementById('tabLimbo'),
+      this.dom.tabPump || document.getElementById('tabPump'),
       this.dom.tabChicken || document.getElementById('tabChicken'),
       this.dom.tabPlinko || document.getElementById('tabPlinko'),
       this.dom.tabCrash || document.getElementById('tabCrash'),
+      this.dom.tabMoles || document.getElementById('tabMoles'),
       this.dom.tabColorTrading || document.getElementById('tabColorTrading'),
       this.dom.tabStock || document.getElementById('tabStock'),
-      this.dom.tabDice || document.getElementById('tabDice')
+      this.dom.tabDice || document.getElementById('tabDice'),
+      this.dom.tabTower || document.getElementById('tabTower')
     ];
     allTabs.forEach(t => t && t.classList.remove('active'));
     
@@ -4672,12 +4711,15 @@ class AppController {
       this.dom.dragontigerView || document.getElementById('dragontigerView'),
       this.dom.minesView || document.getElementById('minesView'),
       this.dom.limboView || document.getElementById('limboView'),
+      this.dom.pumpView || document.getElementById('pumpView'),
       this.dom.chickenView || document.getElementById('chickenView'),
       this.dom.plinkoView || document.getElementById('plinkoView'),
       this.dom.crashView || document.getElementById('crashView'),
+      this.dom.molesView || document.getElementById('molesView'),
       this.dom.colortradingView || document.getElementById('colortradingView'),
       this.dom.stockView || document.getElementById('stockView'),
-      this.dom.diceView || document.getElementById('diceView')
+      this.dom.diceView || document.getElementById('diceView'),
+      this.dom.towerView || document.getElementById('towerView')
     ];
     viewsList.forEach(v => {
       if (v) {
@@ -4762,6 +4804,48 @@ class AppController {
       }
       if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.limbo;
+      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+    } else if (gameType === 'pump') {
+      const tab = this.dom.tabPump || document.getElementById('tabPump');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.pumpView || document.getElementById('pumpView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!this.pump && window.CasinoPump && (document.getElementById('pumpView') || this.dom.pumpView)) {
+        this.pump = new window.CasinoPump('pumpView');
+      }
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
+      this.activeInstance = this.pump;
+      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+    } else if (gameType === 'moles') {
+      const tab = this.dom.tabMoles || document.getElementById('tabMoles');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.molesView || document.getElementById('molesView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!this.moles && window.CasinoMoles && (document.getElementById('molesView') || this.dom.molesView)) {
+        this.moles = new window.CasinoMoles('molesView');
+      }
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
+      this.activeInstance = this.moles;
+      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
+      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+    } else if (gameType === 'tower') {
+      const tab = this.dom.tabTower || document.getElementById('tabTower');
+      if (tab) tab.classList.add('active');
+      const v = this.dom.towerView || document.getElementById('towerView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!this.tower && window.CasinoTower && (document.getElementById('towerView') || this.dom.towerView)) {
+        this.tower = new window.CasinoTower('towerView');
+      }
+      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
+      this.activeInstance = this.tower;
       if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
       if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
@@ -5008,6 +5092,12 @@ class AppController {
         this.mines.setMineCount(parseInt(minesSelect ? minesSelect.value : 3) || 3);
         this.mines.startGame();
       }
+    } else if (this.currentGame === 'pump') {
+      if (this.pump) this.pump.startGame(betAmount);
+    } else if (this.currentGame === 'moles') {
+      if (this.moles) this.moles.startGame(betAmount);
+    } else if (this.currentGame === 'tower') {
+      if (this.tower) this.tower.startGame(betAmount);
     } else if (this.activeInstance && this.activeInstance.startGame) {
       if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(betAmount);
       this.activeInstance.startGame();
@@ -5023,6 +5113,12 @@ class AppController {
       if (this.chickenmines) this.chickenmines.cashOut();
     } else if (this.currentGame === 'mines') {
       if (this.mines) this.mines.cashOut();
+    } else if (this.currentGame === 'pump') {
+      if (this.pump) this.pump.cashOut();
+    } else if (this.currentGame === 'moles') {
+      if (this.moles) this.moles.cashOut();
+    } else if (this.currentGame === 'tower') {
+      if (this.tower) this.tower.cashOut();
     } else if (this.activeInstance && this.activeInstance.cashOut) {
       this.activeInstance.cashOut();
     }
@@ -6763,6 +6859,9 @@ class AppController {
       else if (g.includes('color') || g.includes('wingo')) icon = '🎨 Win Go 30s';
       else if (g.includes('stock') || g.includes('btc') || g.includes('trade')) icon = '📈 Stock BTC';
       else if (g.includes('dice')) icon = '🎲 Classic Dice';
+      else if (g.includes('pump')) icon = '🎈 Stake Pump';
+      else if (g.includes('mole')) icon = '🐹 Stake Moles';
+      else if (g.includes('tower')) icon = '🏰 Tower Legend';
       else icon = '🎮 ' + (item.game || 'Game');
 
       const betVal = item.bet !== undefined ? item.bet : (item.betAmount || 0);
@@ -6878,6 +6977,35 @@ class AppController {
         this.dom.liveOnlineUsersCounter.innerText = `${(baseOnline / 1000).toFixed(1)}k`;
       }
     }, 1800);
+
+    // Dynamic player counts (2,400 to 7,800 per game) updating every 3 seconds
+    const gameTabBadges = [
+      { id: 'tabMines', base: 5400 },
+      { id: 'tabDragonTiger', base: 4800 },
+      { id: 'tabLimbo', base: 3900 },
+      { id: 'tabPump', base: 4500 },
+      { id: 'tabChicken', base: 6100 },
+      { id: 'tabPlinko', base: 7300 },
+      { id: 'tabCrash', base: 6800 },
+      { id: 'tabMoles', base: 3700 },
+      { id: 'tabColorTrading', base: 5900 },
+      { id: 'tabStock', base: 3200 },
+      { id: 'tabDice', base: 2800 },
+      { id: 'tabTower', base: 4600 }
+    ];
+
+    setInterval(() => {
+      gameTabBadges.forEach(item => {
+        const tabEl = document.getElementById(item.id);
+        if (tabEl) {
+          const badge = tabEl.querySelector('.tab-badge');
+          if (badge) {
+            const count = Math.max(2100, Math.min(7900, item.base + Math.floor((Math.random() - 0.5) * 450)));
+            badge.innerText = `🟢 ${(count / 1000).toFixed(1)}k`;
+          }
+        }
+      });
+    }, 3200);
   }
 
   startCommunityLiveWinsStream() {
@@ -6893,12 +7021,15 @@ class AppController {
       { name: '🐉 Dragon Tiger', class: 'dragontiger', multRange: [1.95, 2.00] },
       { name: '💎 Mines', class: 'mines', multRange: [1.20, 6.20] },
       { name: '🎯 Limbo Turbo', class: 'limbo', multRange: [1.30, 15.00] },
+      { name: '🎈 Stake Pump', class: 'pump', multRange: [1.35, 12.00] },
       { name: '🍗 Chicken Road', class: 'chicken', multRange: [1.18, 4.80] },
       { name: '🔴 Plinko', class: 'plinko', multRange: [1.50, 1000.00] },
       { name: '🚀 Crash Rocket', class: 'crash', multRange: [1.20, 12.50] },
+      { name: '🐹 Stake Moles', class: 'moles', multRange: [1.40, 8.50] },
       { name: '🎨 Win Go 30s', class: 'colortrading', multRange: [1.95, 9.00] },
       { name: '📈 Stock BTC', class: 'stock', multRange: [1.90, 1.90] },
-      { name: '🎲 Classic Dice', class: 'dice', multRange: [1.10, 99.00] }
+      { name: '🎲 Classic Dice', class: 'dice', multRange: [1.10, 99.00] },
+      { name: '🏰 Tower Legend', class: 'tower', multRange: [1.70, 24.00] }
     ];
 
     const communityAmounts = [50, 100, 200, 300, 500, 1000, 1500, 2000];

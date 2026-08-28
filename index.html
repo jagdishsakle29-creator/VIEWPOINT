@@ -48,6 +48,9 @@
   <link rel="stylesheet" href="css/stocktrading.css?v=90.0">
   <link rel="stylesheet" href="css/dice.css?v=90.0">
   <link rel="stylesheet" href="css/limbo.css?v=90.0">
+  <link rel="stylesheet" href="css/pump.css?v=90.0">
+  <link rel="stylesheet" href="css/moles.css?v=90.0">
+  <link rel="stylesheet" href="css/tower.css?v=90.0">
 </head>
 <body role="application" translate="no" data-reader-ignore="true">
 
@@ -544,81 +547,98 @@
       </button>
     </div>
 
-    <!-- Game Tabs Container Organized by Pages -->
+    <!-- Game Tabs Container Organized by Pages (4 Games Per Page) -->
     <div class="game-tabs-wrapper">
       <!-- Page 1 Group (Games 1-4) -->
       <div id="gamePageGroup1" class="game-page-group" style="display: flex;">
-        <!-- 1. Mines (Default Active Game) -->
+        <!-- 1. Mines -->
         <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" style="position:relative;">
           <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="#ff3b30"/><path d="M12 2v4M12 20v2M2 13h4M18 13h4M5.5 6.5l2.8 2.8M15.7 16.7l2.8 2.8M18.5 6.5l-2.8 2.8M8.3 16.7l-2.8 2.8" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="2" fill="#fff" opacity="0.6"/></svg>
           <span style="font-weight: 900;">Mines</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 5.4k</span>
         </button>
 
         <!-- 2. Dragon Tiger -->
         <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
           <span style="font-weight: 900;">Dragon Tiger</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 4.8k</span>
         </button>
 
         <!-- 3. Limbo Turbo -->
         <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎯⚡</span>
-          <span style="font-weight: 900;">Limbo Turbo</span>
-          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #ff007a, #7928ca); color: #fff; font-size:9px; font-weight:900;">1000x</span>
+          <span style="font-weight: 900;">Limbo</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 3.9k</span>
+        </button>
+
+        <!-- 4. Stake Pump (Page 1) -->
+        <button id="tabPump" class="tab-btn" data-game="pump" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🎈💨</span>
+          <span style="font-weight: 900;">Pump</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #00e5ff, #0077ff); color: #000; font-size: 8.5px; font-weight: 900;">🟢 4.5k</span>
         </button>
       </div>
 
-      <!-- Page 2 Group (Games 4-6) -->
+      <!-- Page 2 Group (Games 5-8) -->
       <div id="gamePageGroup2" class="game-page-group" style="display: none;">
-        <!-- 4. Chicken Road -->
+        <!-- 5. Chicken Road -->
         <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))" style="position:relative;">
-          <svg class="game-svg-icon" viewBox="0 0 36 36" width="20" height="20">
-            <circle cx="18" cy="22" r="10" fill="#ffffff"/>
-            <path d="M12 11 Q14 6 16 10 Q18 5 20 10 Q22 7 24 12 Z" fill="#ff3366"/>
-            <circle cx="18" cy="14" r="6" fill="#ffffff"/>
-            <polygon points="23,14 28,16 23,18" fill="#f59e0b"/>
-            <circle cx="20" cy="13" r="1.5" fill="#0f172a"/>
-          </svg>
-          <span style="font-weight:900;">🍗 Chicken Road</span>
-          <span class="tab-badge badge-rec" id="badgeRec_chicken" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size:10px; font-weight:900;">270x</span>
+          <span style="font-size: 16px; line-height: 1;">🍗🚗</span>
+          <span style="font-weight: 900;">Chicken</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 6.1k</span>
         </button>
 
-        <!-- 5. Plinko -->
+        <!-- 6. Plinko -->
         <button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))" style="position:relative;">
-          <span style="font-size: 17px; line-height: 1;">🔴🔺</span>
+          <span style="font-size: 16px; line-height: 1;">🔴🔺</span>
           <span style="font-weight: 900;">Plinko</span>
-          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #00e5ff, #3b82f6); color: #fff; font-size:9px; font-weight:900;">1000x 🔥</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 7.3k</span>
         </button>
 
-        <!-- 6. Crash Rocket -->
+        <!-- 7. Crash Rocket -->
         <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))" style="position:relative;">
-          <svg class="game-svg-icon" viewBox="0 0 24 24"><path d="M14 2c0 0 6 3 6 10l-4 4-4-4c0-4-3-6-3-6s3-1 5-4z" fill="#00f5d4"/><path d="M12 12l-4 4-4-1 3-3 5 0z" fill="#00b4d8"/><path d="M5 19l2 2-4 1 2-3z" fill="#f59e0b"/><circle cx="15" cy="8" r="1.5" fill="#ffffff"/></svg>
-          <span style="font-weight: 900;">🚀 Crash Rocket</span>
-          <span class="tab-badge badge-rec" id="badgeRec_crash" style="background: linear-gradient(135deg, #00f5d4, #00b4d8); color: #000; font-size:9px; font-weight:900;">LIVE</span>
+          <span style="font-size: 16px; line-height: 1;">🚀✨</span>
+          <span style="font-weight: 900;">Crash</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 6.8k</span>
+        </button>
+
+        <!-- 8. Stake Moles (Page 2) -->
+        <button id="tabMoles" class="tab-btn" data-game="moles" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🐹🔨</span>
+          <span style="font-weight: 900;">Moles</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size: 8.5px; font-weight: 900;">🟢 3.7k</span>
         </button>
       </div>
 
-      <!-- Page 3 Group (Games 7-9) -->
+      <!-- Page 3 Group (Games 9-12) -->
       <div id="gamePageGroup3" class="game-page-group" style="display: none;">
-        <!-- 7. Win Go 30s -->
+        <!-- 9. Win Go 30s -->
         <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎨</span>
-          <span style="font-weight: 800;">Win Go 30s</span>
-          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff; font-size:9px; font-weight:900;">9x</span>
+          <span style="font-weight: 800;">Win Go</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 5.9k</span>
         </button>
 
-        <!-- 8. Stock BTC -->
+        <!-- 10. Stock BTC -->
         <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">📈</span>
           <span style="font-weight: 800;">Stock BTC</span>
-          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #f59e0b, #00e701); color: #000; font-size:9px; font-weight:900;">+90%</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 3.2k</span>
         </button>
 
-        <!-- 9. Classic Dice -->
+        <!-- 11. Classic Dice -->
         <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))" style="position:relative;">
-          <span style="font-size: 17px; line-height: 1;">🎲</span>
-          <span style="font-weight: 900;">Classic Dice</span>
-          <span class="tab-badge badge-rec" style="background: linear-gradient(135deg, #10b981, #00e701); color: #000; font-size:9px; font-weight:900;">9900x</span>
+          <span style="font-size: 16px; line-height: 1;">🎲</span>
+          <span style="font-weight: 900;">Dice</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 2.8k</span>
+        </button>
+
+        <!-- 12. Tower Legend (Page 3) -->
+        <button id="tabTower" class="tab-btn" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🏰💎</span>
+          <span style="font-weight: 900;">Tower</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #10b981, #00e701); color: #000; font-size: 8.5px; font-weight: 900;">🟢 4.6k</span>
         </button>
       </div>
     </div>
@@ -1483,6 +1503,131 @@
           <div id="stockActiveTradesCard" class="stock-active-trades-card" style="display: none; margin-top: 12px;">
             <strong style="font-size: 13px; color: var(--text-secondary);">Your Open Positions:</strong>
             <div id="stockActiveTradesList" style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;"></div>
+          </div>
+        </div>
+
+        <!-- Game 10: Stake Crypto Pump Game View -->
+        <div id="pumpView" class="game-view pump-view">
+          <div class="pump-stage-wrapper">
+            <div class="pump-history-row" id="pumpHistoryList"></div>
+            
+            <div class="pump-chamber">
+              <div class="pump-balloon" id="pumpBalloon">
+                <div class="pump-balloon-shine"></div>
+                <div class="pump-mult-text" id="pumpMultiplierDisplay">1.00x</div>
+                <div class="pump-profit-text" id="pumpProfitDisplay">₹10.00</div>
+              </div>
+            </div>
+
+            <div class="pump-pressure-gauge">
+              <div class="pump-pressure-fill" id="pumpPressureFill"></div>
+            </div>
+
+            <div id="pumpStatusText" style="font-size: 13px; text-align: center; color: #94a3b8; font-weight: 700;">
+              Set bet & click START to pump
+            </div>
+
+            <!-- Direct Actions inside Pump Stage -->
+            <div class="pump-controls-area">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="flex: 1; position: relative;">
+                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #00e701;">₹</span>
+                  <input type="number" id="pumpDirectBetInput" class="bet-input-field" value="10.00" min="1" step="5" style="padding-left: 28px; width: 100%; height: 44px; font-size: 15px; font-weight: 800; background: rgba(15, 33, 46, 0.9); border: 1.5px solid rgba(0, 231, 1, 0.3); border-radius: 8px; color: #fff;" oninput="document.getElementById('betAmountInput').value = this.value">
+                </div>
+                <div style="display: flex; gap: 4px;">
+                  <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = Math.max(1, (parseFloat(document.getElementById('pumpDirectBetInput').value)||10)/2); document.getElementById('pumpDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">½</button>
+                  <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = (parseFloat(document.getElementById('pumpDirectBetInput').value)||10)*2; document.getElementById('pumpDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">2X</button>
+                  <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = (window.wallet ? window.wallet.balance : 100); document.getElementById('pumpDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">MAX</button>
+                </div>
+              </div>
+
+              <button type="button" id="btnPumpStart" class="btn-stake-primary btn-bet" style="width: 100%; height: 50px; font-size: 16px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4);" onclick="window.app && window.app.handleBetClick()">
+                <span>🎈 START PUMP BET</span>
+              </button>
+
+              <button type="button" id="btnPumpAction" class="btn-pump-action" style="display: none;" onclick="window.app && window.app.pump && window.app.pump.doPump()">
+                <span>💨 PUMP MULTIPLIER</span>
+              </button>
+
+              <button type="button" id="btnPumpCashout" class="btn-pump-cashout" style="display: none;" onclick="window.app && window.app.pump && window.app.pump.cashOut()">
+                <span id="pumpCashoutText">💰 CASHOUT</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 11: Stake Moles Burrow Game View -->
+        <div id="molesView" class="game-view moles-view">
+          <div class="moles-stage-wrapper">
+            <div class="moles-history-row" id="molesHistoryList"></div>
+
+            <div class="moles-stats-card">
+              <div class="moles-stat-item">
+                <div class="moles-stat-label">Traps Count</div>
+                <select id="molesTrapSelect" style="background: rgba(0,0,0,0.5); color: #00e5ff; border: 1px solid #00e5ff; border-radius: 6px; padding: 4px 8px; font-weight: 800; margin-top: 4px;">
+                  <option value="1">1 Trap (Safe)</option>
+                  <option value="2">2 Traps</option>
+                  <option value="3" selected>3 Traps (Standard)</option>
+                  <option value="4">4 Traps (High Multiplier)</option>
+                  <option value="5">5 Traps (Extreme)</option>
+                </select>
+              </div>
+              <div class="moles-stat-item">
+                <div class="moles-stat-label">Multiplier</div>
+                <div class="moles-stat-val" id="molesMultiplierDisplay">1.00x</div>
+              </div>
+              <div class="moles-stat-item">
+                <div class="moles-stat-label">Current Profit</div>
+                <div class="moles-stat-val" id="molesProfitDisplay">₹0.00</div>
+              </div>
+            </div>
+
+            <!-- 12-Hole Grid -->
+            <div class="moles-grid" id="molesGrid"></div>
+
+            <div id="molesStatusText" style="font-size: 13px; text-align: center; color: #94a3b8; font-weight: 700;">
+              Choose traps & tap a hole to start digging
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%;">
+              <button type="button" id="btnMolesStart" class="btn-stake-primary btn-bet" style="flex: 1; height: 48px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4);" onclick="window.app && window.app.handleBetClick()">
+                <span>🐹 START DIGGING</span>
+              </button>
+              <button type="button" id="btnMolesCashout" class="btn-stake-primary" style="flex: 1; height: 48px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000; border-radius: 10px; cursor: pointer; display: none;" onclick="window.app && window.app.moles && window.app.moles.cashOut()">
+                <span id="molesCashoutText">💰 CASHOUT</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 12: Stake Tower Legend Game View -->
+        <div id="towerView" class="game-view tower-view">
+          <div class="tower-stage-wrapper">
+            <div class="tower-history-row" id="towerHistoryList"></div>
+
+            <!-- Difficulty Picker -->
+            <div class="tower-difficulty-row">
+              <button type="button" class="tower-diff-btn" data-diff="easy">Easy (3/4)</button>
+              <button type="button" class="tower-diff-btn active" data-diff="medium">Medium (2/3)</button>
+              <button type="button" class="tower-diff-btn" data-diff="hard">Hard (1/2)</button>
+              <button type="button" class="tower-diff-btn" data-diff="extreme">Extreme (1/3)</button>
+            </div>
+
+            <!-- 9-Floor Tower Container -->
+            <div class="tower-floors-container" id="towerFloorsContainer"></div>
+
+            <div id="towerStatusText" style="font-size: 13px; text-align: center; color: #94a3b8; font-weight: 700;">
+              Choose difficulty & click START to climb the Tower
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%;">
+              <button type="button" id="btnTowerStart" class="btn-stake-primary btn-bet" style="flex: 1; height: 48px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4);" onclick="window.app && window.app.handleBetClick()">
+                <span>🏰 START TOWER CLIMB</span>
+              </button>
+              <button type="button" id="btnTowerCashout" class="btn-stake-primary" style="flex: 1; height: 48px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000; border-radius: 10px; cursor: pointer; display: none;" onclick="window.app && window.app.tower && window.app.tower.cashOut()">
+                <span id="towerCashoutText">👑 CASHOUT FLOOR</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -2831,6 +2976,9 @@
   <script src="js/colortrading.js?v=90.0"></script>
   <script src="js/stocktrading.js?v=90.0"></script>
   <script src="js/dice.js?v=90.0"></script>
+  <script src="js/pump.js?v=90.0"></script>
+  <script src="js/moles.js?v=90.0"></script>
+  <script src="js/tower.js?v=90.0"></script>
   <script src="js/app.js?v=90.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->

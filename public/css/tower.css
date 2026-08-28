@@ -1,0 +1,179 @@
+/* Stake-Style Tower Legend Game Styling */
+.tower-view {
+  display: none;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.tower-view.active {
+  display: block;
+}
+
+.tower-stage-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.tower-history-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 4px;
+  justify-content: center;
+}
+
+.tower-hist-pill {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tower-hist-pill.win {
+  background: rgba(0, 231, 1, 0.15);
+  color: #00e701;
+  border: 1px solid #00e701;
+}
+
+.tower-hist-pill.loss {
+  background: rgba(254, 44, 85, 0.15);
+  color: #fe2c55;
+  border: 1px solid #fe2c55;
+}
+
+.tower-difficulty-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  background: rgba(15, 33, 46, 0.8);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tower-diff-btn {
+  flex: 1;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tower-diff-btn.active {
+  background: rgba(0, 229, 255, 0.2);
+  color: #00e5ff;
+  border: 1px solid #00e5ff;
+}
+
+.tower-floors-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  background: rgba(15, 33, 46, 0.9);
+  border: 1.5px solid var(--border-color);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.tower-floor-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.tower-floor-row.active-floor {
+  background: rgba(0, 229, 255, 0.12);
+  border-color: #00e5ff;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+}
+
+.tower-floor-row.cleared-floor {
+  background: rgba(0, 231, 1, 0.12);
+  border-color: #00e701;
+}
+
+.tower-floor-row.failed-floor {
+  background: rgba(254, 44, 85, 0.15);
+  border-color: #fe2c55;
+}
+
+.tower-floor-row.locked-floor {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.tower-floor-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 54px;
+}
+
+.tower-floor-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.tower-floor-mult {
+  font-size: 12px;
+  font-weight: 900;
+  color: #00e701;
+}
+
+.tower-blocks-group {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.tower-block-btn {
+  flex: 1;
+  height: 42px;
+  background: radial-gradient(circle at center, #1e2c3d 0%, #0e1724 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.tower-block-btn:hover {
+  border-color: #00e5ff;
+  transform: translateY(-1px);
+}
+
+.tower-block-btn.gem-found {
+  background: radial-gradient(circle at center, rgba(0, 231, 1, 0.3) 0%, #0e1724 100%);
+  border-color: #00e701;
+  box-shadow: 0 0 10px rgba(0, 231, 1, 0.3);
+}
+
+.tower-block-btn.skull-hit {
+  background: radial-gradient(circle at center, rgba(254, 44, 85, 0.35) 0%, #0e1724 100%);
+  border-color: #fe2c55;
+  box-shadow: 0 0 15px rgba(254, 44, 85, 0.4);
+}
