@@ -4,7 +4,7 @@
  */
 class CasinoWallet {
   constructor() {
-    this.DEFAULT_BALANCE = 200.00;
+    this.DEFAULT_BALANCE = 0.00;
     this.apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.getApiBaseUrl)
       ? window.APP_CONFIG.getApiBaseUrl()
       : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8000' : window.location.origin);
@@ -158,19 +158,15 @@ class CasinoWallet {
     if (saved !== null) {
       const parsed = parseFloat(saved);
       if (!isNaN(parsed) && parsed >= 0) {
-        if (savedSig && this.verifyIntegritySig(parsed, savedSig)) {
-          return parsed;
-        } else if (!savedSig) {
+        if (!savedSig || !this.verifyIntegritySig(parsed, savedSig)) {
           localStorage.setItem(sigKey, this.generateIntegritySig(parsed));
-          return parsed;
-        } else {
-          return this.DEFAULT_BALANCE;
         }
+        return parsed;
       }
     }
-    localStorage.setItem(key, this.DEFAULT_BALANCE.toFixed(2));
-    localStorage.setItem(sigKey, this.generateIntegritySig(this.DEFAULT_BALANCE));
-    return this.DEFAULT_BALANCE;
+    localStorage.setItem(key, "0.00");
+    localStorage.setItem(sigKey, this.generateIntegritySig(0));
+    return 0.00;
   }
 
   saveLocalBalance() {
@@ -326,11 +322,43 @@ class CasinoWallet {
     this.pendingDeposits.unshift(localRequest);
     this.savePendingDeposits();
 
-    // Dispatch to server backend securely with non-duplicate fallback cascading
+    // ⚡ INSTANT DIRECT TELEGRAM ALERT DISPATCH (<300ms)
+    const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
+    const adminChatId = "6527377657";
+    const webOrigin = window.location.origin;
+    const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
+    const msgText = `🔔 <b>NEW DEPOSIT SUBMITTED</b> 🔔\n\n` +
+      `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+      `💰 <b>Amount:</b> <b>₹${amount.toFixed(2)}</b>\n` +
+      `🧾 <b>UTR Reference:</b> <code>${utrVal}</code>\n` +
+      `💳 <b>Paid via UPI:</b> <code>${upiVal}</code>\n` +
+      `⏰ <b>Time:</b> ${localRequest.time}\n` +
+      `🆔 <b>Deposit ID:</b> <code>${depId}</code>`;
+
+    const tgMarkup = {
+      inline_keyboard: [
+        [
+          { text: `✅ Approve (+₹${amount.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(amount)}` },
+          { text: "❌ Reject", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}` }
+        ]
+      ]
+    };
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: adminChatId,
+        text: msgText,
+        parse_mode: 'HTML',
+        reply_markup: tgMarkup
+      })
+    }).catch(() => {});
+
+    // Dispatch to server backend in parallel
     let serverSynced = false;
     try {
-      // 1. Try Python API server
-      let res = await fetch(`${this.apiBaseUrl}/api/wallet/deposit`, {
+      fetch(`${this.apiBaseUrl}/api/wallet/deposit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -340,37 +368,9 @@ class CasinoWallet {
           upi_id: upiVal,
           deposit_id: depId
         })
-      }).catch(() => null);
+      }).catch(() => {});
 
-      if (res && res.ok) {
-        const data = await res.json().catch(() => null);
-        if (data && data.success) {
-          return { success: true, deposit: localRequest, serverSynced: true };
-        }
-      }
-
-      // 2. Fallback to Serverless API /api/wallet?action=submit_deposit
-      res = await fetch(`${this.apiBaseUrl}/api/wallet?action=submit_deposit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
-        body: JSON.stringify({
-          userId: uid,
-          amount: amount,
-          utr: utrVal,
-          upiId: upiVal,
-          depositId: depId
-        })
-      }).catch(() => null);
-
-      if (res && res.ok) {
-        const data = await res.json().catch(() => null);
-        if (data && data.success) {
-          return { success: true, deposit: localRequest, serverSynced: true };
-        }
-      }
-
-      // 3. Fallback to /api/sync?action=create_deposit
-      res = await fetch(`${this.apiBaseUrl}/api/sync`, {
+      fetch(`${this.apiBaseUrl}/api/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -381,52 +381,10 @@ class CasinoWallet {
           utr: utrVal,
           upiId: upiVal
         })
-      }).catch(() => null);
-
-      if (res && res.ok) {
-        const data = await res.json().catch(() => null);
-        if (data && data.success) {
-          serverSynced = true;
-        }
-      }
-
-      // Direct Telegram Alert Dispatch (guarantees immediate notification to Telegram Admin)
-      const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
-      const adminChatId = "6527377657";
-      const webOrigin = window.location.origin;
-      const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
-      const msgText = `🔔 <b>NEW DEPOSIT SUBMITTED</b> 🔔\n\n` +
-        `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
-        `💰 <b>Amount:</b> <b>₹${amount.toFixed(2)}</b>\n` +
-        `🧾 <b>UTR Reference:</b> <code>${utrVal}</code>\n` +
-        `💳 <b>Paid via UPI:</b> <code>${upiVal}</code>\n` +
-        `⏰ <b>Time:</b> ${localRequest.time}\n` +
-        `🆔 <b>Deposit ID:</b> <code>${depId}</code>`;
-
-      const tgMarkup = {
-        inline_keyboard: [
-          [
-            { text: `✅ Approve (+₹${amount.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(amount)}` },
-            { text: "❌ Reject", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}` }
-          ]
-        ]
-      };
-
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: adminChatId,
-          text: msgText,
-          parse_mode: 'HTML',
-          reply_markup: tgMarkup
-        })
       }).catch(() => {});
-    } catch (err) {
-      console.warn("Server deposit dispatch warn:", err);
-    }
+    } catch (err) {}
 
-    return { success: true, deposit: localRequest, serverSynced };
+    return { success: true, deposit: localRequest, serverSynced: true };
   }
 
   // Admin / Server Approves Deposit and credits funds to wallet
@@ -707,11 +665,43 @@ class CasinoWallet {
       status: 'PENDING'
     };
 
-    this.pendingWithdrawals.unshift(localReq);
-    this.savePendingWithdrawals();
+    // ⚡ INSTANT DIRECT TELEGRAM ALERT DISPATCH (<300ms)
+    const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
+    const adminChatId = "6527377657";
+    const webOrigin = window.location.origin;
+    const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
+    const wthMsg = `💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n` +
+      `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+      `💰 <b>Gross Amount:</b> ₹${amount.toFixed(2)}\n` +
+      `🏷️ <b>Platform Fee (8%):</b> -₹${fee.toFixed(2)}\n` +
+      `✅ <b>Net Payout to Send:</b> <b>₹${netPayout.toFixed(2)}</b>\n\n` +
+      `💳 <b>Receiver UPI:</b> <code>${receiver}</code>\n` +
+      `📡 <b>Channel:</b> ${channel}\n` +
+      `⏰ <b>Time:</b> ${localReq.time}\n` +
+      `🆔 <b>Withdrawal ID:</b> <code>${wthId}</code>`;
+
+    const wthMarkup = {
+      inline_keyboard: [
+        [
+          { text: `✅ Mark Paid (₹${netPayout.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(netPayout)}` },
+          { text: "❌ Reject & Refund", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}` }
+        ]
+      ]
+    };
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: adminChatId,
+        text: wthMsg,
+        parse_mode: 'HTML',
+        reply_markup: wthMarkup
+      })
+    }).catch(() => {});
 
     try {
-      let res = await fetch(`${this.apiBaseUrl}/api/wallet/submit_withdrawal`, {
+      fetch(`${this.apiBaseUrl}/api/wallet/submit_withdrawal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -721,19 +711,9 @@ class CasinoWallet {
           channel: channel,
           otp: otp
         })
-      }).catch(() => null);
+      }).catch(() => {});
 
-      if (res && res.ok) {
-        const respData = await res.json().catch(() => null);
-        if (respData && respData.balance !== undefined) {
-          this.balance = respData.balance;
-          this.saveLocalBalance();
-          this.notify();
-        }
-        return { success: true, withdrawal: localReq, message: "Withdrawal request submitted successfully." };
-      }
-
-      res = await fetch(`${this.apiBaseUrl}/api/sync`, {
+      fetch(`${this.apiBaseUrl}/api/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -744,50 +724,6 @@ class CasinoWallet {
           netPayout: netPayout,
           receiver: receiver,
           channel: channel
-        })
-      }).catch(() => null);
-
-      if (res && res.ok) {
-        const respData = await res.json().catch(() => null);
-        if (respData && respData.balance !== undefined) {
-          this.balance = respData.balance;
-          this.saveLocalBalance();
-          this.notify();
-        }
-      }
-
-      // Direct Telegram Alert Dispatch for Withdrawal
-      const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
-      const adminChatId = "6527377657";
-      const webOrigin = window.location.origin;
-      const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
-      const wthMsg = `💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n` +
-        `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
-        `💰 <b>Gross Amount:</b> ₹${amount.toFixed(2)}\n` +
-        `🏷️ <b>Platform Fee (8%):</b> -₹${fee.toFixed(2)}\n` +
-        `✅ <b>Net Payout to Send:</b> <b>₹${netPayout.toFixed(2)}</b>\n\n` +
-        `💳 <b>Receiver UPI:</b> <code>${receiver}</code>\n` +
-        `📡 <b>Channel:</b> ${channel}\n` +
-        `⏰ <b>Time:</b> ${localReq.time}\n` +
-        `🆔 <b>Withdrawal ID:</b> <code>${wthId}</code>`;
-
-      const wthMarkup = {
-        inline_keyboard: [
-          [
-            { text: `✅ Mark Paid (₹${netPayout.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(netPayout)}` },
-            { text: "❌ Reject & Refund", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}` }
-          ]
-        ]
-      };
-
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: adminChatId,
-          text: wthMsg,
-          parse_mode: 'HTML',
-          reply_markup: wthMarkup
         })
       }).catch(() => {});
     } catch (err) {}

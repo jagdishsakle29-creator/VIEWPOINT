@@ -86,6 +86,11 @@ class CrashGame {
     return Math.max(1.01, Math.min(120.0, result));
   }
 
+  setColorPrediction(color) {
+    this.colorPrediction = (this.colorPrediction === color) ? null : color;
+    return this.colorPrediction;
+  }
+
   async startGame() {
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
@@ -247,13 +252,46 @@ class CrashGame {
     if (this.history.length > 15) this.history.pop();
 
     if (!this.hasCashedOut) {
-      window.wallet.recordBet({
-        game: 'Crash',
-        bet: this.betAmount,
-        multiplier: 0,
-        payout: 0,
-        won: false
-      });
+      let colorWon = false;
+      let colorPayout = 0;
+      let colorMult = 0;
+
+      if (this.colorPrediction === 'red' && this.crashPoint < 2.00) {
+        colorWon = true;
+        colorMult = 1.95;
+        colorPayout = Math.floor(this.betAmount * 1.95 * 100) / 100;
+      } else if (this.colorPrediction === 'green' && this.crashPoint >= 2.00) {
+        colorWon = true;
+        colorMult = 2.00;
+        colorPayout = Math.floor(this.betAmount * 2.00 * 100) / 100;
+      } else if (this.colorPrediction === 'blue' && this.crashPoint >= 10.00) {
+        colorWon = true;
+        colorMult = 10.00;
+        colorPayout = Math.floor(this.betAmount * 10.00 * 100) / 100;
+      }
+
+      if (colorWon) {
+        window.wallet.addWin(colorPayout);
+        window.soundEngine && window.soundEngine.playWin && window.soundEngine.playWin();
+        if (window.app && window.app.showNotification) {
+          window.app.showNotification(`🎉 Crash Color Bet Won! +₹${colorPayout.toFixed(2)} (${colorMult}x)!`, "success");
+        }
+        window.wallet.recordBet({
+          game: `Crash Color (${this.colorPrediction.toUpperCase()})`,
+          bet: this.betAmount,
+          multiplier: colorMult,
+          payout: colorPayout,
+          won: true
+        });
+      } else {
+        window.wallet.recordBet({
+          game: 'Crash',
+          bet: this.betAmount,
+          multiplier: 0,
+          payout: 0,
+          won: false
+        });
+      }
     }
 
     if (this.ui.onCrash) {

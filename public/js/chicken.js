@@ -232,8 +232,9 @@ class ChickenGame {
 
     await new Promise(r => setTimeout(r, 220));
 
-    const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
-    let isHazard = Math.random() < this.hazardRate;
+    const depthFactor = (nextStep / this.totalLanes) * 0.22;
+    const effectiveHazardRate = Math.min(0.85, this.hazardRate + depthFactor);
+    let isHazard = Math.random() < effectiveHazardRate;
 
     try {
       const res = await fetch(`${this.apiBaseUrl}/api/games?action=chicken_reveal`, {

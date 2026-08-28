@@ -1031,6 +1031,31 @@
             </div>
           </div>
 
+          <!-- Crash 3-Way Color Prediction Betting Bar -->
+          <div class="crash-color-prediction-card" style="margin-top: 10px; background: rgba(15, 33, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">🎨 Fast Color Multiplier Prediction:</span>
+              <span id="crashSelectedColorTag" style="font-size: 10px; color: #00e701; font-weight: 800;">Manual Cashout Mode</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <button type="button" id="btnCrashColorRed" class="btn-crash-color" onclick="window.app && window.app.selectCrashColorPrediction('red')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(254, 44, 85, 0.12); border: 1.5px solid #fe2c55; border-radius: 10px; padding: 8px 4px; cursor: pointer; transition: all 0.2s;">
+                <span style="color: #fe2c55; font-size: 13px; font-weight: 900;">🔴 UNDER 2x</span>
+                <span style="color: #cbd5e1; font-size: 10px; margin-top: 2px;">Crash &lt; 2.00x</span>
+                <span style="color: #ffb703; font-size: 11px; font-weight: 900; margin-top: 2px;">1.95x Win</span>
+              </button>
+              <button type="button" id="btnCrashColorGreen" class="btn-crash-color" onclick="window.app && window.app.selectCrashColorPrediction('green')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 231, 1, 0.12); border: 1.5px solid #00e701; border-radius: 10px; padding: 8px 4px; cursor: pointer; transition: all 0.2s;">
+                <span style="color: #00e701; font-size: 13px; font-weight: 900;">🟢 OVER 2x</span>
+                <span style="color: #cbd5e1; font-size: 10px; margin-top: 2px;">Flies &ge; 2.00x</span>
+                <span style="color: #ffb703; font-size: 11px; font-weight: 900; margin-top: 2px;">2.00x Win</span>
+              </button>
+              <button type="button" id="btnCrashColorBlue" class="btn-crash-color" onclick="window.app && window.app.selectCrashColorPrediction('blue')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0, 229, 255, 0.12); border: 1.5px solid #00e5ff; border-radius: 10px; padding: 8px 4px; cursor: pointer; transition: all 0.2s;">
+                <span style="color: #00e5ff; font-size: 13px; font-weight: 900;">🔵 MOON 10x+</span>
+                <span style="color: #cbd5e1; font-size: 10px; margin-top: 2px;">Rocket &ge; 10x</span>
+                <span style="color: #00f59b; font-size: 11px; font-weight: 900; margin-top: 2px;">10.00x Win</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Crash How to Play -->
           <div class="game-how-to-play">
             <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
@@ -1041,7 +1066,8 @@
               <ul>
                 <li>Place your bet and watch the rocket take off into the sky.</li>
                 <li>The multiplier grows higher every second (up to 1,000x+).</li>
-                <li>Click <b>CASHOUT</b> before the rocket crashes to take your profits!</li>
+                <li><b>Color Bet:</b> 🔴 Red pays 1.95x on &lt;2x crash, 🟢 Green pays 2.00x on &ge;2x, 🔵 Blue pays 10.00x on &ge;10x!</li>
+                <li>Or click <b>CASHOUT</b> before the rocket crashes to take your manual multiplier profit!</li>
               </ul>
             </div>
           </div>
@@ -1446,90 +1472,41 @@
           </div>
 
           <!-- Win Go Period & Timer Header -->
-          <div class="trading-header-card">
+          <div class="trading-header-card" style="display: flex; justify-content: space-between; align-items: center; background: rgba(15, 33, 46, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px 12px; margin-bottom: 8px;">
             <div class="trading-period-badge">
-              <span class="trading-period-label">Period ID</span>
-              <span id="tradingPeriodId" class="trading-period-id">--</span>
+              <span class="trading-period-label" style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">Period</span>
+              <span id="tradingPeriodId" class="trading-period-id" style="font-size: 13px; font-weight: 800; color: #00e5ff;">--</span>
             </div>
-            <div class="trading-timer-box">
-              <span class="trading-timer-label">Time Remaining</span>
-              <div class="trading-timer-digits">
-                <span class="time-digit-pill">0</span>
-                <span class="time-digit-pill">0</span>
-                <span style="font-size:20px; font-weight:800; color:#fff; align-self:center;">:</span>
-                <span id="timerDigit1" class="time-digit-pill">3</span>
-                <span id="timerDigit2" class="time-digit-pill">0</span>
+            <div class="trading-timer-box" style="display: flex; flex-direction: column; align-items: flex-end;">
+              <span class="trading-timer-label" style="font-size: 10px; color: #94a3b8; text-transform: uppercase;">Time Remaining</span>
+              <div class="trading-timer-digits" style="display: flex; gap: 3px; align-items: center;">
+                <span class="time-digit-pill" style="background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 12px;">0</span>
+                <span class="time-digit-pill" style="background: rgba(0,0,0,0.6); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 12px;">0</span>
+                <span style="font-size:12px; font-weight:800; color:#fff;">:</span>
+                <span id="timerDigit1" class="time-digit-pill" style="background: #fe2c55; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 12px;">3</span>
+                <span id="timerDigit2" class="time-digit-pill" style="background: #fe2c55; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 900; font-size: 12px;">0</span>
               </div>
             </div>
           </div>
 
-          <!-- Color Bet Buttons -->
-          <div class="color-bet-buttons-row">
-            <button id="btnBetGreen" class="btn-color-bet btn-green-bet" data-choice="green" onclick="window.app && window.app.placeColorBet('color', 'green')">
-              <span>🟢 Join Green</span>
-              <span class="payout-tag">2x (1.5x on 5)</span>
-            </button>
-            <button id="btnBetViolet" class="btn-color-bet btn-violet-bet" data-choice="violet" onclick="window.app && window.app.placeColorBet('color', 'violet')">
-              <span>🟣 Join Violet</span>
-              <span class="payout-tag">4.5x (on 0, 5)</span>
-            </button>
-            <button id="btnBetRed" class="btn-color-bet btn-red-bet" data-choice="red" onclick="window.app && window.app.placeColorBet('color', 'red')">
-              <span>🔴 Join Red</span>
-              <span class="payout-tag">2x (1.5x on 0)</span>
-            </button>
-          </div>
-
-          <!-- Numbers 0-9 Keypad Matrix -->
-          <div class="numbers-bet-grid">
-            <button class="btn-number-bet num-green" data-number="1" onclick="window.app && window.app.placeColorBet('number', 1)">1 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="2" onclick="window.app && window.app.placeColorBet('number', 2)">2 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="3" onclick="window.app && window.app.placeColorBet('number', 3)">3 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="4" onclick="window.app && window.app.placeColorBet('number', 4)">4 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-violet-green" data-number="5" onclick="window.app && window.app.placeColorBet('number', 5)">5 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="6" onclick="window.app && window.app.placeColorBet('number', 6)">6 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="7" onclick="window.app && window.app.placeColorBet('number', 7)">7 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-red" data-number="8" onclick="window.app && window.app.placeColorBet('number', 8)">8 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-green" data-number="9" onclick="window.app && window.app.placeColorBet('number', 9)">9 <span class="num-payout">9x</span></button>
-            <button class="btn-number-bet num-violet-red btn-number-0" data-number="0" onclick="window.app && window.app.placeColorBet('number', 0)">0 <span class="num-payout">9x Jackpot</span></button>
-          </div>
-
-          <!-- Big / Small Buttons -->
-          <div class="big-small-row">
-            <button id="btnBetBig" class="btn-big-bet" data-choice="big" onclick="window.app && window.app.placeColorBet('size', 'big')">
-              <span>🟡 Big (5 - 9)</span>
-              <span class="payout-tag">2x Payout</span>
-            </button>
-            <button id="btnBetSmall" class="btn-small-bet" data-choice="small" onclick="window.app && window.app.placeColorBet('size', 'small')">
-              <span>🔵 Small (0 - 4)</span>
-              <span class="payout-tag">2x Payout</span>
-            </button>
-          </div>
-
-          <!-- Active Bets In Round -->
-          <div id="tradingActiveBetsSlip" class="trading-active-bets" style="display: none;">
-            <strong>Your Active Bets This Round:</strong>
-            <div id="activeBetsList" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
-          </div>
-
           <!-- Recent Trend Balls -->
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes & Trends:</span>
-            <div class="trend-balls-row" id="trendBallsRow"></div>
+          <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes:</span>
+              <span style="font-size: 10px; color: #10b981; font-weight: 800;">● Live Updated</span>
+            </div>
+            <div class="trend-balls-row" id="trendBallsRow" style="display: flex; gap: 6px; overflow-x: auto; padding: 2px 0;"></div>
           </div>
 
-          <!-- Win Go Trend Chart & Game Record Table -->
-          <div class="wingo-history-card" style="margin-top: 14px; background: rgba(15, 33, 46, 0.75); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; overflow-x: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <strong style="color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px;">📊 Win Go Game Record & Chart</strong>
-              <span style="font-size: 11px; color: #10b981; font-weight: 700;">● Live Updated</span>
-            </div>
-            <table class="bets-table" style="width: 100%; font-size: 12px; text-align: center;">
+          <!-- Win Go Trend Chart & Game Record Table (Placed at Top) -->
+          <div class="wingo-history-card" style="margin-bottom: 10px; background: rgba(15, 33, 46, 0.75); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; max-height: 140px; overflow-y: auto;">
+            <table class="bets-table" style="width: 100%; font-size: 11px; text-align: center;">
               <thead>
-                <tr>
-                  <th style="text-align: left; padding: 8px 10px;">Period</th>
-                  <th style="padding: 8px 10px;">Number</th>
-                  <th style="padding: 8px 10px;">Big / Small</th>
-                  <th style="padding: 8px 10px;">Color</th>
+                <tr style="color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                  <th style="text-align: left; padding: 4px 6px;">Period</th>
+                  <th style="padding: 4px 6px;">Number</th>
+                  <th style="padding: 4px 6px;">Big / Small</th>
+                  <th style="padding: 4px 6px;">Color</th>
                 </tr>
               </thead>
               <tbody id="wingoChartTableBody">

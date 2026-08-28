@@ -62,8 +62,8 @@
 .tower-diff-btn {
   flex: 1;
   padding: 10px 4px;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: var(--text-secondary);
   font-size: 12px;
@@ -72,11 +72,32 @@
   transition: all 0.2s ease;
 }
 
-.tower-diff-btn.active {
-  background: linear-gradient(135deg, rgba(0, 229, 255, 0.25), rgba(0, 119, 255, 0.25));
+.tower-diff-btn[data-diff="easy"].active {
+  background: rgba(0, 231, 1, 0.2);
+  color: #00e701;
+  border: 1.5px solid #00e701;
+  box-shadow: 0 0 14px rgba(0, 231, 1, 0.4);
+}
+
+.tower-diff-btn[data-diff="medium"].active {
+  background: rgba(0, 229, 255, 0.2);
   color: #00e5ff;
-  border: 1px solid #00e5ff;
-  box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+  border: 1.5px solid #00e5ff;
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.4);
+}
+
+.tower-diff-btn[data-diff="hard"].active {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1.5px solid #f59e0b;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+}
+
+.tower-diff-btn[data-diff="extreme"].active {
+  background: rgba(254, 44, 85, 0.25);
+  color: #fe2c55;
+  border: 1.5px solid #fe2c55;
+  box-shadow: 0 0 14px rgba(254, 44, 85, 0.5);
 }
 
 .tower-floors-container {

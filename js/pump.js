@@ -53,9 +53,25 @@ class CasinoPump {
     }
   }
 
-  setBetAmount(amt) {
-    this.betAmount = Math.max(1, parseFloat(amt) || 10);
-    this.updateUI();
+  setDifficulty(diff) {
+    this.difficulty = diff || 'medium';
+    if (this.statusText && !this.isPlaying) {
+      const names = { easy: '🟢 Easy (Safe Payouts)', medium: '🟡 Medium (Balanced)', hard: '🔴 Hard (High Multipliers)', daredevil: '⚡ Daredevil (Insane 1000x)' };
+      this.statusText.innerHTML = `<span style="color:#94a3b8;">Difficulty: <b style="color:#00e5ff;">${names[this.difficulty] || 'Medium'}</b> | Tap PUMP to play</span>`;
+    }
+  }
+
+  getStepMultipliers() {
+    const diff = this.difficulty || 'medium';
+    if (diff === 'easy') {
+      return [1.00, 1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.25, 2.75, 3.50];
+    } else if (diff === 'hard') {
+      return [1.00, 1.30, 1.80, 2.60, 4.00, 6.50, 11.00, 20.00, 40.00, 100.00];
+    } else if (diff === 'daredevil') {
+      return [1.00, 1.50, 2.50, 4.50, 8.50, 18.00, 45.00, 120.00, 350.00, 1000.00];
+    }
+    // Medium / Balanced
+    return [1.00, 1.15, 1.35, 1.65, 2.10, 2.75, 3.70, 5.20, 7.80, 12.00];
   }
 
   startGame(betAmount) {
@@ -78,23 +94,30 @@ class CasinoPump {
     this.balloonScale = 1.0;
     this.roundId = 'PMP-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6);
 
-    // Smooth & Rewarding Pump Experience (Low Loss on First Few Pumps):
-    // 5% pop on Pump 1
-    // 15% pop on Pump 2
-    // 40% pop on Pump 3 or 4 (1.4x - 1.8x)
-    // 25% pop on Pump 5 or 6 (2.2x - 3.5x)
-    // 15% reach Pump 7+ (4.8x - 12x)
+    const diff = this.difficulty || 'medium';
     const r = Math.random();
-    if (r < 0.05) {
-      this.targetPopPump = 1;
-    } else if (r < 0.20) {
-      this.targetPopPump = 2;
-    } else if (r < 0.60) {
-      this.targetPopPump = 3 + Math.floor(Math.random() * 2); // 3 or 4
-    } else if (r < 0.85) {
-      this.targetPopPump = 5 + Math.floor(Math.random() * 2); // 5 or 6
+
+    if (diff === 'easy') {
+      if (r < 0.03) this.targetPopPump = 2;
+      else if (r < 0.20) this.targetPopPump = 3 + Math.floor(Math.random() * 2);
+      else if (r < 0.65) this.targetPopPump = 5 + Math.floor(Math.random() * 2);
+      else this.targetPopPump = 7 + Math.floor(Math.random() * 3);
+    } else if (diff === 'hard') {
+      if (r < 0.15) this.targetPopPump = 1;
+      else if (r < 0.50) this.targetPopPump = 2 + Math.floor(Math.random() * 2);
+      else if (r < 0.85) this.targetPopPump = 4 + Math.floor(Math.random() * 2);
+      else this.targetPopPump = 6 + Math.floor(Math.random() * 2);
+    } else if (diff === 'daredevil') {
+      if (r < 0.35) this.targetPopPump = 1;
+      else if (r < 0.70) this.targetPopPump = 2;
+      else if (r < 0.90) this.targetPopPump = 3 + Math.floor(Math.random() * 2);
+      else this.targetPopPump = 5 + Math.floor(Math.random() * 2);
     } else {
-      this.targetPopPump = 7 + Math.floor(Math.random() * 3); // 7, 8, 9
+      // Medium
+      if (r < 0.05) this.targetPopPump = 1;
+      else if (r < 0.25) this.targetPopPump = 2 + Math.floor(Math.random() * 2);
+      else if (r < 0.70) this.targetPopPump = 4 + Math.floor(Math.random() * 2);
+      else this.targetPopPump = 6 + Math.floor(Math.random() * 3);
     }
 
     this.resetBalloonVisuals();
@@ -117,12 +140,13 @@ class CasinoPump {
       return;
     }
 
-    // Step Multipliers (Controlled Casino Curve)
-    const stepMults = [1.00, 1.15, 1.32, 1.58, 1.95, 2.50, 3.40, 4.80, 7.50, 12.00];
+    // Step Multipliers based on difficulty
+    const stepMults = this.getStepMultipliers();
     if (this.pumpCount < stepMults.length) {
       this.currentMultiplier = stepMults[this.pumpCount];
     } else {
-      this.currentMultiplier = Math.round(this.currentMultiplier * 1.35 * 100) / 100;
+      const growth = (this.difficulty === 'daredevil' ? 2.0 : (this.difficulty === 'hard' ? 1.6 : 1.3));
+      this.currentMultiplier = Math.round(this.currentMultiplier * growth * 100) / 100;
     }
 
     this.balloonScale = 1.0 + Math.min(1.6, this.pumpCount * 0.16);

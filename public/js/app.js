@@ -4536,6 +4536,8 @@ class AppController {
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "1.50";
+      // Pump
+      if (this.pump) this.pump.setDifficulty('easy');
 
     } else if (diff === 'hard') {
       if (this.dom.btnDiffHard) this.dom.btnDiffHard.classList.add('active');
@@ -4569,6 +4571,8 @@ class AppController {
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "5.00";
+      // Pump
+      if (this.pump) this.pump.setDifficulty('hard');
 
     } else if (diff === 'daredevil') {
       const btnDare = document.getElementById('btnDiffDaredevil');
@@ -4596,6 +4600,8 @@ class AppController {
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "20.00";
+      // Pump
+      if (this.pump) this.pump.setDifficulty('daredevil');
 
     } else {
       // Medium
@@ -4630,6 +4636,8 @@ class AppController {
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "2.00";
+      // Pump
+      if (this.pump) this.pump.setDifficulty('medium');
     }
 
     if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
@@ -6238,6 +6246,10 @@ class AppController {
 
   // ================= AUTO PLAY ENGINE (Mines, Chicken, Crash) =================
   setBetMode(mode) {
+    if (this.currentGame === 'moles' && mode === 'auto') {
+      this.showNotification("ℹ️ Stake Moles is exclusively manual burrow digging.", "info");
+      return;
+    }
     if (this.isAutoPlaying) {
       this.stopAutoPlay("Switched to " + mode + " mode.");
     }
@@ -6629,14 +6641,12 @@ class AppController {
       this.autoStepTimers.push(nextTimer);
     }, 250);
     this.autoStepTimers.push(timer);
-  }
-
-  runDiceAutoRound(betAmount) {
-    if (!this.dice && window.CasinoDice && (document.getElementById('diceView') || this.dom.diceView)) {
-      this.dice = new window.CasinoDice('diceView');
+  runLimboAutoRound(betAmount) {
+    if (!this.limbo && window.CasinoLimbo && (document.getElementById('limboView') || this.dom.limboView)) {
+      this.limbo = new window.CasinoLimbo('limboView');
     }
-    if (this.dice) {
-      this.dice.roll(betAmount);
+    if (this.limbo) {
+      this.limbo.roll(betAmount);
     }
     const timer = setTimeout(() => {
       if (!this.isAutoPlaying) return;
@@ -6650,10 +6660,39 @@ class AppController {
       }
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 120);
+      }, 150);
       this.autoStepTimers.push(nextTimer);
-    }, 280);
+    }, 320);
     this.autoStepTimers.push(timer);
+  }
+
+  selectCrashColorPrediction(color) {
+    if (!this.crash && window.CasinoCrash) {
+      this.crash = new window.CasinoCrash('crashCanvas', {});
+    }
+    if (this.crash) {
+      const activeColor = this.crash.setColorPrediction(color);
+      const tag = document.getElementById('crashSelectedColorTag');
+      const btnRed = document.getElementById('btnCrashColorRed');
+      const btnGreen = document.getElementById('btnCrashColorGreen');
+      const btnBlue = document.getElementById('btnCrashColorBlue');
+
+      [btnRed, btnGreen, btnBlue].forEach(b => b && (b.style.boxShadow = 'none'));
+
+      if (activeColor === 'red') {
+        if (tag) { tag.innerText = '🔴 Red Bet Active (Win if Crash < 2x)'; tag.style.color = '#fe2c55'; }
+        if (btnRed) btnRed.style.boxShadow = '0 0 14px #fe2c55';
+      } else if (activeColor === 'green') {
+        if (tag) { tag.innerText = '🟢 Green Bet Active (Win if Crash >= 2x)'; tag.style.color = '#00e701'; }
+        if (btnGreen) btnGreen.style.boxShadow = '0 0 14px #00e701';
+      } else if (activeColor === 'blue') {
+        if (tag) { tag.innerText = '🔵 Moon Bet Active (Win if Rocket >= 10x)'; tag.style.color = '#00e5ff'; }
+        if (btnBlue) btnBlue.style.boxShadow = '0 0 14px #00e5ff';
+      } else {
+        if (tag) { tag.innerText = 'Manual Cashout Mode'; tag.style.color = '#94a3b8'; }
+      }
+      window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    }
   }
 
   runDragonTigerAutoRound(betAmount) {
@@ -7172,44 +7211,49 @@ class AppController {
   }
 
   startOnlineMembersLoop() {
-    let baseOnline = 8400 + Math.floor(Math.random() * 2600); // 8,400 to 11,000 range
-    setInterval(() => {
-      // Dynamic active fluctuation between 8,000 to 11,800
-      const delta = Math.floor((Math.random() - 0.48) * 380);
-      baseOnline = Math.max(8120, Math.min(11650, baseOnline + delta));
-      if (this.dom.liveOnlineUsersCounter) {
-        this.dom.liveOnlineUsersCounter.innerText = `${(baseOnline / 1000).toFixed(1)}k`;
-      }
-    }, 1800);
-
-    // Dynamic player counts (2,400 to 7,800 per game) updating every 3 seconds
     const gameTabBadges = [
-      { id: 'tabMines', base: 5400 },
-      { id: 'tabDragonTiger', base: 4800 },
-      { id: 'tabLimbo', base: 3900 },
-      { id: 'tabPump', base: 4500 },
-      { id: 'tabChicken', base: 6100 },
-      { id: 'tabPlinko', base: 7300 },
-      { id: 'tabCrash', base: 6800 },
-      { id: 'tabMoles', base: 3700 },
-      { id: 'tabColorTrading', base: 5900 },
-      { id: 'tabStock', base: 3200 },
-      { id: 'tabDice', base: 2800 },
-      { id: 'tabTower', base: 4600 }
+      { id: 'tabMines', weight: 0.14 },       // ~1,400
+      { id: 'tabChicken', weight: 0.13 },     // ~1,300
+      { id: 'tabCrash', weight: 0.14 },       // ~1,400
+      { id: 'tabDragonTiger', weight: 0.12 }, // ~1,200
+      { id: 'tabPlinko', weight: 0.11 },      // ~1,100
+      { id: 'tabPump', weight: 0.09 },        // ~900
+      { id: 'tabLimbo', weight: 0.08 },       // ~800
+      { id: 'tabTower', weight: 0.07 },       // ~700
+      { id: 'tabColorTrading', weight: 0.05 },// ~500
+      { id: 'tabMoles', weight: 0.04 },       // ~400
+      { id: 'tabStock', weight: 0.04 },       // ~400
+      { id: 'tabDice', weight: 0.03 }         // ~300
     ];
 
-    setInterval(() => {
+    let baseTotal = 8400 + Math.floor(Math.random() * 2500);
+
+    const updateAllCounts = () => {
+      const delta = Math.floor((Math.random() - 0.49) * 260);
+      baseTotal = Math.max(8200, Math.min(11500, baseTotal + delta));
+
+      if (this.dom.liveOnlineUsersCounter) {
+        this.dom.liveOnlineUsersCounter.innerText = `${(baseTotal / 1000).toFixed(1)}k`;
+      }
+      const headerTotal = document.getElementById('headerTotalOnlinePlayers');
+      if (headerTotal) {
+        headerTotal.innerText = `${baseTotal.toLocaleString()} Players Live`;
+      }
+
       gameTabBadges.forEach(item => {
         const tabEl = document.getElementById(item.id);
         if (tabEl) {
           const badge = tabEl.querySelector('.tab-badge');
           if (badge) {
-            const count = Math.max(2100, Math.min(7900, item.base + Math.floor((Math.random() - 0.5) * 450)));
+            const count = Math.round(baseTotal * item.weight + (Math.random() - 0.5) * 40);
             badge.innerText = `🟢 ${(count / 1000).toFixed(1)}k`;
           }
         }
       });
-    }, 3200);
+    };
+
+    updateAllCounts();
+    setInterval(updateAllCounts, 2800);
   }
 
   startCommunityLiveWinsStream() {
