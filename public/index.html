@@ -1700,10 +1700,10 @@
           <div class="moles-stage-wrapper">
             <div class="moles-history-row" id="molesHistoryList"></div>
 
-            <div class="moles-stats-card">
-              <div class="moles-stat-item">
+            <div class="moles-stats-card" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%;">
+              <div class="moles-stat-item" style="flex: 1;">
                 <div class="moles-stat-label">Traps Count</div>
-                <select id="molesTrapSelect" style="background: rgba(0,0,0,0.5); color: #00e5ff; border: 1px solid #00e5ff; border-radius: 6px; padding: 4px 8px; font-weight: 800; margin-top: 4px;">
+                <select id="molesTrapSelect" style="background: rgba(0,0,0,0.5); color: #00e5ff; border: 1.5px solid #00e5ff; border-radius: 8px; padding: 6px 10px; font-weight: 800; margin-top: 4px; width: 100%;">
                   <option value="1">1 Trap (Safe)</option>
                   <option value="2">2 Traps</option>
                   <option value="3" selected>3 Traps (Standard)</option>
@@ -1711,13 +1711,13 @@
                   <option value="5">5 Traps (Extreme)</option>
                 </select>
               </div>
-              <div class="moles-stat-item">
-                <div class="moles-stat-label">Multiplier</div>
-                <div class="moles-stat-val" id="molesMultiplierDisplay">1.00x</div>
-              </div>
-              <div class="moles-stat-item">
-                <div class="moles-stat-label">Current Profit</div>
-                <div class="moles-stat-val" id="molesProfitDisplay">₹0.00</div>
+              <div class="moles-stat-item moles-combined-box" style="flex: 1.2; background: rgba(0, 231, 1, 0.08); border: 1.5px solid rgba(0, 231, 1, 0.35); border-radius: 12px; padding: 6px 12px; text-align: center;">
+                <div class="moles-stat-label" style="color: #00e701; font-size: 11px; font-weight: 800; text-transform: uppercase;">Multiplier & Profit</div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2px;">
+                  <span class="moles-stat-val" id="molesMultiplierDisplay" style="color: #00e5ff; font-size: 19px; font-weight: 900;">1.00x</span>
+                  <span style="color: rgba(255,255,255,0.3); font-weight: 900;">•</span>
+                  <span class="moles-stat-val" id="molesProfitDisplay" style="color: #00e701; font-size: 19px; font-weight: 900;">₹10.00</span>
+                </div>
               </div>
             </div>
 
