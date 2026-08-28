@@ -611,34 +611,34 @@
         </button>
       </div>
 
-      <!-- Page 3 Group (Games 9-12) -->
+      <!-- Page 3 Group (Games 9-12: Dice, Tower, Win Go, Stock BTC) -->
       <div id="gamePageGroup3" class="game-page-group" style="display: none;">
-        <!-- 9. Win Go 30s -->
-        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🎨</span>
-          <span style="font-weight: 800;">Win Go</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 5.9k</span>
-        </button>
-
-        <!-- 10. Stock BTC -->
-        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">📈</span>
-          <span style="font-weight: 800;">Stock BTC</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 3.2k</span>
-        </button>
-
-        <!-- 11. Classic Dice -->
+        <!-- 9. Classic Dice (Page 3 - 1st) -->
         <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎲</span>
           <span style="font-weight: 900;">Dice</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 2.8k</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 4.2k</span>
         </button>
 
-        <!-- 12. Tower Legend (Page 3) -->
+        <!-- 10. Tower Legend (Page 3 - 2nd) -->
         <button id="tabTower" class="tab-btn" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🏰💎</span>
           <span style="font-weight: 900;">Tower</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #10b981, #00e701); color: #000; font-size: 8.5px; font-weight: 900;">🟢 4.6k</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #10b981, #00e701); color: #000; font-size: 8.5px; font-weight: 900;">🟢 5.8k</span>
+        </button>
+
+        <!-- 11. Win Go 30s (Page 3 - 3rd) -->
+        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🎨</span>
+          <span style="font-weight: 800;">Win Go</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 6.4k</span>
+        </button>
+
+        <!-- 12. Stock BTC (Page 3 - 4th) -->
+        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">📈</span>
+          <span style="font-weight: 800;">Stock BTC</span>
+          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 3.9k</span>
         </button>
       </div>
     </div>
@@ -908,6 +908,21 @@
             <div class="mine-tile" data-index="23"></div>
             <div class="mine-tile" data-index="24"></div>
           </div>
+
+          <!-- Mines How to Play -->
+          <div class="game-how-to-play">
+            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+              <span>📖 Mines Rules & How to Play</span>
+              <span>▼</span>
+            </div>
+            <div class="how-to-play-body" style="display: none;">
+              <ul>
+                <li>Set your bet amount and select the number of hidden bombs (1 to 24).</li>
+                <li>Click any tile to reveal 💎 Gems. Each gem increases your cashout multiplier!</li>
+                <li>Avoid the 💣 Bombs. Click <b>CASHOUT</b> anytime to lock in your winnings.</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <!-- Game 2: Chicken Road Crossing Highway View -->
@@ -973,6 +988,21 @@
               </button>
             </div>
 
+            <!-- Chicken How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Chicken Road Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Choose highway difficulty mode (Easy, Medium, Hard, Daredevil).</li>
+                  <li>Click <b>JUMP NEXT LANE</b> to guide the chicken across traffic.</li>
+                  <li>Every lane crossed increases your payout. Cash out anytime before hitting a bone!</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -998,6 +1028,21 @@
             <div class="crash-multiplier-overlay">
               <div id="crashMultiplierText" class="crash-big-multiplier">1.00x</div>
               <div id="crashStatusTag" class="crash-status-tag">FLIGHT READY</div>
+            </div>
+          </div>
+
+          <!-- Crash How to Play -->
+          <div class="game-how-to-play">
+            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+              <span>📖 Crash Rocket Rules & How to Play</span>
+              <span>▼</span>
+            </div>
+            <div class="how-to-play-body" style="display: none;">
+              <ul>
+                <li>Place your bet and watch the rocket take off into the sky.</li>
+                <li>The multiplier grows higher every second (up to 1,000x+).</li>
+                <li>Click <b>CASHOUT</b> before the rocket crashes to take your profits!</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -1059,6 +1104,22 @@
                 </select>
               </div>
             </div>
+
+            <!-- Plinko How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Plinko Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Choose your Risk Profile (Low, Medium, High) and number of Rows.</li>
+                  <li>Click BET / Drop Ball to let the ball bounce through the peg pyramid.</li>
+                  <li>Landing in the outer edge buckets awards massive multipliers (up to 1,000x)!</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1112,6 +1173,22 @@
                 <span>🎲 ROLL DICE / BET</span>
               </button>
             </div>
+
+            <!-- Dice How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Classic Dice Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Drag the slider to choose your Target Number (between 2 and 98).</li>
+                  <li>Select <b>Roll Over</b> or <b>Roll Under</b> to set your win condition.</li>
+                  <li>Click ROLL DICE. If the rolled number satisfies the condition, you win up to 9900x!</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1143,6 +1220,22 @@
                 <div style="font-size: 10px; color: #64748b; margin-top: 6px; text-align: center;">Payout: Target × Bet Amount</div>
               </div>
             </div>
+
+            <!-- Limbo How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Limbo Turbo Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Enter your Target Multiplier (from 1.01x up to 1,000,000x).</li>
+                  <li>Click BET to launch the Limbo generator.</li>
+                  <li>If the generated multiplier is equal or greater than your target, you instantly win!</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1443,6 +1536,21 @@
                 <!-- Dynamically populated -->
               </tbody>
             </table>
+
+            <!-- Win Go How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Win Go 30s Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Predict the outcome color (Green, Red, Violet) or exact Number (0-9) drawn every 30s.</li>
+                  <li>Green/Red awards 2x payout; Violet awards 4.5x payout; Correct number awards 9x payout!</li>
+                  <li>Big (5-9) and Small (0-4) bets award 2x payout.</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1504,6 +1612,21 @@
             <strong style="font-size: 13px; color: var(--text-secondary);">Your Open Positions:</strong>
             <div id="stockActiveTradesList" style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;"></div>
           </div>
+
+          <!-- Stock How to Play -->
+          <div class="game-how-to-play">
+            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+              <span>📖 Stock BTC Binary Trading Rules & How to Play</span>
+              <span>▼</span>
+            </div>
+            <div class="how-to-play-body" style="display: none;">
+              <ul>
+                <li>Choose your asset (BTC, ETH, NIFTY) and trade expiration (30s, 60s, 2m).</li>
+                <li>Click <b>CALL (UP)</b> if you predict the price will close higher, or <b>PUT (DOWN)</b> if lower.</li>
+                <li>Correct predictions return +90% profit (1.90x total payout)!</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <!-- Game 10: Stake Crypto Pump Game View -->
@@ -1553,6 +1676,22 @@
                 <span id="pumpCashoutText">💰 CASHOUT</span>
               </button>
             </div>
+
+            <!-- Pump How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Stake Pump Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Click <b>START PUMP</b> to begin a round.</li>
+                  <li>Each <b>PUMP</b> compresses air and multiplies your balloon payout.</li>
+                  <li>Click <b>CASHOUT</b> before the balloon pops to secure your winnings!</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1597,6 +1736,22 @@
                 <span id="molesCashoutText">💰 CASHOUT</span>
               </button>
             </div>
+
+            <!-- Moles How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Stake Moles Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Choose the number of hammer traps (1 to 5) in the 12-hole burrow grid.</li>
+                  <li>Click any mound to dig. Uncovering a 🐹 Golden Mole multiplies your profit.</li>
+                  <li>Avoid the 🔨 Hammer Traps. Cash out anytime to collect!</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1628,6 +1783,23 @@
                 <span id="towerCashoutText">👑 CASHOUT FLOOR</span>
               </button>
             </div>
+
+            <!-- Tower How to Play -->
+            <div class="game-how-to-play">
+              <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
+                <span>📖 Tower Legend Rules & How to Play</span>
+                <span>▼</span>
+              </div>
+              <div class="how-to-play-body" style="display: none;">
+                <ul>
+                  <li>Select Tower difficulty mode (Easy, Medium, Hard, Extreme).</li>
+                  <li>Click START to begin at Floor 1. Pick a doorway on the active level.</li>
+                  <li>Uncovering a 💎 Gem advances you to the next floor with higher multipliers!</li>
+                  <li>Avoid 💀 Skulls. Click <b>CASHOUT FLOOR</b> anytime to collect your loot.</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 

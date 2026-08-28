@@ -4624,7 +4624,7 @@ class AppController {
     const pageGames = {
       1: ['mines', 'dragontiger', 'limbo', 'pump'],
       2: ['chicken', 'plinko', 'crash', 'moles'],
-      3: ['colortrading', 'stock', 'dice', 'tower']
+      3: ['dice', 'tower', 'colortrading', 'stock']
     };
     if (!pageGames[pageNum].includes(this.currentGame)) {
       this.switchGame(pageGames[pageNum][0]);
@@ -5097,6 +5097,19 @@ class AppController {
       if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(betAmount);
       this.activeInstance.startGame();
     }
+
+    // Instantly switch BET button to active CASHOUT button for interactive games
+    if (['mines', 'chicken', 'chickenmines', 'pump', 'moles', 'tower', 'crash'].includes(this.currentGame)) {
+      if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
+      if (this.dom.btnActionCashout) {
+        this.dom.btnActionCashout.style.display = 'flex';
+        this.dom.btnActionCashout.disabled = false;
+        const amtDisp = document.getElementById('cashoutAmountDisplay');
+        const multDisp = document.getElementById('cashoutMultiplierDisplay');
+        if (amtDisp) amtDisp.innerText = `₹${betAmount.toFixed(2)}`;
+        if (multDisp) multDisp.innerText = `1.00x`;
+      }
+    }
   }
 
   handleCashoutClick() {
@@ -5117,6 +5130,10 @@ class AppController {
     } else if (this.activeInstance && this.activeInstance.cashOut) {
       this.activeInstance.cashOut();
     }
+
+    // Switch back to BET button
+    if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
+    if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'flex';
   }
 
   setPlinkoRisk(risk) {
