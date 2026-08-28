@@ -5166,12 +5166,17 @@ class AppController {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
       if (this.dom.btnActionCashout) {
         this.dom.btnActionCashout.style.display = 'flex';
-        this.dom.btnActionCashout.disabled = false;
+        const isStepGame = ['mines', 'chicken', 'chickenmines', 'moles', 'tower'].includes(this.currentGame);
+        this.dom.btnActionCashout.disabled = isStepGame;
         const amtDisp = document.getElementById('cashoutAmountDisplay');
         const multDisp = document.getElementById('cashoutMultiplierDisplay');
-        if (amtDisp) amtDisp.innerText = `₹${betAmount.toFixed(2)}`;
-        if (multDisp) multDisp.innerText = `1.00x`;
+        if (amtDisp) amtDisp.innerText = isStepGame ? `${window.wallet.currency}0.00` : `${window.wallet.currency}${betAmount.toFixed(2)}`;
+        if (multDisp) multDisp.innerText = isStepGame ? `0.00x` : `1.00x`;
       }
+    }
+
+    if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
+      this.activeInstance.updateNextMultiplierPreview();
     }
   }
 
