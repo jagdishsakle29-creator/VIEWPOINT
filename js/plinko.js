@@ -182,16 +182,16 @@ class CasinoPlinko {
     const numRows = this.rows;
     const mid = (count - 1) / 2;
 
-    // Authentic Casino House Edge Probability Distribution (96% RTP):
-    // 78% of drops land in Center Loss Buckets (0.2x - 0.7x) -> House wins
-    // 19% of drops land in Low Win / Push Buckets (1.0x - 2.0x)
+    // Authentic Casino House Edge Probability Distribution (94% RTP):
+    // 85% of drops land in Center Loss Buckets (0.2x - 0.7x) -> House wins
+    // 12% of drops land in Low Win / Push Buckets (1.0x - 2.0x)
     // 3% of drops land in Outer Jackpot Buckets (3x - 1000x)
     let targetBucketIndex = Math.round(mid);
     const rng = Math.random();
 
-    if (rng < 0.78) {
+    if (rng < 0.85) {
       // Land in central loss zone (offset 0, +1, or -1 from center)
-      const offset = (Math.random() < 0.45) ? 0 : (Math.random() < 0.5 ? 1 : -1);
+      const offset = (Math.random() < 0.55) ? 0 : (Math.random() < 0.5 ? 1 : -1);
       targetBucketIndex = Math.round(mid + offset);
     } else if (rng < 0.97) {
       // Land in slight win/push zone (offset 2 or 3)

@@ -1074,6 +1074,24 @@
                 <div class="dice-stat-val" id="diceWinChanceDisplay" style="color: #00e5ff;">50.00%</div>
               </div>
             </div>
+
+            <!-- Direct Roll Dice Action Bar -->
+            <div class="dice-action-row" style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin-left: auto; margin-right: auto;">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="flex: 1; position: relative;">
+                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #00e701;">₹</span>
+                  <input type="number" id="diceDirectBetInput" class="bet-input-field" value="10.00" min="1" step="5" style="padding-left: 28px; width: 100%; height: 44px; font-size: 15px; font-weight: 800; background: rgba(15, 33, 46, 0.9); border: 1.5px solid rgba(0, 231, 1, 0.3); border-radius: 8px; color: #fff;" oninput="document.getElementById('betAmountInput').value = this.value">
+                </div>
+                <div style="display: flex; gap: 4px;">
+                  <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = Math.max(1, (parseFloat(document.getElementById('diceDirectBetInput').value)||10)/2); document.getElementById('diceDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">½</button>
+                  <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = (parseFloat(document.getElementById('diceDirectBetInput').value)||10)*2; document.getElementById('diceDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">2X</button>
+                  <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = (window.wallet ? window.wallet.balance : 100); document.getElementById('diceDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">MAX</button>
+                </div>
+              </div>
+              <button type="button" id="btnDirectRollDice" class="btn-stake-primary btn-bet" style="width: 100%; height: 50px; font-size: 16px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4); display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.app && window.app.handleBetClick()">
+                <span>🎲 ROLL DICE / BET</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1384,6 +1402,27 @@
           <div style="display: flex; flex-direction: column; gap: 4px;">
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Recent Outcomes & Trends:</span>
             <div class="trend-balls-row" id="trendBallsRow"></div>
+          </div>
+
+          <!-- Win Go Trend Chart & Game Record Table -->
+          <div class="wingo-history-card" style="margin-top: 14px; background: rgba(15, 33, 46, 0.75); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; overflow-x: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <strong style="color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px;">📊 Win Go Game Record & Chart</strong>
+              <span style="font-size: 11px; color: #10b981; font-weight: 700;">● Live Updated</span>
+            </div>
+            <table class="bets-table" style="width: 100%; font-size: 12px; text-align: center;">
+              <thead>
+                <tr>
+                  <th style="text-align: left; padding: 8px 10px;">Period</th>
+                  <th style="padding: 8px 10px;">Number</th>
+                  <th style="padding: 8px 10px;">Big / Small</th>
+                  <th style="padding: 8px 10px;">Color</th>
+                </tr>
+              </thead>
+              <tbody id="wingoChartTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -1768,12 +1807,9 @@
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 14px;">
         Congratulations on joining! You've unlocked your exclusive new player reward:
       </p>
-      <div style="background: rgba(0, 231, 1, 0.12); border: 1px dashed #00e701; border-radius: 12px; padding: 14px; margin-bottom: 12px;">
-        <span style="font-size: 12px; text-transform: uppercase; color: #8fa0b5; font-weight: 700; letter-spacing: 1px;">Instant Signup Reward</span>
+      <div style="background: rgba(0, 231, 1, 0.12); border: 1px dashed #00e701; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+        <span style="font-size: 12px; text-transform: uppercase; color: #8fa0b5; font-weight: 700; letter-spacing: 1px;">VIP Signup Reward</span>
         <div style="font-size: 32px; font-weight: 900; color: #00e701; margin-top: 4px;">+₹200.00</div>
-      </div>
-      <div style="font-size: 11.5px; color: #fbbf24; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 7px 10px; margin-bottom: 16px; font-weight: 700; line-height: 1.35;">
-        ⚠️ This is Demo Money for practice only (non-withdrawable). Add funds to unlock real cash withdrawals!
       </div>
       <button id="btnClaimWelcomeBonus" class="btn-action-primary" style="width: 100%; height: 48px; font-size: 15px; font-weight: 800; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); box-shadow: 0 4px 15px rgba(0,231,1,0.4);" onclick="window.app && window.app.claimWelcomeBonus()">
         <span>🎉 CLAIM ₹200 BONUS NOW</span>

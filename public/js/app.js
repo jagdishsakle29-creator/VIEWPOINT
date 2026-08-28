@@ -1961,7 +1961,7 @@ class AppController {
       const net = w.netPayout !== undefined ? w.netPayout : (Math.round((w.amount - fee) * 100) / 100);
       return `
         <tr style="${isRejected ? 'background: rgba(239,68,68,0.06);' : ''}">
-          <td>${w.time}</td>
+          <td><div style="font-size: 11.5px; font-weight: 700; color: #cbd5e1;">${w.date || new Date().toLocaleDateString()}</div><div style="font-size: 10px; color: var(--text-muted);">${w.time || 'Recent'}</div></td>
           <td><span class="channel-tag ${channelClass}">${channel}</span></td>
           <td style="color: ${color}; font-weight: 800;">
             ${window.wallet.currency}${net.toFixed(2)}
@@ -4434,7 +4434,7 @@ class AppController {
       }
       return `
       <tr style="${d.status === 'REJECTED' ? 'background: rgba(239,68,68,0.06);' : ''}">
-        <td>${d.time || 'Recent'}</td>
+        <td><div style="font-size: 11.5px; font-weight: 700; color: #cbd5e1;">${d.date || new Date().toLocaleDateString()}</div><div style="font-size: 10px; color: var(--text-muted);">${d.time || 'Recent'}</div></td>
         <td style="color: ${d.status === 'REJECTED' ? '#ef4444' : 'var(--accent-green)'}; font-weight: 800;">+${window.wallet.currency}${d.amount.toFixed(2)}</td>
         <td><code style="font-size: 11px; color: ${d.status === 'REJECTED' ? '#ff6b6b' : 'var(--accent-cyan)'};">${d.utr}</code></td>
         <td>${badge}</td>
@@ -5490,16 +5490,49 @@ class AppController {
   }
 
   renderTrendBalls(history) {
-    if (!this.dom.trendBallsRow || !history) return;
-    this.dom.trendBallsRow.innerHTML = history.map(item => {
-      let bg = '#10b981';
-      if (item.colors.includes('violet') && item.colors.includes('red')) bg = 'linear-gradient(135deg, #8b5cf6 50%, #ef4444 50%)';
-      else if (item.colors.includes('violet') && item.colors.includes('green')) bg = 'linear-gradient(135deg, #8b5cf6 50%, #10b981 50%)';
-      else if (item.color === 'red') bg = '#ef4444';
-      else if (item.color === 'violet') bg = '#8b5cf6';
+    if (!history) return;
+    if (this.dom.trendBallsRow) {
+      this.dom.trendBallsRow.innerHTML = history.map(item => {
+        let bg = '#10b981';
+        if (item.colors.includes('violet') && item.colors.includes('red')) bg = 'linear-gradient(135deg, #8b5cf6 50%, #ef4444 50%)';
+        else if (item.colors.includes('violet') && item.colors.includes('green')) bg = 'linear-gradient(135deg, #8b5cf6 50%, #10b981 50%)';
+        else if (item.color === 'red') bg = '#ef4444';
+        else if (item.color === 'violet') bg = '#8b5cf6';
 
-      return `<div class="trend-ball" style="background: ${bg};">${item.number}</div>`;
-    }).join('');
+        return `<div class="trend-ball" style="background: ${bg};">${item.number}</div>`;
+      }).join('');
+    }
+
+    const chartBody = document.getElementById('wingoChartTableBody');
+    if (chartBody) {
+      chartBody.innerHTML = history.slice(0, 10).map((item, idx) => {
+        let colorTag = '<span style="background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; padding: 2px 7px; border-radius: 4px; font-weight:800; font-size:11px;">🟢 Green</span>';
+        if (item.colors.includes('violet') && item.colors.includes('red')) {
+          colorTag = '<span style="background: rgba(139,92,246,0.2); color: #c084fc; border: 1px solid #8b5cf6; padding: 2px 7px; border-radius: 4px; font-weight:800; font-size:11px;">🟣 Red+Violet</span>';
+        } else if (item.colors.includes('violet') && item.colors.includes('green')) {
+          colorTag = '<span style="background: rgba(139,92,246,0.2); color: #34d399; border: 1px solid #10b981; padding: 2px 7px; border-radius: 4px; font-weight:800; font-size:11px;">🟣 Green+Violet</span>';
+        } else if (item.color === 'red') {
+          colorTag = '<span style="background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; padding: 2px 7px; border-radius: 4px; font-weight:800; font-size:11px;">🔴 Red</span>';
+        }
+
+        const sizeTag = item.size === 'Big'
+          ? '<span style="color: #fbbf24; font-weight:800;">🟡 BIG</span>'
+          : '<span style="color: #00e5ff; font-weight:800;">🔵 SMALL</span>';
+
+        const basePeriod = (this.colortrading && this.colortrading.periodId) || '202608280010';
+        const numPart = parseInt(basePeriod.slice(-4)) || 10;
+        const displayPeriod = basePeriod.slice(0, -4) + String(Math.max(1, numPart - idx - 1)).padStart(4, '0');
+
+        return `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td style="text-align: left; padding: 6px 10px; font-family: monospace; color: var(--text-muted);">${displayPeriod}</td>
+            <td style="padding: 6px 10px;"><strong style="font-size: 14px; color: #fff;">${item.number}</strong></td>
+            <td style="padding: 6px 10px;">${sizeTag}</td>
+            <td style="padding: 6px 10px;">${colorTag}</td>
+          </tr>
+        `;
+      }).join('');
+    }
   }
 
   renderActiveBetsSlip(bets) {
@@ -6738,8 +6771,8 @@ class AppController {
 
       const isWin = !!item.won && payoutVal > 0;
       const payoutHtml = isWin
-        ? `<span class="payout-green">+${window.wallet.currency}${payoutVal.toFixed(2)}</span>`
-        : `<span class="payout-red">-${window.wallet.currency}${betVal.toFixed(2)}</span>`;
+        ? `<span class="badge-win-pill" style="display:inline-block; background: rgba(0, 231, 1, 0.15); color: #00e701; border: 1.5px solid #00e701; padding: 4px 9px; border-radius: 6px; font-weight: 900; box-shadow: 0 0 8px rgba(0,231,1,0.2);">+${window.wallet.currency}${payoutVal.toFixed(2)}</span>`
+        : `<span class="badge-loss-pill" style="display:inline-block; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1.5px solid #ef4444; padding: 4px 9px; border-radius: 6px; font-weight: 900; box-shadow: 0 0 8px rgba(239,68,68,0.2);">-${window.wallet.currency}${betVal.toFixed(2)}</span>`;
 
       return `
         <tr>
@@ -6753,7 +6786,10 @@ class AppController {
           <td>
             ${payoutHtml}
           </td>
-          <td>${item.time}</td>
+          <td>
+            <div style="font-size: 11.5px; font-weight: 700; color: #cbd5e1;">${item.date || new Date().toLocaleDateString()}</div>
+            <div style="font-size: 10px; color: var(--text-muted);">${item.time}</div>
+          </td>
         </tr>
       `;
     }).join('');
@@ -6833,14 +6869,15 @@ class AppController {
   }
 
   startOnlineMembersLoop() {
-    let baseOnline = Math.floor(6400 + Math.random() * 2600); // 6.4k to 9.0k (5k-10k range)
+    let baseOnline = 8400 + Math.floor(Math.random() * 2600); // 8,400 to 11,000 range
     setInterval(() => {
-      const delta = Math.floor((Math.random() - 0.49) * 32);
-      baseOnline = Math.max(5240, Math.min(9860, baseOnline + delta));
+      // Dynamic active fluctuation between 8,000 to 11,800
+      const delta = Math.floor((Math.random() - 0.48) * 380);
+      baseOnline = Math.max(8120, Math.min(11650, baseOnline + delta));
       if (this.dom.liveOnlineUsersCounter) {
         this.dom.liveOnlineUsersCounter.innerText = `${(baseOnline / 1000).toFixed(1)}k`;
       }
-    }, 2800);
+    }, 1800);
   }
 
   startCommunityLiveWinsStream() {
