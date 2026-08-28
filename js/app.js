@@ -4551,12 +4551,12 @@ class AppController {
       if (plinkoSelect) plinkoSelect.value = "low";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
-        this.dom.crashAutoCashoutInput.value = "1.50";
-        if (this.crash) this.crash.setAutoCashout(1.50);
+        this.dom.crashAutoCashoutInput.value = "1.30";
+        if (this.crash) this.crash.setAutoCashout(1.30);
       }
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
-      if (limboInput) limboInput.value = "1.50";
+      if (limboInput) limboInput.value = "1.30";
       // Pump
       if (this.pump) this.pump.setDifficulty('easy');
 
@@ -4586,12 +4586,12 @@ class AppController {
       if (plinkoSelect) plinkoSelect.value = "hard";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
-        this.dom.crashAutoCashoutInput.value = "5.00";
-        if (this.crash) this.crash.setAutoCashout(5.00);
+        this.dom.crashAutoCashoutInput.value = "6.50";
+        if (this.crash) this.crash.setAutoCashout(6.50);
       }
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
-      if (limboInput) limboInput.value = "5.00";
+      if (limboInput) limboInput.value = "6.50";
       // Pump
       if (this.pump) this.pump.setDifficulty('hard');
 
@@ -4620,7 +4620,7 @@ class AppController {
       if (this.plinko) this.plinko.setRisk('hard');
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
-      if (limboInput) limboInput.value = "20.00";
+      if (limboInput) limboInput.value = "18.00";
       // Pump
       if (this.pump) this.pump.setDifficulty('daredevil');
 
@@ -4651,12 +4651,12 @@ class AppController {
       if (plinkoSelect) plinkoSelect.value = "medium";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
-        this.dom.crashAutoCashoutInput.value = "2.00";
-        if (this.crash) this.crash.setAutoCashout(2.00);
+        this.dom.crashAutoCashoutInput.value = "2.10";
+        if (this.crash) this.crash.setAutoCashout(2.10);
       }
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
-      if (limboInput) limboInput.value = "2.00";
+      if (limboInput) limboInput.value = "2.10";
       // Pump
       if (this.pump) this.pump.setDifficulty('medium');
     }

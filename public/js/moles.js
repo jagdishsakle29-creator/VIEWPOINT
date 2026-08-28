@@ -163,13 +163,20 @@ class CasinoMoles {
   }
 
   calculateMultiplier(molesFound, traps) {
-    const total = this.totalHoles;
-    let prob = 1.0;
-    for (let i = 0; i < molesFound; i++) {
-      prob *= (total - traps - i) / (total - i);
-    }
-    const rawMult = (0.94 / prob); // 94% RTP
-    return Math.max(1.15, Math.floor(rawMult * 100) / 100);
+    let baseCurves = {
+      easy: [1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.20, 2.60, 3.10, 3.75, 4.60, 5.70],
+      medium: [1.15, 1.35, 1.65, 2.10, 2.75, 3.70, 5.20, 7.50, 11.00, 16.50, 25.00, 39.00],
+      hard: [1.30, 1.80, 2.60, 4.00, 6.50, 11.00, 20.00, 38.00, 75.00, 150.00, 310.00, 650.00],
+      daredevil: [1.50, 2.50, 4.50, 8.50, 18.00, 45.00, 120.00, 320.00, 900.00, 2600.00, 7800.00, 24000.00]
+    };
+
+    let curve = baseCurves.medium;
+    if (traps <= 1) curve = baseCurves.easy;
+    else if (traps === 4) curve = baseCurves.hard;
+    else if (traps >= 5) curve = baseCurves.daredevil;
+
+    const idx = Math.max(0, Math.min(curve.length - 1, molesFound - 1));
+    return curve[idx] || 1.15;
   }
 
   handleTrapHit(index, holeEl) {

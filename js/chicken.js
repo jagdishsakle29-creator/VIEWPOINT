@@ -56,21 +56,16 @@ class ChickenGame {
 
   generateMultiplierTable() {
     this.multipliers = [1.0];
-    const safeProbability = 1.0 - this.hazardRate;
-    const houseEdge = 0.97;
-    let mult = 1.0;
+    let baseCurves = {
+      easy: [1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.20, 2.60, 3.10, 3.75, 4.60, 5.70, 7.10, 8.90, 11.20, 14.20, 18.00, 23.00, 29.50, 38.00, 49.00, 64.00, 84.00, 110.00, 150.00],
+      medium: [1.15, 1.35, 1.65, 2.10, 2.75, 3.70, 5.20, 7.50, 11.00, 16.50, 25.00, 39.00, 62.00, 100.00, 165.00, 280.00, 480.00, 850.00, 1500.00, 2800.00, 5200.00, 9800.00, 18500.00, 35000.00, 68000.00],
+      hard: [1.30, 1.80, 2.60, 4.00, 6.50, 11.00, 20.00, 38.00, 75.00, 150.00, 310.00, 650.00, 1400.00, 3100.00, 7000.00, 16000.00, 38000.00, 90000.00, 210000.00, 500000.00, 1200000.00, 2900000.00, 7000000.00, 17000000.00, 42000000.00],
+      daredevil: [1.50, 2.50, 4.50, 8.50, 18.00, 45.00, 120.00, 320.00, 900.00, 2600.00, 7800.00, 24000.00, 75000.00, 240000.00, 780000.00, 2600000.00, 8800000.00, 30000000.00, 100000000.00, 350000000.00, 1200000000.00, 4200000000.00, 15000000000.00, 55000000000.00, 200000000000.00]
+    };
 
-    const maxTarget = this.difficulty === 'hard' ? 270.0 : (this.difficulty === 'medium' ? 88.0 : 26.5);
-
-    for (let i = 1; i <= this.totalLanes; i++) {
-      mult = mult * (1.0 / safeProbability) * houseEdge;
-      if (i === this.totalLanes) {
-        mult = maxTarget;
-      } else {
-        mult = Math.min(maxTarget * (i / this.totalLanes), mult);
-        mult = Math.min(265.0, mult);
-      }
-      this.multipliers.push(Math.round(mult * 100) / 100);
+    const curve = baseCurves[this.difficulty] || baseCurves.medium;
+    for (let i = 0; i < this.totalLanes; i++) {
+      this.multipliers.push(curve[i] || Math.round((this.multipliers[this.multipliers.length - 1] * 1.3) * 100) / 100);
     }
   }
 
