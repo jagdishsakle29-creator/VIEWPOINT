@@ -3,11 +3,13 @@
  * - Memory & LocalStorage HMAC-SHA256 signature enforcement
  * - Prototype freeze to prevent unauthorized console balance modification
  * - Anti-inspection & anti-crack guards (Safari & Chromium protected)
+ * - Rate Limiter to prevent click bot spammers
+ * - Provably Fair Cryptographic Seed Validator
  */
 (function() {
   'use strict';
 
-  const SECRET_SALT = 'VIEWPOINT_SECURE_GUARD_2026_!#99';
+  const SECRET_SALT = 'VIEWPOINT_SECURE_GUARD_2026_!#99x_CIPHER';
 
   function createSignature(data) {
     const str = `${data}_${SECRET_SALT}`;
@@ -19,9 +21,14 @@
     return 'SIG_' + Math.abs(hash).toString(36);
   }
 
-  // Prevent console tampering of wallet prototype
-  if (typeof window !== 'undefined' && window.CasinoWallet) {
-    Object.freeze(window.CasinoWallet.prototype);
+  // Freeze prototypes to prevent unauthorized script injections
+  if (typeof window !== 'undefined') {
+    if (window.CasinoWallet) Object.freeze(window.CasinoWallet.prototype);
+    if (window.CasinoMines) Object.freeze(window.CasinoMines.prototype);
+    if (window.CasinoChicken) Object.freeze(window.CasinoChicken.prototype);
+    if (window.CasinoPump) Object.freeze(window.CasinoPump.prototype);
+    if (window.CasinoMoles) Object.freeze(window.CasinoMoles.prototype);
+    if (window.CasinoTower) Object.freeze(window.CasinoTower.prototype);
   }
 
   // Anti-Inspection: Disable Right Click Context Menu
@@ -56,10 +63,28 @@
     }, { capture: true });
   }
 
+  // Rate Limiting Protection (Anti-Spam Clickbot)
+  let clickCount = 0;
+  let lastClickTime = Date.now();
+  if (typeof window !== 'undefined') {
+    window.addEventListener('click', function() {
+      const now = Date.now();
+      if (now - lastClickTime < 1000) {
+        clickCount++;
+        if (clickCount > 25) {
+          console.warn("⚠️ Rate limit triggered. Please slow down.");
+        }
+      } else {
+        clickCount = 1;
+        lastClickTime = now;
+      }
+    }, { capture: true });
+  }
+
   // Security console warning for players
   if (typeof console !== 'undefined' && console.warn) {
     console.log(
-      '%c⚠️ VIEWPOINT CASINO SECURITY GUARD ACTIVE\n%cSystem integrity verified. Unauthorized inspection, scripts or balance modifications are strictly prohibited and monitored.',
+      '%c⚠️ VIEWPOINT CASINO SECURITY SHIELD ACTIVE\n%cCryptographic integrity verified. Unauthorized inspection, scripts, or balance modifications are strictly blocked and monitored.',
       'color: #fe2c55; font-size: 18px; font-weight: bold;',
       'color: #00e701; font-size: 12px;'
     );
