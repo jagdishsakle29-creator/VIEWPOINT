@@ -4501,38 +4501,41 @@ class AppController {
 
   setDifficulty(diff) {
     window.soundEngine.playClick();
-    [this.dom.btnDiffEasy, this.dom.btnDiffMed, this.dom.btnDiffHard].forEach(b => b && b.classList.remove('active'));
+    const allDiffBtns = [this.dom.btnDiffEasy, this.dom.btnDiffMed, this.dom.btnDiffHard, document.getElementById('btnDiffDaredevil')];
+    allDiffBtns.forEach(b => b && b.classList.remove('active'));
 
     if (diff === 'easy') {
       if (this.dom.btnDiffEasy) this.dom.btnDiffEasy.classList.add('active');
-      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟢 Easy (Low Risk)";
+      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟢 Easy (Low Risk - Safe Payouts)";
       
       // Mines
       if (this.dom.minesCountSelect) {
         this.dom.minesCountSelect.value = "1";
         if (this.mines) this.mines.setMineCount(1);
       }
-      // Chicken Mines & Chicken Road
+      // Chicken
       if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "2";
-        if (this.chicken) this.chicken.setBoneCount(2);
-        if (this.chickenmines) this.chickenmines.setMineCount(2);
+        this.dom.bonesCountSelect.value = "easy";
+        if (this.chicken) this.chicken.setDifficulty('easy');
       }
-      if (this.chicken) {
-        this.chicken.setDifficulty('easy');
-        this.renderHighwayLanes();
-      }
+      // Tower
+      if (this.tower) this.tower.setDifficulty('easy');
+      // Moles
+      if (this.moles) this.moles.setTrapCount(1);
+      const moleSelect = document.getElementById('molesTrapSelect');
+      if (moleSelect) moleSelect.value = "1";
+      // Plinko
+      if (this.plinko) this.plinko.setRisk('low');
+      const plinkoSelect = document.getElementById('plinkoRiskSelect');
+      if (plinkoSelect) plinkoSelect.value = "low";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "1.50";
         if (this.crash) this.crash.setAutoCashout(1.50);
       }
       // Limbo
-      const limboInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
-      if (limboInput) {
-        limboInput.value = "1.50";
-        this.updateLimboProb();
-      }
+      const limboInput = document.getElementById('limboTargetInput');
+      if (limboInput) limboInput.value = "1.50";
 
     } else if (diff === 'hard') {
       if (this.dom.btnDiffHard) this.dom.btnDiffHard.classList.add('active');
@@ -4540,62 +4543,93 @@ class AppController {
       
       // Mines
       if (this.dom.minesCountSelect) {
-        this.dom.minesCountSelect.value = "10";
-        if (this.mines) this.mines.setMineCount(10);
+        this.dom.minesCountSelect.value = "5";
+        if (this.mines) this.mines.setMineCount(5);
       }
-      // Chicken Mines & Chicken Road
+      // Chicken
       if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "10";
-        if (this.chicken) this.chicken.setBoneCount(10);
-        if (this.chickenmines) this.chickenmines.setMineCount(10);
+        this.dom.bonesCountSelect.value = "hard";
+        if (this.chicken) this.chicken.setDifficulty('hard');
       }
-      if (this.chicken) {
-        this.chicken.setDifficulty('hard');
-        this.renderHighwayLanes();
-      }
+      // Tower
+      if (this.tower) this.tower.setDifficulty('hard');
+      // Moles
+      if (this.moles) this.moles.setTrapCount(4);
+      const moleSelect = document.getElementById('molesTrapSelect');
+      if (moleSelect) moleSelect.value = "4";
+      // Plinko
+      if (this.plinko) this.plinko.setRisk('hard');
+      const plinkoSelect = document.getElementById('plinkoRiskSelect');
+      if (plinkoSelect) plinkoSelect.value = "hard";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "5.00";
         if (this.crash) this.crash.setAutoCashout(5.00);
       }
       // Limbo
-      const limboInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
-      if (limboInput) {
-        limboInput.value = "10.00";
-        this.updateLimboProb();
+      const limboInput = document.getElementById('limboTargetInput');
+      if (limboInput) limboInput.value = "5.00";
+
+    } else if (diff === 'daredevil') {
+      const btnDare = document.getElementById('btnDiffDaredevil');
+      if (btnDare) btnDare.classList.add('active');
+      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "⚡ Extreme / Daredevil (Max Multiplier)";
+
+      // Mines
+      if (this.dom.minesCountSelect) {
+        this.dom.minesCountSelect.value = "10";
+        if (this.mines) this.mines.setMineCount(10);
       }
+      // Chicken
+      if (this.dom.bonesCountSelect) {
+        this.dom.bonesCountSelect.value = "daredevil";
+        if (this.chicken) this.chicken.setDifficulty('daredevil');
+      }
+      // Tower
+      if (this.tower) this.tower.setDifficulty('extreme');
+      // Moles
+      if (this.moles) this.moles.setTrapCount(5);
+      const moleSelect = document.getElementById('molesTrapSelect');
+      if (moleSelect) moleSelect.value = "5";
+      // Plinko
+      if (this.plinko) this.plinko.setRisk('hard');
+      // Limbo
+      const limboInput = document.getElementById('limboTargetInput');
+      if (limboInput) limboInput.value = "20.00";
 
     } else {
       // Medium
       if (this.dom.btnDiffMed) this.dom.btnDiffMed.classList.add('active');
-      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟡 Balanced Mode";
+      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟡 Medium (Balanced Mode)";
       
       // Mines
       if (this.dom.minesCountSelect) {
         this.dom.minesCountSelect.value = "3";
         if (this.mines) this.mines.setMineCount(3);
       }
-      // Chicken Mines & Chicken Road
+      // Chicken
       if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "4";
-        if (this.chicken) this.chicken.setBoneCount(4);
-        if (this.chickenmines) this.chickenmines.setMineCount(4);
+        this.dom.bonesCountSelect.value = "medium";
+        if (this.chicken) this.chicken.setDifficulty('medium');
       }
-      if (this.chicken) {
-        this.chicken.setDifficulty('medium');
-        this.renderHighwayLanes();
-      }
+      // Tower
+      if (this.tower) this.tower.setDifficulty('medium');
+      // Moles
+      if (this.moles) this.moles.setTrapCount(3);
+      const moleSelect = document.getElementById('molesTrapSelect');
+      if (moleSelect) moleSelect.value = "3";
+      // Plinko
+      if (this.plinko) this.plinko.setRisk('medium');
+      const plinkoSelect = document.getElementById('plinkoRiskSelect');
+      if (plinkoSelect) plinkoSelect.value = "medium";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "2.00";
         if (this.crash) this.crash.setAutoCashout(2.00);
       }
       // Limbo
-      const limboInput = this.dom.p1LimboTargetMultiplierInput || this.dom.limboTargetMultiplierInput;
-      if (limboInput) {
-        limboInput.value = "2.00";
-        this.updateLimboProb();
-      }
+      const limboInput = document.getElementById('limboTargetInput');
+      if (limboInput) limboInput.value = "2.00";
     }
 
     if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {

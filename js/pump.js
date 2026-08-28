@@ -78,20 +78,23 @@ class CasinoPump {
     this.balloonScale = 1.0;
     this.roundId = 'PMP-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6);
 
-    // Controlled Casino House Edge:
-    // 50% pop on Pump 1 or 2 (Loss)
-    // 35% pop on Pump 3 or 4 (1.4x - 1.8x)
-    // 12% pop on Pump 5 or 6 (2.2x - 3.5x)
-    // 3% reach Pump 7+ (Max 6x-10x)
+    // Smooth & Rewarding Pump Experience (Low Loss on First Few Pumps):
+    // 5% pop on Pump 1
+    // 15% pop on Pump 2
+    // 40% pop on Pump 3 or 4 (1.4x - 1.8x)
+    // 25% pop on Pump 5 or 6 (2.2x - 3.5x)
+    // 15% reach Pump 7+ (4.8x - 12x)
     const r = Math.random();
-    if (r < 0.50) {
-      this.targetPopPump = 1 + Math.floor(Math.random() * 2); // 1 or 2
-    } else if (r < 0.85) {
+    if (r < 0.05) {
+      this.targetPopPump = 1;
+    } else if (r < 0.20) {
+      this.targetPopPump = 2;
+    } else if (r < 0.60) {
       this.targetPopPump = 3 + Math.floor(Math.random() * 2); // 3 or 4
-    } else if (r < 0.97) {
+    } else if (r < 0.85) {
       this.targetPopPump = 5 + Math.floor(Math.random() * 2); // 5 or 6
     } else {
-      this.targetPopPump = 7 + Math.floor(Math.random() * 2); // 7 or 8
+      this.targetPopPump = 7 + Math.floor(Math.random() * 3); // 7, 8, 9
     }
 
     this.resetBalloonVisuals();
