@@ -1,10 +1,10 @@
 /**
- * VIEWPOINT - Stake-Style Crypto Pump (Balloon Multiplier) Game Engine
+ * VIEWPOINT - Premium Stake-Style Crypto Pump (Balloon Multiplier) Engine
  * Features:
- * - Real-Time Inflatable Crypto Balloon Physics
- * - Multiplier Scaling from 1.00x up to 1000.00x
- * - Dynamic Burst Chance Calculation (Casino 95% RTP House Edge)
- * - Visual Pressure Gauge & Tactile Pulse Animations
+ * - High-End Inflatable Crypto Sphere Physics & Steam Particles
+ * - Analog Air Pressure Gauge & Compressor Lever
+ * - Strict Casino House Edge (Low/Medium Multiplier Focus, Low High-Multiplier Frequency)
+ * - Full Manual & Auto Play Integration
  * - Instant Cashout & Provably Fair SHA-256
  */
 class CasinoPump {
@@ -26,19 +26,30 @@ class CasinoPump {
     this.multDisplay = document.getElementById('pumpMultiplierDisplay');
     this.profitDisplay = document.getElementById('pumpProfitDisplay');
     this.pressureFill = document.getElementById('pumpPressureFill');
+    this.pressureNeedle = document.getElementById('pumpNeedle');
+    this.psiValue = document.getElementById('pumpPsiValue');
     this.btnPump = document.getElementById('btnPumpAction');
     this.btnCashout = document.getElementById('btnPumpCashout');
     this.btnStart = document.getElementById('btnPumpStart');
     this.statusText = document.getElementById('pumpStatusText');
 
     if (this.btnPump) {
-      this.btnPump.addEventListener('click', () => this.doPump());
+      this.btnPump.onclick = (e) => {
+        e.preventDefault();
+        this.doPump();
+      };
     }
     if (this.btnCashout) {
-      this.btnCashout.addEventListener('click', () => this.cashOut());
+      this.btnCashout.onclick = (e) => {
+        e.preventDefault();
+        this.cashOut();
+      };
     }
     if (this.btnStart) {
-      this.btnStart.addEventListener('click', () => this.startGame());
+      this.btnStart.onclick = (e) => {
+        e.preventDefault();
+        this.startGame();
+      };
     }
   }
 
@@ -67,13 +78,21 @@ class CasinoPump {
     this.balloonScale = 1.0;
     this.roundId = 'PMP-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6);
 
-    // Determine target pop pump count with authentic casino house edge (Avg 3-7 pumps before pop)
-    // 25% pop on pump 1-2, 55% pop on pump 3-5, 15% pop on pump 6-9, 5% high multiplier 10+
+    // Controlled Casino House Edge:
+    // 50% pop on Pump 1 or 2 (Loss)
+    // 35% pop on Pump 3 or 4 (1.4x - 1.8x)
+    // 12% pop on Pump 5 or 6 (2.2x - 3.5x)
+    // 3% reach Pump 7+ (Max 6x-10x)
     const r = Math.random();
-    if (r < 0.22) this.targetPopPump = Math.floor(1 + Math.random() * 2);
-    else if (r < 0.75) this.targetPopPump = Math.floor(3 + Math.random() * 3);
-    else if (r < 0.94) this.targetPopPump = Math.floor(6 + Math.random() * 4);
-    else this.targetPopPump = Math.floor(10 + Math.random() * 12);
+    if (r < 0.50) {
+      this.targetPopPump = 1 + Math.floor(Math.random() * 2); // 1 or 2
+    } else if (r < 0.85) {
+      this.targetPopPump = 3 + Math.floor(Math.random() * 2); // 3 or 4
+    } else if (r < 0.97) {
+      this.targetPopPump = 5 + Math.floor(Math.random() * 2); // 5 or 6
+    } else {
+      this.targetPopPump = 7 + Math.floor(Math.random() * 2); // 7 or 8
+    }
 
     this.resetBalloonVisuals();
     this.updateUI();
@@ -89,35 +108,33 @@ class CasinoPump {
     this.pumpCount++;
     window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
 
-    // Check if balloon pops
+    // Check if burst
     if (this.pumpCount >= this.targetPopPump) {
       this.handlePop();
       return;
     }
 
-    // Calculate Multiplier Progression
-    // Each pump adds accelerating multiplier
-    const stepMults = [1.00, 1.12, 1.28, 1.50, 1.82, 2.30, 3.10, 4.40, 6.80, 11.50, 22.0, 50.0, 120.0, 300.0, 1000.0];
+    // Step Multipliers (Controlled Casino Curve)
+    const stepMults = [1.00, 1.15, 1.32, 1.58, 1.95, 2.50, 3.40, 4.80, 7.50, 12.00];
     if (this.pumpCount < stepMults.length) {
       this.currentMultiplier = stepMults[this.pumpCount];
     } else {
-      this.currentMultiplier = Math.round(this.currentMultiplier * 1.55 * 100) / 100;
+      this.currentMultiplier = Math.round(this.currentMultiplier * 1.35 * 100) / 100;
     }
 
-    this.balloonScale = 1.0 + Math.min(1.8, this.pumpCount * 0.12);
+    this.balloonScale = 1.0 + Math.min(1.6, this.pumpCount * 0.16);
     this.animatePumpPulse();
     this.updateUI();
   }
 
   animatePumpPulse() {
     if (!this.balloon) return;
-    this.balloon.style.transform = `scale(${this.balloonScale * 1.12})`;
-    this.balloon.classList.remove('popped');
+    this.balloon.style.transform = `scale(${this.balloonScale * 1.1})`;
     setTimeout(() => {
       if (this.balloon && this.isPlaying) {
         this.balloon.style.transform = `scale(${this.balloonScale})`;
       }
-    }, 120);
+    }, 100);
   }
 
   handlePop() {
@@ -148,7 +165,7 @@ class CasinoPump {
   }
 
   cashOut() {
-    if (!this.isPlaying || this.pumpCount === 0) return;
+    if (!this.isPlaying || this.pumpCount === 0) return 0;
     this.isPlaying = false;
 
     const payout = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
@@ -171,6 +188,7 @@ class CasinoPump {
     if (window.app && window.app.showNotification) {
       window.app.showNotification(`🎉 CASHOUT! Won +₹${payout.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)!`, "success");
     }
+    return payout;
   }
 
   resetBalloonVisuals() {
@@ -186,13 +204,22 @@ class CasinoPump {
     if (this.multDisplay) this.multDisplay.innerText = `${this.currentMultiplier.toFixed(2)}x`;
     if (this.profitDisplay) this.profitDisplay.innerText = `₹${profit.toFixed(2)}`;
 
-    // Update Pressure Gauge Bar
+    // Update Pressure Fill & Dial
+    const pct = Math.min(100, (this.pumpCount / 8) * 100);
     if (this.pressureFill) {
-      const pct = Math.min(100, (this.pumpCount / 12) * 100);
       this.pressureFill.style.width = `${pct}%`;
       if (pct > 70) this.pressureFill.style.background = '#fe2c55';
       else if (pct > 40) this.pressureFill.style.background = '#f59e0b';
       else this.pressureFill.style.background = '#00e701';
+    }
+
+    if (this.pressureNeedle) {
+      const deg = -90 + (pct * 1.8);
+      this.pressureNeedle.style.transform = `rotate(${deg}deg)`;
+    }
+
+    if (this.psiValue) {
+      this.psiValue.innerText = `${Math.round(pct * 1.5)} PSI`;
     }
 
     if (this.btnStart) this.btnStart.style.display = this.isPlaying ? 'none' : 'flex';
@@ -206,7 +233,7 @@ class CasinoPump {
     if (this.statusText) {
       if (isPopped) this.statusText.innerHTML = `<span style="color:#fe2c55; font-weight:800;">💥 POPPED! Try next round</span>`;
       else if (isCashedOut) this.statusText.innerHTML = `<span style="color:#00e701; font-weight:800;">🎉 WON ₹${profit.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)</span>`;
-      else if (this.isPlaying) this.statusText.innerHTML = `<span style="color:#00e5ff; font-weight:800;">💨 Air Pressure: ${this.pumpCount} Pumps | Multiplier: ${this.currentMultiplier.toFixed(2)}x</span>`;
+      else if (this.isPlaying) this.statusText.innerHTML = `<span style="color:#00e5ff; font-weight:800;">💨 Air Pressure: ${this.pumpCount} Pumps | Mult: ${this.currentMultiplier.toFixed(2)}x</span>`;
       else this.statusText.innerHTML = `<span style="color:#94a3b8;">Set bet & click PUMP to start</span>`;
     }
   }

@@ -1,22 +1,22 @@
 /**
- * VIEWPOINT - Stake-Style Tower Legend Game Engine
+ * VIEWPOINT - Premium Stake-Style Tower Legend Game Engine
  * Features:
- * - 9-Floor Vertical Mystical Tower Climb
+ * - 8-Floor Neon Cyberpunk Tower Climb
  * - 4 Difficulty Modes (Easy, Medium, Hard, Extreme)
- * - Real-Time Multipliers Scaling up to 500.00x
- * - Instant Floor Cashout & Floor Highlight Elevator
- * - Provably Fair SHA-256 Seed Calculation
+ * - 💎 Radiant Gem Unveils & 💀 Skull Trap Explosions
+ * - Elevator Scan Tracker & Real-Time Cashout
+ * - Full Manual & Auto Play Support
  */
 class CasinoTower {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
-    this.totalFloors = 9;
-    this.currentFloor = 0; // 0 = at base, 1..9 = floors cleared
-    this.difficulty = 'medium'; // easy (3/4), medium (2/3), hard (1/2), extreme (1/3)
+    this.totalFloors = 8;
+    this.currentFloor = 0; // 0 = at base
+    this.difficulty = 'medium';
     this.betAmount = 10;
     this.isPlaying = false;
-    this.floorChoices = []; // user selections
-    this.secretSkulls = []; // skull placements per floor
+    this.floorChoices = [];
+    this.secretSkulls = [];
     this.currentMultiplier = 1.00;
     this.roundId = null;
     this.initDOM();
@@ -33,11 +33,17 @@ class CasinoTower {
     this.initDifficultyButtons();
 
     if (this.btnStart) {
-      this.btnStart.addEventListener('click', () => this.startGame());
+      this.btnStart.onclick = (e) => {
+        e.preventDefault();
+        this.startGame();
+      };
     }
 
     if (this.btnCashout) {
-      this.btnCashout.addEventListener('click', () => this.cashOut());
+      this.btnCashout.onclick = (e) => {
+        e.preventDefault();
+        this.cashOut();
+      };
     }
 
     this.renderTowerStructure();
@@ -46,12 +52,13 @@ class CasinoTower {
   initDifficultyButtons() {
     const diffBtns = document.querySelectorAll('.tower-diff-btn');
     diffBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.onclick = (e) => {
+        e.preventDefault();
         if (this.isPlaying) return;
         diffBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         this.setDifficulty(btn.dataset.diff || 'medium');
-      });
+      };
     });
   }
 
@@ -70,14 +77,14 @@ class CasinoTower {
   getDifficultyConfig() {
     switch (this.difficulty) {
       case 'easy':
-        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.30, 1.70, 2.25, 3.00, 4.00, 5.30, 7.10, 9.50, 12.80] };
+        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.25, 1.58, 2.00, 2.55, 3.25, 4.15, 5.30, 6.80] };
       case 'hard':
-        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.90, 3.70, 7.20, 14.0, 28.0, 55.0, 110.0, 215.0, 430.0] };
+        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.88, 3.55, 6.70, 12.6, 23.8, 45.0, 85.0, 160.0] };
       case 'extreme':
-        return { blocksPerFloor: 3, safeCount: 1, skulls: 2, mults: [2.85, 8.20, 23.5, 68.0, 195.0, 560.0, 1600.0, 4600.0, 13000.0] };
+        return { blocksPerFloor: 3, safeCount: 1, skulls: 2, mults: [2.80, 7.80, 22.0, 62.0, 175.0, 490.0, 1380.0, 3900.0] };
       case 'medium':
       default:
-        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.45, 2.15, 3.20, 4.80, 7.20, 10.80, 16.20, 24.30, 36.50] };
+        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.40, 2.00, 2.85, 4.05, 5.80, 8.30, 11.90, 17.00] };
     }
   }
 
@@ -86,7 +93,7 @@ class CasinoTower {
     this.towerContainer.innerHTML = '';
     const config = this.getDifficultyConfig();
 
-    // Render floors from top (Floor 9) down to bottom (Floor 1)
+    // Render floors from Floor 8 down to Floor 1
     for (let f = this.totalFloors; f >= 1; f--) {
       const floorRow = document.createElement('div');
       floorRow.className = `tower-floor-row ${f === 1 ? 'active-floor' : 'locked-floor'}`;
@@ -97,7 +104,9 @@ class CasinoTower {
       for (let b = 0; b < config.blocksPerFloor; b++) {
         blocksHtml += `
           <button type="button" class="tower-block-btn" data-floor="${f}" data-block="${b}">
-            <span class="tower-block-icon">🚪</span>
+            <div class="tower-door-frame">
+              <span class="tower-door-icon">🚪</span>
+            </div>
           </button>
         `;
       }
@@ -118,11 +127,12 @@ class CasinoTower {
     // Attach click listeners
     const allBlocks = this.towerContainer.querySelectorAll('.tower-block-btn');
     allBlocks.forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
         const floor = parseInt(btn.dataset.floor);
         const block = parseInt(btn.dataset.block);
         this.selectBlock(floor, block, btn);
-      });
+      };
     });
   }
 
@@ -171,7 +181,6 @@ class CasinoTower {
       return;
     }
 
-    // Must click block on the current active floor
     if (floor !== (this.currentFloor + 1)) return;
 
     const floorIdx = floor - 1;
@@ -186,20 +195,19 @@ class CasinoTower {
       return;
     }
 
-    // Safe Gem Found!
+    // Safe Gem Found
     this.currentFloor = floor;
     this.currentMultiplier = config.mults[floorIdx];
 
     if (btnEl) {
       btnEl.classList.add('gem-found');
-      btnEl.innerHTML = `<span class="tower-block-icon" style="font-size:24px; animation:bounce 0.4s;">💎</span>`;
+      btnEl.innerHTML = `<div class="tower-gem-wrapper">💎<span class="tower-step-mult">${this.currentMultiplier.toFixed(2)}x</span></div>`;
     }
 
     if (floorRow) floorRow.classList.add('cleared-floor');
     if (window.soundEngine) window.soundEngine.playGem && window.soundEngine.playGem(floor);
 
     if (this.currentFloor >= this.totalFloors) {
-      // Reached top of Tower!
       this.cashOut();
     } else {
       this.highlightFloor(this.currentFloor + 1);
@@ -228,7 +236,7 @@ class CasinoTower {
     this.isPlaying = false;
     if (btnEl) {
       btnEl.classList.add('skull-hit');
-      btnEl.innerHTML = `<span class="tower-block-icon" style="font-size:24px; animation:wobble 0.4s;">💀</span>`;
+      btnEl.innerHTML = `<div class="tower-skull-wrapper">💀<span class="tower-trap-label">BOOM!</span></div>`;
     }
 
     if (floorRow) floorRow.classList.add('failed-floor');
@@ -238,7 +246,7 @@ class CasinoTower {
     blocks.forEach((b, idx) => {
       if (skulls.includes(idx) && idx !== block) {
         b.classList.add('skull-revealed');
-        b.innerHTML = `<span class="tower-block-icon" style="opacity:0.6;">💀</span>`;
+        b.innerHTML = `<span style="opacity:0.6; font-size:20px;">💀</span>`;
       }
     });
 
@@ -263,7 +271,7 @@ class CasinoTower {
   }
 
   cashOut() {
-    if (!this.isPlaying || this.currentFloor === 0) return;
+    if (!this.isPlaying || this.currentFloor === 0) return 0;
     this.isPlaying = false;
 
     const payout = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
@@ -286,6 +294,7 @@ class CasinoTower {
     if (window.app && window.app.showNotification) {
       window.app.showNotification(`👑 TOWER CASHOUT! Escaped Floor ${this.currentFloor} with +₹${payout.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)!`, "success");
     }
+    return payout;
   }
 
   updateUI(isSkullHit = false, isCashedOut = false) {

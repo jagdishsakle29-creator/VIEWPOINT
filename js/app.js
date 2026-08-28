@@ -6369,6 +6369,12 @@ class AppController {
       this.runChickenMinesAutoRound(betAmount);
     } else if (this.currentGame === 'chicken') {
       this.runChickenAutoRound(betAmount);
+    } else if (this.currentGame === 'pump') {
+      this.runPumpAutoRound(betAmount);
+    } else if (this.currentGame === 'moles') {
+      this.runMolesAutoRound(betAmount);
+    } else if (this.currentGame === 'tower') {
+      this.runTowerAutoRound(betAmount);
     } else if (this.currentGame === 'crash') {
       this.runCrashAutoRound(betAmount);
     } else if (this.currentGame === 'limbo') {
@@ -6384,6 +6390,158 @@ class AppController {
     } else {
       this.runMinesAutoRound(betAmount);
     }
+  }
+
+  runPumpAutoRound(betAmount) {
+    if (!this.pump && window.CasinoPump && (document.getElementById('pumpView') || this.dom.pumpView)) {
+      this.pump = new window.CasinoPump('pumpView');
+    }
+    if (!this.pump) return;
+    const started = this.pump.startGame(betAmount);
+    if (!started) {
+      this.stopAutoPlay("Failed to start Pump Auto round.");
+      return;
+    }
+
+    const targetPumps = Math.random() < 0.65 ? 1 : 2;
+    let currPumps = 0;
+
+    const pumpInterval = setInterval(() => {
+      if (!this.isAutoPlaying || !this.pump.isPlaying) {
+        clearInterval(pumpInterval);
+        this.finishAutoRound();
+        return;
+      }
+
+      this.pump.doPump();
+      currPumps++;
+
+      if (!this.pump.isPlaying) {
+        clearInterval(pumpInterval);
+        this.finishAutoRound();
+        return;
+      }
+
+      if (currPumps >= targetPumps) {
+        clearInterval(pumpInterval);
+        this.pump.cashOut();
+        this.finishAutoRound();
+      }
+    }, 320);
+    this.autoStepTimers.push(pumpInterval);
+  }
+
+  runMolesAutoRound(betAmount) {
+    if (!this.moles && window.CasinoMoles && (document.getElementById('molesView') || this.dom.molesView)) {
+      this.moles = new window.CasinoMoles('molesView');
+    }
+    if (!this.moles) return;
+    const started = this.moles.startGame(betAmount);
+    if (!started) {
+      this.stopAutoPlay("Failed to start Moles Auto round.");
+      return;
+    }
+
+    const targetDigs = Math.random() < 0.6 ? 1 : 2;
+    let currDigs = 0;
+    const unrevealed = Array.from({length: 12}, (_, i) => i);
+    for (let i = unrevealed.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [unrevealed[i], unrevealed[j]] = [unrevealed[j], unrevealed[i]];
+    }
+
+    const digInterval = setInterval(() => {
+      if (!this.isAutoPlaying || !this.moles.isPlaying) {
+        clearInterval(digInterval);
+        this.finishAutoRound();
+        return;
+      }
+
+      const holeToDig = unrevealed.pop();
+      if (holeToDig === undefined) {
+        clearInterval(digInterval);
+        this.moles.cashOut();
+        this.finishAutoRound();
+        return;
+      }
+
+      this.moles.digHole(holeToDig);
+      currDigs++;
+
+      if (!this.moles.isPlaying) {
+        clearInterval(digInterval);
+        this.finishAutoRound();
+        return;
+      }
+
+      if (currDigs >= targetDigs) {
+        clearInterval(digInterval);
+        this.moles.cashOut();
+        this.finishAutoRound();
+      }
+    }, 360);
+    this.autoStepTimers.push(digInterval);
+  }
+
+  runTowerAutoRound(betAmount) {
+    if (!this.tower && window.CasinoTower && (document.getElementById('towerView') || this.dom.towerView)) {
+      this.tower = new window.CasinoTower('towerView');
+    }
+    if (!this.tower) return;
+    const started = this.tower.startGame(betAmount);
+    if (!started) {
+      this.stopAutoPlay("Failed to start Tower Auto round.");
+      return;
+    }
+
+    const targetFloor = Math.random() < 0.7 ? 1 : 2;
+    let currFloor = 0;
+
+    const climbInterval = setInterval(() => {
+      if (!this.isAutoPlaying || !this.tower.isPlaying) {
+        clearInterval(climbInterval);
+        this.finishAutoRound();
+        return;
+      }
+
+      currFloor++;
+      const config = this.tower.getDifficultyConfig();
+      const randomBlock = Math.floor(Math.random() * config.blocksPerFloor);
+      const btnEl = this.tower.towerContainer ? this.tower.towerContainer.querySelector(`[data-floor="${currFloor}"][data-block="${randomBlock}"]`) : null;
+      this.tower.selectBlock(currFloor, randomBlock, btnEl);
+
+      if (!this.tower.isPlaying) {
+        clearInterval(climbInterval);
+        this.finishAutoRound();
+        return;
+      }
+
+      if (currFloor >= targetFloor) {
+        clearInterval(climbInterval);
+        this.tower.cashOut();
+        this.finishAutoRound();
+      }
+    }, 420);
+    this.autoStepTimers.push(climbInterval);
+  }
+
+  finishAutoRound() {
+    const timer = setTimeout(() => {
+      if (!this.isAutoPlaying) return;
+      this.autoRoundsCompleted++;
+      if (this.dom.btnAutoStartText) {
+        this.dom.btnAutoStartText.innerText = `⏹️ STOP AUTO (${this.autoRoundsCompleted} / ${this.autoRoundsTotal || '∞'})`;
+      }
+      if (this.autoRoundsTotal > 0 && this.autoRoundsCompleted >= this.autoRoundsTotal) {
+        this.stopAutoPlay(`Completed ${this.autoRoundsTotal} rounds!`);
+        return;
+      }
+      const nextTimer = setTimeout(() => {
+        this.runNextAutoRound();
+      }, 250);
+      this.autoStepTimers.push(nextTimer);
+    }, 200);
+    this.autoStepTimers.push(timer);
   }
 
   runPlinkoAutoRound(betAmount) {

@@ -1,11 +1,11 @@
 /**
- * VIEWPOINT - Stake-Style Moles Burrow Game Engine
+ * VIEWPOINT - Premium Stake-Style Moles Burrow Game Engine
  * Features:
- * - 12 Hole Underground Burrow Grid (4x3 layout)
- * - Configurable Traps Count (1, 2, 3, 4 or 5 Traps)
- * - Authentic Golden Mole Animations with Increasing Multiplier
- * - Instant Cashout & Zero Lag State Machine
- * - Provably Fair SHA-256 Seed Calculation
+ * - 12-Hole 3D Lush Garden Molehill Grid
+ * - Animated 3D Golden Mole Reveal & Steel Hammer Smash
+ * - Configurable Traps Count (1 to 5) with Balanced Casino RTP
+ * - Full Manual & Auto Play Support
+ * - Instant Cashout & Zero Lag
  */
 class CasinoMoles {
   constructor(containerId) {
@@ -31,17 +31,23 @@ class CasinoMoles {
     this.statusText = document.getElementById('molesStatusText');
 
     if (this.trapSelect) {
-      this.trapSelect.addEventListener('change', (e) => {
+      this.trapSelect.onchange = (e) => {
         this.setTrapCount(parseInt(e.target.value) || 3);
-      });
+      };
     }
 
     if (this.btnStart) {
-      this.btnStart.addEventListener('click', () => this.startGame());
+      this.btnStart.onclick = (e) => {
+        e.preventDefault();
+        this.startGame();
+      };
     }
 
     if (this.btnCashout) {
-      this.btnCashout.addEventListener('click', () => this.cashOut());
+      this.btnCashout.onclick = (e) => {
+        e.preventDefault();
+        this.cashOut();
+      };
     }
 
     this.renderHolesGrid();
@@ -54,7 +60,7 @@ class CasinoMoles {
 
   setTrapCount(count) {
     if (this.isPlaying) return;
-    this.trapCount = Math.max(1, Math.min(6, parseInt(count) || 3));
+    this.trapCount = Math.max(1, Math.min(5, parseInt(count) || 3));
     this.updateUI();
   }
 
@@ -66,14 +72,18 @@ class CasinoMoles {
       hole.className = 'mole-hole-card';
       hole.dataset.index = i;
       hole.innerHTML = `
-        <div class="mole-hole-inner">
-          <div class="mole-mound">
-            <span class="mole-hole-icon">🕳️</span>
-            <span class="mole-hole-number">#${i + 1}</span>
+        <div class="mole-mound">
+          <div class="mole-dirt-rim"></div>
+          <div class="mole-hole-pit">
+            <span class="mole-eye-icon">🕳️</span>
           </div>
+          <span class="mole-hole-tag">Hole ${i + 1}</span>
         </div>
       `;
-      hole.addEventListener('click', () => this.digHole(i));
+      hole.onclick = (e) => {
+        e.preventDefault();
+        this.digHole(i);
+      };
       this.grid.appendChild(hole);
     }
   }
@@ -128,7 +138,7 @@ class CasinoMoles {
       return;
     }
 
-    // Safe Golden Mole Found (Win step)
+    // Safe Golden Mole Found
     const safeFound = this.revealedIndices.size;
     const totalSafe = this.totalHoles - this.trapCount;
     this.currentMultiplier = this.calculateMultiplier(safeFound, this.trapCount);
@@ -137,15 +147,14 @@ class CasinoMoles {
       holeEl.classList.add('mole-found');
       holeEl.innerHTML = `
         <div class="mole-revealed golden-mole">
-          <span style="font-size: 32px; animation: bounce 0.5s ease;">🐹</span>
-          <span class="mole-mult-tag">+${this.currentMultiplier.toFixed(2)}x</span>
+          <div class="mole-sprite-3d">🐹</div>
+          <div class="mole-coin-badge">💰 +${this.currentMultiplier.toFixed(2)}x</div>
         </div>
       `;
     }
 
     if (window.soundEngine) window.soundEngine.playGem && window.soundEngine.playGem(safeFound);
 
-    // If all safe moles found -> Auto Cashout Win
     if (safeFound >= totalSafe) {
       this.cashOut();
     } else {
@@ -159,8 +168,8 @@ class CasinoMoles {
     for (let i = 0; i < molesFound; i++) {
       prob *= (total - traps - i) / (total - i);
     }
-    const rawMult = (0.95 / prob); // 95% RTP
-    return Math.max(1.10, Math.floor(rawMult * 100) / 100);
+    const rawMult = (0.94 / prob); // 94% RTP
+    return Math.max(1.15, Math.floor(rawMult * 100) / 100);
   }
 
   handleTrapHit(index, holeEl) {
@@ -169,8 +178,8 @@ class CasinoMoles {
       holeEl.classList.add('trap-hit');
       holeEl.innerHTML = `
         <div class="mole-revealed trap-hammer">
-          <span style="font-size: 32px; animation: wobble 0.5s ease;">🔨</span>
-          <span class="mole-trap-tag">TRAP!</span>
+          <div class="hammer-sprite-3d">🔨</div>
+          <div class="mole-trap-badge">TRAP!</div>
         </div>
       `;
     }
@@ -183,7 +192,7 @@ class CasinoMoles {
           otherEl.classList.add('trap-revealed');
           otherEl.innerHTML = `
             <div class="mole-revealed trap-dim">
-              <span style="font-size: 26px; opacity:0.6;">🔨</span>
+              <span style="font-size: 24px; opacity:0.6;">🔨</span>
             </div>
           `;
         }
@@ -211,7 +220,7 @@ class CasinoMoles {
   }
 
   cashOut() {
-    if (!this.isPlaying || this.revealedIndices.size === 0) return;
+    if (!this.isPlaying || this.revealedIndices.size === 0) return 0;
     this.isPlaying = false;
 
     const payout = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
@@ -234,6 +243,7 @@ class CasinoMoles {
     if (window.app && window.app.showNotification) {
       window.app.showNotification(`🎉 CASHOUT! Won +₹${payout.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)!`, "success");
     }
+    return payout;
   }
 
   updateUI(isTrapHit = false, isCashedOut = false) {
@@ -254,7 +264,7 @@ class CasinoMoles {
       if (isTrapHit) this.statusText.innerHTML = `<span style="color:#fe2c55; font-weight:800;">🔨 TRAP HIT! Try another burrow</span>`;
       else if (isCashedOut) this.statusText.innerHTML = `<span style="color:#00e701; font-weight:800;">🎉 WON ₹${profit.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)</span>`;
       else if (this.isPlaying) this.statusText.innerHTML = `<span style="color:#00e5ff; font-weight:800;">🐹 Safe Moles: ${this.revealedIndices.size} / ${this.totalHoles - this.trapCount} | Next: ${this.calculateMultiplier(this.revealedIndices.size + 1, this.trapCount).toFixed(2)}x</span>`;
-      else this.statusText.innerHTML = `<span style="color:#94a3b8;">Choose traps count & click hole to start digging</span>`;
+      else this.statusText.innerHTML = `<span style="color:#94a3b8;">Choose traps & tap a hole to start digging</span>`;
     }
   }
 
