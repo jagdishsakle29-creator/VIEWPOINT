@@ -7166,7 +7166,19 @@ class AppController {
     }, 450);
   }
 
+  onPlinkoLanded(data) {
+    if (data.won && data.multiplier >= 1.0) {
+      this.showToast({
+        won: true,
+        multiplier: data.multiplier,
+        payout: data.payout
+      });
+    }
+    this.renderHistoryTable();
+  }
+
   showToast(result) {
+    if (!this.dom.roundResultToast) return;
     if (result.won) {
       this.dom.roundResultToast.classList.remove('loss');
       this.dom.toastMultiplier.innerText = `${result.multiplier.toFixed(2)}x`;
@@ -7175,18 +7187,20 @@ class AppController {
     } else {
       this.dom.roundResultToast.classList.add('loss');
       this.dom.toastMultiplier.innerText = `0.00x`;
-      this.dom.toastPayout.innerText = `-${window.wallet.currency}${this.activeInstance.betAmount.toFixed(2)}`;
-      this.dom.toastTagline.innerText = this.currentGame === 'mines' ? "BOOM! You hit a mine." : (this.currentGame === 'chicken' ? "CRUNCH! You hit a bone." : "CRASHED! Plane flew away.");
+      const betVal = (this.activeInstance && this.activeInstance.betAmount) || 10;
+      this.dom.toastPayout.innerText = `-${window.wallet.currency}${betVal.toFixed(2)}`;
+      this.dom.toastTagline.innerText = this.currentGame === 'mines' ? "BOOM! You hit a mine." : (this.currentGame === 'chicken' ? "CRUNCH! You hit a bone." : "ROUND OVER");
     }
 
     this.dom.roundResultToast.classList.add('show');
-    setTimeout(() => {
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => {
       this.hideToast();
-    }, 4000);
+    }, 1200); // Fast 1.2s dismissal!
   }
 
   hideToast() {
-    this.dom.roundResultToast.classList.remove('show');
+    if (this.dom.roundResultToast) this.dom.roundResultToast.classList.remove('show');
   }
 
   renderHistoryTable() {

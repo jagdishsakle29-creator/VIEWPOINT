@@ -342,12 +342,27 @@ class CasinoPlinko {
   }
 
   handleBucketHit(ball) {
-    const targetIdx = (ball.targetBucketIndex !== undefined && this.buckets[ball.targetBucketIndex])
-      ? ball.targetBucketIndex
-      : Math.floor(this.buckets.length / 2);
+    // 100% Guaranteed Visual Parity: find bucket closest to actual ball.x coordinate
+    let hitBucket = null;
+    let minDiff = 999999;
+    for (let i = 0; i < this.buckets.length; i++) {
+      const b = this.buckets[i];
+      const centerX = b.x + b.w / 2;
+      const diff = Math.abs(ball.x - centerX);
+      if (diff < minDiff) {
+        minDiff = diff;
+        hitBucket = b;
+      }
+    }
 
-    const hitBucket = this.buckets[targetIdx] || this.buckets[Math.floor(this.buckets.length / 2)];
-    hitBucket.scale = 1.35;
+    if (!hitBucket) {
+      const targetIdx = (ball.targetBucketIndex !== undefined && this.buckets[ball.targetBucketIndex])
+        ? ball.targetBucketIndex
+        : Math.floor(this.buckets.length / 2);
+      hitBucket = this.buckets[targetIdx] || this.buckets[0];
+    }
+
+    hitBucket.scale = 1.45;
 
     const mult = hitBucket.mult;
     const payout = Math.round(ball.bet * mult * 100) / 100;
@@ -377,6 +392,7 @@ class CasinoPlinko {
         multiplier: mult,
         payout: payout,
         bet: ball.bet,
+        won: won,
         bucketIndex: hitBucket.index
       });
     }
