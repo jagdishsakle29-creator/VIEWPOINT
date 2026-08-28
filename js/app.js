@@ -6694,17 +6694,45 @@ class AppController {
     this.autoStepTimers.push(timer);
   }
 
+  syncCrashColorBetInput(val) {
+    const amt = parseFloat(val) || 0;
+    if (this.dom.betAmountInput) {
+      this.dom.betAmountInput.value = amt ? amt.toFixed(2) : '';
+    }
+  }
+
   setCrashColorBetAmount(amt) {
+    const input = document.getElementById('crashColorBetAmountInput');
+    if (input) input.value = amt.toFixed(0);
     if (this.dom.betAmountInput) {
       this.dom.betAmountInput.value = amt.toFixed(2);
     }
     const chips = document.querySelectorAll('.crash-bet-chip');
     chips.forEach(c => {
-      const match = c.innerText.includes(amt >= 1000 ? '1K' : String(amt));
+      const match = c.innerText.includes(amt >= 1000 ? '1,000' : String(amt));
       c.style.background = match ? 'rgba(0, 229, 255, 0.25)' : 'rgba(255,255,255,0.06)';
       c.style.borderColor = match ? '#00e5ff' : 'rgba(255,255,255,0.15)';
     });
     window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+  }
+
+  halfCrashColorBet() {
+    const input = document.getElementById('crashColorBetAmountInput');
+    let amt = Math.max(1, Math.round(((parseFloat(input ? input.value : 10) || 10) / 2) * 100) / 100);
+    this.setCrashColorBetAmount(amt);
+  }
+
+  doubleCrashColorBet() {
+    const input = document.getElementById('crashColorBetAmountInput');
+    let amt = Math.max(1, Math.round(((parseFloat(input ? input.value : 10) || 10) * 2) * 100) / 100);
+    if (window.wallet) amt = Math.min(window.wallet.balance, amt);
+    this.setCrashColorBetAmount(amt);
+  }
+
+  maxCrashColorBet() {
+    let amt = window.wallet ? Math.floor(window.wallet.balance) : 1000;
+    if (amt <= 0) amt = 10;
+    this.setCrashColorBetAmount(amt);
   }
 
   placeCrashColorDirectBet(color) {
@@ -6718,8 +6746,9 @@ class AppController {
       return;
     }
 
+    const colorInput = document.getElementById('crashColorBetAmountInput');
     const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
-    const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
+    const betAmount = parseFloat(colorInput ? colorInput.value : (betInput ? betInput.value : 10)) || 10;
 
     if (!window.wallet || !window.wallet.hasFunds(betAmount)) {
       this.showNotification(`❌ Insufficient balance! Please deposit to place ${color.toUpperCase()} color bet.`, "error");
