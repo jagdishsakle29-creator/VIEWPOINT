@@ -56,6 +56,40 @@
 
   <!-- Inline Instant Click Handler (Zero Network Latency / 100% Reliable) -->
   <script>
+    // Global Safe Sound Engine Fallback (prevents freezing on audio lookup)
+    window.soundEngine = window.soundEngine || {
+      playClick: function(){},
+      playBet: function(){},
+      playWin: function(){},
+      playBomb: function(){},
+      playGem: function(){},
+      playCashout: function(){},
+      playDeposit: function(){},
+      playCarCrash: function(){},
+      playChickenHop: function(){},
+      playChicken: function(){},
+      playBone: function(){},
+      toggleSound: function(){}
+    };
+
+    window.handleBetClick = function() {
+      if (window.app && window.app.handleBetClick) {
+        window.app.handleBetClick();
+      }
+    };
+
+    window.handleCashoutClick = function() {
+      if (window.app && window.app.handleCashoutClick) {
+        window.app.handleCashoutClick();
+      }
+    };
+
+    window.setDifficulty = function(diff) {
+      if (window.app && window.app.setDifficulty) {
+        window.app.setDifficulty(diff);
+      }
+    };
+
     window.openAuthModal = function(type) {
       var m = document.getElementById('modalAuth');
       if (m) { m.classList.add('open'); m.style.display = 'flex'; }

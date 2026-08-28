@@ -21,16 +21,6 @@
     return 'SIG_' + Math.abs(hash).toString(36);
   }
 
-  // Freeze prototypes to prevent unauthorized script injections
-  if (typeof window !== 'undefined') {
-    if (window.CasinoWallet) Object.freeze(window.CasinoWallet.prototype);
-    if (window.CasinoMines) Object.freeze(window.CasinoMines.prototype);
-    if (window.CasinoChicken) Object.freeze(window.CasinoChicken.prototype);
-    if (window.CasinoPump) Object.freeze(window.CasinoPump.prototype);
-    if (window.CasinoMoles) Object.freeze(window.CasinoMoles.prototype);
-    if (window.CasinoTower) Object.freeze(window.CasinoTower.prototype);
-  }
-
   // Anti-Inspection: Disable Right Click Context Menu
   if (typeof document !== 'undefined') {
     document.addEventListener('contextmenu', function(e) {
