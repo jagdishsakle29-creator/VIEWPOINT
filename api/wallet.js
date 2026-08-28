@@ -99,7 +99,7 @@ export default async function handler(req, res) {
   }
 
   // 3. CREATE DEPOSIT REQUEST (Server-Side Validated)
-  if (action === 'submit_deposit') {
+  if (action === 'submit_deposit' || action === 'create_deposit') {
     const amount = parseFloat(params.amount || 0);
     const minDeposit = 100.0;
     const maxDeposit = 100000.0;
@@ -119,10 +119,10 @@ export default async function handler(req, res) {
       });
     }
 
-    const depId = 'DEP-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const depId = params.id || ('DEP-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase());
     const depRecord = {
       id: depId,
-      userId: String(userId),
+      userId: String(userId || params.userId || 'Player'),
       amount: amount,
       utr: utr,
       upiId: String(params.upiId || 'adrenox1@axl'),
@@ -147,7 +147,7 @@ export default async function handler(req, res) {
   }
 
   // 4. SUBMIT WITHDRAWAL REQUEST (Server-Side Validated, Deducts Balance Atomically)
-  if (action === 'submit_withdrawal') {
+  if (action === 'submit_withdrawal' || action === 'create_withdrawal') {
     const amount = parseFloat(params.amount || 0);
     const minWithdraw = 200.0;
     const maxWithdraw = 50000.0;

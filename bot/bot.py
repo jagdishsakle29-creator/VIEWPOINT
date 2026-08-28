@@ -73,14 +73,16 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"• 🐉 *Dragon Tiger* (Live Casino VIP Table)\n"
         f"• 💣 *Mines* (Up to 10,000x multiplier)\n"
         f"• 🎯 *Limbo Turbo* (1,000,000x Multiplier)\n"
+        f"• 🎈 *Stake Pump* (Crypto Balloon Multiplier)\n"
         f"• 🍗 *Chicken Road* (270x Lane Walker)\n"
         f"• 🔴 *Plinko* (1,000x Pin Drop)\n"
         f"• 🚀 *Crash* (Aviator Rocket flight)\n"
+        f"• 🐹 *Stake Moles* (Burrow Gold Multiplier)\n"
         f"• 🎨 *Win Go 30s* (Color Trading)\n"
         f"• 📈 *Stock BTC* (Real-Time Candlestick)\n"
-        f"• 🎲 *Classic Dice* (9900x Roll)\n\n"
-        f"💰 *Current Balance:* ₹{db_user['balance']:,.2f}\n"
-        f"🎁 *₹200 Demo Money Credited* (Non-withdrawable, for gameplay)\n\n"
+        f"• 🎲 *Classic Dice* (9900x Roll)\n"
+        f"• 🏰 *Tower Legend* (Climb Tower Multiplier)\n\n"
+        f"💰 *Current Balance:* ₹{db_user['balance']:,.2f}\n\n"
         f"Click the button below to start playing instantly inside Telegram Mini App! 👇"
     )
 
@@ -448,24 +450,24 @@ async def handle_text_messages(update: Update, context: ContextTypes.DEFAULT_TYP
             reply_markup=get_back_keyboard()
         )
 
-        # Notify Admins with Approve/Reject buttons
+        # Notify Admins with Approve/Reject buttons (HTML mode, 100% safe)
         admin_alert = (
-            f"🔔 *NEW DEPOSIT REQUEST* 🔔\n\n"
-            f"👤 *User:* {user.first_name} (`{user.id}`)\n"
-            f"💰 *Amount:* ₹{amount:,.2f}\n"
-            f"🧾 *UTR:* `{utr_str}`\n"
-            f"🆔 *ID:* `{dep_id}`"
+            f"🔔 <b>NEW DEPOSIT REQUEST</b> 🔔\n\n"
+            f"👤 <b>User:</b> {user.first_name} (<code>{user.id}</code>)\n"
+            f"💰 <b>Amount:</b> <b>₹{amount:,.2f}</b>\n"
+            f"🧾 <b>UTR:</b> <code>{utr_str}</code>\n"
+            f"🆔 <b>ID:</b> <code>{dep_id}</code>"
         )
         for admin_id in list(dict.fromkeys(ADMIN_IDS)):
             try:
                 await context.bot.send_message(
                     chat_id=admin_id,
                     text=admin_alert,
-                    parse_mode="Markdown",
+                    parse_mode="HTML",
                     reply_markup=get_admin_approval_keyboard(dep_id, "DEP")
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Error sending admin alert to {admin_id}: {e}")
 
     elif state == "AWAITING_WITHDRAW_DETAILS":
         USER_STATE.pop(user.id, None)
@@ -492,34 +494,34 @@ async def handle_text_messages(update: Update, context: ContextTypes.DEFAULT_TYP
             return
 
         await update.message.reply_text(
-            f"✅ *Withdrawal Request Submitted!*\n\n"
-            f"💰 *Gross Amount:* ₹{res['amount']:,.2f}\n"
-            f"🏷️ *Fee (8%):* -₹{res['fee']:,.2f}\n"
-            f"💵 *Net Payout to Receive:* ₹{res['net_payout']:,.2f}\n"
-            f"💳 *UPI ID:* `{res['receiver']}`\n\n"
+            f"✅ <b>Withdrawal Request Submitted!</b>\n\n"
+            f"💰 <b>Gross Amount:</b> ₹{res['amount']:,.2f}\n"
+            f"🏷️ <b>Fee (8%):</b> -₹{res['fee']:,.2f}\n"
+            f"💵 <b>Net Payout to Receive:</b> ₹{res['net_payout']:,.2f}\n"
+            f"💳 <b>UPI ID:</b> <code>{res['receiver']}</code>\n\n"
             f"Payout request process ho rahi hai.",
-            parse_mode="Markdown",
+            parse_mode="HTML",
             reply_markup=get_back_keyboard()
         )
 
-        # Notify Admins with Approve/Reject buttons
+        # Notify Admins with Approve/Reject buttons (HTML mode, 100% safe)
         admin_alert = (
-            f"💸 *NEW WITHDRAWAL REQUEST* 💸\n\n"
-            f"👤 *User:* {user.first_name} (`{user.id}`)\n"
-            f"💰 *Net Payout to Send:* *₹{res['net_payout']:,.2f}*\n"
-            f"💳 *Send to UPI:* `{res['receiver']}`\n"
-            f"🆔 *ID:* `{wth_id}`"
+            f"💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n"
+            f"👤 <b>User:</b> {user.first_name} (<code>{user.id}</code>)\n"
+            f"💰 <b>Net Payout to Send:</b> <b>₹{res['net_payout']:,.2f}</b>\n"
+            f"💳 <b>Send to UPI:</b> <code>{res['receiver']}</code>\n"
+            f"🆔 <b>ID:</b> <code>{wth_id}</code>"
         )
         for admin_id in list(dict.fromkeys(ADMIN_IDS)):
             try:
                 await context.bot.send_message(
                     chat_id=admin_id,
                     text=admin_alert,
-                    parse_mode="Markdown",
+                    parse_mode="HTML",
                     reply_markup=get_admin_approval_keyboard(wth_id, "WTH")
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Error sending admin alert to {admin_id}: {e}")
 
 async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """

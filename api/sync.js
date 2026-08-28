@@ -206,6 +206,7 @@ export default async function handler(req, res) {
       createdAt: Date.now()
     };
     store.saveWithdrawal(wthRecord);
+    await dispatchTelegramSyncAlert(wthRecord, 'WITHDRAWAL');
     return res.status(200).json({ success: true, withdrawal: wthRecord });
   }
 

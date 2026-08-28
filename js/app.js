@@ -2787,7 +2787,7 @@ class AppController {
     localStorage.setItem('stake_user_auth', JSON.stringify(this.currentUser));
     this.syncAuthUI();
     window.soundEngine.playCashout();
-    this.showNotification(`⚡ Instant Guest Access: ${guestName}! Enjoy Demo Games.`, "success");
+    this.showNotification(`⚡ Instant Guest Access: ${guestName}! Welcome to VIEWPOINT.`, "success");
 
     if (this.crash && this.crash.resizeCanvas) this.crash.resizeCanvas();
     if (this.stock && this.stock.resizeCanvas) this.stock.resizeCanvas();
@@ -3356,31 +3356,16 @@ class AppController {
   }
 
   checkAndShowWelcomeBonus(user) {
-    if (!user) return;
-    const phone = user.phone || user.username;
-    const userBonusKey = 'bonus_claimed_' + phone;
-    const deviceBonusKey = 'vp_device_bonus_claimed';
-
-    // 1 Device = 1 Bonus Anti-Abuse Lock
-    if (!localStorage.getItem(userBonusKey) && !localStorage.getItem(deviceBonusKey)) {
-      setTimeout(() => {
-        const modal = document.getElementById('modalWelcomeBonus');
-        if (modal) modal.classList.add('open');
-      }, 600);
-    }
+    // Welcome popup disabled as requested
+    return;
   }
 
   async claimWelcomeBonus() {
-    const modal = document.getElementById('modalWelcomeBonus');
-    if (modal) modal.classList.remove('open');
-
     if (!window.wallet) return;
     const res = await window.wallet.claimWelcomeBonusServer();
     if (res.success) {
       window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
       this.showNotification("🎉 " + res.message, "success");
-    } else {
-      this.showNotification("⚠️ " + (res.error || "Welcome bonus already claimed."), "info");
     }
   }
 
