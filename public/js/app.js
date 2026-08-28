@@ -6662,6 +6662,8 @@ class AppController {
       this.autoStepTimers.push(nextTimer);
     }, 250);
     this.autoStepTimers.push(timer);
+  }
+
   runLimboAutoRound(betAmount) {
     if (!this.limbo && window.CasinoLimbo && (document.getElementById('limboView') || this.dom.limboView)) {
       this.limbo = new window.CasinoLimbo('limboView');
