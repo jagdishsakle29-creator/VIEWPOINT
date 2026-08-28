@@ -87,9 +87,30 @@ const ASSETS = {
       <circle cx="74" cy="35" r="7" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
       <line x1="45" y1="45" x2="55" y2="55" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
       <line x1="55" y1="45" x2="45" y2="55" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>
   `
 };
+
+if (typeof window !== 'undefined') {
+  if (!window.soundEngine && typeof CasinoAudioEngine !== 'undefined') {
+    try { window.soundEngine = new CasinoAudioEngine(); } catch(e) {}
+  }
+  if (!window.soundEngine) {
+    window.soundEngine = {
+      playClick: function(){},
+      playBet: function(){},
+      playWin: function(){},
+      playBomb: function(){},
+      playGem: function(){},
+      playCashout: function(){},
+      playDeposit: function(){},
+      playCarCrash: function(){},
+      playChickenHop: function(){},
+      playChicken: function(){},
+      playBone: function(){},
+      toggleSound: function(){}
+    };
+  }
+}
 
 class AppController {
   constructor() {
