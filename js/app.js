@@ -6694,6 +6694,56 @@ class AppController {
     this.autoStepTimers.push(timer);
   }
 
+  setCrashColorBetAmount(amt) {
+    if (this.dom.betAmountInput) {
+      this.dom.betAmountInput.value = amt.toFixed(2);
+    }
+    const chips = document.querySelectorAll('.crash-bet-chip');
+    chips.forEach(c => {
+      const match = c.innerText.includes(amt >= 1000 ? '1K' : String(amt));
+      c.style.background = match ? 'rgba(0, 229, 255, 0.25)' : 'rgba(255,255,255,0.06)';
+      c.style.borderColor = match ? '#00e5ff' : 'rgba(255,255,255,0.15)';
+    });
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+  }
+
+  placeCrashColorDirectBet(color) {
+    if (!this.crash && window.CasinoCrash) {
+      this.crash = new window.CasinoCrash('crashCanvas', {});
+    }
+    if (!this.crash) return;
+
+    if (this.crash.isPlaying) {
+      this.showNotification("⚠️ Rocket flight already active! Wait for round to finish.", "info");
+      return;
+    }
+
+    const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
+    const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
+
+    if (!window.wallet || !window.wallet.hasFunds(betAmount)) {
+      this.showNotification(`❌ Insufficient balance! Please deposit to place ${color.toUpperCase()} color bet.`, "error");
+      if (this.openDepositModal) this.openDepositModal();
+      return;
+    }
+
+    this.selectCrashColorPrediction(color);
+    this.crash.setBetAmount(betAmount);
+    this.crash.startGame();
+
+    const tag = document.getElementById('crashSelectedColorTag');
+    if (tag) {
+      const labels = {
+        red: '🔴 Red (<2x) Active | Payout 1.95x',
+        green: '🟢 Green (≥2x) Active | Payout 2.00x',
+        blue: '🔵 Moon (≥10x) Active | Payout 10.00x'
+      };
+      tag.innerText = labels[color] || 'Color Bet Active';
+    }
+
+    this.showNotification(`🚀 Placed ${window.wallet.currency}${betAmount.toFixed(2)} on ${color.toUpperCase()} prediction!`, "success");
+  }
+
   selectCrashColorPrediction(color) {
     if (!this.crash && window.CasinoCrash) {
       this.crash = new window.CasinoCrash('crashCanvas', {});
