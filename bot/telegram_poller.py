@@ -177,7 +177,7 @@ def handle_callback(cb):
 
     elif data == "menu_referral":
         answer_callback_query(cb_id)
-        ref_link = f"https://t.me/ViewpointGameBot?start={user_id}"
+        ref_link = f"https://t.me/viewpoint_games_bot?start={user_id}"
         ref_text = (
             f"👥 <b>REFER & EARN PROGRAM</b>\n\n"
             f"Share your referral link with friends and earn <b>₹500 bonus</b> on their first deposit!\n\n"
