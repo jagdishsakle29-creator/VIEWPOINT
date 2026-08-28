@@ -4921,7 +4921,7 @@ class AppController {
       if (tab) tab.classList.add('active');
       const v = this.dom.chickenView || document.getElementById('chickenView');
       if (v) { v.classList.add('active'); v.style.display = 'block'; }
-      if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'flex';
+      if (this.dom.chickenSelectGroup) this.dom.chickenSelectGroup.style.display = 'none';
       if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'flex';
       if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'flex';
       this.activeInstance = this.chicken;

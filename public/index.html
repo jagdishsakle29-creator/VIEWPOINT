@@ -1169,16 +1169,8 @@
             <div class="plinko-canvas-container">
               <canvas id="plinkoCanvas" width="460" height="420"></canvas>
             </div>
-            <div class="plinko-quick-settings">
-              <div class="plinko-setting-box">
-                <label>Risk Profile</label>
-                <select id="plinkoRiskSelect" onchange="window.app && window.app.setPlinkoRisk(this.value)">
-                  <option value="low">🟢 Low Risk</option>
-                  <option value="medium" selected>🟡 Medium Risk</option>
-                  <option value="hard">🔴 High Risk (1000x)</option>
-                </select>
-              </div>
-              <div class="plinko-setting-box">
+            <div class="plinko-quick-settings" style="display: flex; justify-content: center; margin-top: 10px;">
+              <div class="plinko-setting-box" style="width: 100%; max-width: 280px;">
                 <label>Pyramid Rows</label>
                 <select id="plinkoRowsSelect" onchange="window.app && window.app.setPlinkoRows(this.value)">
                   <option value="8">8 Rows</option>
