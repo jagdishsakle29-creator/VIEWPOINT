@@ -268,21 +268,16 @@ class CasinoWallet {
   }
 
   hasFunds(amount) {
-    if (this.balance < amount && amount > 0) {
-      this.balance = Math.max(this.balance + 500, 500);
-      this.saveLocalBalance();
-      this.notify();
-      return true;
-    }
-    return this.balance >= amount && amount > 0;
+    if (isNaN(amount) || amount <= 0) return false;
+    return this.balance >= amount;
   }
 
-  // Optimistic UI deduction while awaiting authoritative server result
+  // Authoritative balance deduction (Strict - Never goes negative)
   deduct(amount) {
+    if (isNaN(amount) || amount <= 0) return false;
     if (this.balance < amount) {
-      this.balance = Math.max(this.balance + 500, 500);
+      return false;
     }
-    if (amount <= 0) return false;
     this.balance = Math.max(0, Math.round((this.balance - amount) * 100) / 100);
     this.saveLocalBalance();
     this.notify();

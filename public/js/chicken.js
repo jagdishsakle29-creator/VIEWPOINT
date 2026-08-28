@@ -103,7 +103,7 @@ class ChickenGame {
   }
 
   async startGame() {
-    if (this.isPlaying) this.reset();
+    if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui && this.ui.onError) this.ui.onError("Insufficient balance! Please deposit to play.");
       return false;

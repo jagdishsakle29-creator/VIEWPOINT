@@ -91,7 +91,7 @@ class MinesGame {
   }
 
   async startGame() {
-    if (this.isPlaying) this.reset();
+    if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui && this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
       return false;

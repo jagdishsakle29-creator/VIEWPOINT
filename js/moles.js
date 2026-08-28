@@ -90,7 +90,7 @@ class CasinoMoles {
 
   startGame(betAmount) {
     if (betAmount) this.betAmount = betAmount;
-    if (this.isPlaying) this.reset();
+    if (this.isPlaying) return false;
 
     if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {
       if (window.app && window.app.showNotification) {

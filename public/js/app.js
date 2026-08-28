@@ -5032,6 +5032,16 @@ class AppController {
     this.hideToast();
     if (!this.currentGame) this.currentGame = 'chicken';
     
+    // Prevent duplicate bet deductions while a round is actively playing
+    if (this.activeInstance && this.activeInstance.isPlaying) {
+      if (this.activeInstance.cashOut && (this.activeInstance.currentMultiplier > 1.0 || (this.activeInstance.revealedCount && this.activeInstance.revealedCount > 0) || (this.activeInstance.currentStep && this.activeInstance.currentStep > 0))) {
+        this.handleCashoutClick();
+        return;
+      }
+      this.showNotification("⚠️ Round in progress! Pick your step or cash out.", "info");
+      return;
+    }
+    
     const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
     const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
     
