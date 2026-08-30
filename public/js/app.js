@@ -4905,16 +4905,22 @@ class AppController {
     } else {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = (gameType === 'moles' || gameType === 'plinko') ? 'none' : 'flex';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
+    }
       
-      // Master difficultyControlGroup under bet tab (Strictly shown for Tower, Chicken, Pump, Limbo, Mines, Dice; Removed from Plinko, Crash, Moles)
-      if (this.dom.difficultyControlGroup) {
-        this.dom.difficultyControlGroup.style.display = ['chicken', 'tower', 'pump', 'limbo', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
-      }
+    // Master difficultyControlGroup under bet tab (Strictly shown for Tower, Chicken, Pump, Mines, Dice; Removed from Plinko, Crash, Moles, Limbo)
+    if (this.dom.difficultyControlGroup) {
+      this.dom.difficultyControlGroup.style.display = ['chicken', 'tower', 'pump', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
     }
 
     // Crash Auto Cashout Group: only on Crash
     if (this.dom.crashSelectGroup) {
       this.dom.crashSelectGroup.style.display = (gameType === 'crash') ? 'flex' : 'none';
+    }
+
+    // Limbo Target Multiplier Group: only on Limbo
+    const limboSelGroup = document.getElementById('limboSelectGroup');
+    if (limboSelGroup) {
+      limboSelGroup.style.display = (gameType === 'limbo') ? 'flex' : 'none';
     }
 
     // Auto Diamond / Safe Picks per round: strictly for Mines game
@@ -5346,6 +5352,9 @@ class AppController {
   }
 
   setLimboTarget(target) {
+    if (!this.limbo && window.CasinoLimbo && document.getElementById('limboView')) {
+      this.limbo = new window.CasinoLimbo('limboView');
+    }
     if (this.limbo) this.limbo.setTarget(target);
   }
 

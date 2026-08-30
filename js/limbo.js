@@ -16,25 +16,31 @@ class CasinoLimbo {
 
   initDOM() {
     this.targetInput = document.getElementById('limboTargetInput');
+    this.targetInputSidebar = document.getElementById('limboTargetInputSidebar');
     this.displayWinChance = document.getElementById('limboWinChanceDisplay');
+    this.displayWinChanceSidebar = document.getElementById('limboWinChanceSidebar');
     this.displayResult = document.getElementById('limboResultDisplay');
     this.resultContainer = document.getElementById('limboResultContainer');
 
-    if (this.targetInput) {
-      this.targetInput.addEventListener('input', (e) => {
-        let val = parseFloat(e.target.value);
-        if (isNaN(val) || val < 1.01) val = 1.01;
-        this.targetMultiplier = val;
-        this.updateWinChance();
-      });
-    }
+    const handleInput = (e) => {
+      let val = parseFloat(e.target.value);
+      if (isNaN(val) || val < 1.01) val = 1.01;
+      this.targetMultiplier = val;
+      if (this.targetInput && this.targetInput !== e.target) this.targetInput.value = val.toFixed(2);
+      if (this.targetInputSidebar && this.targetInputSidebar !== e.target) this.targetInputSidebar.value = val.toFixed(2);
+      this.updateWinChance();
+    };
+
+    if (this.targetInput) this.targetInput.addEventListener('input', handleInput);
+    if (this.targetInputSidebar) this.targetInputSidebar.addEventListener('input', handleInput);
 
     this.updateWinChance();
   }
 
   setTarget(t) {
-    this.targetMultiplier = parseFloat(t);
+    this.targetMultiplier = Math.max(1.01, parseFloat(t) || 2.0);
     if (this.targetInput) this.targetInput.value = this.targetMultiplier.toFixed(2);
+    if (this.targetInputSidebar) this.targetInputSidebar.value = this.targetMultiplier.toFixed(2);
     this.updateWinChance();
     window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
   }
@@ -42,7 +48,10 @@ class CasinoLimbo {
   updateWinChance() {
     const chance = Math.max(0.0001, Math.min(98.0, 99.0 / this.targetMultiplier));
     if (this.displayWinChance) {
-      this.displayWinChance.innerText = `${chance.toFixed(4)}%`;
+      this.displayWinChance.innerText = `${chance.toFixed(2)}%`;
+    }
+    if (this.displayWinChanceSidebar) {
+      this.displayWinChanceSidebar.innerText = `Win: ${chance.toFixed(2)}%`;
     }
   }
 

@@ -919,6 +919,23 @@
           </div>
         </div>
 
+        <!-- Limbo Target Multiplier Selector (Visible on Limbo Tab) -->
+        <div id="limboSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Target Multiplier</label>
+            <span class="control-helper" id="limboWinChanceSidebar">Win: 49.50%</span>
+          </div>
+          <div class="input-with-actions">
+            <input type="number" id="limboTargetInputSidebar" class="bet-input-field" value="2.00" min="1.01" step="0.10" style="padding-left: 14px;" oninput="window.app && window.app.setLimboTarget(this.value)">
+            <div class="bet-quick-actions">
+              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(1.50)">1.5x</button>
+              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(2.00)">2x</button>
+              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(5.00)">5x</button>
+              <button class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(10.00)">10x</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Color Trading Contract Chips (Visible on Color Trading Tab) -->
         <div id="colorTradingSelectGroup" class="control-group" style="display: none;">
           <div class="control-header">
