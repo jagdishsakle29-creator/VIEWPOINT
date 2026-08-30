@@ -4552,23 +4552,30 @@ class AppController {
     const allDiffBtns = [this.dom.btnDiffEasy, this.dom.btnDiffMed, this.dom.btnDiffHard, document.getElementById('btnDiffDaredevil')];
     allDiffBtns.forEach(b => b && b.classList.remove('active'));
 
+    // Auto-instantiate any active engines so they receive the difficulty updates
+    if (!this.tower && window.CasinoTower && document.getElementById('towerView')) this.tower = new window.CasinoTower('towerView');
+    if (!this.pump && window.CasinoPump && document.getElementById('pumpView')) this.pump = new window.CasinoPump('pumpView');
+    if (!this.moles && window.CasinoMoles && document.getElementById('molesView')) this.moles = new window.CasinoMoles('molesView');
+    if (!this.chicken && window.CasinoChicken && document.getElementById('chickenView')) this.chicken = new window.CasinoChicken('chickenView');
+    if (!this.mines && window.CasinoMines && document.getElementById('minesView')) this.mines = new window.CasinoMines('minesView');
+    if (!this.plinko && window.CasinoPlinko && document.getElementById('plinkoCanvas')) this.plinko = new window.CasinoPlinko('plinkoCanvas');
+    if (!this.limbo && window.CasinoLimbo && document.getElementById('limboView')) this.limbo = new window.CasinoLimbo('limboView');
+
     if (diff === 'easy') {
       if (this.dom.btnDiffEasy) this.dom.btnDiffEasy.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟢 Easy (Low Risk - Safe Payouts)";
       
-      // Mines
+      // Mines (1 Mine: 24 Safe Gems)
       if (this.dom.minesCountSelect) {
         this.dom.minesCountSelect.value = "1";
         if (this.mines) this.mines.setMineCount(1);
       }
-      // Chicken
-      if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "easy";
-        if (this.chicken) this.chicken.setDifficulty('easy');
-      }
+      // Chicken (Easy: 1 Bone, 24 Lanes)
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "easy";
+      if (this.chicken) this.chicken.setDifficulty('easy');
       // Tower (4 Doors: 3 Diamonds, 1 Skull)
       if (this.tower) this.tower.setDifficulty('easy');
-      // Moles
+      // Moles (1 Trap: 11 Safe Moles)
       if (this.moles) this.moles.setTrapCount(1);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "1";
@@ -4594,19 +4601,17 @@ class AppController {
       if (this.dom.btnDiffHard) this.dom.btnDiffHard.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🔴 Hard (High Multipliers)";
       
-      // Mines
+      // Mines (5 Mines)
       if (this.dom.minesCountSelect) {
         this.dom.minesCountSelect.value = "5";
         if (this.mines) this.mines.setMineCount(5);
       }
-      // Chicken
-      if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "hard";
-        if (this.chicken) this.chicken.setDifficulty('hard');
-      }
+      // Chicken (Hard: 3 Bones)
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "hard";
+      if (this.chicken) this.chicken.setDifficulty('hard');
       // Tower (2 Doors: 1 Diamond, 1 Skull)
       if (this.tower) this.tower.setDifficulty('hard');
-      // Moles
+      // Moles (4 Traps)
       if (this.moles) this.moles.setTrapCount(4);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "4";
@@ -4633,19 +4638,17 @@ class AppController {
       if (btnDare) btnDare.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "⚡ Extreme / Daredevil (Max 1000x)";
 
-      // Mines
+      // Mines (10 Mines)
       if (this.dom.minesCountSelect) {
         this.dom.minesCountSelect.value = "10";
         if (this.mines) this.mines.setMineCount(10);
       }
-      // Chicken
-      if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "daredevil";
-        if (this.chicken) this.chicken.setDifficulty('daredevil');
-      }
+      // Chicken (Daredevil: 4 Bones)
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "daredevil";
+      if (this.chicken) this.chicken.setDifficulty('daredevil');
       // Tower (3 Doors: 1 Diamond, 2 Skulls)
       if (this.tower) this.tower.setDifficulty('extreme');
-      // Moles
+      // Moles (5 Traps)
       if (this.moles) this.moles.setTrapCount(5);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "5";
@@ -4672,19 +4675,17 @@ class AppController {
       if (this.dom.btnDiffMed) this.dom.btnDiffMed.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟡 Medium (Balanced Mode)";
       
-      // Mines
+      // Mines (3 Mines)
       if (this.dom.minesCountSelect) {
         this.dom.minesCountSelect.value = "3";
         if (this.mines) this.mines.setMineCount(3);
       }
-      // Chicken
-      if (this.dom.bonesCountSelect) {
-        this.dom.bonesCountSelect.value = "medium";
-        if (this.chicken) this.chicken.setDifficulty('medium');
-      }
+      // Chicken (Med: 2 Bones)
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "medium";
+      if (this.chicken) this.chicken.setDifficulty('medium');
       // Tower (3 Doors: 2 Diamonds, 1 Skull)
       if (this.tower) this.tower.setDifficulty('medium');
-      // Moles
+      // Moles (3 Traps)
       if (this.moles) this.moles.setTrapCount(3);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "3";
@@ -4705,6 +4706,13 @@ class AppController {
       if (limboInput) limboInput.value = "2.10";
       // Pump (Balanced)
       if (this.pump) this.pump.setDifficulty('medium');
+    }
+
+    // Refresh visuals across active game
+    if (this.chicken) this.renderHighwayLanes();
+    if (this.mines) this.mines.updateNextMultiplierPreview();
+    if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
+      this.activeInstance.updateNextMultiplierPreview();
     }
 
     if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {

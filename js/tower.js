@@ -69,7 +69,7 @@ class CasinoTower {
 
   setDifficulty(diff) {
     if (this.isPlaying) return;
-    this.difficulty = diff;
+    this.difficulty = (diff === 'daredevil' || diff === 'extreme') ? 'extreme' : (diff || 'medium');
     this.renderTowerStructure();
     this.updateUI();
   }
@@ -80,6 +80,7 @@ class CasinoTower {
         return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.20, 2.60] };
       case 'hard':
         return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.30, 1.80, 2.60, 4.00, 6.50, 11.00, 20.00, 38.00] };
+      case 'daredevil':
       case 'extreme':
         return { blocksPerFloor: 3, safeCount: 1, skulls: 2, mults: [1.50, 2.50, 4.50, 8.50, 18.00, 45.00, 120.00, 320.00] };
       case 'medium':

@@ -62,7 +62,15 @@ class CasinoMoles {
     else this.trapCount = 3;
 
     if (this.trapSelect) this.trapSelect.value = String(this.trapCount);
-    this.updateUI();
+    
+    // Update live multiplier preview
+    const nextPreview = this.calculateMultiplier(1, this.trapCount);
+    if (this.multDisplay) this.multDisplay.innerText = `${nextPreview.toFixed(2)}x`;
+    if (this.profitDisplay) this.profitDisplay.innerText = `₹${(this.betAmount * nextPreview).toFixed(2)}`;
+    if (this.statusText) {
+      const names = { 1: '🟢 1 Trap (Safe: 11)', 3: '🟡 3 Traps (Standard)', 4: '🔴 4 Traps (High Win)', 5: '⚡ 5 Traps (Extreme)' };
+      this.statusText.innerHTML = `<span style="color:#94a3b8;">Selected: <b style="color:#00e5ff;">${names[this.trapCount]}</b> | Next: <b style="color:#00e701;">+${nextPreview.toFixed(2)}x</b></span>`;
+    }
   }
 
   setBetAmount(amt) {

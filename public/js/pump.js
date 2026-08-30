@@ -55,8 +55,16 @@ class CasinoPump {
 
   setDifficulty(diff) {
     this.difficulty = diff || 'medium';
+    const mults = this.getStepMultipliers();
+    const nextPreview = mults[1] || 1.15;
+    
+    if (!this.isPlaying) {
+      if (this.multDisplay) this.multDisplay.innerText = `${nextPreview.toFixed(2)}x`;
+      if (this.profitDisplay) this.profitDisplay.innerText = `₹${(this.betAmount * nextPreview).toFixed(2)}`;
+    }
+
     if (this.statusText && !this.isPlaying) {
-      const names = { easy: '🟢 Easy (Safe Payouts)', medium: '🟡 Medium (Balanced)', hard: '🔴 Hard (High Multipliers)', daredevil: '⚡ Daredevil (Insane 1000x)' };
+      const names = { easy: '🟢 Easy (Safe 5x)', medium: '🟡 Medium (Balanced 25x)', hard: '🔴 Hard (High 300x)', daredevil: '⚡ Daredevil (Max 1000x)' };
       this.statusText.innerHTML = `<span style="color:#94a3b8;">Difficulty: <b style="color:#00e5ff;">${names[this.difficulty] || 'Medium'}</b> | Tap PUMP to play</span>`;
     }
   }
