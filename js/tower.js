@@ -142,7 +142,7 @@ class CasinoTower {
 
     if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {
       if (window.app && window.app.showNotification) {
-        window.app.showNotification("❌ Insufficient balance for Tower Legend bet!", "error");
+        window.app.showNotification("❌ Insufficient balance for Tower bet!", "error");
       }
       return false;
     }
@@ -153,26 +153,35 @@ class CasinoTower {
     this.isPlaying = true;
     this.currentFloor = 0;
     this.currentMultiplier = 1.00;
-    this.roundId = 'TOW-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6);
-    this.generateTowerSkulls();
+    this.roundId = 'TWR-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 6);
+    this.secretSkulls = this.generateSkulls();
 
     this.renderTowerStructure();
     this.highlightFloor(1);
     this.updateUI();
+
+    if (window.app && window.app.dom) {
+      if (window.app.dom.btnActionBet) window.app.dom.btnActionBet.style.display = 'none';
+      if (window.app.dom.btnActionCashout) {
+        window.app.dom.btnActionCashout.style.display = 'flex';
+        window.app.dom.btnActionCashout.disabled = true;
+      }
+    }
     return true;
   }
 
-  generateTowerSkulls() {
-    this.secretSkulls = [];
+  generateSkulls() {
     const config = this.getDifficultyConfig();
-    for (let f = 1; f <= this.totalFloors; f++) {
-      const skulls = [];
-      while (skulls.length < config.skulls) {
-        const r = Math.floor(Math.random() * config.blocksPerFloor);
-        if (!skulls.includes(r)) skulls.push(r);
+    const result = [];
+    for (let f = 0; f < this.totalFloors; f++) {
+      const indices = Array.from({ length: config.blocksPerFloor }, (_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
       }
-      this.secretSkulls.push(skulls);
+      result.push(indices.slice(0, config.skulls));
     }
+    return result;
   }
 
   selectBlock(floor, block, btnEl) {
@@ -198,10 +207,26 @@ class CasinoTower {
     // Safe Gem Found
     this.currentFloor = floor;
     this.currentMultiplier = config.mults[floorIdx];
+    const currentProfit = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
 
     if (btnEl) {
       btnEl.classList.add('gem-found');
       btnEl.innerHTML = `<div class="tower-gem-wrapper">💎<span class="tower-step-mult">${this.currentMultiplier.toFixed(2)}x</span></div>`;
+    }
+
+    // Sync to bottom global cashout bar
+    if (window.app) {
+      const amtDisp = document.getElementById('cashoutAmountDisplay');
+      const multDisp = document.getElementById('cashoutMultiplierDisplay');
+      if (amtDisp) amtDisp.innerText = `${window.wallet.currency}${currentProfit.toFixed(2)}`;
+      if (multDisp) multDisp.innerText = `${this.currentMultiplier.toFixed(2)}x`;
+      if (window.app.dom && window.app.dom.btnActionCashout) {
+        window.app.dom.btnActionCashout.disabled = false;
+        window.app.dom.btnActionCashout.style.display = 'flex';
+      }
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'none';
+      }
     }
 
     if (floorRow) floorRow.classList.add('cleared-floor');
@@ -265,8 +290,14 @@ class CasinoTower {
     this.addHistoryPill(entry);
     this.updateUI(true);
 
-    if (window.app && window.app.showNotification) {
-      window.app.showNotification(`💀 Skull hit on Floor ${floor}! Tower collapsed (-₹${this.betAmount.toFixed(2)})`, "error");
+    if (window.app) {
+      if (window.app.dom && window.app.dom.btnActionCashout) window.app.dom.btnActionCashout.style.display = 'none';
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'flex';
+        window.app.dom.btnActionBet.disabled = false;
+      }
+      window.app.showToast({ won: false, multiplier: 0, payout: 0 });
+      window.app.renderHistoryTable();
     }
   }
 
@@ -291,8 +322,14 @@ class CasinoTower {
     this.addHistoryPill(entry);
     this.updateUI(false, true);
 
-    if (window.app && window.app.showNotification) {
-      window.app.showNotification(`👑 TOWER CASHOUT! Escaped Floor ${this.currentFloor} with +₹${payout.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)!`, "success");
+    if (window.app) {
+      if (window.app.dom && window.app.dom.btnActionCashout) window.app.dom.btnActionCashout.style.display = 'none';
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'flex';
+        window.app.dom.btnActionBet.disabled = false;
+      }
+      window.app.showToast({ won: true, multiplier: this.currentMultiplier, payout: payout });
+      window.app.renderHistoryTable();
     }
     return payout;
   }

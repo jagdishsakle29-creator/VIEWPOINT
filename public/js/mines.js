@@ -26,6 +26,10 @@ class MinesGame {
   setMineCount(count) {
     if (this.isPlaying) return;
     this.mineCount = Math.max(1, Math.min(24, parseInt(count) || 3));
+    this.revealedIndices.clear();
+    this.revealedCount = 0;
+    this.currentMultiplier = 1.0;
+    try { sessionStorage.removeItem('stake_active_round_mines'); } catch(e) {}
     this.updateNextMultiplierPreview();
   }
 

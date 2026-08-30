@@ -53,6 +53,18 @@ class CasinoMoles {
     this.renderHolesGrid();
   }
 
+  setDifficulty(diff) {
+    if (this.isPlaying) return;
+    this.difficulty = diff || 'medium';
+    if (diff === 'easy') this.trapCount = 1;
+    else if (diff === 'hard') this.trapCount = 4;
+    else if (diff === 'daredevil') this.trapCount = 5;
+    else this.trapCount = 3;
+
+    if (this.trapSelect) this.trapSelect.value = String(this.trapCount);
+    this.updateUI();
+  }
+
   setBetAmount(amt) {
     this.betAmount = Math.max(1, parseFloat(amt) || 10);
     this.updateUI();
@@ -110,6 +122,14 @@ class CasinoMoles {
 
     this.renderHolesGrid();
     this.updateUI();
+
+    if (window.app && window.app.dom) {
+      if (window.app.dom.btnActionBet) window.app.dom.btnActionBet.style.display = 'none';
+      if (window.app.dom.btnActionCashout) {
+        window.app.dom.btnActionCashout.style.display = 'flex';
+        window.app.dom.btnActionCashout.disabled = true;
+      }
+    }
     return true;
   }
 
@@ -142,6 +162,7 @@ class CasinoMoles {
     const safeFound = this.revealedIndices.size;
     const totalSafe = this.totalHoles - this.trapCount;
     this.currentMultiplier = this.calculateMultiplier(safeFound, this.trapCount);
+    const currentProfit = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
 
     if (holeEl) {
       holeEl.classList.add('mole-found');
@@ -151,6 +172,21 @@ class CasinoMoles {
           <div class="mole-coin-badge">💰 +${this.currentMultiplier.toFixed(2)}x</div>
         </div>
       `;
+    }
+
+    // Sync to bottom global cashout bar
+    if (window.app) {
+      const amtDisp = document.getElementById('cashoutAmountDisplay');
+      const multDisp = document.getElementById('cashoutMultiplierDisplay');
+      if (amtDisp) amtDisp.innerText = `${window.wallet.currency}${currentProfit.toFixed(2)}`;
+      if (multDisp) multDisp.innerText = `${this.currentMultiplier.toFixed(2)}x`;
+      if (window.app.dom && window.app.dom.btnActionCashout) {
+        window.app.dom.btnActionCashout.disabled = false;
+        window.app.dom.btnActionCashout.style.display = 'flex';
+      }
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'none';
+      }
     }
 
     if (window.soundEngine) window.soundEngine.playGem && window.soundEngine.playGem(safeFound);
@@ -221,8 +257,14 @@ class CasinoMoles {
     this.addHistoryPill(entry);
     this.updateUI(true);
 
-    if (window.app && window.app.showNotification) {
-      window.app.showNotification(`🔨 Trap hit! Mole burrow collapsed (-₹${this.betAmount.toFixed(2)})`, "error");
+    if (window.app) {
+      if (window.app.dom && window.app.dom.btnActionCashout) window.app.dom.btnActionCashout.style.display = 'none';
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'flex';
+        window.app.dom.btnActionBet.disabled = false;
+      }
+      window.app.showToast({ won: false, multiplier: 0, payout: 0 });
+      window.app.renderHistoryTable();
     }
   }
 
@@ -247,8 +289,14 @@ class CasinoMoles {
     this.addHistoryPill(entry);
     this.updateUI(false, true);
 
-    if (window.app && window.app.showNotification) {
-      window.app.showNotification(`🎉 CASHOUT! Won +₹${payout.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)!`, "success");
+    if (window.app) {
+      if (window.app.dom && window.app.dom.btnActionCashout) window.app.dom.btnActionCashout.style.display = 'none';
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'flex';
+        window.app.dom.btnActionBet.disabled = false;
+      }
+      window.app.showToast({ won: true, multiplier: this.currentMultiplier, payout: payout });
+      window.app.renderHistoryTable();
     }
     return payout;
   }
