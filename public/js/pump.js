@@ -83,7 +83,14 @@ class CasinoPump {
   }
 
   startGame(betAmount) {
-    if (betAmount) this.betAmount = betAmount;
+    if (betAmount) {
+      this.betAmount = parseFloat(betAmount);
+    } else {
+      const pInput = document.getElementById('pumpDirectBetInput');
+      const bInput = document.getElementById('betAmountInput');
+      const val = parseFloat(pInput ? pInput.value : (bInput ? bInput.value : 10)) || (window.app ? window.app.betAmount : 10);
+      this.betAmount = Math.max(1, val);
+    }
     if (this.isPlaying) return false;
 
     if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {
@@ -130,6 +137,14 @@ class CasinoPump {
 
     this.resetBalloonVisuals();
     this.updateUI();
+
+    if (window.app && window.app.dom) {
+      if (window.app.dom.btnActionBet) window.app.dom.btnActionBet.style.display = 'none';
+      if (window.app.dom.btnActionCashout) {
+        window.app.dom.btnActionCashout.style.display = 'flex';
+        window.app.dom.btnActionCashout.disabled = true;
+      }
+    }
     return true;
   }
 
@@ -160,6 +175,10 @@ class CasinoPump {
     this.balloonScale = 1.0 + Math.min(1.6, this.pumpCount * 0.16);
     this.animatePumpPulse();
     this.updateUI();
+
+    if (window.app && window.app.dom && window.app.dom.btnActionCashout) {
+      window.app.dom.btnActionCashout.disabled = false;
+    }
   }
 
   animatePumpPulse() {
@@ -194,8 +213,14 @@ class CasinoPump {
     this.addHistoryPill(entry);
     this.updateUI(true);
 
-    if (window.app && window.app.showNotification) {
-      window.app.showNotification(`💥 POP! Balloon burst at ${this.currentMultiplier.toFixed(2)}x (-₹${this.betAmount.toFixed(2)})`, "error");
+    if (window.app) {
+      if (window.app.dom && window.app.dom.btnActionCashout) window.app.dom.btnActionCashout.style.display = 'none';
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'flex';
+        window.app.dom.btnActionBet.disabled = false;
+      }
+      window.app.showToast({ won: false, multiplier: 0, payout: 0 });
+      window.app.renderHistoryTable();
     }
   }
 
@@ -203,7 +228,7 @@ class CasinoPump {
     if (!this.isPlaying || this.pumpCount === 0) return 0;
     this.isPlaying = false;
 
-    const payout = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
+    const payout = Math.round((this.betAmount * this.currentMultiplier) * 100) / 100;
     window.wallet.addWin(payout);
     if (window.soundEngine) window.soundEngine.playWin && window.soundEngine.playWin();
 
@@ -220,8 +245,14 @@ class CasinoPump {
     this.addHistoryPill(entry);
     this.updateUI(false, true);
 
-    if (window.app && window.app.showNotification) {
-      window.app.showNotification(`🎉 CASHOUT! Won +₹${payout.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)!`, "success");
+    if (window.app) {
+      if (window.app.dom && window.app.dom.btnActionCashout) window.app.dom.btnActionCashout.style.display = 'none';
+      if (window.app.dom && window.app.dom.btnActionBet) {
+        window.app.dom.btnActionBet.style.display = 'flex';
+        window.app.dom.btnActionBet.disabled = false;
+      }
+      window.app.showToast({ won: true, multiplier: this.currentMultiplier, payout: payout });
+      window.app.renderHistoryTable();
     }
     return payout;
   }
@@ -235,9 +266,17 @@ class CasinoPump {
   }
 
   updateUI(isPopped = false, isCashedOut = false) {
-    const profit = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
+    const profit = Math.round((this.betAmount * this.currentMultiplier) * 100) / 100;
     if (this.multDisplay) this.multDisplay.innerText = `${this.currentMultiplier.toFixed(2)}x`;
     if (this.profitDisplay) this.profitDisplay.innerText = `₹${profit.toFixed(2)}`;
+
+    // Sync to bottom global cashout bar
+    if (window.app) {
+      const amtDisp = document.getElementById('cashoutAmountDisplay');
+      const multDisp = document.getElementById('cashoutMultiplierDisplay');
+      if (amtDisp) amtDisp.innerText = `${window.wallet.currency}${profit.toFixed(2)}`;
+      if (multDisp) multDisp.innerText = `${this.currentMultiplier.toFixed(2)}x`;
+    }
 
     // Update Pressure Fill & Dial
     const pct = Math.min(100, (this.pumpCount / 8) * 100);
