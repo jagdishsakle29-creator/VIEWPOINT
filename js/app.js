@@ -4539,16 +4539,19 @@ class AppController {
         this.dom.bonesCountSelect.value = "easy";
         if (this.chicken) this.chicken.setDifficulty('easy');
       }
-      // Tower
+      // Tower (4 Doors: 3 Diamonds, 1 Skull)
       if (this.tower) this.tower.setDifficulty('easy');
       // Moles
       if (this.moles) this.moles.setTrapCount(1);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "1";
-      // Plinko
-      if (this.plinko) this.plinko.setRisk('low');
-      const plinkoSelect = document.getElementById('plinkoRiskSelect');
-      if (plinkoSelect) plinkoSelect.value = "low";
+      // Plinko (10 Rows, Low Risk)
+      if (this.plinko) {
+        this.plinko.setRisk('low');
+        this.plinko.setRows(10);
+      }
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      if (plinkoRowsSelect) plinkoRowsSelect.value = "10";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "1.30";
@@ -4557,12 +4560,12 @@ class AppController {
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "1.30";
-      // Pump
+      // Pump (Safe Growth)
       if (this.pump) this.pump.setDifficulty('easy');
 
     } else if (diff === 'hard') {
       if (this.dom.btnDiffHard) this.dom.btnDiffHard.classList.add('active');
-      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🔴 Hard (High Multiplier)";
+      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🔴 Hard (High Multipliers)";
       
       // Mines
       if (this.dom.minesCountSelect) {
@@ -4574,16 +4577,19 @@ class AppController {
         this.dom.bonesCountSelect.value = "hard";
         if (this.chicken) this.chicken.setDifficulty('hard');
       }
-      // Tower
+      // Tower (2 Doors: 1 Diamond, 1 Skull)
       if (this.tower) this.tower.setDifficulty('hard');
       // Moles
       if (this.moles) this.moles.setTrapCount(4);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "4";
-      // Plinko
-      if (this.plinko) this.plinko.setRisk('hard');
-      const plinkoSelect = document.getElementById('plinkoRiskSelect');
-      if (plinkoSelect) plinkoSelect.value = "hard";
+      // Plinko (14 Rows, Hard Risk)
+      if (this.plinko) {
+        this.plinko.setRisk('hard');
+        this.plinko.setRows(14);
+      }
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      if (plinkoRowsSelect) plinkoRowsSelect.value = "14";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "6.50";
@@ -4592,13 +4598,13 @@ class AppController {
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "6.50";
-      // Pump
+      // Pump (2x Higher Multipliers)
       if (this.pump) this.pump.setDifficulty('hard');
 
     } else if (diff === 'daredevil') {
       const btnDare = document.getElementById('btnDiffDaredevil');
       if (btnDare) btnDare.classList.add('active');
-      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "⚡ Extreme / Daredevil (Max Multiplier)";
+      if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "⚡ Extreme / Daredevil (Max 1000x)";
 
       // Mines
       if (this.dom.minesCountSelect) {
@@ -4610,22 +4616,32 @@ class AppController {
         this.dom.bonesCountSelect.value = "daredevil";
         if (this.chicken) this.chicken.setDifficulty('daredevil');
       }
-      // Tower
+      // Tower (3 Doors: 1 Diamond, 2 Skulls)
       if (this.tower) this.tower.setDifficulty('extreme');
       // Moles
       if (this.moles) this.moles.setTrapCount(5);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "5";
-      // Plinko
-      if (this.plinko) this.plinko.setRisk('hard');
+      // Plinko (16 Rows Max, Hard Risk with 1000x jackpot)
+      if (this.plinko) {
+        this.plinko.setRisk('hard');
+        this.plinko.setRows(16);
+      }
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      if (plinkoRowsSelect) plinkoRowsSelect.value = "16";
+      // Crash
+      if (this.dom.crashAutoCashoutInput) {
+        this.dom.crashAutoCashoutInput.value = "18.00";
+        if (this.crash) this.crash.setAutoCashout(18.00);
+      }
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "18.00";
-      // Pump
+      // Pump (Hard Max 1000x Progression)
       if (this.pump) this.pump.setDifficulty('daredevil');
 
     } else {
-      // Medium
+      // Medium / Balanced
       if (this.dom.btnDiffMed) this.dom.btnDiffMed.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟡 Medium (Balanced Mode)";
       
@@ -4639,16 +4655,19 @@ class AppController {
         this.dom.bonesCountSelect.value = "medium";
         if (this.chicken) this.chicken.setDifficulty('medium');
       }
-      // Tower
+      // Tower (3 Doors: 2 Diamonds, 1 Skull)
       if (this.tower) this.tower.setDifficulty('medium');
       // Moles
       if (this.moles) this.moles.setTrapCount(3);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "3";
-      // Plinko
-      if (this.plinko) this.plinko.setRisk('medium');
-      const plinkoSelect = document.getElementById('plinkoRiskSelect');
-      if (plinkoSelect) plinkoSelect.value = "medium";
+      // Plinko (12 Rows, Medium Risk)
+      if (this.plinko) {
+        this.plinko.setRisk('medium');
+        this.plinko.setRows(12);
+      }
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      if (plinkoRowsSelect) plinkoRowsSelect.value = "12";
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "2.10";
@@ -4657,7 +4676,7 @@ class AppController {
       // Limbo
       const limboInput = document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "2.10";
-      // Pump
+      // Pump (Balanced)
       if (this.pump) this.pump.setDifficulty('medium');
     }
 
@@ -7623,14 +7642,153 @@ class AppController {
       }
     }
 
+    // Instant Win / Loss Popup (<500ms)
     if (res.totalWinPayout > 0) {
-      this.showNotification(`🎉 Dragon Tiger Payout: ${window.wallet.currency}${res.totalWinPayout.toFixed(2)}!`, 'success');
+      const mult = res.totalUserBet > 0 ? (res.totalWinPayout / res.totalUserBet) : 2.0;
+      this.showToast({
+        won: true,
+        multiplier: mult,
+        payout: res.totalWinPayout
+      });
+      this.showNotification(`🎉 Dragon Tiger Win: ${window.wallet.currency}${res.totalWinPayout.toFixed(2)}!`, 'success');
     } else if (res.totalUserBet > 0) {
-      this.showNotification(`💥 Round settled. Good luck next round!`, 'info');
+      this.showToast({
+        won: false,
+        multiplier: 0,
+        payout: 0
+      });
+      this.showNotification(`💥 Dragon Tiger round settled. Good luck next round!`, 'info');
     }
+
+    // Visually clear chips after settling so lost amount does not stay stuck on spots
+    setTimeout(() => {
+      if (this.dragontiger && this.dragontiger.gameState === 'settled') {
+        const allBadges = document.querySelectorAll('.dt-spot-chip-badge');
+        allBadges.forEach(b => { b.innerText = '₹0'; });
+        const allSpots = document.querySelectorAll('.dt-bet-spot, .dt-side-bet-btn');
+        allSpots.forEach(s => s.classList.remove('has-bet'));
+        if (this.dom.dtTotalBetDisplay) this.dom.dtTotalBetDisplay.innerText = `${window.wallet.currency}0.00`;
+      }
+    }, 1200);
 
     this.renderDtBeadRoad(res.history);
     this.renderHistoryTable();
+  }
+
+  requestPromoCodeFromAdmin() {
+    const uid = (window.wallet && (window.wallet.activeTelegramId || window.wallet.activeUserId)) || 'Guest_' + Math.floor(Math.random()*10000);
+    const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
+    const adminChatId = "6527377657";
+
+    const msg = `🎁 <b>REQUEST: 1-TIME PROMO VIDEO CODE</b> 🎁\n\n` +
+      `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+      `⏰ <b>Requested At:</b> ${new Date().toLocaleTimeString('en-IN')}\n\n` +
+      `👉 Admin, please issue a 1-time single-use promo code to this player!`;
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: adminChatId,
+        text: msg,
+        parse_mode: 'HTML'
+      })
+    }).catch(() => {});
+
+    this.showNotification("✈️ Request sent to Admin! Opening Telegram...", "success");
+    setTimeout(() => {
+      window.open('https://t.me/VIEWPOINT78', '_blank');
+    }, 600);
+  }
+
+  redeemSupportPromoCode() {
+    const input = document.getElementById('supportPromoCodeInput') || document.getElementById('inputPromoCode');
+    const rawCode = (input ? input.value : '').trim().toUpperCase();
+
+    if (!rawCode || rawCode.length < 3) {
+      this.showNotification("⚠️ Please enter a valid promo code!", "error");
+      return;
+    }
+
+    const uid = (window.wallet && (window.wallet.activeTelegramId || window.wallet.activeUserId)) || 'guest';
+    const usedKey = `viewpoint_used_promo_${uid}_${rawCode}`;
+
+    if (localStorage.getItem(usedKey)) {
+      this.showNotification("❌ This promo code has already been used on your account (1-Time Limit)!", "error");
+      return;
+    }
+
+    // Dynamic Admin-Issued Code Map
+    const validCodes = {
+      'VP100': 100,
+      'VP500': 500,
+      'PROMO50': 50,
+      'PROMO100': 100,
+      'PROMO500': 500,
+      'VIEWPOINT': 200,
+      'VIP2026': 250,
+      'BONUS100': 100,
+      'LUCKY777': 150
+    };
+
+    // Also check dynamic promo codes created by admin in localStorage
+    try {
+      const customAdminCodes = JSON.parse(localStorage.getItem('viewpoint_admin_promo_codes') || '{}');
+      Object.assign(validCodes, customAdminCodes);
+    } catch(e) {}
+
+    let bonusAmount = validCodes[rawCode];
+
+    // If admin issued custom prefix (e.g. VP + amount)
+    if (!bonusAmount && rawCode.startsWith('VP') && !isNaN(parseInt(rawCode.replace('VP', '')))) {
+      bonusAmount = parseInt(rawCode.replace('VP', ''));
+    }
+
+    if (!bonusAmount || bonusAmount <= 0) {
+      this.showNotification("❌ Invalid or expired promo code. Request fresh 1-time code from Admin!", "error");
+      return;
+    }
+
+    // Mark as redeemed (1-Time Use) with timestamp
+    localStorage.setItem(usedKey, JSON.stringify({
+      code: rawCode,
+      amount: bonusAmount,
+      redeemedAt: Date.now()
+    }));
+
+    if (window.wallet) {
+      window.wallet.addWin(bonusAmount);
+      window.soundEngine && window.soundEngine.playWin && window.soundEngine.playWin();
+    }
+
+    if (input) input.value = '';
+
+    this.showNotification(`🎉 SUCCESS! ₹${bonusAmount.toFixed(2)} Promo Bonus credited to your wallet!`, "success");
+    this.showToast({
+      won: true,
+      multiplier: 1.0,
+      payout: bonusAmount,
+      tagline: "PROMO CODE REDEEMED! 🎁"
+    });
+
+    // Notify Admin on Telegram Instantly
+    const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
+    const adminChatId = "6527377657";
+    const notifyMsg = `🎉 <b>PROMO CODE REDEEMED (1-TIME)</b> 🎉\n\n` +
+      `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+      `🎁 <b>Code:</b> <code>${rawCode}</code>\n` +
+      `💰 <b>Bonus Amount:</b> <b>₹${bonusAmount.toFixed(2)}</b>\n` +
+      `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('en-IN')}`;
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: adminChatId,
+        text: notifyMsg,
+        parse_mode: 'HTML'
+      })
+    }).catch(() => {});
   }
 
   resetDtTableVisuals() {

@@ -1540,6 +1540,27 @@
             </div>
           </div>
 
+          <!-- Win Go Trend Chart & Game Record Table (Placed at TOP) -->
+          <div class="wingo-history-card" style="margin-bottom: 10px; background: rgba(15, 33, 46, 0.85); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; max-height: 150px; overflow-y: auto;">
+            <div style="font-size: 11px; font-weight: 800; color: #00e5ff; margin-bottom: 6px; display: flex; justify-content: space-between;">
+              <span>📈 Win Go Trend History</span>
+              <span style="color: #94a3b8;">Live Record</span>
+            </div>
+            <table class="bets-table" style="width: 100%; font-size: 11px; text-align: center;">
+              <thead>
+                <tr style="color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                  <th style="text-align: left; padding: 4px 6px;">Period</th>
+                  <th style="padding: 4px 6px;">Number</th>
+                  <th style="padding: 4px 6px;">Big / Small</th>
+                  <th style="padding: 4px 6px;">Color</th>
+                </tr>
+              </thead>
+              <tbody id="wingoChartTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
           <!-- Recent Trend Balls -->
           <div style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1549,7 +1570,8 @@
             <div class="trend-balls-row" id="trendBallsRow" style="display: flex; gap: 6px; overflow-x: auto; padding: 2px 0;"></div>
           </div>
 
-          <!-- Win Go 3-Way Colors Action Row -->
+          <!-- Win Go Keypad / Betting Board (Placed at BOTTOM) -->
+          <!-- 3-Way Colors Action Row -->
           <div class="color-bet-buttons" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
             <button id="btnBetGreen" class="btn-color-bet btn-green" style="height: 46px; background: linear-gradient(180deg, #00e701 0%, #00a801 100%); color: #000; font-weight: 900; font-size: 14px; border-radius: 10px; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0, 231, 1, 0.35);">
               <span>🟢 GREEN</span>
@@ -1565,7 +1587,7 @@
             </button>
           </div>
 
-          <!-- Numbers 0-9 Matrix (9x Payout) -->
+          <!-- Numbers 0-9 Matrix (9x Payout) Keypad -->
           <div class="number-bet-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px;">
             <button class="btn-number-bet" data-number="0" style="background: linear-gradient(135deg, #a855f7 50%, #fe2c55 50%); height: 40px; border-radius: 8px; border: none; color: #fff; font-weight: 900; font-size: 15px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">0</button>
             <button class="btn-number-bet" data-number="1" style="background: #00e701; height: 40px; border-radius: 8px; border: none; color: #000; font-weight: 900; font-size: 15px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">1</button>
@@ -1591,21 +1613,6 @@
             </button>
           </div>
 
-          <!-- Win Go Trend Chart & Game Record Table -->
-          <div class="wingo-history-card" style="margin-bottom: 10px; background: rgba(15, 33, 46, 0.75); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; max-height: 160px; overflow-y: auto;">
-            <div style="font-size: 11px; font-weight: 800; color: #00e5ff; margin-bottom: 6px; display: flex; justify-content: space-between;">
-              <span>📈 Win Go Trend History</span>
-              <span style="color: #94a3b8;">10 Rounds</span>
-            </div>
-            <table class="bets-table" style="width: 100%; font-size: 11px; text-align: center;">
-              <thead>
-                <tr style="color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                  <th style="text-align: left; padding: 4px 6px;">Period</th>
-                  <th style="padding: 4px 6px;">Number</th>
-                  <th style="padding: 4px 6px;">Big / Small</th>
-                  <th style="padding: 4px 6px;">Color</th>
-                </tr>
-              </thead>
               <tbody id="wingoChartTableBody">
                 <!-- Dynamically populated -->
               </tbody>
@@ -2773,11 +2780,42 @@
         </div>
       </div>
 
+      <!-- 🎁 1-Time Promo Video Code Request Section in Support -->
+      <div style="margin-top: 12px; background: linear-gradient(135deg, rgba(239,68,68,0.18), rgba(245,158,11,0.18)); border: 1.5px solid rgba(239,68,68,0.45); border-radius: 12px; padding: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span style="font-weight: 900; font-size: 13px; color: #ff6b6b; display: flex; align-items: center; gap: 6px;">
+            <span>🎬 Request Admin for 1-Time Promo Code</span>
+          </span>
+          <span style="font-size: 10px; background: #fe2c55; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 800;">1-TIME USE (1-DAY)</span>
+        </div>
+        <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.4;">
+          Request Admin to promo video code for 1 time. Promo code is single-use and changes daily.
+        </p>
+
+        <!-- Request Code Button to Admin Telegram -->
+        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+          <button type="button" onclick="window.app && window.app.requestPromoCodeFromAdmin()" style="flex: 1; height: 38px; background: linear-gradient(135deg, #229ED9, #0088cc); color: #fff; border: none; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <span>✈️ Request Code from Admin (@VIEWPOINT78)</span>
+          </button>
+          <button type="button" onclick="window.app && window.app.openPromoVideoModal()" style="padding: 0 12px; height: 38px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;">
+            <span>🎥 Watch Video</span>
+          </button>
+        </div>
+
+        <!-- Redeem Promo Code Input -->
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="supportPromoCodeInput" placeholder="Enter Admin 1-Time Promo Code" style="flex: 1; height: 38px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0 10px; color: #00e5ff; font-weight: 800; font-size: 13px; text-transform: uppercase;">
+          <button type="button" onclick="window.app && window.app.redeemSupportPromoCode()" style="height: 38px; padding: 0 16px; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; font-weight: 900; font-size: 13px; border: none; border-radius: 8px; cursor: pointer;">
+            <span>🎁 Redeem</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Quick Action Question Chips -->
-      <div class="chat-quick-actions">
+      <div class="chat-quick-actions" style="margin-top: 10px;">
         <button class="chip-chat-quick" data-query="check_deposit">🔍 Check My Deposit Status</button>
         <button class="chip-chat-quick" data-query="how_to_add">💳 How to Add Money</button>
-        <button class="chip-chat-quick" data-query="game_rules">📜 Game Rules & Tips</button>
+        <button class="chip-chat-quick" data-query="promo_code" onclick="window.app && window.app.requestPromoCodeFromAdmin()">🎁 Request Promo Code</button>
         <button class="chip-chat-quick" data-query="human_agent">👨‍💼 Contact Admin</button>
       </div>
 

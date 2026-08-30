@@ -215,10 +215,75 @@ def handle_callback(cb):
         answer_callback_query(cb_id, "❌ Withdrawal Rejected", show_alert=True)
         edit_message_text(chat_id, msg_id, f"❌ <b>Withdrawal Rejected</b>\nID: <code>{wth_id}</code>\nStatus: Refunded to wallet.")
 
+import threading
+
+# Dynamic In-Memory & File Store for 1-Time Promo Codes
+PROMO_CODES_FILE = BASE_DIR / "promo_codes.json"
+
+def load_promo_codes():
+    if PROMO_CODES_FILE.exists():
+        try:
+            with open(PROMO_CODES_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def save_promo_codes(codes):
+    try:
+        with open(PROMO_CODES_FILE, "w") as f:
+            json.dump(codes, f, indent=2)
+    except Exception as e:
+        print("Save promo error:", e)
+
+dispatched_deposits = set()
+dispatched_withdrawals = set()
+
+def background_notification_monitor():
+    """Ultra-fast background monitor that checks database for new deposits/withdrawals every 1.5s"""
+    while True:
+        try:
+            if db:
+                # Check Pending Deposits
+                deps = db.get_pending_deposits() if hasattr(db, 'get_pending_deposits') else []
+                for dep in deps:
+                    d_id = dep.get("id") or dep.get("deposit_id")
+                    if d_id and d_id not in dispatched_deposits:
+                        dispatched_deposits.add(d_id)
+                        amt = float(dep.get("amount", 0))
+                        uid = dep.get("user_id") or dep.get("telegram_id") or "Player"
+                        utr = dep.get("utr", "N/A")
+                        
+                        alert_text = (
+                            f"🔔 <b>NEW UPI DEPOSIT RECORD</b> 🔔\n\n"
+                            f"👤 <b>Player ID:</b> <code>{uid}</code>\n"
+                            f"💰 <b>Amount:</b> <b>₹{amt:,.2f}</b>\n"
+                            f"🧾 <b>UTR Reference:</b> <code>{utr}</code>\n"
+                            f"⏰ <b>Time:</b> {time.strftime('%I:%M:%S %p')}\n"
+                            f"🆔 <b>Deposit ID:</b> <code>{d_id}</code>"
+                        )
+                        kb = {
+                            "inline_keyboard": [
+                                [
+                                    {"text": f"✅ Approve (+₹{amt:,.0f})", "callback_data": f"app_dep_{d_id}"},
+                                    {"text": "❌ Reject", "callback_data": f"rej_dep_{d_id}"}
+                                ]
+                            ]
+                        }
+                        for admin_id in ADMIN_IDS:
+                            send_message(admin_id, alert_text, kb)
+        except Exception as e:
+            pass
+        time.sleep(1.5)
+
 def run_bot_polling():
-    print("🚀 Starting VIEWPOINT Native Telegram Bot Poller...")
+    print("🚀 Starting VIEWPOINT Native Telegram Bot Poller with Instant Alerts...")
     # Delete any stale webhook to enable getUpdates polling
     api_call("deleteWebhook", {"drop_pending_updates": False})
+    
+    # Launch background alert monitor thread
+    t = threading.Thread(target=background_notification_monitor, daemon=True)
+    t.start()
     
     offset = 0
     while True:
@@ -232,12 +297,47 @@ def run_bot_polling():
                         msg = update["message"]
                         user = msg.get("from", {})
                         chat_id = msg.get("chat", {}).get("id")
-                        text = msg.get("text", "")
+                        text = msg.get("text", "").strip()
                         
                         if text.startswith("/start"):
                             handle_start(user, chat_id, text)
                         elif text.startswith("/play"):
                             send_message(chat_id, "🎮 Click below to open VIEWPOINT Casino:", get_main_menu(user.get("id")))
+                        elif text.startswith("/gencode") and chat_id in ADMIN_IDS:
+                            # /gencode 100 or /gencode 500
+                            parts = text.split()
+                            amt = 100.0
+                            if len(parts) > 1:
+                                try:
+                                    amt = float(parts[1])
+                                except ValueError:
+                                    amt = 100.0
+                            code = f"VP{int(amt)}-" + str(int(time.time()))[-4:]
+                            codes = load_promo_codes()
+                            codes[code] = {
+                                "amount": amt,
+                                "created_at": time.time(),
+                                "expires_at": time.time() + 86400, # 1 day validity
+                                "used_by": []
+                            }
+                            save_promo_codes(codes)
+                            
+                            send_message(
+                                chat_id,
+                                f"🎁 <b>1-TIME PROMO CODE GENERATED!</b>\n\n"
+                                f"🔑 <b>Code:</b> <code>{code}</code>\n"
+                                f"💰 <b>Bonus Amount:</b> ₹{amt:.2f}\n"
+                                f"⏳ <b>Validity:</b> 1-Day Single Use\n\n"
+                                f"👉 Send this code to player. It can only be redeemed 1 time!"
+                            )
+                        elif text.startswith("/help"):
+                            send_message(
+                                chat_id,
+                                "📖 <b>VIEWPOINT BOT COMMANDS</b>\n\n"
+                                "/start - Open main menu & Play WebApp\n"
+                                "/play - Launch casino instant webapp\n"
+                                "/gencode &lt;amt&gt; - Admin: Generate 1-time promo code (e.g. /gencode 500)"
+                            )
                     
                     elif "callback_query" in update:
                         handle_callback(update["callback_query"])
