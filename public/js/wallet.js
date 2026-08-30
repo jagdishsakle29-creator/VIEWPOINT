@@ -325,7 +325,7 @@ class CasinoWallet {
     // ⚡ INSTANT DIRECT TELEGRAM ALERT DISPATCH (<300ms)
     const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
     const adminChatId = "6527377657";
-    const webOrigin = window.location.origin;
+    const webOrigin = (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')) ? 'https://viewpoint.diy' : window.location.origin;
     const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
     const msgText = `🔔 <b>NEW DEPOSIT SUBMITTED</b> 🔔\n\n` +
       `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
@@ -347,6 +347,7 @@ class CasinoWallet {
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
       body: JSON.stringify({
         chat_id: adminChatId,
         text: msgText,
@@ -668,7 +669,7 @@ class CasinoWallet {
     // ⚡ INSTANT DIRECT TELEGRAM ALERT DISPATCH (<300ms)
     const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
     const adminChatId = "6527377657";
-    const webOrigin = window.location.origin;
+    const webOrigin = (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')) ? 'https://viewpoint.diy' : window.location.origin;
     const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
     const wthMsg = `💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n` +
       `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
@@ -692,6 +693,7 @@ class CasinoWallet {
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
       body: JSON.stringify({
         chat_id: adminChatId,
         text: wthMsg,
