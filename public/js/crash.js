@@ -91,10 +91,17 @@ class CrashGame {
     return this.colorPrediction;
   }
 
-  async startGame() {
+  async startGame(betAmount) {
+    if (betAmount) {
+      this.betAmount = parseFloat(betAmount);
+    } else {
+      const bInput = document.getElementById('betAmountInput');
+      const val = parseFloat(bInput ? bInput.value : 10) || 10;
+      this.betAmount = Math.max(1, val);
+    }
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
-      if (this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
+      if (this.ui && this.ui.onError) this.ui.onError("Insufficient balance to place bet!");
       return false;
     }
 
@@ -110,7 +117,7 @@ class CrashGame {
     this.startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     this.particles = [];
 
-    if (this.ui.onGameStart) {
+    if (this.ui && this.ui.onGameStart) {
       this.ui.onGameStart({
         betAmount: this.betAmount,
         autoCashout: this.autoCashoutMultiplier
@@ -118,7 +125,8 @@ class CrashGame {
     }
 
     // Start rendering loop instantly (zero lag)
-    this.loop();
+    if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
+    this.animFrameId = requestAnimationFrame(() => this.loop());
 
     // Fetch authoritative server crash point in background
     try {
@@ -147,69 +155,50 @@ class CrashGame {
     if (!this.isPlaying || this.isCrashed || this.hasCashedOut) return;
 
     this.hasCashedOut = true;
-    let payout = Math.floor(this.betAmount * this.currentMultiplier * 100) / 100;
+    const currentMult = this.currentMultiplier;
+    const exactPayout = Math.round((this.betAmount * currentMult) * 100) / 100;
 
+    // Credit exact win to wallet immediately
+    window.wallet.addWin(exactPayout);
+    window.soundEngine && window.soundEngine.playWin && window.soundEngine.playWin();
+
+    // Background server log sync
     try {
       const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
       const apiBase = window.wallet.apiBaseUrl;
-      let res = await fetch(`${apiBase}/api/games?action=crash_cashout`, {
+      fetch(`${apiBase}/api/games?action=crash_cashout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': String(uid) },
         body: JSON.stringify({
           action: 'crash_cashout',
           roundId: this.roundId,
           userId: uid,
-          multiplier: this.currentMultiplier
+          betAmount: this.betAmount,
+          bet_amount: this.betAmount,
+          multiplier: currentMult,
+          payout: exactPayout
         })
-      }).catch(() => null);
-
-      if (!res || !res.ok) {
-        res = await fetch(`${apiBase}/api/game/crash/cashout`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            round_id: this.roundId,
-            telegram_id: uid,
-            bet_amount: this.betAmount,
-            multiplier: this.currentMultiplier
-          })
-        }).catch(() => null);
-      }
-
-      if (res && res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          payout = data.payout || payout;
-          if (data.balance !== undefined) {
-            window.wallet.setServerBalance(data.balance);
-          } else {
-            window.wallet.addWin(payout);
-          }
-        } else {
-          window.wallet.addWin(payout);
-        }
-      } else {
-        window.wallet.addWin(payout);
-      }
-    } catch (e) {
-      window.wallet.addWin(payout);
-    }
-
-    window.soundEngine && window.soundEngine.playGem && window.soundEngine.playGem(4);
+      }).catch(() => {});
+    } catch (e) {}
 
     window.wallet.recordBet({
       game: 'Crash',
       bet: this.betAmount,
-      multiplier: this.currentMultiplier,
-      payout: payout,
+      multiplier: currentMult,
+      payout: exactPayout,
       won: true
     });
 
-    if (this.ui.onCashout) {
+    if (this.ui && this.ui.onCashout) {
       this.ui.onCashout({
-        multiplier: this.currentMultiplier,
-        payout: payout
+        multiplier: currentMult,
+        payout: exactPayout
       });
+    }
+
+    if (window.app) {
+      window.app.showToast({ won: true, multiplier: currentMult, payout: exactPayout });
+      window.app.renderHistoryTable();
     }
   }
 

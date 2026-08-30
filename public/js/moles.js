@@ -109,7 +109,13 @@ class CasinoMoles {
   }
 
   startGame(betAmount) {
-    if (betAmount) this.betAmount = betAmount;
+    if (betAmount) {
+      this.betAmount = parseFloat(betAmount);
+    } else {
+      const bInput = document.getElementById('betAmountInput');
+      const val = parseFloat(bInput ? bInput.value : 10) || 10;
+      this.betAmount = Math.max(1, val);
+    }
     if (this.isPlaying) return false;
 
     if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {

@@ -5215,10 +5215,29 @@ class AppController {
       return;
     }
     
-    const betInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
-    const betAmount = parseFloat(betInput ? betInput.value : 10) || 10;
+    let betAmount = 10;
+    const directInputs = {
+      'crash': document.getElementById('crashDirectBetInput'),
+      'plinko': document.getElementById('plinkoDirectBetInput'),
+      'pump': document.getElementById('pumpDirectBetInput'),
+      'dice': document.getElementById('diceDirectBetInput'),
+      'limbo': document.getElementById('limboDirectBetInput'),
+      'moles': document.getElementById('molesDirectBetInput'),
+      'tower': document.getElementById('towerDirectBetInput'),
+      'chicken': document.getElementById('p2ChickenBetInput')
+    };
+    const activeDirect = directInputs[this.currentGame];
+    const mainInput = (this.dom && this.dom.betAmountInput) || document.getElementById('betAmountInput');
     
-    if (!window.wallet || !window.wallet.hasFunds(betAmount)) {
+    if (activeDirect && parseFloat(activeDirect.value) > 0) {
+      betAmount = parseFloat(activeDirect.value);
+      if (mainInput) mainInput.value = betAmount.toFixed(0);
+    } else if (mainInput && parseFloat(mainInput.value) > 0) {
+      betAmount = parseFloat(mainInput.value);
+    }
+    this.betAmount = Math.max(1, betAmount);
+    
+    if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {
       const balStr = window.wallet ? `${window.wallet.currency}${window.wallet.balance.toFixed(2)}` : '₹0.00';
       this.showNotification(`❌ Insufficient balance (${balStr})! Please deposit funds to play.`, "error");
       if (this.openDepositModal) this.openDepositModal();
@@ -5226,49 +5245,49 @@ class AppController {
     }
 
     if (this.currentGame === 'plinko') {
-      if (this.plinko) this.plinko.dropBall(betAmount);
+      if (this.plinko) this.plinko.dropBall(this.betAmount);
     } else if (this.currentGame === 'dice') {
-      if (this.dice) this.dice.roll(betAmount);
+      if (this.dice) this.dice.roll(this.betAmount);
     } else if (this.currentGame === 'limbo') {
-      if (this.limbo) this.limbo.roll(betAmount);
+      if (this.limbo) this.limbo.roll(this.betAmount);
       else this.rollLimbo();
     } else if (this.currentGame === 'crash') {
       if (this.crash) {
-        this.crash.setBetAmount(betAmount);
+        this.crash.setBetAmount(this.betAmount);
         const autoCashout = (this.dom && this.dom.crashAutoCashoutInput) || document.getElementById('crashAutoCashoutInput');
         this.crash.setAutoCashout(parseFloat(autoCashout ? autoCashout.value : 2.0) || 2.0);
-        this.crash.startGame();
+        this.crash.startGame(this.betAmount);
       }
     } else if (this.currentGame === 'chicken') {
       if (this.chicken) {
-        this.chicken.setBetAmount(betAmount);
+        this.chicken.setBetAmount(this.betAmount);
         const bonesSelect = (this.dom && this.dom.bonesCountSelect) || document.getElementById('bonesCountSelect');
         this.chicken.setDifficulty(bonesSelect ? bonesSelect.value : 'medium');
-        this.chicken.startGame();
+        this.chicken.startGame(this.betAmount);
       }
     } else if (this.currentGame === 'chickenmines') {
       if (this.chickenmines) {
-        this.chickenmines.setBetAmount(betAmount);
+        this.chickenmines.setBetAmount(this.betAmount);
         const bonesSelect = (this.dom && this.dom.bonesCountSelect) || document.getElementById('bonesCountSelect');
         this.chickenmines.setMineCount(parseInt(bonesSelect ? bonesSelect.value : 3) || 3);
-        this.chickenmines.startGame();
+        this.chickenmines.startGame(this.betAmount);
       }
     } else if (this.currentGame === 'mines') {
       if (this.mines) {
-        this.mines.setBetAmount(betAmount);
+        this.mines.setBetAmount(this.betAmount);
         const minesSelect = (this.dom && this.dom.minesCountSelect) || document.getElementById('minesCountSelect');
         this.mines.setMineCount(parseInt(minesSelect ? minesSelect.value : 3) || 3);
-        this.mines.startGame();
+        this.mines.startGame(this.betAmount);
       }
     } else if (this.currentGame === 'pump') {
-      if (this.pump) this.pump.startGame(betAmount);
+      if (this.pump) this.pump.startGame(this.betAmount);
     } else if (this.currentGame === 'moles') {
-      if (this.moles) this.moles.startGame(betAmount);
+      if (this.moles) this.moles.startGame(this.betAmount);
     } else if (this.currentGame === 'tower') {
-      if (this.tower) this.tower.startGame(betAmount);
+      if (this.tower) this.tower.startGame(this.betAmount);
     } else if (this.activeInstance && this.activeInstance.startGame) {
-      if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(betAmount);
-      this.activeInstance.startGame();
+      if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(this.betAmount);
+      this.activeInstance.startGame(this.betAmount);
     }
 
     // Instantly switch BET button to active CASHOUT button for interactive games

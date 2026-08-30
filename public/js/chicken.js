@@ -97,7 +97,15 @@ class ChickenGame {
     this.roundId = null;
   }
 
-  async startGame() {
+  async startGame(betAmount) {
+    if (betAmount) {
+      this.betAmount = parseFloat(betAmount);
+    } else {
+      const bInput = document.getElementById('betAmountInput');
+      const p2Input = document.getElementById('p2ChickenBetInput');
+      const val = parseFloat(bInput ? bInput.value : (p2Input ? p2Input.value : 10)) || 10;
+      this.betAmount = Math.max(1, val);
+    }
     if (this.isPlaying) return false;
     if (!window.wallet.hasFunds(this.betAmount)) {
       if (this.ui && this.ui.onError) this.ui.onError("Insufficient balance! Please deposit to play.");
