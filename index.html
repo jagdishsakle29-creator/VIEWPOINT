@@ -1351,29 +1351,9 @@
         <div id="limboView" class="game-view limbo-view">
           <div class="limbo-game-wrapper">
             <div class="limbo-history-row" id="limboHistoryList"></div>
-            <div id="limboResultContainer" class="limbo-display-container">
+            <div id="limboResultContainer" class="limbo-display-container" style="margin-bottom: 16px;">
               <div id="limboResultDisplay" class="limbo-multiplier-text">1.00x</div>
               <div style="font-size: 11px; color: #94a3b8; font-weight: 800; text-transform: uppercase; margin-top: 4px;">Multiplier Burst</div>
-            </div>
-            <div class="limbo-controls-grid">
-              <div class="limbo-control-card">
-                <label class="control-label">Target Multiplier:</label>
-                <div class="input-with-actions" style="margin-top: 4px;">
-                  <input type="number" id="limboTargetInput" class="bet-input-field" value="2.00" min="1.01" max="1000000" step="0.10">
-                </div>
-                <div class="limbo-quick-targets">
-                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(1.5)">1.5x</button>
-                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(2.0)">2x</button>
-                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(5.0)">5x</button>
-                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(10.0)">10x</button>
-                  <button type="button" class="limbo-quick-btn" onclick="window.app && window.app.setLimboTarget(100.0)">100x</button>
-                </div>
-              </div>
-              <div class="limbo-control-card">
-                <label class="control-label">Win Chance (%):</label>
-                <div id="limboWinChanceDisplay" style="padding: 10px; background: rgba(0,0,0,0.5); border-radius: 8px; font-weight: 900; color: #00e5ff; text-align: center; font-size: 20px; font-family: Outfit, sans-serif; margin-top: 4px;">49.50%</div>
-                <div style="font-size: 10px; color: #64748b; margin-top: 6px; text-align: center;">Payout: Target × Bet Amount</div>
-              </div>
             </div>
 
             <!-- Limbo How to Play -->
@@ -1384,7 +1364,7 @@
               </div>
               <div class="how-to-play-body" style="display: none;">
                 <ul>
-                  <li>Enter your Target Multiplier (from 1.01x up to 1,000,000x).</li>
+                  <li>Enter your Target Multiplier under the Bet panel (from 1.01x up to 1,000,000x).</li>
                   <li>Click BET to launch the Limbo generator.</li>
                   <li>If the generated multiplier is equal or greater than your target, you instantly win!</li>
                 </ul>
@@ -1821,6 +1801,26 @@
                   <button type="button" class="btn-quick-bet" style="height: 38px; padding: 0 8px; border-radius: 8px; font-size: 11px;" onclick="let val = (parseFloat(document.getElementById('pumpDirectBetInput').value)||10)*2; document.getElementById('pumpDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">2X</button>
                   <button type="button" class="btn-quick-bet" style="height: 38px; padding: 0 8px; border-radius: 8px; font-size: 11px;" onclick="let val = (window.wallet ? window.wallet.balance : 100); document.getElementById('pumpDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">MAX</button>
                 </div>
+              </div>
+
+              <!-- Direct Pump Difficulty Mode Bar inside Pump Stage -->
+              <div class="difficulty-modes-row" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; width: 100%; margin-bottom: 8px;">
+                <button type="button" class="btn-diff-mode pump-diff-stage-btn" data-diff="easy" onclick="window.setDifficulty('easy')">
+                  <span style="font-weight: 800;">🟢 Easy</span>
+                  <small style="font-size: 10px; opacity: 0.8;">Safe 5x</small>
+                </button>
+                <button type="button" class="btn-diff-mode pump-diff-stage-btn active" data-diff="medium" onclick="window.setDifficulty('medium')">
+                  <span style="font-weight: 800;">🟡 Med</span>
+                  <small style="font-size: 10px; opacity: 0.8;">25x</small>
+                </button>
+                <button type="button" class="btn-diff-mode pump-diff-stage-btn" data-diff="hard" onclick="window.setDifficulty('hard')">
+                  <span style="font-weight: 800;">🔴 Hard</span>
+                  <small style="font-size: 10px; opacity: 0.8;">300x</small>
+                </button>
+                <button type="button" class="btn-diff-mode pump-diff-stage-btn" data-diff="daredevil" onclick="window.setDifficulty('daredevil')">
+                  <span style="font-weight: 800;">⚡ Max</span>
+                  <small style="font-size: 10px; opacity: 0.8;">1000x</small>
+                </button>
               </div>
 
               <button type="button" id="btnPumpStart" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4);" onclick="window.app && window.app.handleBetClick()">

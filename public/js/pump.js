@@ -55,6 +55,12 @@ class CasinoPump {
 
   setDifficulty(diff) {
     this.difficulty = diff || 'medium';
+    const targetDiff = (diff === 'daredevil' || diff === 'extreme') ? 'daredevil' : (diff || 'medium');
+    
+    document.querySelectorAll('.pump-diff-stage-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.diff === targetDiff);
+    });
+
     const mults = this.getStepMultipliers();
     const nextPreview = mults[1] || 1.15;
     

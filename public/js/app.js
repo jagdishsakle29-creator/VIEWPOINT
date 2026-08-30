@@ -4711,8 +4711,8 @@ class AppController {
     // Refresh visuals across active game
     if (this.chicken) this.renderHighwayLanes();
     if (this.mines) this.mines.updateNextMultiplierPreview();
-    if (this.tower) { this.tower.renderTowerStructure(); this.tower.updateUI(); }
-    if (this.pump) this.pump.setDifficulty(diff);
+    if (this.tower) { this.tower.setDifficulty(diff); }
+    if (this.pump) { this.pump.setDifficulty(diff); }
     if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
       this.activeInstance.updateNextMultiplierPreview();
     }
