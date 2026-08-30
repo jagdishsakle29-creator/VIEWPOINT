@@ -838,6 +838,54 @@
           </div>
         </div>
 
+        <!-- Plinko Pyramid Rows Selector (Visible on Plinko Tab) -->
+        <div id="plinkoSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Pyramid Rows</label>
+            <span class="control-helper" id="plinkoRowsLabelHelper">12 Rows (Balanced)</span>
+          </div>
+          <div class="custom-select-wrapper">
+            <select id="plinkoRowsSelectSidebar" class="custom-select" onchange="window.app && window.app.setPlinkoRows(this.value)">
+              <option value="8">8 Rows (Fast)</option>
+              <option value="10">10 Rows (Standard)</option>
+              <option value="12" selected>12 Rows (Balanced)</option>
+              <option value="14">14 Rows (High Win)</option>
+              <option value="16">16 Rows (Max 1000x)</option>
+            </select>
+            <span class="select-arrow">▼</span>
+          </div>
+        </div>
+
+        <!-- Moles 1 to 5 Trap Selector (Visible on Moles Tab) -->
+        <div id="molesSelectGroup" class="control-group" style="display: none;">
+          <div class="control-header">
+            <label class="control-label">Hammer Traps</label>
+            <span class="control-helper" id="molesTrapsLabelHelper">3 Traps (9 Safe Moles)</span>
+          </div>
+          <div class="moles-traps-row" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+            <button type="button" class="btn-diff-mode btn-mole-trap" data-traps="1" onclick="window.app && window.app.setMolesTrapCount(1)">
+              <span>1 🔨</span>
+              <small>Safe</small>
+            </button>
+            <button type="button" class="btn-diff-mode btn-mole-trap" data-traps="2" onclick="window.app && window.app.setMolesTrapCount(2)">
+              <span>2 🔨</span>
+              <small>Easy</small>
+            </button>
+            <button type="button" class="btn-diff-mode btn-mole-trap active" data-traps="3" onclick="window.app && window.app.setMolesTrapCount(3)">
+              <span>3 🔨</span>
+              <small>Med</small>
+            </button>
+            <button type="button" class="btn-diff-mode btn-mole-trap" data-traps="4" onclick="window.app && window.app.setMolesTrapCount(4)">
+              <span>4 🔨</span>
+              <small>Hard</small>
+            </button>
+            <button type="button" class="btn-diff-mode btn-mole-trap" data-traps="5" onclick="window.app && window.app.setMolesTrapCount(5)">
+              <span>5 🔨</span>
+              <small>Max</small>
+            </button>
+          </div>
+        </div>
+
         <!-- Highway Difficulty Selector (Visible on Chicken Tab) -->
         <div id="chickenSelectGroup" class="control-group" style="display: flex;">
           <div class="control-header">
@@ -1172,33 +1220,40 @@
         <!-- Game: Stake Plinko View -->
         <div id="plinkoView" class="game-view plinko-view">
           <div class="plinko-game-wrapper">
+            <!-- Plinko Canvas at the Top -->
             <div class="plinko-canvas-container">
-              <canvas id="plinkoCanvas" width="460" height="420"></canvas>
+              <canvas id="plinkoCanvas" width="460" height="400"></canvas>
             </div>
-            <div class="plinko-quick-settings" style="display: flex; justify-content: center; margin-top: 10px;">
-              <div class="plinko-setting-box" style="width: 100%; max-width: 280px;">
-                <label>Pyramid Rows</label>
-                <select id="plinkoRowsSelect" onchange="window.app && window.app.setPlinkoRows(this.value)">
-                  <option value="8">8 Rows</option>
-                  <option value="10">10 Rows</option>
-                  <option value="12" selected>12 Rows</option>
-                  <option value="14">14 Rows</option>
-                  <option value="16">16 Rows (Max)</option>
-                </select>
+
+            <!-- Direct Plinko Controls Under Canvas (No Scrolling Required) -->
+            <div class="plinko-direct-controls" style="width: 100%; max-width: 460px; margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <div style="flex: 1; position: relative;">
+                  <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #00e701; font-size: 13px;">₹</span>
+                  <input type="number" id="plinkoDirectBetInput" class="bet-input-field" value="10.00" min="1" step="5" style="padding-left: 24px; width: 100%; height: 38px; font-size: 14px; font-weight: 800; background: rgba(15, 33, 46, 0.9); border: 1.5px solid rgba(0, 231, 1, 0.3); border-radius: 8px; color: #fff;" oninput="document.getElementById('betAmountInput').value = this.value">
+                </div>
+                <div style="display: flex; gap: 4px;">
+                  <button type="button" class="btn-quick-bet" style="height: 38px; padding: 0 8px; border-radius: 8px; font-size: 11px;" onclick="let val = Math.max(1, (parseFloat(document.getElementById('plinkoDirectBetInput').value)||10)/2); document.getElementById('plinkoDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">½</button>
+                  <button type="button" class="btn-quick-bet" style="height: 38px; padding: 0 8px; border-radius: 8px; font-size: 11px;" onclick="let val = (parseFloat(document.getElementById('plinkoDirectBetInput').value)||10)*2; document.getElementById('plinkoDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">2X</button>
+                  <button type="button" class="btn-quick-bet" style="height: 38px; padding: 0 8px; border-radius: 8px; font-size: 11px;" onclick="let val = (window.wallet ? window.wallet.balance : 100); document.getElementById('plinkoDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">MAX</button>
+                </div>
               </div>
+
+              <button type="button" id="btnPlinkoDropDirect" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4);" onclick="window.app && window.app.handleBetClick()">
+                <span>🟢 DROP BALL (BET)</span>
+              </button>
             </div>
 
             <!-- Plinko How to Play -->
-            <div class="game-how-to-play">
+            <div class="game-how-to-play" style="margin-top: 10px;">
               <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
                 <span>📖 Plinko Rules & How to Play</span>
                 <span>▼</span>
               </div>
               <div class="how-to-play-body" style="display: none;">
                 <ul>
-                  <li>Choose your Risk Profile (Low, Medium, High) and number of Rows.</li>
-                  <li>Click BET / Drop Ball to let the ball bounce through the peg pyramid.</li>
-                  <li>Landing in the outer edge buckets awards massive multipliers (up to 1,000x)!</li>
+                  <li>Select Pyramid Rows from the panel below the bet tab.</li>
+                  <li>Click DROP BALL to let balls cascade down through the pegs into multiplier buckets!</li>
                 </ul>
               </div>
             </div>

@@ -4711,12 +4711,46 @@ class AppController {
     // Refresh visuals across active game
     if (this.chicken) this.renderHighwayLanes();
     if (this.mines) this.mines.updateNextMultiplierPreview();
+    if (this.tower) { this.tower.renderTowerStructure(); this.tower.updateUI(); }
+    if (this.pump) this.pump.setDifficulty(diff);
     if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
       this.activeInstance.updateNextMultiplierPreview();
     }
+  }
 
-    if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
-      this.activeInstance.updateNextMultiplierPreview();
+  setMolesTrapCount(count) {
+    const num = parseInt(count) || 3;
+    window.soundEngine.playClick();
+    document.querySelectorAll('.btn-mole-trap').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.traps) === num);
+    });
+    const helper = document.getElementById('molesTrapsLabelHelper');
+    if (helper) {
+      const safe = 12 - num;
+      helper.innerText = `${num} Traps (${safe} Safe Moles)`;
+    }
+    if (!this.moles && window.CasinoMoles && document.getElementById('molesView')) {
+      this.moles = new window.CasinoMoles('molesView');
+    }
+    if (this.moles) {
+      this.moles.setTrapCount(num);
+    }
+  }
+
+  setPlinkoRows(rows) {
+    const num = parseInt(rows) || 12;
+    window.soundEngine.playClick();
+    const sel1 = document.getElementById('plinkoRowsSelectSidebar');
+    if (sel1) sel1.value = String(num);
+    const helper = document.getElementById('plinkoRowsLabelHelper');
+    if (helper) {
+      helper.innerText = `${num} Rows (${num === 16 ? 'Max 1000x' : (num >= 14 ? 'High Win' : 'Balanced')})`;
+    }
+    if (!this.plinko && window.CasinoPlinko && document.getElementById('plinkoCanvas')) {
+      this.plinko = new window.CasinoPlinko('plinkoCanvas');
+    }
+    if (this.plinko) {
+      this.plinko.setRows(num);
     }
   }
 
@@ -4837,6 +4871,12 @@ class AppController {
     if (this.dom.colorTradingSelectGroup) this.dom.colorTradingSelectGroup.style.display = 'none';
     if (this.dom.stockSelectGroup) this.dom.stockSelectGroup.style.display = 'none';
 
+    const plinkoSelGroup = document.getElementById('plinkoSelectGroup');
+    if (plinkoSelGroup) plinkoSelGroup.style.display = (gameType === 'plinko') ? 'flex' : 'none';
+
+    const molesSelGroup = document.getElementById('molesSelectGroup');
+    if (molesSelGroup) molesSelGroup.style.display = (gameType === 'moles') ? 'flex' : 'none';
+
     if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'none';
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
@@ -4863,12 +4903,18 @@ class AppController {
       if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
       this.betMode = 'manual';
     } else {
-      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = (gameType === 'moles') ? 'none' : 'flex';
+      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = (gameType === 'moles' || gameType === 'plinko') ? 'none' : 'flex';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
-      // Master difficultyControlGroup under bet tab (working for Tower, Pump, Moles, Chicken, Plinko, Limbo, Crash, Mines, Dice)
+      
+      // Master difficultyControlGroup under bet tab (Strictly shown for Tower, Chicken, Pump, Limbo, Mines, Dice; Removed from Plinko, Crash, Moles)
       if (this.dom.difficultyControlGroup) {
-        this.dom.difficultyControlGroup.style.display = ['chicken', 'tower', 'pump', 'moles', 'plinko', 'limbo', 'crash', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
+        this.dom.difficultyControlGroup.style.display = ['chicken', 'tower', 'pump', 'limbo', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
       }
+    }
+
+    // Crash Auto Cashout Group: only on Crash
+    if (this.dom.crashSelectGroup) {
+      this.dom.crashSelectGroup.style.display = (gameType === 'crash') ? 'flex' : 'none';
     }
 
     // Auto Diamond / Safe Picks per round: strictly for Mines game
@@ -5901,6 +5947,8 @@ class AppController {
     buildLanes('highwayLanesContainer', '');
     buildLanes('p2HighwayLanesContainer', 'p2_');
 
+    this.updateChickenVisibleLanes(0);
+
     const finishTag = document.getElementById('finishMultiplierTag');
     if (finishTag && multipliers.length > 0) {
       finishTag.innerText = `${multipliers[multipliers.length - 1].toFixed(2)}x`;
@@ -5909,6 +5957,27 @@ class AppController {
     if (p2FinishTag && multipliers.length > 0) {
       p2FinishTag.innerText = `${multipliers[multipliers.length - 1].toFixed(2)}x`;
     }
+  }
+
+  updateChickenVisibleLanes(step = 0) {
+    const maxVisibleAhead = 6;
+    const currentStep = step;
+    ['', 'p2_'].forEach(prefix => {
+      for (let i = 1; i <= 25; i++) {
+        const lane = document.getElementById(`${prefix}roadLane_${i}`);
+        if (!lane) continue;
+        // Show lanes from 1 up to currentStep + maxVisibleAhead (progressive unlocking of upcoming rounds)
+        if (i <= Math.min(25, currentStep + maxVisibleAhead)) {
+          lane.style.display = 'flex';
+        } else {
+          lane.style.display = 'none';
+        }
+      }
+      const activeLane = document.getElementById(`${prefix}roadLane_${currentStep > 0 ? currentStep : 1}`);
+      if (activeLane) {
+        activeLane.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
   }
 
   handleChickenDifficultyChange(diff) {
@@ -5942,6 +6011,7 @@ class AppController {
 
   onChickenGameStart(data) {
     this.resetHighwayUI();
+    this.updateChickenVisibleLanes(0);
     this.hideToast();
 
     // Page 1 UI
@@ -6026,9 +6096,11 @@ class AppController {
         targetLane.classList.add('active-hen-lane');
         const slot = document.getElementById(`${prefix}henSlot_${lane}`);
         if (slot) slot.innerHTML = henSvg;
-        targetLane.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetLane.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     });
+
+    this.updateChickenVisibleLanes(lane);
   }
 
   onChickenSafeHop(data) {
@@ -6039,6 +6111,8 @@ class AppController {
         lane.classList.add('cleared');
       }
     });
+
+    this.updateChickenVisibleLanes(data.lane || this.chicken.currentStep);
 
     if (this.betMode !== 'auto' && !this.isAutoPlaying) {
       this.dom.btnActionCashout.disabled = false;
@@ -8037,4 +8111,10 @@ window.closeDtHowToPlayModal = function() {
 };
 window.setDifficulty = function(diff) {
   if (window.app && window.app.setDifficulty) return window.app.setDifficulty(diff);
+};
+window.setMolesTrapCount = function(count) {
+  if (window.app && window.app.setMolesTrapCount) return window.app.setMolesTrapCount(count);
+};
+window.setPlinkoRows = function(rows) {
+  if (window.app && window.app.setPlinkoRows) return window.app.setPlinkoRows(rows);
 };
