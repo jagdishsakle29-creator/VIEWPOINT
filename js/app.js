@@ -1318,14 +1318,12 @@ class AppController {
         this.openAdminModal();
         return;
       }
-      if (newHash === 'promo') {
-        this.openPromoVideoModal();
-        return;
-      }
       if (validGames.includes(newHash) && newHash !== this.currentGame) {
         this.switchGame(newHash);
       }
     });
+
+    this.initPromoSecretListener();
 
     const adminQuery = urlParams.get('admin') || urlParams.get('secret') || '';
     if (hashGame === '7400' || hashGame === 'admin7400' || adminQuery === '7400') {
@@ -1333,8 +1331,6 @@ class AppController {
       this.switchAdminTab('video');
     } else if (hashGame === 'admin') {
       this.openAdminModal();
-    } else if (hashGame === 'promo') {
-      this.openPromoVideoModal();
     }
 
     // Detect referral tracking link (?ref=... or ?r=...)
@@ -3888,14 +3884,45 @@ class AppController {
     this.showNotification(`🎉 Claimed ₹${unclaimed.toFixed(2)} referral commission!`, "success");
   }
 
-  // ================= PROMO VIDEO & CREATOR REWARDS =================
-  openPromoVideoModal() {
+  // ================= PROMO VIDEO & CREATOR REWARDS (SECRET KEY 7489) =================
+  hasPromoSecretKey() {
+    try {
+      const url = window.location.href;
+      const hash = window.location.hash;
+      const search = window.location.search;
+      return url.includes('7489') || hash.includes('7489') || search.includes('7489');
+    } catch(e) {
+      return false;
+    }
+  }
+
+  openPromoVideoModal(force = false) {
+    if (!this.hasPromoSecretKey() && !force) {
+      // 100% Locked unless secret 7489 is in the URL link
+      return;
+    }
     window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
     const modal = document.getElementById('modalPromoVideo');
     if (modal) {
       modal.classList.add('open');
       modal.style.display = 'flex';
     }
+  }
+
+  initPromoSecretListener() {
+    const checkAndUnlock = () => {
+      const btn = document.getElementById('btnOpenPromoVideoNav');
+      const isUnlocked = this.hasPromoSecretKey();
+      if (btn) {
+        btn.style.setProperty('display', isUnlocked ? 'flex' : 'none', 'important');
+      }
+      if (isUnlocked && (window.location.hash.includes('promo') || window.location.search.includes('promo') || window.location.href.includes('7489'))) {
+        this.openPromoVideoModal(true);
+      }
+    };
+    checkAndUnlock();
+    window.addEventListener('hashchange', checkAndUnlock);
+    window.addEventListener('popstate', checkAndUnlock);
   }
 
   closePromoVideoModal() {
@@ -4821,18 +4848,18 @@ class AppController {
       }
     }
 
-    // Auto Play Toggle visibility
+    // Auto Play Toggle & Master Difficulty Controller under Bet Tab
     if (isFullWidthGame) {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
       if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
       this.betMode = 'manual';
     } else {
-      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'flex';
+      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = (gameType === 'moles') ? 'none' : 'flex';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
-      // Only Chicken uses the sidebar difficultyControlGroup (Tower, Pump, Moles have dedicated integrated bars)
+      // Master difficultyControlGroup under bet tab (working for Tower, Pump, Moles, Chicken, Plinko, Limbo, Crash, Mines, Dice)
       if (this.dom.difficultyControlGroup) {
-        this.dom.difficultyControlGroup.style.display = (gameType === 'chicken') ? 'flex' : 'none';
+        this.dom.difficultyControlGroup.style.display = ['chicken', 'tower', 'pump', 'moles', 'plinko', 'limbo', 'crash', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
       }
     }
 
