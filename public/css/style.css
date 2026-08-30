@@ -723,6 +723,7 @@ body {
   box-shadow: var(--shadow-card);
   display: grid;
   grid-template-columns: 310px 1fr;
+  align-items: stretch;
   min-height: 520px;
   position: relative;
   backdrop-filter: blur(12px);
@@ -735,18 +736,23 @@ body {
     flex-direction: column;
     min-height: auto;
     border-radius: 16px;
+    margin-bottom: 16px;
   }
   .game-stage {
     order: 1;
     width: 100%;
+    padding: 8px;
   }
   .controls-panel {
     order: 2;
     border-right: none;
     border-top: 1px solid var(--border-color);
-    padding: 14px 12px;
-    gap: 10px;
+    padding: 12px 10px;
+    gap: 8px;
     width: 100%;
+  }
+  .bottom-section {
+    margin-top: 18px;
   }
 }
 

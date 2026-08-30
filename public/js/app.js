@@ -6916,8 +6916,12 @@ class AppController {
   }
 
   runLimboAutoRound(betAmount) {
-    this.rollLimbo();
-
+    if (!this.limbo && window.CasinoLimbo && (document.getElementById('limboView') || this.dom.limboView)) {
+      this.limbo = new window.CasinoLimbo('limboView');
+    }
+    if (this.limbo) {
+      this.limbo.roll(betAmount);
+    }
     const timer = setTimeout(() => {
       if (!this.isAutoPlaying) return;
       this.autoRoundsCompleted++;
@@ -6947,10 +6951,9 @@ class AppController {
 
       const nextTimer = setTimeout(() => {
         this.runNextAutoRound();
-      }, 30);
+      }, 350); // Clean 350ms pause before next roll
       this.autoStepTimers.push(nextTimer);
-    }, 70);
-
+    }, 600); // 600ms roll animation time
     this.autoStepTimers.push(timer);
   }
 
