@@ -1720,10 +1720,8 @@
         <div id="pumpView" class="game-view pump-view" style="max-width: 460px; margin: 0 auto; padding: 4px 0;">
           <div class="pump-stage-wrapper" style="padding: 10px; border-radius: 14px; background: radial-gradient(circle at 50% 0%, #152538 0%, #0c1824 100%); border: 1.5px solid rgba(0, 229, 255, 0.35); box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
             
-            <div class="pump-history-row" id="pumpHistoryList" style="margin-bottom: 6px;"></div>
-            
-            <!-- Compact Balloon Chamber -->
-            <div class="pump-chamber" style="height: 180px; min-height: 180px; margin-bottom: 8px;">
+            <!-- Compact Balloon Chamber at the VERY TOP -->
+            <div class="pump-chamber" style="height: 185px; min-height: 185px; margin-bottom: 8px;">
               <div class="pump-balloon" id="pumpBalloon">
                 <div class="pump-balloon-shine"></div>
                 <div class="pump-mult-text" id="pumpMultiplierDisplay" style="font-size: 26px;">1.00x</div>
@@ -1768,6 +1766,9 @@
               </div>
             </div>
 
+            <!-- History Pills at the bottom -->
+            <div class="pump-history-row" id="pumpHistoryList" style="margin-top: 8px; margin-bottom: 4px;"></div>
+
             <!-- Pump How to Play -->
             <div class="game-how-to-play" style="margin-top: 8px;">
               <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
@@ -1790,9 +1791,7 @@
         <div id="molesView" class="game-view moles-view" style="max-width: 460px; margin: 0 auto;">
           <div class="moles-stage-wrapper">
 
-            <div class="moles-history-row" id="molesHistoryList" style="margin-bottom: 6px;"></div>
-
-            <!-- Dynamic Multiplier & Profit Status Bar -->
+            <!-- Dynamic Multiplier & Profit Status Bar at the TOP -->
             <div class="moles-stats-card" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; margin-bottom: 8px; background: rgba(0, 231, 1, 0.08); border: 1.5px solid rgba(0, 231, 1, 0.35); border-radius: 10px; padding: 6px 12px;">
               <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Next Multiplier</div>
               <div style="display: flex; align-items: center; gap: 8px;">
@@ -1818,6 +1817,9 @@
               </button>
             </div>
 
+            <!-- History Pills at bottom -->
+            <div class="moles-history-row" id="molesHistoryList" style="margin-top: 8px; margin-bottom: 4px;"></div>
+
             <!-- Moles How to Play -->
             <div class="game-how-to-play" style="margin-top: 8px;">
               <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
@@ -1840,10 +1842,8 @@
         <div id="towerView" class="game-view tower-view" style="max-width: 460px; margin: 0 auto;">
           <div class="tower-stage-wrapper">
 
-            <div class="tower-history-row" id="towerHistoryList" style="margin-bottom: 6px;"></div>
-
-            <!-- 8-Floor Tower Container -->
-            <div class="tower-floors-container" id="towerFloorsContainer"></div>
+            <!-- 8-Floor Tower Container at the VERY TOP -->
+            <div class="tower-floors-container" id="towerFloorsContainer" style="margin-bottom: 8px;"></div>
 
             <div id="towerStatusText" style="font-size: 12px; text-align: center; color: #94a3b8; font-weight: 700; margin: 8px 0;">
               Choose difficulty & click START to climb the Tower
@@ -1857,6 +1857,9 @@
                 <span id="towerCashoutText">👑 CASHOUT FLOOR</span>
               </button>
             </div>
+
+            <!-- History Pills at bottom -->
+            <div class="tower-history-row" id="towerHistoryList" style="margin-top: 8px; margin-bottom: 4px;"></div>
 
             <!-- Tower How to Play -->
             <div class="game-how-to-play">

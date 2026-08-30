@@ -1250,12 +1250,12 @@ class AppController {
       });
     }
 
-    // Difficulty Mode Selector (Easy / Medium / Hard)
-    if (this.dom.btnDiffEasy) {
-      this.dom.btnDiffEasy.addEventListener('click', () => this.setDifficulty('easy'));
-      if (this.dom.btnDiffMed) this.dom.btnDiffMed.addEventListener('click', () => this.setDifficulty('medium'));
-      if (this.dom.btnDiffHard) this.dom.btnDiffHard.addEventListener('click', () => this.setDifficulty('hard'));
-    }
+    // Difficulty Mode Selector (Easy / Medium / Hard / Daredevil)
+    if (this.dom.btnDiffEasy) this.dom.btnDiffEasy.addEventListener('click', () => this.setDifficulty('easy'));
+    if (this.dom.btnDiffMed) this.dom.btnDiffMed.addEventListener('click', () => this.setDifficulty('medium'));
+    if (this.dom.btnDiffHard) this.dom.btnDiffHard.addEventListener('click', () => this.setDifficulty('hard'));
+    const btnDare = document.getElementById('btnDiffDaredevil');
+    if (btnDare) btnDare.addEventListener('click', () => this.setDifficulty('daredevil'));
 
     // Community Live Wins vs Personal Bets Tab Switcher
     if (this.dom.tabCommunityWins && this.dom.tabMyBets) {
@@ -8034,4 +8034,7 @@ window.openDtHowToPlayModal = function() {
 };
 window.closeDtHowToPlayModal = function() {
   if (window.app && window.app.closeDtHowToPlayModal) return window.app.closeDtHowToPlayModal();
+};
+window.setDifficulty = function(diff) {
+  if (window.app && window.app.setDifficulty) return window.app.setDifficulty(diff);
 };
