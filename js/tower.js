@@ -70,6 +70,12 @@ class CasinoTower {
   setDifficulty(diff) {
     if (this.isPlaying) return;
     this.difficulty = (diff === 'daredevil' || diff === 'extreme') ? 'extreme' : (diff || 'medium');
+    const targetDiff = (diff === 'daredevil' || diff === 'extreme') ? 'daredevil' : (diff || 'medium');
+    
+    document.querySelectorAll('.tower-diff-stage-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.diff === targetDiff);
+    });
+
     this.renderTowerStructure();
     this.updateUI();
   }
