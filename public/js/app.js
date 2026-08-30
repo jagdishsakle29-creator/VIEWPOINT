@@ -4821,7 +4821,7 @@ class AppController {
       }
     }
 
-    // Auto Play Toggle visibility: Enabled on Mines, Chicken, Crash
+    // Auto Play Toggle visibility
     if (isFullWidthGame) {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
@@ -4830,6 +4830,16 @@ class AppController {
     } else {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'flex';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
+      // Only Chicken uses the sidebar difficultyControlGroup (Tower, Pump, Moles have dedicated integrated bars)
+      if (this.dom.difficultyControlGroup) {
+        this.dom.difficultyControlGroup.style.display = (gameType === 'chicken') ? 'flex' : 'none';
+      }
+    }
+
+    // Auto Diamond / Safe Picks per round: strictly for Mines game
+    const autoPicksGroup = document.getElementById('autoPicksGroup');
+    if (autoPicksGroup) {
+      autoPicksGroup.style.display = (gameType === 'mines') ? 'block' : 'none';
     }
 
     if (gameType === 'plinko') {
