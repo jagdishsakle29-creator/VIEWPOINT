@@ -4549,8 +4549,11 @@ class AppController {
 
   setDifficulty(diff) {
     window.soundEngine.playClick();
-    const allDiffBtns = [this.dom.btnDiffEasy, this.dom.btnDiffMed, this.dom.btnDiffHard, document.getElementById('btnDiffDaredevil')];
-    allDiffBtns.forEach(b => b && b.classList.remove('active'));
+    document.querySelectorAll('.btn-diff-mode, .tower-diff-stage-btn, .pump-diff-stage-btn').forEach(b => {
+      if (b.dataset && b.dataset.diff) {
+        b.classList.toggle('active', b.dataset.diff === diff);
+      }
+    });
 
     // Auto-instantiate any active engines so they receive the difficulty updates
     if (!this.tower && window.CasinoTower && document.getElementById('towerView')) this.tower = new window.CasinoTower('towerView');
