@@ -78,12 +78,12 @@ class CasinoTower {
   getDifficultyConfig() {
     switch (this.difficulty) {
       case 'easy':
-        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.28, 1.65, 2.15, 2.80, 3.70, 4.90, 6.50, 8.80] };
+        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.28, 1.65, 2.15, 2.80, 3.70, 4.90, 6.50, 8.80], label: '🟢 EASY (4 Doors/Floor: 3💎 1💀)' };
       case 'hard':
-        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.94, 3.80, 7.50, 15.00, 30.00, 60.00, 120.00, 240.00] };
+        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.94, 3.80, 7.50, 15.00, 30.00, 60.00, 120.00, 240.00], label: '🔴 HARD (2 Doors/Floor: 1💎 1💀)' };
       case 'medium':
       default:
-        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.45, 2.15, 3.20, 4.80, 7.20, 10.80, 16.20, 24.50] };
+        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.45, 2.15, 3.20, 4.80, 7.20, 10.80, 16.20, 24.50], label: '🟡 MEDIUM (3 Doors/Floor: 2💎 1💀)' };
     }
   }
 
@@ -134,6 +134,10 @@ class CasinoTower {
         this.selectBlock(floor, block, btn);
       };
     });
+
+    if (this.statusText && !this.isPlaying) {
+      this.statusText.innerHTML = `<span style="display:inline-block; background:rgba(0,229,255,0.12); border:1px solid #00e5ff; padding:4px 12px; border-radius:8px; color:#00e5ff; font-weight:800; font-size:12px;">Active: <b>${config.label}</b></span>`;
+    }
   }
 
   startGame(betAmount) {
