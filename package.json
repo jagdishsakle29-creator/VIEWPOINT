@@ -2,16 +2,5 @@
   "name": "viewpoint-casino",
   "version": "2.0.0",
   "description": "VIEWPOINT.DIY - Instant Casino & Arcade Games",
-  "private": true,
-  "scripts": {
-    "build": "echo 'Build successful'",
-    "start": "node -e 'console.log(\"OK\")'",
-    "cap:sync": "npx cap sync android",
-    "cap:open": "npx cap open android"
-  },
-  "devDependencies": {
-    "@capacitor/android": "^6.0.0",
-    "@capacitor/cli": "^6.0.0",
-    "@capacitor/core": "^6.0.0"
-  }
+  "private": true
 }
