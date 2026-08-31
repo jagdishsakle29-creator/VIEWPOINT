@@ -196,15 +196,13 @@
   box-shadow: 0 6px 15px rgba(0, 229, 255, 0.3);
 }
 
-.tower-tile-frame,
-.tower-door-frame {
+.tower-tile-frame {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.tower-tile-icon,
-.tower-door-icon {
+.tower-tile-icon {
   font-size: 20px;
   opacity: 0.85;
 }
