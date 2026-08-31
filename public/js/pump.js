@@ -79,7 +79,7 @@ class CasinoPump {
     }
 
     if (this.statusText && !this.isPlaying) {
-      const names = { easy: '🟢 Easy (1.18x ➔ 1.80x)', medium: '🟡 Medium (1.20x ➔ 1.45x ➔ 1.86x)', hard: '🔴 Hard (1.35x ➔ 1.67x ➔ 2.00x)' };
+      const names = { easy: '🟢 Easy (Safe 1.08x ➔ 1.18x ➔ 1.30x)', medium: '🟡 Medium (Bal 1.20x ➔ 1.45x ➔ 1.86x)', hard: '🔴 Hard (High 1.35x ➔ 1.95x ➔ 3.10x)' };
       this.statusText.innerHTML = `<span style="color:#94a3b8;">Difficulty: <b style="color:#00e5ff;">${names[this.difficulty] || 'Medium'}</b> (1st Pump: <b style="color:#00e701;">+${nextPreview.toFixed(2)}x</b>)</span>`;
     }
   }
@@ -87,14 +87,14 @@ class CasinoPump {
   getStepMultipliers() {
     const diff = this.difficulty || 'medium';
     if (diff === 'easy') {
-      // User: 1x, 1.18x, 1.80x and smooth upward curve
-      return [1.00, 1.18, 1.80, 2.45, 3.20, 4.10, 5.30, 6.80, 8.50, 11.00, 15.00, 20.00];
+      // Easy: Safe, lowest risk, gradual progression (1.08x, 1.18x, 1.30x, 1.45x, 1.65x...)
+      return [1.00, 1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.20, 2.60, 3.10, 3.80, 5.00];
     } else if (diff === 'hard') {
-      // User: 1.35x, 1.67x, 2.00x and steady high-growth jumps
-      return [1.00, 1.35, 1.67, 2.00, 2.80, 4.20, 7.00, 12.50, 24.00, 50.00, 120.00, 300.00];
+      // Hard: High risk, fastest progression (1.35x, 1.95x, 3.10x, 5.20x, 9.00x...)
+      return [1.00, 1.35, 1.95, 3.10, 5.20, 9.00, 16.00, 30.00, 60.00, 120.00, 250.00, 500.00];
     }
-    // Medium / Balanced: User: 1.20x, 1.45x, 1.86x and progressive multiplier
-    return [1.00, 1.20, 1.45, 1.86, 2.50, 3.40, 4.80, 7.00, 10.50, 16.00, 25.00, 40.00];
+    // Medium: Balanced risk, strictly between Easy & Hard (1.20x, 1.45x, 1.86x, 2.50x, 3.40x...)
+    return [1.00, 1.20, 1.45, 1.86, 2.50, 3.40, 4.80, 7.00, 10.50, 15.00, 20.00, 25.00];
   }
 
   startGame(betAmount) {

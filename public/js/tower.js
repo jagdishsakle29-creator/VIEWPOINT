@@ -77,15 +77,12 @@ class CasinoTower {
   getDifficultyConfig() {
     switch (this.difficulty) {
       case 'easy':
-        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.20, 2.60] };
+        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.28, 1.65, 2.15, 2.80, 3.70, 4.90, 6.50, 8.80] };
       case 'hard':
-        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.30, 1.80, 2.60, 4.00, 6.50, 11.00, 20.00, 38.00] };
-      case 'daredevil':
-      case 'extreme':
-        return { blocksPerFloor: 3, safeCount: 1, skulls: 2, mults: [1.50, 2.50, 4.50, 8.50, 18.00, 45.00, 120.00, 320.00] };
+        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.94, 3.80, 7.50, 15.00, 30.00, 60.00, 120.00, 240.00] };
       case 'medium':
       default:
-        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.15, 1.35, 1.65, 2.10, 2.75, 3.70, 5.20, 7.50] };
+        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.45, 2.15, 3.20, 4.80, 7.20, 10.80, 16.20, 24.50] };
     }
   }
 
