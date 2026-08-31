@@ -78,12 +78,12 @@ class CasinoTower {
   getDifficultyConfig() {
     switch (this.difficulty) {
       case 'easy':
-        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.28, 1.65, 2.15, 2.80, 3.70, 4.90, 6.50, 8.80], label: '🟢 EASY (4 Doors/Floor: 3💎 1💀)' };
+        return { blocksPerFloor: 4, safeCount: 3, skulls: 1, mults: [1.28, 1.65, 2.15, 2.80, 3.70, 4.90, 6.50, 8.80], label: '🟢 EASY (4 Tiles/Floor: 3💎 1💀)' };
       case 'hard':
-        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.94, 3.80, 7.50, 15.00, 30.00, 60.00, 120.00, 240.00], label: '🔴 HARD (2 Doors/Floor: 1💎 1💀)' };
+        return { blocksPerFloor: 2, safeCount: 1, skulls: 1, mults: [1.94, 3.80, 7.50, 15.00, 30.00, 60.00, 120.00, 240.00], label: '🔴 HARD (2 Tiles/Floor: 1💎 1💀)' };
       case 'medium':
       default:
-        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.45, 2.15, 3.20, 4.80, 7.20, 10.80, 16.20, 24.50], label: '🟡 MEDIUM (3 Doors/Floor: 2💎 1💀)' };
+        return { blocksPerFloor: 3, safeCount: 2, skulls: 1, mults: [1.45, 2.15, 3.20, 4.80, 7.20, 10.80, 16.20, 24.50], label: '🟡 MEDIUM (3 Tiles/Floor: 2💎 1💀)' };
     }
   }
 
@@ -104,8 +104,8 @@ class CasinoTower {
       for (let b = 0; b < config.blocksPerFloor; b++) {
         blocksHtml += `
           <button type="button" class="tower-block-btn" data-floor="${f}" data-block="${b}">
-            <div class="tower-door-frame">
-              <span class="tower-door-icon">🚪</span>
+            <div class="tower-tile-frame">
+              <span class="tower-tile-icon">🔒</span>
             </div>
           </button>
         `;

@@ -4576,7 +4576,7 @@ class AppController {
       // Chicken (Easy: 1 Bone, 24 Lanes)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "easy";
       if (this.chicken) this.chicken.setDifficulty('easy');
-      // Tower (4 Doors: 3 Diamonds, 1 Skull)
+      // Tower (4 Tiles: 3 Diamonds, 1 Skull)
       if (this.tower) this.tower.setDifficulty('easy');
       // Moles (1 Trap: 11 Safe Moles)
       if (this.moles) this.moles.setTrapCount(1);
@@ -4612,7 +4612,7 @@ class AppController {
       // Chicken (Hard: 3 Bones)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "hard";
       if (this.chicken) this.chicken.setDifficulty('hard');
-      // Tower (2 Doors: 1 Diamond, 1 Skull)
+      // Tower (2 Tiles: 1 Diamond, 1 Skull)
       if (this.tower) this.tower.setDifficulty('hard');
       // Moles (4 Traps)
       if (this.moles) this.moles.setTrapCount(4);
@@ -4649,7 +4649,7 @@ class AppController {
       // Chicken (Daredevil: 4 Bones)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "daredevil";
       if (this.chicken) this.chicken.setDifficulty('daredevil');
-      // Tower (3 Doors: 1 Diamond, 2 Skulls)
+      // Tower (3 Tiles: 1 Diamond, 2 Skulls)
       if (this.tower) this.tower.setDifficulty('extreme');
       // Moles (5 Traps)
       if (this.moles) this.moles.setTrapCount(5);
@@ -4686,7 +4686,7 @@ class AppController {
       // Chicken (Med: 2 Bones)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "medium";
       if (this.chicken) this.chicken.setDifficulty('medium');
-      // Tower (3 Doors: 2 Diamonds, 1 Skull)
+      // Tower (3 Tiles: 2 Diamonds, 1 Skull)
       if (this.tower) this.tower.setDifficulty('medium');
       // Moles (3 Traps)
       if (this.moles) this.moles.setTrapCount(3);
