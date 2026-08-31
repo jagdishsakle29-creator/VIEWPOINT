@@ -54,12 +54,7 @@ class CasinoPump {
   }
 
   setDifficulty(diff) {
-    this.difficulty = diff || 'medium';
-    const targetDiff = (diff === 'daredevil' || diff === 'extreme') ? 'daredevil' : (diff || 'medium');
-    
-    document.querySelectorAll('.pump-diff-stage-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.diff === targetDiff);
-    });
+    this.difficulty = (diff === 'daredevil' || diff === 'extreme') ? 'daredevil' : (diff || 'medium');
 
     const mults = this.getStepMultipliers();
     const nextPreview = mults[1] || 1.15;
@@ -70,8 +65,8 @@ class CasinoPump {
     }
 
     if (this.statusText && !this.isPlaying) {
-      const names = { easy: '🟢 Easy (Safe 5x)', medium: '🟡 Medium (Balanced 25x)', hard: '🔴 Hard (High 300x)', daredevil: '⚡ Daredevil (Max 1000x)' };
-      this.statusText.innerHTML = `<span style="color:#94a3b8;">Difficulty: <b style="color:#00e5ff;">${names[this.difficulty] || 'Medium'}</b> | Tap PUMP to play</span>`;
+      const names = { easy: '🟢 Easy (Safe 5x Max)', medium: '🟡 Medium (Balanced 25x Max)', hard: '🔴 Hard (High 500x Max)', daredevil: '⚡ Daredevil (Nitro 1000x Max)' };
+      this.statusText.innerHTML = `<span style="color:#94a3b8;">Difficulty: <b style="color:#00e5ff;">${names[this.difficulty] || 'Medium'}</b> (Next: <b style="color:#00e701;">+${nextPreview.toFixed(2)}x</b>)</span>`;
     }
   }
 
@@ -80,9 +75,9 @@ class CasinoPump {
     if (diff === 'easy') {
       return [1.00, 1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.20, 2.60, 3.20, 4.00, 5.00];
     } else if (diff === 'hard') {
-      return [1.00, 1.30, 1.80, 2.60, 4.00, 6.50, 11.00, 20.00, 38.00, 75.00, 150.00, 300.00];
+      return [1.00, 1.50, 2.30, 3.80, 6.50, 12.00, 24.00, 50.00, 100.00, 250.00, 500.00];
     } else if (diff === 'daredevil') {
-      return [1.00, 1.80, 2.50, 3.90, 4.30, 5.80, 7.00, 12.00, 25.00, 60.00, 150.00, 500.00, 1000.00];
+      return [1.00, 2.00, 4.50, 10.00, 25.00, 65.00, 160.00, 400.00, 1000.00];
     }
     // Medium / Balanced
     return [1.00, 1.15, 1.35, 1.65, 2.10, 2.75, 3.70, 5.20, 7.50, 11.00, 16.00, 25.00];
