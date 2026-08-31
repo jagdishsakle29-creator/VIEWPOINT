@@ -18,7 +18,21 @@ class CasinoPump {
     this.targetPopPump = 0;
     this.history = [];
     this.roundId = null;
+    this.difficulty = 'medium';
     this.initDOM();
+  }
+
+  setBetAmount(amt) {
+    this.betAmount = Math.max(1, parseFloat(amt) || 10);
+    const pInput = document.getElementById('pumpDirectBetInput');
+    if (pInput && parseFloat(pInput.value) !== this.betAmount) {
+      pInput.value = this.betAmount;
+    }
+    const mults = this.getStepMultipliers();
+    const nextPreview = mults[1] || 1.15;
+    if (!this.isPlaying && this.profitDisplay) {
+      this.profitDisplay.innerText = `₹${(this.betAmount * nextPreview).toFixed(2)}`;
+    }
   }
 
   initDOM() {
