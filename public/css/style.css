@@ -2449,6 +2449,55 @@ body {
   box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
 }
 
+.btn-diff-mode.active[data-diff="daredevil"] {
+  background: rgba(255, 51, 102, 0.25);
+  border-color: #ff3366;
+  color: #ff3366;
+  box-shadow: 0 0 12px rgba(255, 51, 102, 0.4);
+}
+
+/* Dedicated Moles 1 to 5 Traps Selector */
+.btn-mole-trap {
+  background: var(--bg-primary);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 8px 2px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.btn-mole-trap:hover {
+  border-color: #00e5ff;
+  transform: translateY(-1px);
+}
+
+.btn-mole-trap.active {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.3) 0%, rgba(0, 231, 1, 0.25) 100%) !important;
+  border: 1.5px solid #00e5ff !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.5) !important;
+  transform: scale(1.04);
+}
+
+.btn-mole-trap.active span {
+  color: #00e5ff !important;
+  font-weight: 900 !important;
+}
+
+.btn-mole-trap.active small {
+  color: #00e701 !important;
+  font-weight: 800 !important;
+}
+
 /* Community Live Wins Tabs & Table */
 .community-history-tabs {
   display: flex;
