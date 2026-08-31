@@ -69,7 +69,8 @@ class CasinoTower {
 
   setDifficulty(diff) {
     if (this.isPlaying) return;
-    this.difficulty = (diff === 'daredevil' || diff === 'extreme') ? 'extreme' : (diff || 'medium');
+    this.difficulty = diff || 'medium';
+    if (!this.towerContainer) this.towerContainer = document.getElementById('towerFloorsContainer');
     this.renderTowerStructure();
     this.updateUI();
   }
@@ -87,6 +88,7 @@ class CasinoTower {
   }
 
   renderTowerStructure() {
+    if (!this.towerContainer) this.towerContainer = document.getElementById('towerFloorsContainer');
     if (!this.towerContainer) return;
     this.towerContainer.innerHTML = '';
     const config = this.getDifficultyConfig();
