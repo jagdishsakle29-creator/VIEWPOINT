@@ -323,6 +323,16 @@ class CasinoPump {
       if (cashoutText) cashoutText.innerText = `CASHOUT ₹${profit.toFixed(2)}`;
     }
 
+    // Dynamic Next Pump Multiplier & Profit Preview
+    const mults = this.getStepMultipliers();
+    const nextIdx = this.isPlaying ? (this.pumpCount + 1) : 1;
+    const nextMult = mults[nextIdx] || (this.currentMultiplier * 1.35);
+    const nextProfit = Math.round((this.betAmount * nextMult) * 100) / 100;
+    const nextMultTag = document.getElementById('pumpNextMultTag');
+    const nextProfitTag = document.getElementById('pumpNextProfitTag');
+    if (nextMultTag) nextMultTag.innerText = `${nextMult.toFixed(2)}x`;
+    if (nextProfitTag) nextProfitTag.innerText = `Profit: +₹${nextProfit.toFixed(2)}`;
+
     if (this.statusText) {
       if (isPopped) this.statusText.innerHTML = `<span style="color:#fe2c55; font-weight:800;">💥 POPPED! Try next round</span>`;
       else if (isCashedOut) this.statusText.innerHTML = `<span style="color:#00e701; font-weight:800;">🎉 WON ₹${profit.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x)</span>`;

@@ -1770,6 +1770,16 @@
         <div id="pumpView" class="game-view pump-view" style="max-width: 460px; margin: 0 auto; padding: 4px 0;">
           <div class="pump-stage-wrapper" style="padding: 10px; border-radius: 14px; background: radial-gradient(circle at 50% 0%, #152538 0%, #0c1824 100%); border: 1.5px solid rgba(0, 229, 255, 0.35); box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
             
+            <!-- Live Next Multiplier & Profit Preview Banner -->
+            <div class="pump-next-preview-card" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; background: rgba(0, 231, 1, 0.08); border: 1.5px solid rgba(0, 231, 1, 0.35); border-radius: 10px; padding: 6px 12px;">
+              <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Next Pump</div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="pumpNextMultTag" style="color: #00e5ff; font-size: 16px; font-weight: 900;">1.08x</span>
+                <span style="color: rgba(255,255,255,0.3); font-weight: 900;">•</span>
+                <span id="pumpNextProfitTag" style="color: #00e701; font-size: 16px; font-weight: 900;">Profit: +₹10.80</span>
+              </div>
+            </div>
+
             <!-- Compact Balloon Chamber at the VERY TOP -->
             <div class="pump-chamber" style="height: 185px; min-height: 185px; margin-bottom: 8px;">
               <div class="pump-balloon" id="pumpBalloon">
@@ -1907,6 +1917,16 @@
         <!-- Game 12: Stake Tower Legend Game View -->
         <div id="towerView" class="game-view tower-view" style="max-width: 460px; margin: 0 auto;">
           <div class="tower-stage-wrapper">
+
+            <!-- Live Next Floor Multiplier & Profit Preview Banner -->
+            <div class="tower-next-preview-card" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px; background: rgba(0, 231, 1, 0.08); border: 1.5px solid rgba(0, 231, 1, 0.35); border-radius: 10px; padding: 6px 12px;">
+              <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Next Floor</div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="towerNextMultTag" style="color: #00e5ff; font-size: 16px; font-weight: 900;">1.28x</span>
+                <span style="color: rgba(255,255,255,0.3); font-weight: 900;">•</span>
+                <span id="towerNextProfitTag" style="color: #00e701; font-size: 16px; font-weight: 900;">Profit: +₹12.80</span>
+              </div>
+            </div>
 
             <!-- 8-Floor Tower Container at the VERY TOP -->
             <div class="tower-floors-container" id="towerFloorsContainer" style="margin-bottom: 8px;"></div>

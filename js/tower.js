@@ -356,11 +356,21 @@ class CasinoTower {
       if (cashoutText) cashoutText.innerText = `CASHOUT ₹${profit.toFixed(2)}`;
     }
 
+    // Dynamic Next Floor Multiplier & Profit Preview
+    const config = this.getDifficultyConfig();
+    const nextFloor = this.isPlaying ? (this.currentFloor + 1) : 1;
+    const nextMult = (nextFloor <= this.totalFloors) ? config.mults[nextFloor - 1] : config.mults[this.totalFloors - 1];
+    const nextProfit = Math.round(this.betAmount * nextMult * 100) / 100;
+    const nextMultTag = document.getElementById('towerNextMultTag');
+    const nextProfitTag = document.getElementById('towerNextProfitTag');
+    if (nextMultTag) nextMultTag.innerText = `F${nextFloor}: ${nextMult.toFixed(2)}x`;
+    if (nextProfitTag) nextProfitTag.innerText = `Profit: +₹${nextProfit.toFixed(2)}`;
+
     if (this.statusText) {
       if (isSkullHit) this.statusText.innerHTML = `<span style="color:#fe2c55; font-weight:800;">💀 TOWER COLLAPSED! Try climbing again</span>`;
       else if (isCashedOut) this.statusText.innerHTML = `<span style="color:#00e701; font-weight:800;">👑 CASHOUT: ₹${profit.toFixed(2)} (${this.currentMultiplier.toFixed(2)}x) at Floor ${this.currentFloor}</span>`;
-      else if (this.isPlaying) this.statusText.innerHTML = `<span style="color:#00e5ff; font-weight:800;">🏰 Cleared Floor ${this.currentFloor} / ${this.totalFloors} | Current Mult: ${this.currentMultiplier.toFixed(2)}x</span>`;
-      else this.statusText.innerHTML = `<span style="color:#94a3b8;">Choose difficulty & start climbing the Tower</span>`;
+      else if (this.isPlaying) this.statusText.innerHTML = `<span style="color:#00e5ff; font-weight:800;">🏰 Cleared Floor ${this.currentFloor} / ${this.totalFloors} | Next: ${nextMult.toFixed(2)}x</span>`;
+      else this.statusText.innerHTML = `<span style="display:inline-block; background:rgba(0,229,255,0.12); border:1px solid #00e5ff; padding:4px 12px; border-radius:8px; color:#00e5ff; font-weight:800; font-size:12px;">Active: <b>${config.label}</b></span>`;
     }
   }
 
