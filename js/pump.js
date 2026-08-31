@@ -68,10 +68,10 @@ class CasinoPump {
   }
 
   setDifficulty(diff) {
-    this.difficulty = (diff === 'daredevil' || diff === 'extreme') ? 'daredevil' : (diff || 'medium');
+    this.difficulty = diff || 'medium';
 
     const mults = this.getStepMultipliers();
-    const nextPreview = mults[1] || 1.15;
+    const nextPreview = mults[1] || 1.20;
     
     if (!this.isPlaying) {
       if (this.multDisplay) this.multDisplay.innerText = `${nextPreview.toFixed(2)}x`;
@@ -79,22 +79,22 @@ class CasinoPump {
     }
 
     if (this.statusText && !this.isPlaying) {
-      const names = { easy: '🟢 Easy (Safe 5x Max)', medium: '🟡 Medium (Balanced 25x Max)', hard: '🔴 Hard (High 500x Max)', daredevil: '⚡ Daredevil (Nitro 1000x Max)' };
-      this.statusText.innerHTML = `<span style="color:#94a3b8;">Difficulty: <b style="color:#00e5ff;">${names[this.difficulty] || 'Medium'}</b> (Next: <b style="color:#00e701;">+${nextPreview.toFixed(2)}x</b>)</span>`;
+      const names = { easy: '🟢 Easy (1.18x ➔ 1.80x)', medium: '🟡 Medium (1.20x ➔ 1.45x ➔ 1.86x)', hard: '🔴 Hard (1.35x ➔ 1.67x ➔ 2.00x)' };
+      this.statusText.innerHTML = `<span style="color:#94a3b8;">Difficulty: <b style="color:#00e5ff;">${names[this.difficulty] || 'Medium'}</b> (1st Pump: <b style="color:#00e701;">+${nextPreview.toFixed(2)}x</b>)</span>`;
     }
   }
 
   getStepMultipliers() {
     const diff = this.difficulty || 'medium';
     if (diff === 'easy') {
-      return [1.00, 1.08, 1.18, 1.30, 1.45, 1.65, 1.90, 2.20, 2.60, 3.20, 4.00, 5.00];
+      // User: 1x, 1.18x, 1.80x and smooth upward curve
+      return [1.00, 1.18, 1.80, 2.45, 3.20, 4.10, 5.30, 6.80, 8.50, 11.00, 15.00, 20.00];
     } else if (diff === 'hard') {
-      return [1.00, 1.50, 2.30, 3.80, 6.50, 12.00, 24.00, 50.00, 100.00, 250.00, 500.00];
-    } else if (diff === 'daredevil') {
-      return [1.00, 2.00, 4.50, 10.00, 25.00, 65.00, 160.00, 400.00, 1000.00];
+      // User: 1.35x, 1.67x, 2.00x and steady high-growth jumps
+      return [1.00, 1.35, 1.67, 2.00, 2.80, 4.20, 7.00, 12.50, 24.00, 50.00, 120.00, 300.00];
     }
-    // Medium / Balanced
-    return [1.00, 1.15, 1.35, 1.65, 2.10, 2.75, 3.70, 5.20, 7.50, 11.00, 16.00, 25.00];
+    // Medium / Balanced: User: 1.20x, 1.45x, 1.86x and progressive multiplier
+    return [1.00, 1.20, 1.45, 1.86, 2.50, 3.40, 4.80, 7.00, 10.50, 16.00, 25.00, 40.00];
   }
 
   startGame(betAmount) {
