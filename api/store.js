@@ -170,25 +170,28 @@ function claimNotificationLock(notifKey) {
   const store = loadStore();
   if (!store.notifications) store.notifications = {};
   const current = store.notifications[notifKey];
-  if (current === 'SENT' || current === 'PROCESSING') {
-    return false; // Lock failed, already claimed or completed
+  if (current && (current.status === 'SENT' || current.status === 'PROCESSING')) {
+    if (Date.now() - (current.time || 0) < 300000) {
+      return false; // Lock active: already claimed or sent
+    }
   }
-  store.notifications[notifKey] = 'PROCESSING';
+  store.notifications[notifKey] = { status: 'PROCESSING', time: Date.now() };
   saveStore();
-  return true; // Lock acquired
+  return true; // Lock successfully claimed
 }
 
-function markNotificationSent(notifKey) {
+function markNotificationSent(notifKey, messageId = null) {
   const store = loadStore();
   if (!store.notifications) store.notifications = {};
-  store.notifications[notifKey] = 'SENT';
+  store.notifications[notifKey] = { status: 'SENT', time: Date.now(), messageId };
   saveStore();
 }
 
 function isNotificationSent(notifKey) {
   const store = loadStore();
   if (!store.notifications) store.notifications = {};
-  return store.notifications[notifKey] === 'SENT';
+  const current = store.notifications[notifKey];
+  return current && current.status === 'SENT';
 }
 
 module.exports = {

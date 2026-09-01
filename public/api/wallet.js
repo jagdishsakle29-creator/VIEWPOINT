@@ -262,7 +262,7 @@ async function dispatchServerTelegramAlert(item, type) {
 
   const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
   const rawAdminIds = process.env.ADMIN_IDS || process.env.TELEGRAM_CHAT_ID || '6527377657';
-  const adminIds = rawAdminIds.split(',').map(s => s.trim()).filter(Boolean);
+  const adminIds = Array.from(new Set(rawAdminIds.split(',').map(s => s.trim()).filter(Boolean)));
 
   if (!token || !adminIds.length) return;
 
@@ -316,9 +316,10 @@ async function dispatchServerTelegramAlert(item, type) {
     };
   }
 
+  let sentMessageId = null;
   for (const chatId of adminIds) {
     try {
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      const resp = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -328,9 +329,13 @@ async function dispatchServerTelegramAlert(item, type) {
           reply_markup: replyMarkup
         })
       });
+      const data = await resp.json();
+      if (data && data.result && data.result.message_id) {
+        sentMessageId = data.result.message_id;
+      }
     } catch (e) {
       console.warn("Telegram dispatch warn for chat:", chatId, e.message);
     }
   }
-  store.markNotificationSent(notifKey);
+  store.markNotificationSent(notifKey, sentMessageId);
 }

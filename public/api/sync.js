@@ -119,7 +119,6 @@ export default async function handler(req, res) {
       createdAt: Date.now()
     };
     store.saveDeposit(depRecord);
-    await dispatchTelegramSyncAlert(depRecord, 'DEPOSIT');
     return res.status(200).json({ success: true, deposit: depRecord });
   }
 
@@ -207,7 +206,6 @@ export default async function handler(req, res) {
       createdAt: Date.now()
     };
     store.saveWithdrawal(wthRecord);
-    await dispatchTelegramSyncAlert(wthRecord, 'WITHDRAWAL');
     return res.status(200).json({ success: true, withdrawal: wthRecord });
   }
 
