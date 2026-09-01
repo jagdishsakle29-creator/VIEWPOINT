@@ -318,64 +318,22 @@ class CasinoWallet {
       createdAt: Date.now()
     };
 
+    if (this._isSubmittingDeposit) {
+      return { success: false, error: "Deposit submission already in progress" };
+    }
+    this._isSubmittingDeposit = true;
+
     // Save locally first so UI is immediately responsive
     this.pendingDeposits.unshift(localRequest);
     this.savePendingDeposits();
 
-    // ⚡ INSTANT DIRECT TELEGRAM ALERT DISPATCH (<300ms)
-    const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
-    const adminChatId = "6527377657";
-    const webOrigin = (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')) ? 'https://viewpoint.diy' : window.location.origin;
-    const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
-    const msgText = `🔔 <b>NEW DEPOSIT SUBMITTED</b> 🔔\n\n` +
-      `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
-      `💰 <b>Amount:</b> <b>₹${amount.toFixed(2)}</b>\n` +
-      `🧾 <b>UTR Reference:</b> <code>${utrVal}</code>\n` +
-      `💳 <b>Paid via UPI:</b> <code>${upiVal}</code>\n` +
-      `⏰ <b>Time:</b> ${localRequest.time}\n` +
-      `🆔 <b>Deposit ID:</b> <code>${depId}</code>`;
-
-    const tgMarkup = {
-      inline_keyboard: [
-        [
-          { text: `✅ Approve (+₹${amount.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(amount)}` },
-          { text: "❌ Reject", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_dep&id=${encodeURIComponent(depId)}&userId=${encodeURIComponent(uid)}` }
-        ]
-      ]
-    };
-
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      keepalive: true,
-      body: JSON.stringify({
-        chat_id: adminChatId,
-        text: msgText,
-        parse_mode: 'HTML',
-        reply_markup: tgMarkup
-      })
-    }).catch(() => {});
-
-    // Dispatch to server backend in parallel
-    let serverSynced = false;
+    // ⚡ Single Authoritative Backend Request (Server handles Telegram alert idempotently)
     try {
-      fetch(`${this.apiBaseUrl}/api/wallet/deposit`, {
+      fetch(`${this.apiBaseUrl}/api/wallet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          telegram_id: uid,
-          amount: amount,
-          utr: utrVal,
-          upi_id: upiVal,
-          deposit_id: depId
-        })
-      }).catch(() => {});
-
-      fetch(`${this.apiBaseUrl}/api/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'create_deposit',
+          action: 'submit_deposit',
           id: depId,
           userId: uid,
           amount: amount,
@@ -383,7 +341,9 @@ class CasinoWallet {
           upiId: upiVal
         })
       }).catch(() => {});
-    } catch (err) {}
+    } catch (err) {} finally {
+      setTimeout(() => { this._isSubmittingDeposit = false; }, 2000);
+    }
 
     return { success: true, deposit: localRequest, serverSynced: true };
   }
@@ -666,69 +626,30 @@ class CasinoWallet {
       status: 'PENDING'
     };
 
-    // ⚡ INSTANT DIRECT TELEGRAM ALERT DISPATCH (<300ms)
-    const botToken = "8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M";
-    const adminChatId = "6527377657";
-    const webOrigin = (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')) ? 'https://viewpoint.diy' : window.location.origin;
-    const adminSecret = "VIEWPOINT_ADMIN_SECRET_2026";
-    const wthMsg = `💸 <b>NEW WITHDRAWAL REQUEST</b> 💸\n\n` +
-      `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
-      `💰 <b>Gross Amount:</b> ₹${amount.toFixed(2)}\n` +
-      `🏷️ <b>Platform Fee (8%):</b> -₹${fee.toFixed(2)}\n` +
-      `✅ <b>Net Payout to Send:</b> <b>₹${netPayout.toFixed(2)}</b>\n\n` +
-      `💳 <b>Receiver UPI:</b> <code>${receiver}</code>\n` +
-      `📡 <b>Channel:</b> ${channel}\n` +
-      `⏰ <b>Time:</b> ${localReq.time}\n` +
-      `🆔 <b>Withdrawal ID:</b> <code>${wthId}</code>`;
+    if (this._isSubmittingWithdrawal) {
+      return { success: false, error: "Withdrawal submission already in progress" };
+    }
+    this._isSubmittingWithdrawal = true;
 
-    const wthMarkup = {
-      inline_keyboard: [
-        [
-          { text: `✅ Mark Paid (₹${netPayout.toFixed(0)})`, url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=approve_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}&amt=${encodeURIComponent(netPayout)}` },
-          { text: "❌ Reject & Refund", url: `${webOrigin}/api/sync?secret=${encodeURIComponent(adminSecret)}&action=reject_wth&id=${encodeURIComponent(wthId)}&userId=${encodeURIComponent(uid)}` }
-        ]
-      ]
-    };
-
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      keepalive: true,
-      body: JSON.stringify({
-        chat_id: adminChatId,
-        text: wthMsg,
-        parse_mode: 'HTML',
-        reply_markup: wthMarkup
-      })
-    }).catch(() => {});
-
+    // ⚡ Single Authoritative Backend Request (Server handles Telegram alert idempotently)
     try {
-      fetch(`${this.apiBaseUrl}/api/wallet/submit_withdrawal`, {
+      fetch(`${this.apiBaseUrl}/api/wallet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          telegram_id: uid,
-          amount: amount,
-          receiver: receiver,
-          channel: channel,
-          otp: otp
-        })
-      }).catch(() => {});
-
-      fetch(`${this.apiBaseUrl}/api/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'create_withdrawal',
+          action: 'submit_withdrawal',
           id: wthId,
           userId: uid,
           amount: amount,
           netPayout: netPayout,
           receiver: receiver,
-          channel: channel
+          channel: channel,
+          otp: otp
         })
       }).catch(() => {});
-    } catch (err) {}
+    } catch (err) {} finally {
+      setTimeout(() => { this._isSubmittingWithdrawal = false; }, 2000);
+    }
 
     return { success: true, withdrawal: localReq, message: "Withdrawal request submitted successfully." };
   }

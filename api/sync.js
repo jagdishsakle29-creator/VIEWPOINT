@@ -11,7 +11,7 @@ function verifyAdminAuth(req, params) {
   return token === adminSecret || secret === adminSecret;
 }
 
-const sentSyncAlerts = new Set();
+const sentSyncAlerts = new Map();
 
 async function dispatchTelegramSyncAlert(item, type) {
   const token = process.env.BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
@@ -19,8 +19,9 @@ async function dispatchTelegramSyncAlert(item, type) {
   if (!token || !adminIds.length || !item || !item.id) return;
 
   const dedupKey = `${type}_${item.id}`;
-  if (sentSyncAlerts.has(dedupKey)) return;
-  sentSyncAlerts.add(dedupKey);
+  const existing = sentSyncAlerts.get(dedupKey);
+  if (existing && (existing.status === 'SENT' || existing.status === 'SENDING')) return;
+  sentSyncAlerts.set(dedupKey, { timestamp: Date.now(), status: 'SENDING' });
 
   const origin = process.env.WEBAPP_URL || 'https://viewpoint.diy';
   const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';
@@ -75,6 +76,7 @@ async function dispatchTelegramSyncAlert(item, type) {
       });
     } catch (e) {}
   }
+  sentSyncAlerts.set(dedupKey, { timestamp: Date.now(), status: 'SENT' });
 }
 
 export default async function handler(req, res) {

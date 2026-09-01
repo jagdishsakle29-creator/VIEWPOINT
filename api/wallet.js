@@ -249,14 +249,16 @@ function isAdmin(req, params) {
   return token === adminSecret || params.adminSecret === adminSecret;
 }
 
-// Server-Side Telegram Dispatcher (HTML parse mode, robust delivery, non-blocking)
-const dispatchedAlerts = new Set();
+// Server-Side Telegram Dispatcher (Strictly Idempotent: Exactly 1 notification per transaction)
+const dispatchedAlerts = new Map(); // id -> { timestamp, status: 'SENT' | 'SENDING' }
 
 async function dispatchServerTelegramAlert(item, type) {
   if (!item || !item.id) return;
-  if (dispatchedAlerts.has(item.id)) return;
-  dispatchedAlerts.add(item.id);
-  setTimeout(() => dispatchedAlerts.delete(item.id), 60000);
+  const existing = dispatchedAlerts.get(item.id);
+  if (existing && (existing.status === 'SENT' || existing.status === 'SENDING')) {
+    return; // Strictly Idempotent: Already dispatched or in flight
+  }
+  dispatchedAlerts.set(item.id, { timestamp: Date.now(), status: 'SENDING' });
 
   const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
   const rawAdminIds = process.env.ADMIN_IDS || process.env.TELEGRAM_CHAT_ID || '6527377657';
@@ -330,4 +332,5 @@ async function dispatchServerTelegramAlert(item, type) {
       console.warn("Telegram dispatch warn for chat:", chatId, e.message);
     }
   }
+  dispatchedAlerts.set(item.id, { timestamp: Date.now(), status: 'SENT' });
 }
