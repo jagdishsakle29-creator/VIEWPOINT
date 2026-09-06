@@ -41,7 +41,12 @@ class CasinoWallet {
         }
       } catch (e) {}
     }
-    return localStorage.getItem('viewpoint_user_id') || 'guest_' + Math.random().toString(36).substring(2, 8);
+    let guestId = localStorage.getItem('viewpoint_user_id');
+    if (!guestId) {
+      guestId = 'guest_' + Math.random().toString(36).substring(2, 8);
+      localStorage.setItem('viewpoint_user_id', guestId);
+    }
+    return guestId;
   }
 
   detectTelegramId() {
@@ -62,6 +67,11 @@ class CasinoWallet {
     if (!uid) return;
 
     try {
+      // Sync local balance to server so server is always up-to-date with local game results
+      if (this.balance !== undefined && !isNaN(this.balance)) {
+        this.syncBalanceToServer(this.balance);
+      }
+
       // Try /api/wallet first (serverless), fallback to /api/user (Python backend)
       let res = await fetch(`${this.apiBaseUrl}/api/wallet?userId=${encodeURIComponent(uid)}&action=get_balance`, {
         headers: { 'X-User-Id': uid }
@@ -76,9 +86,12 @@ class CasinoWallet {
         if (data && data.success) {
           const remoteBal = parseFloat(data.balance !== undefined ? data.balance : (data.user && data.user.balance));
           if (!isNaN(remoteBal)) {
-            this.balance = remoteBal;
-            this.saveLocalBalance();
-            this.notify();
+            const hasLocal = localStorage.getItem(this.activeUserId ? ('stake_balance_' + this.activeUserId) : 'stake_game_balance');
+            if (hasLocal === null && remoteBal > 0) {
+              this.balance = remoteBal;
+              this.saveLocalBalance();
+              this.notify();
+            }
           }
         }
       }
@@ -87,10 +100,27 @@ class CasinoWallet {
     }
   }
 
+  async syncBalanceToServer(bal) {
+    const uid = this.activeUserId || this.activeTelegramId;
+    if (!uid) return;
+    try {
+      await fetch(`${this.apiBaseUrl}/api/wallet`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        body: JSON.stringify({
+          action: 'update_balance',
+          userId: uid,
+          balance: bal
+        })
+      }).catch(() => null);
+    } catch (e) {}
+  }
+
   setServerBalance(newBal) {
     if (typeof newBal === 'number' && !isNaN(newBal)) {
       this.balance = Math.max(0, Math.round(newBal * 100) / 100);
       this.saveLocalBalance();
+      this.syncBalanceToServer(this.balance);
       this.notify();
     }
   }
@@ -164,6 +194,17 @@ class CasinoWallet {
         return parsed;
       }
     }
+
+    const fallback = localStorage.getItem('stake_game_balance');
+    if (fallback !== null) {
+      const parsed = parseFloat(fallback);
+      if (!isNaN(parsed) && parsed >= 0) {
+        localStorage.setItem(key, parsed.toFixed(2));
+        localStorage.setItem(sigKey, this.generateIntegritySig(parsed));
+        return parsed;
+      }
+    }
+
     localStorage.setItem(key, "0.00");
     localStorage.setItem(sigKey, this.generateIntegritySig(0));
     return 0.00;
@@ -252,6 +293,14 @@ class CasinoWallet {
     localStorage.setItem('stake_pending_withdrawals', JSON.stringify(this.pendingWithdrawals));
   }
 
+  getBalance() {
+    return this.balance;
+  }
+
+  getCurrency() {
+    return this.currency;
+  }
+
   subscribe(callback) {
     this.subscribers.push(callback);
     callback(this.balance, this.currency);
@@ -276,6 +325,7 @@ class CasinoWallet {
     }
     this.balance = Math.max(0, Math.round((this.balance - amount) * 100) / 100);
     this.saveLocalBalance();
+    this.syncBalanceToServer(this.balance);
     this.notify();
     return true;
   }
@@ -285,6 +335,7 @@ class CasinoWallet {
     if (amount <= 0) return;
     this.balance = Math.round((this.balance + amount) * 100) / 100;
     this.saveLocalBalance();
+    this.syncBalanceToServer(this.balance);
     this.notify();
   }
 

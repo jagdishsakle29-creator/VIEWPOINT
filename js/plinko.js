@@ -66,8 +66,9 @@ class CasinoPlinko {
     if (!this.canvas) return;
     const parent = this.canvas.parentElement;
     const dpr = window.devicePixelRatio || 1;
-    const w = parent ? Math.min(parent.clientWidth || 460, 560) : 460;
-    const h = Math.max(380, Math.min(520, w * 1.05));
+    const isMobile = window.innerWidth <= 600;
+    const w = parent ? Math.min(parent.clientWidth || 340, 440) : 340;
+    const h = isMobile ? Math.max(220, Math.min(260, w * 0.72)) : Math.max(280, Math.min(340, w * 0.78));
 
     this.width = w;
     this.height = h;
@@ -104,9 +105,10 @@ class CasinoPlinko {
     const w = this.width;
     const h = this.height;
     const numRows = this.rows;
+    const isMobile = h < 280;
 
-    const topPad = 35;
-    const bottomPad = 55;
+    const topPad = isMobile ? 16 : 24;
+    const bottomPad = isMobile ? 30 : 42;
     const usableH = h - topPad - bottomPad;
     const rowSpacing = usableH / (numRows + 1);
 
@@ -114,7 +116,7 @@ class CasinoPlinko {
     for (let r = 0; r < numRows; r++) {
       const pegCount = r + 3;
       const rowY = topPad + (r + 1) * rowSpacing;
-      const pegSpacing = Math.min(w * 0.85 / (numRows + 2), 34);
+      const pegSpacing = Math.min(w * 0.88 / (numRows + 2), 30);
       const startX = (w - (pegCount - 1) * pegSpacing) / 2;
 
       for (let c = 0; c < pegCount; c++) {
@@ -122,7 +124,7 @@ class CasinoPlinko {
         this.pegs.push({
           x,
           y: rowY,
-          r: Math.max(2.5, Math.min(4, 38 / numRows)),
+          r: Math.max(2, Math.min(3.5, 34 / numRows)),
           glow: 0
         });
       }
@@ -131,8 +133,9 @@ class CasinoPlinko {
     // Build Multiplier Buckets at the bottom
     const mults = this.getMultipliers();
     const count = mults.length;
-    const bucketY = h - 38;
-    const bucketW = Math.min((w * 0.94) / count, 36);
+    const bucketH = isMobile ? 20 : 24;
+    const bucketY = h - bucketH - 6;
+    const bucketW = Math.min((w * 0.96) / count, 32);
     const totalW = count * bucketW;
     const startBX = (w - totalW) / 2;
 
@@ -152,7 +155,7 @@ class CasinoPlinko {
         x: startBX + i * bucketW,
         y: bucketY,
         w: bucketW - 2,
-        h: 26,
+        h: bucketH,
         bg: bg,
         color: color,
         scale: 1,

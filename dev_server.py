@@ -12,6 +12,24 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 PORT = 8000
 WEB_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATE_FILE = os.path.join(WEB_ROOT, 'data', 'dev_state.json')
+
+def load_dev_state():
+    try:
+        if os.path.exists(STATE_FILE):
+            with open(STATE_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {"wallets": {}, "deposits": [], "withdrawals": []}
+
+def save_dev_state(state):
+    try:
+        os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+        with open(STATE_FILE, 'w', encoding='utf-8') as f:
+            json.dump(state, f, indent=2)
+    except Exception:
+        pass
 
 class DevServerHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -34,7 +52,7 @@ class DevServerHandler(SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-Id')
         self.end_headers()
 
     def do_GET(self):
@@ -44,19 +62,24 @@ class DevServerHandler(SimpleHTTPRequestHandler):
         if parsed.path.startswith('/api/'):
             params = urllib.parse.parse_qs(parsed.query)
             action = params.get('action', [''])[0]
+            uid = params.get('userId', [None])[0] or params.get('telegram_id', [None])[0] or self.headers.get('X-User-Id') or 'guest_default'
             
-            if 'balance' in parsed.path or action == 'get_balance':
+            state = load_dev_state()
+            user_wallet = state["wallets"].get(uid)
+            
+            if 'balance' in parsed.path or action == 'get_balance' or parsed.path == '/api/user':
+                current_bal = user_wallet.get('balance', 0.00) if user_wallet else 0.00
                 return self._send_json({
                     "success": True,
-                    "balance": 1000.00,
-                    "user": {"userId": "guest_local", "username": "Player", "balance": 1000.00}
+                    "balance": current_bal,
+                    "user": {"userId": uid, "username": "Player", "balance": current_bal}
                 })
             elif action in ['admin_get_pending', 'get_members']:
                 return self._send_json({
                     "success": True,
-                    "deposits": [],
-                    "withdrawals": [],
-                    "members": []
+                    "deposits": state.get("deposits", []),
+                    "withdrawals": state.get("withdrawals", []),
+                    "members": list(state.get("wallets", {}).values())
                 })
             else:
                 return self._send_json({"success": True, "message": "API OK"})
@@ -75,33 +98,63 @@ class DevServerHandler(SimpleHTTPRequestHandler):
             body = {}
 
         if parsed.path.startswith('/api/'):
+            action = body.get('action', '')
+            uid = body.get('userId') or body.get('telegram_id') or self.headers.get('X-User-Id') or 'guest_default'
+            state = load_dev_state()
+            if uid not in state["wallets"]:
+                state["wallets"][uid] = {"userId": uid, "balance": float(body.get('balance', 0.00)), "currency": "₹"}
+
+            wallet = state["wallets"][uid]
+
+            if action in ['update_balance', 'sync_balance', 'set_balance']:
+                if 'balance' in body:
+                    wallet['balance'] = round(float(body['balance']), 2)
+                    save_dev_state(state)
+                return self._send_json({"success": True, "balance": wallet['balance']})
+
             # Simulate deposit / wallet / sync
-            if 'deposit' in parsed.path or 'sync' in parsed.path:
+            if 'deposit' in parsed.path or action == 'deposit':
                 amount = float(body.get('amount') or 100)
                 utr = body.get('utr') or 'DEMO_UTR_12345'
+                dep_obj = {
+                    "id": f"DEP-{os.urandom(4).hex()}",
+                    "amount": amount,
+                    "utr": utr,
+                    "status": "APPROVED",
+                    "userId": uid
+                }
+                wallet['balance'] = round(wallet.get('balance', 0) + amount, 2)
+                state.setdefault("deposits", []).append(dep_obj)
+                save_dev_state(state)
                 return self._send_json({
                     "success": True,
-                    "message": "Deposit recorded successfully",
-                    "deposit": {
-                        "id": f"DEP-{os.urandom(4).hex()}",
-                        "amount": amount,
-                        "utr": utr,
-                        "status": "PENDING"
-                    }
+                    "message": "Deposit recorded and approved",
+                    "deposit": dep_obj,
+                    "balance": wallet['balance']
                 })
-            elif 'withdraw' in parsed.path:
+            elif 'withdraw' in parsed.path or action == 'withdraw':
                 amount = float(body.get('amount') or 200)
+                if wallet.get('balance', 0) >= amount:
+                    wallet['balance'] = round(wallet['balance'] - amount, 2)
+                wth_obj = {
+                    "id": f"WTH-{os.urandom(4).hex()}",
+                    "amount": amount,
+                    "status": "APPROVED",
+                    "userId": uid
+                }
+                state.setdefault("withdrawals", []).append(wth_obj)
+                save_dev_state(state)
                 return self._send_json({
                     "success": True,
-                    "message": "Withdrawal request received",
-                    "withdrawal": {
-                        "id": f"WTH-{os.urandom(4).hex()}",
-                        "amount": amount,
-                        "status": "PENDING"
-                    }
+                    "message": "Withdrawal request processed",
+                    "withdrawal": wth_obj,
+                    "balance": wallet['balance']
                 })
             else:
-                return self._send_json({"success": True, "result": body})
+                if 'balance' in body:
+                    wallet['balance'] = round(float(body['balance']), 2)
+                    save_dev_state(state)
+                return self._send_json({"success": True, "balance": wallet.get('balance', 0.0), "result": body})
 
         self._send_json({"success": True})
 

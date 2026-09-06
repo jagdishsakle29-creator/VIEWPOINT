@@ -65,6 +65,19 @@ class CasinoPump {
         this.startGame();
       };
     }
+
+    document.querySelectorAll('#pumpView .pump-diff-stage-btn').forEach(btn => {
+      ['click', 'touchend'].forEach(evt => {
+        btn.addEventListener(evt, (e) => {
+          if (e.type === 'touchend') e.preventDefault();
+          const d = btn.dataset.diff || btn.getAttribute('data-diff');
+          if (d) {
+            window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+            this.setDifficulty(d);
+          }
+        }, { passive: false });
+      });
+    });
   }
 
   setDifficulty(diff) {
@@ -80,6 +93,10 @@ class CasinoPump {
     if (!this.isPlaying) {
       if (this.multDisplay) this.multDisplay.innerText = `${nextPreview.toFixed(2)}x`;
       if (this.profitDisplay) this.profitDisplay.innerText = `₹${(this.betAmount * nextPreview).toFixed(2)}`;
+      const nextMultTag = document.getElementById('pumpNextMultTag');
+      const nextProfitTag = document.getElementById('pumpNextProfitTag');
+      if (nextMultTag) nextMultTag.innerText = `${nextPreview.toFixed(2)}x`;
+      if (nextProfitTag) nextProfitTag.innerText = `Profit: +₹${(this.betAmount * nextPreview).toFixed(2)}`;
     }
 
     if (this.statusText && !this.isPlaying) {

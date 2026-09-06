@@ -1,8 +1,8 @@
-/* Premium Stake-Style Moles Burrow Game Styling */
+/* Premium Stake-Style Moles Burrow Game Styling - Ultra-Compact Zero-Scroll */
 .moles-view {
   display: none;
   width: 100%;
-  padding: 16px;
+  padding: 4px 6px;
   box-sizing: border-box;
 }
 
@@ -14,25 +14,482 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 6px;
   width: 100%;
-  max-width: 580px;
+  max-width: 420px;
   margin: 0 auto;
 }
 
+/* 1. Header Multiplier Status Bar */
+.moles-stats-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: rgba(0, 231, 1, 0.08);
+  border: 1.5px solid rgba(0, 231, 1, 0.35);
+  border-radius: 10px;
+  padding: 4px 10px;
+  box-sizing: border-box;
+}
+
+.moles-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.moles-stat-label {
+  font-size: 10px;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.moles-stat-val-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.moles-stat-val {
+  font-size: 15px;
+  font-weight: 900;
+  color: #00e5ff;
+}
+
+.moles-stat-dot {
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 900;
+}
+
+.moles-stat-profit {
+  font-size: 15px;
+  font-weight: 900;
+  color: #00e701;
+}
+
+.moles-status-pill {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-align: right;
+}
+
+/* 2. 12-Hole Compact Grid (4x3) */
+.moles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  width: 100%;
+  max-width: 320px;
+  margin: 2px auto;
+}
+
+.mole-hole-card {
+  aspect-ratio: 1 / 1;
+  background: radial-gradient(circle at 50% 60%, #203348 0%, #0e1724 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  padding: 2px;
+  will-change: transform;
+}
+
+.mole-hole-card:hover {
+  border-color: #00e701;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 231, 1, 0.25);
+}
+
+.mole-hole-card:active {
+  transform: scale(0.95);
+}
+
+.mole-mound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.mole-hole-pit {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, #070c14 60%, #152234 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+}
+
+.mole-eye-icon {
+  font-size: 14px;
+}
+
+.mole-hole-tag {
+  font-size: 8px;
+  color: var(--text-muted, #94a3b8);
+  font-weight: 800;
+}
+
+.mole-hole-card.mole-found {
+  background: radial-gradient(circle at 50% 50%, rgba(0, 231, 1, 0.25) 0%, #0c1624 100%);
+  border-color: #00e701;
+  box-shadow: 0 0 12px rgba(0, 231, 1, 0.45);
+}
+
+.mole-revealed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: molePop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+@keyframes molePop {
+  0% { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.mole-sprite-3d {
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.mole-coin-badge {
+  font-size: 8.5px;
+  font-weight: 900;
+  color: #00e701;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 231, 1, 0.4);
+}
+
+.mole-hole-card.trap-hit {
+  background: radial-gradient(circle at 50% 50%, rgba(254, 44, 85, 0.35) 0%, #120912 100%);
+  border-color: #fe2c55;
+  box-shadow: 0 0 14px rgba(254, 44, 85, 0.5);
+}
+
+.hammer-sprite-3d {
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(254, 44, 85, 0.8));
+}
+
+.mole-trap-badge {
+  font-size: 8px;
+  font-weight: 900;
+  color: #fe2c55;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(254, 44, 85, 0.5);
+}
+
+.mole-hole-card.trap-revealed {
+  opacity: 0.45;
+}
+
+/* 3. Hammer Traps Row (Shifted below grid) */
+.moles-traps-panel {
+  width: 100%;
+  background: rgba(15, 33, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 5px 8px;
+  box-sizing: border-box;
+}
+
+.moles-traps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.moles-traps-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+
+.moles-traps-count-tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #00e5ff;
+}
+
+.moles-traps-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin: 6px 0 !important;
+  box-sizing: border-box !important;
+}
+
+.moles-traps-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.moles-traps-pills {
+  display: flex !important;
+  flex-direction: row !important;
+  flex: 1 !important;
+  gap: 4px !important;
+  justify-content: space-between !important;
+}
+
+.btn-mole-trap {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px 2px !important;
+  border-radius: 6px !important;
+  background: rgba(26, 44, 56, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+}
+
+.btn-mole-trap .trap-num {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.btn-mole-trap .trap-mode {
+  font-size: 9px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.btn-mole-trap:hover:not(:disabled) {
+  border-color: #00e5ff;
+  color: #fff;
+}
+
+.btn-mole-trap.active {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.25) 0%, rgba(0, 150, 255, 0.3) 100%);
+  border-color: #00e5ff;
+  color: #00e5ff;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+}
+
+.btn-mole-trap:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 4. Integrated Bet Amount & Quick Actions at Start Digging */
+.moles-bet-control-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(15, 33, 46, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+.moles-bet-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.moles-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: rgba(10, 20, 30, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 7px;
+  padding: 0 8px;
+  height: 36px;
+}
+
+.moles-input-wrap:focus-within {
+  border-color: #00e701;
+  box-shadow: 0 0 8px rgba(0, 231, 1, 0.3);
+}
+
+.moles-curr-prefix {
+  font-size: 14px;
+  font-weight: 900;
+  color: #00e701;
+  margin-right: 4px;
+}
+
+.moles-bet-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: inherit;
+}
+
+.moles-quick-actions {
+  display: flex;
+  gap: 3px;
+}
+
+.btn-quick-chip {
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: rgba(30, 50, 68, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.btn-quick-chip:hover {
+  background: rgba(45, 75, 100, 0.9);
+  border-color: #00e701;
+  color: #fff;
+}
+
+/* Quick Chips Row */
+.moles-chips-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.moles-chip-btn {
+  height: 26px;
+  border-radius: 5px;
+  background: rgba(22, 38, 52, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.moles-chip-btn:hover {
+  border-color: #00e701;
+  color: #00e701;
+}
+
+.moles-chip-btn.active {
+  background: rgba(0, 231, 1, 0.18);
+  border-color: #00e701;
+  color: #00e701;
+  font-weight: 900;
+}
+
+.moles-chip-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Action Buttons */
+.moles-action-buttons {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.btn-moles-start {
+  width: 100%;
+  height: 42px;
+  font-size: 15px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #00e701 0%, #00b001 100%);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(0, 231, 1, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn-moles-start:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(0, 231, 1, 0.55);
+}
+
+.btn-moles-start:active {
+  transform: scale(0.98);
+}
+
+.btn-moles-cashout {
+  width: 100%;
+  height: 42px;
+  font-size: 15px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(245, 158, 11, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulseCashout 1.2s infinite;
+}
+
+@keyframes pulseCashout {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+  50% { transform: scale(1.02); box-shadow: 0 0 18px rgba(245, 158, 11, 0.7); }
+  100% { transform: scale(1); box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+}
+
+/* History Row */
 .moles-history-row {
   display: flex;
-  gap: 8px;
+  gap: 5px;
   overflow-x: auto;
   width: 100%;
-  padding-bottom: 4px;
+  padding: 2px 0;
   justify-content: center;
+  min-height: 22px;
 }
 
 .moles-hist-pill {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 8px;
+  font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -47,151 +504,4 @@
   background: rgba(254, 44, 85, 0.15);
   color: #fe2c55;
   border: 1px solid #fe2c55;
-}
-
-.moles-stats-card {
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  background: rgba(15, 33, 46, 0.9);
-  border: 1.5px solid var(--border-color);
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.moles-stat-item {
-  text-align: center;
-}
-
-.moles-stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.moles-stat-val {
-  font-size: 20px;
-  font-weight: 900;
-  color: #00e701;
-  margin-top: 2px;
-}
-
-.moles-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  width: 100%;
-}
-
-.mole-hole-card {
-  aspect-ratio: 1 / 1;
-  background: radial-gradient(circle at 50% 60%, #203348 0%, #0e1724 100%);
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.16s ease;
-  user-select: none;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.mole-hole-card:hover {
-  border-color: #00e701;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 231, 1, 0.25);
-}
-
-.mole-hole-card:active {
-  transform: scale(0.94);
-}
-
-.mole-mound {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.mole-hole-pit {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: radial-gradient(circle at center, #070c14 60%, #152234 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.9);
-}
-
-.mole-eye-icon {
-  font-size: 24px;
-}
-
-.mole-hole-tag {
-  font-size: 10px;
-  color: var(--text-muted);
-  font-weight: 800;
-}
-
-.mole-hole-card.mole-found {
-  background: radial-gradient(circle at 50% 50%, rgba(0, 231, 1, 0.25) 0%, #0c1624 100%);
-  border-color: #00e701;
-  box-shadow: 0 0 20px rgba(0, 231, 1, 0.45);
-}
-
-.mole-revealed {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  animation: zoomIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.mole-sprite-3d {
-  font-size: 34px;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-}
-
-.mole-coin-badge {
-  font-size: 11px;
-  font-weight: 900;
-  color: #00e701;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 2px 8px;
-  border-radius: 8px;
-  margin-top: 2px;
-  border: 1px solid rgba(0, 231, 1, 0.4);
-}
-
-.mole-hole-card.trap-hit {
-  background: radial-gradient(circle at 50% 50%, rgba(254, 44, 85, 0.35) 0%, #120912 100%);
-  border-color: #fe2c55;
-  box-shadow: 0 0 25px rgba(254, 44, 85, 0.5);
-}
-
-.hammer-sprite-3d {
-  font-size: 34px;
-  filter: drop-shadow(0 4px 8px rgba(254, 44, 85, 0.8));
-}
-
-.mole-trap-badge {
-  font-size: 11px;
-  font-weight: 900;
-  color: #fe2c55;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 2px 8px;
-  border-radius: 8px;
-  margin-top: 2px;
-  border: 1px solid rgba(254, 44, 85, 0.5);
-}
-
-.mole-hole-card.trap-revealed {
-  opacity: 0.45;
 }

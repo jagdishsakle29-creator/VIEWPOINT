@@ -39,6 +39,27 @@ function saveStore() {
   } catch (e) {}
 }
 
+function setWalletBalance(userId, balance) {
+  const store = loadStore();
+  const uid = String(userId || 'user_default').trim();
+  const bal = Math.max(0, Math.round(parseFloat(balance || 0) * 100) / 100);
+  if (!store.wallets[uid]) {
+    store.wallets[uid] = {
+      userId: uid,
+      balance: bal,
+      totalDeposited: 0.00,
+      totalWithdrawn: 0.00,
+      currency: '₹',
+      updatedAt: Date.now()
+    };
+  } else {
+    store.wallets[uid].balance = bal;
+    store.wallets[uid].updatedAt = Date.now();
+  }
+  saveStore();
+  return store.wallets[uid];
+}
+
 function getWallet(userId) {
   const store = loadStore();
   const uid = String(userId || 'user_default').trim();
@@ -198,6 +219,7 @@ module.exports = {
   loadStore,
   saveStore,
   getWallet,
+  setWalletBalance,
   updateWalletBalance,
   getDeposit,
   saveDeposit,

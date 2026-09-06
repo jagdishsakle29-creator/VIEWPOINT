@@ -216,9 +216,12 @@ class MinesGame {
   }
 
   revealTile(index) {
+    index = parseInt(index);
+    if (isNaN(index) || index < 0 || index >= this.totalTiles) return;
+
     if (!this.isPlaying) {
-      this.startGame();
-      return;
+      const started = this.startGame();
+      if (!started || !this.isPlaying) return;
     }
     if (this.revealedIndices.has(index)) return;
 

@@ -49,8 +49,20 @@ export default async function handler(req, res) {
   const userId = params.userId || params.telegram_id || req.headers['x-user-id'] || 'guest_default';
 
   // 1. GET BALANCE
-  if (req.method === 'GET' || action === 'get_balance') {
+  if ((req.method === 'GET' && !action) || action === 'get_balance') {
     const wallet = getWallet(userId);
+    return res.status(200).json({
+      success: true,
+      userId: wallet.userId,
+      balance: wallet.balance,
+      currency: wallet.currency
+    });
+  }
+
+  // 1.1 UPDATE / SYNC BALANCE
+  if (action === 'update_balance' || action === 'sync_balance' || action === 'set_balance') {
+    const bal = parseFloat(params.balance !== undefined ? params.balance : 0);
+    const wallet = store.setWalletBalance(userId, bal);
     return res.status(200).json({
       success: true,
       userId: wallet.userId,

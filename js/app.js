@@ -1251,11 +1251,20 @@ class AppController {
     }
 
     // Difficulty Mode Selector (Easy / Medium / Hard / Daredevil)
-    if (this.dom.btnDiffEasy) this.dom.btnDiffEasy.addEventListener('click', () => this.setDifficulty('easy'));
-    if (this.dom.btnDiffMed) this.dom.btnDiffMed.addEventListener('click', () => this.setDifficulty('medium'));
-    if (this.dom.btnDiffHard) this.dom.btnDiffHard.addEventListener('click', () => this.setDifficulty('hard'));
+    const attachDiffListener = (el, diff) => {
+      if (!el) return;
+      ['click', 'touchend'].forEach(evt => {
+        el.addEventListener(evt, (e) => {
+          if (e.type === 'touchend') e.preventDefault();
+          this.setDifficulty(diff);
+        }, { passive: false });
+      });
+    };
+    attachDiffListener(this.dom.btnDiffEasy || document.getElementById('btnDiffEasy'), 'easy');
+    attachDiffListener(this.dom.btnDiffMed || document.getElementById('btnDiffMed'), 'medium');
+    attachDiffListener(this.dom.btnDiffHard || document.getElementById('btnDiffHard'), 'hard');
     const btnDare = document.getElementById('btnDiffDaredevil');
-    if (btnDare) btnDare.addEventListener('click', () => this.setDifficulty('daredevil'));
+    if (btnDare) attachDiffListener(btnDare, 'daredevil');
 
     // Community Live Wins vs Personal Bets Tab Switcher
     if (this.dom.tabCommunityWins && this.dom.tabMyBets) {
@@ -1453,41 +1462,29 @@ class AppController {
     }
 
     // Color Trading Button Events
-    if (this.dom.btnBetGreen) {
-      this.dom.btnBetGreen.addEventListener('click', () => {
-        const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
-        const res = this.colortrading.placeBet('color', 'green', betVal);
-        if (!res.success) this.showNotification(res.msg, 'error');
-      });
-      this.dom.btnBetViolet.addEventListener('click', () => {
-        const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
-        const res = this.colortrading.placeBet('color', 'violet', betVal);
-        if (!res.success) this.showNotification(res.msg, 'error');
-      });
-      this.dom.btnBetRed.addEventListener('click', () => {
-        const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
-        const res = this.colortrading.placeBet('color', 'red', betVal);
-        if (!res.success) this.showNotification(res.msg, 'error');
-      });
-      this.dom.btnBetBig.addEventListener('click', () => {
-        const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
-        const res = this.colortrading.placeBet('size', 'big', betVal);
-        if (!res.success) this.showNotification(res.msg, 'error');
-      });
-      this.dom.btnBetSmall.addEventListener('click', () => {
-        const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
-        const res = this.colortrading.placeBet('size', 'small', betVal);
-        if (!res.success) this.showNotification(res.msg, 'error');
-      });
+    const btnGreen = document.getElementById('btnBetGreen') || this.dom.btnBetGreen;
+    const btnViolet = document.getElementById('btnBetViolet') || this.dom.btnBetViolet;
+    const btnRed = document.getElementById('btnBetRed') || this.dom.btnBetRed;
+    const btnBig = document.getElementById('btnBetBig') || this.dom.btnBetBig;
+    const btnSmall = document.getElementById('btnBetSmall') || this.dom.btnBetSmall;
 
-      this.dom.numberBetButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const num = btn.dataset.number;
-          const betVal = parseFloat(this.dom.betAmountInput.value) || 10;
-          const res = this.colortrading.placeBet('number', num, betVal);
-          if (!res.success) this.showNotification(res.msg, 'error');
-        });
+    if (btnGreen) btnGreen.addEventListener('click', () => this.selectColorTradingChoice('color', 'green', '2.00x', btnGreen));
+    if (btnViolet) btnViolet.addEventListener('click', () => this.selectColorTradingChoice('color', 'violet', '4.50x', btnViolet));
+    if (btnRed) btnRed.addEventListener('click', () => this.selectColorTradingChoice('color', 'red', '2.00x', btnRed));
+    if (btnBig) btnBig.addEventListener('click', () => this.selectColorTradingChoice('size', 'big', '2.00x', btnBig));
+    if (btnSmall) btnSmall.addEventListener('click', () => this.selectColorTradingChoice('size', 'small', '2.00x', btnSmall));
+
+    const numBtns = document.querySelectorAll('#colortradingView .btn-number-bet');
+    numBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const num = btn.dataset.number;
+        this.selectColorTradingChoice('number', num, '9.00x', btn);
       });
+    });
+
+    const btnSubmitWinGo = document.getElementById('btnColortradingBet');
+    if (btnSubmitWinGo) {
+      btnSubmitWinGo.addEventListener('click', () => this.handleColorTradingSubmitBet());
     }
 
     // Stock Market Asset Selection
@@ -4549,9 +4546,13 @@ class AppController {
 
   setDifficulty(diff) {
     window.soundEngine.playClick();
+    this.selectedDifficulty = diff;
+
+    // Toggle active class on all matching difficulty buttons (sidebar + in-game stages)
     document.querySelectorAll('.btn-diff-mode, .tower-diff-stage-btn, .pump-diff-stage-btn').forEach(b => {
-      if (b.dataset && b.dataset.diff) {
-        b.classList.toggle('active', b.dataset.diff === diff);
+      const bDiff = (b.dataset && b.dataset.diff) || b.getAttribute('data-diff');
+      if (bDiff) {
+        b.classList.toggle('active', bDiff === diff);
       }
     });
 
@@ -4560,162 +4561,183 @@ class AppController {
     if (!this.pump && window.CasinoPump && document.getElementById('pumpView')) this.pump = new window.CasinoPump('pumpView');
     if (!this.moles && window.CasinoMoles && document.getElementById('molesView')) this.moles = new window.CasinoMoles('molesView');
     if (!this.chicken && window.CasinoChicken && document.getElementById('chickenView')) this.chicken = new window.CasinoChicken('chickenView');
-    if (!this.mines && window.CasinoMines && document.getElementById('minesView')) this.mines = new window.CasinoMines('minesView');
+    if (!this.mines && window.MinesGame && document.getElementById('minesView')) this.mines = new window.MinesGame({
+      onMultiplierUpdate: (data) => this.onGameMultiplierUpdate(data),
+      onTileReveal: (idx, type, isMine) => this.onMineTileReveal(idx, type, isMine),
+      onGameOver: (win, profit) => this.onMinesGameOver(win, profit)
+    });
     if (!this.plinko && window.CasinoPlinko && document.getElementById('plinkoCanvas')) this.plinko = new window.CasinoPlinko('plinkoCanvas');
     if (!this.limbo && window.CasinoLimbo && document.getElementById('limboView')) this.limbo = new window.CasinoLimbo('limboView');
 
     if (diff === 'easy') {
-      if (this.dom.btnDiffEasy) this.dom.btnDiffEasy.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟢 Easy (Low Risk - Safe Payouts)";
       
       // Mines (1 Mine: 24 Safe Gems)
-      if (this.dom.minesCountSelect) {
-        this.dom.minesCountSelect.value = "1";
-        if (this.mines) this.mines.setMineCount(1);
-      }
-      // Chicken (Easy: 1 Bone, 24 Lanes)
+      if (this.dom.minesCountSelect) this.dom.minesCountSelect.value = "1";
+      if (this.mines && this.mines.setMineCount) this.mines.setMineCount(1);
+
+      // Chicken (Easy: 15% Traffic, Safe 85%)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "easy";
-      if (this.chicken) this.chicken.setDifficulty('easy');
+      if (this.chicken && this.chicken.setDifficulty) this.chicken.setDifficulty('easy');
+
       // Tower (4 Tiles: 3 Diamonds, 1 Skull)
-      if (this.tower) this.tower.setDifficulty('easy');
+      if (this.tower && this.tower.setDifficulty) this.tower.setDifficulty('easy');
+
       // Moles (1 Trap: 11 Safe Moles)
-      if (this.moles) this.moles.setTrapCount(1);
+      if (this.moles && this.moles.setTrapCount) this.moles.setTrapCount(1);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "1";
+
       // Plinko (10 Rows, Low Risk)
       if (this.plinko) {
-        this.plinko.setRisk('low');
-        this.plinko.setRows(10);
+        if (this.plinko.setRisk) this.plinko.setRisk('low');
+        if (this.plinko.setRows) this.plinko.setRows(10);
       }
-      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelectSidebar') || document.getElementById('plinkoRowsSelect');
       if (plinkoRowsSelect) plinkoRowsSelect.value = "10";
+
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "1.30";
-        if (this.crash) this.crash.setAutoCashout(1.30);
+        if (this.crash && this.crash.setAutoCashout) this.crash.setAutoCashout(1.30);
       }
+
       // Limbo
-      const limboInput = document.getElementById('limboTargetInput');
+      const limboInput = document.getElementById('limboTargetInputSidebar') || document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "1.30";
+      if (this.limbo && this.limbo.setTarget) this.limbo.setTarget(1.30);
+
       // Pump (Safe Growth)
-      if (this.pump) this.pump.setDifficulty('easy');
+      if (this.pump && this.pump.setDifficulty) this.pump.setDifficulty('easy');
 
     } else if (diff === 'hard') {
-      if (this.dom.btnDiffHard) this.dom.btnDiffHard.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🔴 Hard (High Multipliers)";
       
-      // Mines (5 Mines)
-      if (this.dom.minesCountSelect) {
-        this.dom.minesCountSelect.value = "5";
-        if (this.mines) this.mines.setMineCount(5);
-      }
-      // Chicken (Hard: 3 Bones)
+      // Mines (5 Mines: 20 Safe Gems)
+      if (this.dom.minesCountSelect) this.dom.minesCountSelect.value = "5";
+      if (this.mines && this.mines.setMineCount) this.mines.setMineCount(5);
+
+      // Chicken (Hard: 35% Traffic)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "hard";
-      if (this.chicken) this.chicken.setDifficulty('hard');
+      if (this.chicken && this.chicken.setDifficulty) this.chicken.setDifficulty('hard');
+
       // Tower (2 Tiles: 1 Diamond, 1 Skull)
-      if (this.tower) this.tower.setDifficulty('hard');
+      if (this.tower && this.tower.setDifficulty) this.tower.setDifficulty('hard');
+
       // Moles (4 Traps)
-      if (this.moles) this.moles.setTrapCount(4);
+      if (this.moles && this.moles.setTrapCount) this.moles.setTrapCount(4);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "4";
+
       // Plinko (14 Rows, Hard Risk)
       if (this.plinko) {
-        this.plinko.setRisk('hard');
-        this.plinko.setRows(14);
+        if (this.plinko.setRisk) this.plinko.setRisk('hard');
+        if (this.plinko.setRows) this.plinko.setRows(14);
       }
-      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelectSidebar') || document.getElementById('plinkoRowsSelect');
       if (plinkoRowsSelect) plinkoRowsSelect.value = "14";
+
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "6.50";
-        if (this.crash) this.crash.setAutoCashout(6.50);
+        if (this.crash && this.crash.setAutoCashout) this.crash.setAutoCashout(6.50);
       }
+
       // Limbo
-      const limboInput = document.getElementById('limboTargetInput');
+      const limboInput = document.getElementById('limboTargetInputSidebar') || document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "6.50";
-      // Pump (2x Higher Multipliers)
-      if (this.pump) this.pump.setDifficulty('hard');
+      if (this.limbo && this.limbo.setTarget) this.limbo.setTarget(6.50);
+
+      // Pump (High Multipliers)
+      if (this.pump && this.pump.setDifficulty) this.pump.setDifficulty('hard');
 
     } else if (diff === 'daredevil') {
-      const btnDare = document.getElementById('btnDiffDaredevil');
-      if (btnDare) btnDare.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "⚡ Extreme / Daredevil (Max 1000x)";
 
       // Mines (10 Mines)
-      if (this.dom.minesCountSelect) {
-        this.dom.minesCountSelect.value = "10";
-        if (this.mines) this.mines.setMineCount(10);
-      }
-      // Chicken (Daredevil: 4 Bones)
+      if (this.dom.minesCountSelect) this.dom.minesCountSelect.value = "10";
+      if (this.mines && this.mines.setMineCount) this.mines.setMineCount(10);
+
+      // Chicken (Daredevil: 50% Traffic)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "daredevil";
-      if (this.chicken) this.chicken.setDifficulty('daredevil');
-      // Tower (3 Tiles: 1 Diamond, 2 Skulls)
-      if (this.tower) this.tower.setDifficulty('extreme');
+      if (this.chicken && this.chicken.setDifficulty) this.chicken.setDifficulty('daredevil');
+
+      // Tower (Extreme)
+      if (this.tower && this.tower.setDifficulty) this.tower.setDifficulty('extreme');
+
       // Moles (5 Traps)
-      if (this.moles) this.moles.setTrapCount(5);
+      if (this.moles && this.moles.setTrapCount) this.moles.setTrapCount(5);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "5";
-      // Plinko (16 Rows Max, Hard Risk with 1000x jackpot)
+
+      // Plinko (16 Rows Max, Hard Risk)
       if (this.plinko) {
-        this.plinko.setRisk('hard');
-        this.plinko.setRows(16);
+        if (this.plinko.setRisk) this.plinko.setRisk('hard');
+        if (this.plinko.setRows) this.plinko.setRows(16);
       }
-      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelectSidebar') || document.getElementById('plinkoRowsSelect');
       if (plinkoRowsSelect) plinkoRowsSelect.value = "16";
+
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "18.00";
-        if (this.crash) this.crash.setAutoCashout(18.00);
+        if (this.crash && this.crash.setAutoCashout) this.crash.setAutoCashout(18.00);
       }
+
       // Limbo
-      const limboInput = document.getElementById('limboTargetInput');
+      const limboInput = document.getElementById('limboTargetInputSidebar') || document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "18.00";
+      if (this.limbo && this.limbo.setTarget) this.limbo.setTarget(18.00);
+
       // Pump (Hard Max 1000x Progression)
-      if (this.pump) this.pump.setDifficulty('daredevil');
+      if (this.pump && this.pump.setDifficulty) this.pump.setDifficulty('daredevil');
 
     } else {
       // Medium / Balanced
-      if (this.dom.btnDiffMed) this.dom.btnDiffMed.classList.add('active');
       if (this.dom.difficultyLabelHelper) this.dom.difficultyLabelHelper.innerText = "🟡 Medium (Balanced Mode)";
       
-      // Mines (3 Mines)
-      if (this.dom.minesCountSelect) {
-        this.dom.minesCountSelect.value = "3";
-        if (this.mines) this.mines.setMineCount(3);
-      }
-      // Chicken (Med: 2 Bones)
+      // Mines (3 Mines: 22 Safe Gems)
+      if (this.dom.minesCountSelect) this.dom.minesCountSelect.value = "3";
+      if (this.mines && this.mines.setMineCount) this.mines.setMineCount(3);
+
+      // Chicken (Medium: 25% Traffic)
       if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.value = "medium";
-      if (this.chicken) this.chicken.setDifficulty('medium');
+      if (this.chicken && this.chicken.setDifficulty) this.chicken.setDifficulty('medium');
+
       // Tower (3 Tiles: 2 Diamonds, 1 Skull)
-      if (this.tower) this.tower.setDifficulty('medium');
+      if (this.tower && this.tower.setDifficulty) this.tower.setDifficulty('medium');
+
       // Moles (3 Traps)
-      if (this.moles) this.moles.setTrapCount(3);
+      if (this.moles && this.moles.setTrapCount) this.moles.setTrapCount(3);
       const moleSelect = document.getElementById('molesTrapSelect');
       if (moleSelect) moleSelect.value = "3";
+
       // Plinko (12 Rows, Medium Risk)
       if (this.plinko) {
-        this.plinko.setRisk('medium');
-        this.plinko.setRows(12);
+        if (this.plinko.setRisk) this.plinko.setRisk('medium');
+        if (this.plinko.setRows) this.plinko.setRows(12);
       }
-      const plinkoRowsSelect = document.getElementById('plinkoRowsSelect');
+      const plinkoRowsSelect = document.getElementById('plinkoRowsSelectSidebar') || document.getElementById('plinkoRowsSelect');
       if (plinkoRowsSelect) plinkoRowsSelect.value = "12";
+
       // Crash
       if (this.dom.crashAutoCashoutInput) {
         this.dom.crashAutoCashoutInput.value = "2.10";
-        if (this.crash) this.crash.setAutoCashout(2.10);
+        if (this.crash && this.crash.setAutoCashout) this.crash.setAutoCashout(2.10);
       }
+
       // Limbo
-      const limboInput = document.getElementById('limboTargetInput');
+      const limboInput = document.getElementById('limboTargetInputSidebar') || document.getElementById('limboTargetInput');
       if (limboInput) limboInput.value = "2.10";
+      if (this.limbo && this.limbo.setTarget) this.limbo.setTarget(2.10);
+
       // Pump (Balanced)
-      if (this.pump) this.pump.setDifficulty('medium');
+      if (this.pump && this.pump.setDifficulty) this.pump.setDifficulty('medium');
     }
 
     // Refresh visuals across active game
-    if (this.chicken) this.renderHighwayLanes();
-    if (this.mines) this.mines.updateNextMultiplierPreview();
-    if (this.tower) { this.tower.setDifficulty(diff); }
-    if (this.pump) { this.pump.setDifficulty(diff); }
+    if (this.chicken && this.renderHighwayLanes) this.renderHighwayLanes();
+    if (this.mines && this.mines.updateNextMultiplierPreview) this.mines.updateNextMultiplierPreview();
     if (this.activeInstance && this.activeInstance.updateNextMultiplierPreview) {
       this.activeInstance.updateNextMultiplierPreview();
     }
@@ -4877,15 +4899,12 @@ class AppController {
     const plinkoSelGroup = document.getElementById('plinkoSelectGroup');
     if (plinkoSelGroup) plinkoSelGroup.style.display = (gameType === 'plinko') ? 'flex' : 'none';
 
-    const molesSelGroup = document.getElementById('molesSelectGroup');
-    if (molesSelGroup) molesSelGroup.style.display = (gameType === 'moles') ? 'flex' : 'none';
-
     if (this.dom.multiplierPreviewCard) this.dom.multiplierPreviewCard.style.display = 'none';
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock) hide left controls sidebar and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock');
+    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock, Pump, Moles, Tower) hide master controls panel and take 100% width
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
@@ -4899,6 +4918,12 @@ class AppController {
       }
     }
 
+    // Manage stock trading animation render loop
+    if (this.stock) {
+      if (gameType === 'stock') this.stock.startRenderLoop();
+      else this.stock.stopRenderLoop();
+    }
+
     // Auto Play Toggle & Master Difficulty Controller under Bet Tab
     if (isFullWidthGame) {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
@@ -4910,9 +4935,9 @@ class AppController {
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
     }
       
-    // Master difficultyControlGroup under bet tab (Strictly shown for Tower, Chicken, Pump, Mines, Dice; Removed from Plinko, Crash, Moles, Limbo)
+    // Master difficultyControlGroup under bet tab (Strictly shown for Chicken, Mines, Dice; Removed from Plinko, Crash, Moles, Limbo, Pump, Tower)
     if (this.dom.difficultyControlGroup) {
-      this.dom.difficultyControlGroup.style.display = ['chicken', 'tower', 'pump', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
+      this.dom.difficultyControlGroup.style.display = ['chicken', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
     }
 
     // Crash Auto Cashout Group: only on Crash
@@ -4983,12 +5008,11 @@ class AppController {
       if (!this.pump && window.CasinoPump && (document.getElementById('pumpView') || this.dom.pumpView)) {
         this.pump = new window.CasinoPump('pumpView');
       }
-      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.pump;
-      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
-      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
-      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
-      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+      if (this.pump) {
+        this.pump.setDifficulty(this.pump.difficulty || 'medium');
+        this.pump.updateUI();
+      }
     } else if (gameType === 'moles') {
       const tab = this.dom.tabMoles || document.getElementById('tabMoles');
       if (tab) tab.classList.add('active');
@@ -4997,12 +5021,7 @@ class AppController {
       if (!this.moles && window.CasinoMoles && (document.getElementById('molesView') || this.dom.molesView)) {
         this.moles = new window.CasinoMoles('molesView');
       }
-      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.moles;
-      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
-      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
-      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
-      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
     } else if (gameType === 'tower') {
       const tab = this.dom.tabTower || document.getElementById('tabTower');
       if (tab) tab.classList.add('active');
@@ -5011,12 +5030,11 @@ class AppController {
       if (!this.tower && window.CasinoTower && (document.getElementById('towerView') || this.dom.towerView)) {
         this.tower = new window.CasinoTower('towerView');
       }
-      if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
       this.activeInstance = this.tower;
-      if (this.dom.btnActionBet) { this.dom.btnActionBet.style.display = 'flex'; this.dom.btnActionBet.disabled = false; }
-      if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
-      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
-      if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
+      if (this.tower) {
+        this.tower.setDifficulty(this.tower.difficulty || 'medium');
+        this.tower.updateUI();
+      }
     } else if (gameType === 'mines') {
       const tab = this.dom.tabMines || document.getElementById('tabMines');
       if (tab) tab.classList.add('active');
@@ -5030,6 +5048,7 @@ class AppController {
       this.resetGridUI();
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
       if (this.mines) {
         this.mines.setMineCount(parseInt(this.dom.minesCountSelect ? this.dom.minesCountSelect.value : 3) || 3);
         this.mines.updateNextMultiplierPreview();
@@ -5740,7 +5759,9 @@ class AppController {
     window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
     if (window.wallet) {
       window.wallet.balance = parseFloat(amount) || 10000.00;
-      window.wallet.updateUI();
+      window.wallet.saveLocalBalance();
+      window.wallet.syncBalanceToServer && window.wallet.syncBalanceToServer(window.wallet.balance);
+      window.wallet.notify();
     }
     this.showNotification(`🎬 Demo balance set to ${window.wallet.currency}${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} for video recording!`, "success");
     const adminModal = document.getElementById('modalUpiSettings');
@@ -5778,8 +5799,13 @@ class AppController {
   }
 
   resetWallet() {
-    window.soundEngine.playClick();
-    window.wallet.resetBalance(0.00);
+    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    if (window.wallet) {
+      window.wallet.balance = 0.00;
+      window.wallet.saveLocalBalance();
+      window.wallet.syncBalanceToServer && window.wallet.syncBalanceToServer(0.00);
+      window.wallet.notify();
+    }
     this.showNotification(`Balance reset to ${window.wallet.currency}0.00!`, "info");
   }
 
@@ -5852,17 +5878,114 @@ class AppController {
     }
   }
 
-  renderActiveBetsSlip(bets) {
-    if (!this.dom.tradingActiveBetsSlip || !this.dom.activeBetsList) return;
-    if (!bets || bets.length === 0) {
-      this.dom.tradingActiveBetsSlip.style.display = 'none';
+  selectColorTradingChoice(type, choice, multLabel, btnElement) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    this.selectedColorTradingBet = { type, choice, mult: multLabel };
+    
+    // Update active highlight across all selection buttons
+    const container = document.getElementById('colortradingView');
+    if (container) {
+      container.querySelectorAll('.btn-color-bet, .btn-number-bet, .btn-size-bet').forEach(b => {
+        b.classList.remove('active');
+        b.style.borderColor = 'transparent';
+        b.style.boxShadow = '';
+      });
+    }
+    if (btnElement) {
+      btnElement.classList.add('active');
+      btnElement.style.borderColor = '#00e5ff';
+      btnElement.style.boxShadow = '0 0 14px rgba(0, 229, 255, 0.5)';
+    }
+
+    const textEl = document.getElementById('colortradingChoiceText');
+    if (textEl) {
+      let icon = '🎨';
+      if (type === 'color') {
+        icon = choice === 'green' ? '🟢' : (choice === 'red' ? '🔴' : '🟣');
+      } else if (type === 'number') {
+        icon = `🔢 #${choice}`;
+      } else if (type === 'size') {
+        icon = choice === 'big' ? '🟡 BIG (5-9)' : '🔵 SMALL (0-4)';
+      }
+      textEl.innerText = `${icon} ${choice.toUpperCase()} (${multLabel})`;
+      textEl.style.color = (choice === 'green' || choice === 'small') ? '#00e701' : (choice === 'red' ? '#fe2c55' : (choice === 'violet' ? '#c084fc' : '#fbbf24'));
+    }
+  }
+
+  handleColorTradingSubmitBet() {
+    if (!this.colortrading && window.ColorTradingGame) {
+      this.colortrading = new window.ColorTradingGame({
+        onTimerTick: (data) => {
+          const pId = this.dom.tradingPeriodId || document.getElementById('tradingPeriodId');
+          const d1 = this.dom.timerDigit1 || document.getElementById('timerDigit1');
+          const d2 = this.dom.timerDigit2 || document.getElementById('timerDigit2');
+          if (pId) pId.innerText = data.periodId;
+          const tens = Math.floor(data.timeLeft / 10);
+          const ones = data.timeLeft % 10;
+          if (d1) d1.innerText = tens;
+          if (d2) d2.innerText = ones;
+          const isHurry = data.timeLeft <= 5;
+          if (d1) d1.classList.toggle('hurry', isHurry);
+          if (d2) d2.classList.toggle('hurry', isHurry);
+          const betBtn = document.getElementById('btnColortradingBet');
+          if (betBtn) {
+            if (isHurry) {
+              betBtn.disabled = true;
+              betBtn.style.opacity = '0.6';
+              betBtn.innerHTML = `<span>🔒 LOCKED (Drawing in ${data.timeLeft}s...)</span>`;
+            } else {
+              betBtn.disabled = false;
+              betBtn.style.opacity = '1';
+              betBtn.innerHTML = `<span>🎨 PLACE BET (Win Go 30s)</span>`;
+            }
+          }
+        },
+        onBetPlaced: (bets) => {
+          this.renderActiveBetsSlip(bets);
+        },
+        onRoundSettled: (res) => {
+          this.renderTrendBalls(res.history);
+          this.renderActiveBetsSlip([]);
+          if (res.totalWin > 0) {
+            this.showNotification(`🎉 You won ${window.wallet.currency}${res.totalWin.toFixed(2)} in Color Trading!`, "success");
+          }
+          this.renderHistoryTable();
+        }
+      });
+    }
+    if (!this.colortrading) return;
+
+    if (this.colortrading.timeLeft <= 5) {
+      this.showNotification("🔒 Betting locked for this round (drawing in 5s)!", "info");
       return;
     }
-    this.dom.tradingActiveBetsSlip.style.display = 'flex';
-    this.dom.activeBetsList.innerHTML = bets.map(b => `
-      <div class="active-bet-pill">
-        <span>${b.choice.toUpperCase()}</span>
-        <strong style="color: var(--accent-green);">${window.wallet.currency}${b.amount}</strong>
+
+    const input = document.getElementById('colortradingBetInput') || this.dom.betAmountInput;
+    const betVal = parseFloat(input ? input.value : 10) || 10;
+
+    const sel = this.selectedColorTradingBet || { type: 'color', choice: 'green', mult: '2.00x' };
+    const res = this.colortrading.placeBet(sel.type, sel.choice, betVal);
+    if (res && !res.success) {
+      this.showNotification(res.msg || "Failed to place bet", "error");
+    } else {
+      this.showNotification(`✅ Placed ${window.wallet.currency}${betVal} on ${sel.choice.toUpperCase()}!`, "success");
+      this.renderActiveBetsSlip(this.colortrading.activeBets || []);
+    }
+  }
+
+  renderActiveBetsSlip(bets) {
+    const slip = document.getElementById('colortradingActiveSlip') || this.dom.tradingActiveBetsSlip;
+    const list = document.getElementById('colortradingActiveBetsList') || this.dom.activeBetsList;
+    if (!slip || !list) return;
+    if (!bets || bets.length === 0) {
+      slip.style.display = 'none';
+      return;
+    }
+    slip.style.display = 'block';
+    list.innerHTML = bets.map(b => `
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 4px 8px; border-radius: 6px;">
+        <span style="font-weight: 800; color: #fff;">${b.choice.toUpperCase()} (${b.type})</span>
+        <strong style="color: #00e701;">${window.wallet ? window.wallet.currency : '₹'}${b.amount}</strong>
       </div>
     `).join('');
   }
@@ -5886,8 +6009,8 @@ class AppController {
 
   renderGrids() {
     // Mines 5x5 Grid
-    let mineTiles = this.dom.minesGrid.querySelectorAll('.mine-tile');
-    if (mineTiles.length === 0) {
+    let mineTiles = this.dom.minesGrid ? this.dom.minesGrid.querySelectorAll('.mine-tile') : [];
+    if (this.dom.minesGrid && mineTiles.length === 0) {
       this.dom.minesGrid.innerHTML = '';
       for (let i = 0; i < 25; i++) {
         const tile = document.createElement('div');
@@ -5898,8 +6021,25 @@ class AppController {
       mineTiles = this.dom.minesGrid.querySelectorAll('.mine-tile');
     }
 
+    if (this.dom.minesGrid && !this.dom.minesGrid._delegated) {
+      this.dom.minesGrid._delegated = true;
+      const handleTileTap = (e) => {
+        const tile = e.target.closest('.mine-tile');
+        if (!tile || !tile.dataset.index) return;
+        const i = parseInt(tile.dataset.index);
+        if (isNaN(i)) return;
+        if (!this.mines.isPlaying) {
+          this.mines.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
+          this.mines.setMineCount(parseInt(this.dom.minesCountSelect.value) || 3);
+        }
+        this.mines.revealTile(i);
+      };
+      this.dom.minesGrid.addEventListener('click', handleTileTap);
+    }
+
     mineTiles.forEach((tile, i) => {
-      tile.onclick = () => {
+      tile.onclick = (e) => {
+        e.stopPropagation();
         if (!this.mines.isPlaying) {
           this.mines.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
           this.mines.setMineCount(parseInt(this.dom.minesCountSelect.value) || 3);
@@ -5922,8 +6062,24 @@ class AppController {
         clocheTiles = this.dom.chickenMinesGrid.querySelectorAll('.mine-tile');
       }
 
+      if (!this.dom.chickenMinesGrid._delegated) {
+        this.dom.chickenMinesGrid._delegated = true;
+        this.dom.chickenMinesGrid.addEventListener('click', (e) => {
+          const tile = e.target.closest('.mine-tile');
+          if (!tile || !tile.dataset.index) return;
+          const i = parseInt(tile.dataset.index);
+          if (isNaN(i)) return;
+          if (!this.chickenmines.isPlaying) {
+            this.chickenmines.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
+            this.chickenmines.setMineCount(parseInt(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 3) || 3);
+          }
+          this.chickenmines.revealTile(i);
+        });
+      }
+
       clocheTiles.forEach((tile, i) => {
-        tile.onclick = () => {
+        tile.onclick = (e) => {
+          e.stopPropagation();
           if (!this.chickenmines.isPlaying) {
             this.chickenmines.setBetAmount(parseFloat(this.dom.betAmountInput.value) || 10);
             this.chickenmines.setMineCount(parseInt(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 3) || 3);
@@ -7505,42 +7661,69 @@ class AppController {
 
   startOnlineMembersLoop() {
     const gameTabBadges = [
-      { id: 'tabMines', weight: 0.14 },       // ~1,400
-      { id: 'tabChicken', weight: 0.13 },     // ~1,300
-      { id: 'tabCrash', weight: 0.14 },       // ~1,400
-      { id: 'tabDragonTiger', weight: 0.12 }, // ~1,200
-      { id: 'tabPlinko', weight: 0.11 },      // ~1,100
-      { id: 'tabPump', weight: 0.09 },        // ~900
-      { id: 'tabLimbo', weight: 0.08 },       // ~800
-      { id: 'tabTower', weight: 0.07 },       // ~700
-      { id: 'tabColorTrading', weight: 0.05 },// ~500
-      { id: 'tabMoles', weight: 0.04 },       // ~400
-      { id: 'tabStock', weight: 0.04 },       // ~400
-      { id: 'tabDice', weight: 0.03 }         // ~300
+      { id: 'tabMines', name: 'Mines', weight: 0.18 },           // 18% (~1.8k - ~12.6k)
+      { id: 'tabCrash', name: 'Crash', weight: 0.16 },           // 16% (~1.6k - ~11.2k)
+      { id: 'tabChicken', name: 'Chicken Road', weight: 0.14 },  // 14% (~1.4k - ~9.8k)
+      { id: 'tabDragonTiger', name: 'Dragon Tiger', weight: 0.12 }, // 12% (~1.2k - ~8.4k)
+      { id: 'tabPlinko', name: 'Plinko', weight: 0.11 },         // 11% (~1.1k - ~7.7k)
+      { id: 'tabLimbo', name: 'Limbo Turbo', weight: 0.07 },     // 7% (~700 - ~4.9k)
+      { id: 'tabColorTrading', name: 'Win Go 30s', weight: 0.06 }, // 6% (~600 - ~4.2k)
+      { id: 'tabPump', name: 'Stake Pump', weight: 0.05 },       // 5% (~500 - ~3.5k)
+      { id: 'tabMoles', name: 'Stake Moles', weight: 0.04 },     // 4% (~400 - ~2.8k)
+      { id: 'tabTower', name: 'Tower Legend', weight: 0.03 },    // 3% (~300 - ~2.1k)
+      { id: 'tabStock', name: 'Stock BTC', weight: 0.02 },       // 2% (~200 - ~1.4k)
+      { id: 'tabDice', name: 'Classic Dice', weight: 0.02 }      // 2% (~200 - ~1.4k)
     ];
 
-    let baseTotal = 8400 + Math.floor(Math.random() * 2500);
+    // Initial total active members strictly between 10k and 70k (average ~38.5k)
+    let baseTotal = 28000 + Math.floor(Math.random() * 26000);
+
+    const formatCount = (n) => {
+      if (n >= 1000) {
+        return `${(n / 1000).toFixed(1)}k`;
+      }
+      return `${n}`;
+    };
 
     const updateAllCounts = () => {
-      const delta = Math.floor((Math.random() - 0.49) * 260);
-      baseTotal = Math.max(8200, Math.min(11500, baseTotal + delta));
+      // Natural gentle fluctuation (±40 to ±160 players)
+      const delta = Math.floor((Math.random() - 0.48) * 140);
+      // Clamp strictly between 10,000 and 70,000
+      baseTotal = Math.max(10500, Math.min(69500, baseTotal + delta));
+
+      const totalFormatted = formatCount(baseTotal);
 
       if (this.dom.liveOnlineUsersCounter) {
-        this.dom.liveOnlineUsersCounter.innerText = `${(baseTotal / 1000).toFixed(1)}k`;
+        this.dom.liveOnlineUsersCounter.innerText = totalFormatted;
       }
-      const headerTotal = document.getElementById('headerTotalOnlinePlayers');
-      if (headerTotal) {
-        headerTotal.innerText = `${baseTotal.toLocaleString()} Players Live`;
+      const cornerPill = document.querySelector('.btn-corner-pill.online');
+      if (cornerPill) {
+        cornerPill.title = `${baseTotal.toLocaleString()} Active Players Online`;
       }
 
-      gameTabBadges.forEach(item => {
+      const headerTotal = document.getElementById('headerTotalOnlinePlayers');
+      if (headerTotal) {
+        headerTotal.innerText = `${baseTotal.toLocaleString()} Active Players Live`;
+      }
+
+      // Distribute total across games so the sum matches baseTotal
+      let allocatedTotal = 0;
+      gameTabBadges.forEach((item, index) => {
         const tabEl = document.getElementById(item.id);
+        let gamePlayers = 0;
+        if (index === gameTabBadges.length - 1) {
+          gamePlayers = Math.max(50, baseTotal - allocatedTotal);
+        } else {
+          gamePlayers = Math.max(50, Math.round(baseTotal * item.weight));
+          allocatedTotal += gamePlayers;
+        }
+
         if (tabEl) {
           const badge = tabEl.querySelector('.tab-badge');
           if (badge) {
-            const count = Math.round(baseTotal * item.weight + (Math.random() - 0.5) * 40);
-            badge.innerText = `🟢 ${(count / 1000).toFixed(1)}k`;
+            badge.innerText = `🟢 ${formatCount(gamePlayers)}`;
           }
+          tabEl.setAttribute('title', `${item.name}: ${gamePlayers.toLocaleString()} members playing`);
         }
       });
     };

@@ -31,7 +31,7 @@ class StockTradingGame {
 
     this.startPriceLoop();
     this.startTradeLoop();
-    this.renderLoop();
+    this.startRenderLoop();
   }
 
   resizeCanvas() {
@@ -251,9 +251,26 @@ class StockTradingGame {
     }
   }
 
+  startRenderLoop() {
+    if (this._isRendering) return;
+    this._isRendering = true;
+    this.renderLoop();
+  }
+
+  stopRenderLoop() {
+    this._isRendering = false;
+    if (this._animId) {
+      cancelAnimationFrame(this._animId);
+      this._animId = null;
+    }
+  }
+
   renderLoop() {
-    this.render();
-    requestAnimationFrame(() => this.renderLoop());
+    if (!this._isRendering) return;
+    if (!document.hidden && this.canvas && this.canvas.offsetParent !== null) {
+      this.render();
+    }
+    this._animId = requestAnimationFrame(() => this.renderLoop());
   }
 
   render() {

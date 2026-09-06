@@ -1,0 +1,26 @@
+{
+  "wallets": {
+    "guest_8521wt": {
+      "userId": "guest_8521wt",
+      "balance": 994.0,
+      "currency": "\u20b9"
+    },
+    "78912345": {
+      "userId": "78912345",
+      "balance": 994.0,
+      "currency": "\u20b9"
+    },
+    "guest_wv3ydg": {
+      "userId": "guest_wv3ydg",
+      "balance": 0.0,
+      "currency": "\u20b9"
+    },
+    "1234567890": {
+      "userId": "1234567890",
+      "balance": 0.0,
+      "currency": "\u20b9"
+    }
+  },
+  "deposits": [],
+  "withdrawals": []
+}

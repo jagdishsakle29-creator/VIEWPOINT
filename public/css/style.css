@@ -612,21 +612,21 @@ body {
 @media (max-width: 600px) {
   .game-page-group {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
     width: 100%;
   }
   .game-page-group .tab-btn {
-    padding: 8px 4px;
-    font-size: 11px;
+    padding: 6px 2px;
+    font-size: 10px;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 8px;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     text-align: center;
   }
   .game-page-group .tab-btn span {
-    font-size: 10.5px;
+    font-size: 9.5px;
     line-height: 1.1;
   }
   .game-page-group .tab-badge {
@@ -735,24 +735,30 @@ body {
     display: flex;
     flex-direction: column;
     min-height: auto;
-    border-radius: 16px;
-    margin-bottom: 16px;
+    border-radius: 14px;
+    margin-bottom: 8px;
   }
   .game-stage {
     order: 1;
     width: 100%;
-    padding: 8px;
+    padding: 4px 6px 8px 6px;
+    min-height: auto;
   }
   .controls-panel {
     order: 2;
     border-right: none;
     border-top: 1px solid var(--border-color);
-    padding: 12px 10px;
-    gap: 8px;
+    border-bottom: none;
+    padding: 6px 10px;
+    gap: 4px;
     width: 100%;
   }
+  .multiplier-bar-container {
+    margin-bottom: 6px;
+    padding: 5px 8px;
+  }
   .bottom-section {
-    margin-top: 18px;
+    margin-top: 14px;
   }
 }
 
@@ -760,17 +766,17 @@ body {
 .controls-panel {
   background: linear-gradient(180deg, #151a24 0%, #10141c 100%);
   border-right: 1px solid var(--border-color);
-  padding: 16px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   justify-content: flex-start;
 }
 
 .control-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .control-header {
@@ -780,15 +786,15 @@ body {
 }
 
 .control-label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
   color: var(--text-secondary);
 }
 
 .control-helper {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--accent-cyan);
   font-weight: 600;
 }
@@ -797,24 +803,25 @@ body {
 .input-with-actions {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   transition: all 0.25s ease;
   overflow: hidden;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  height: 38px;
 }
 
 .input-with-actions:focus-within {
   border-color: var(--accent-green);
-  box-shadow: 0 0 15px var(--accent-green-glow), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 12px var(--accent-green-glow), inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .input-currency-prefix {
-  padding-left: 14px;
+  padding-left: 10px;
   color: var(--accent-green);
   font-weight: 800;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .bet-input-field {
@@ -822,28 +829,33 @@ body {
   border: none;
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
-  padding: 14px 10px;
+  padding: 6px 8px;
   width: 100%;
   outline: none;
+  height: 36px;
 }
 
 .bet-quick-actions {
   display: flex;
-  padding-right: 6px;
-  gap: 4px;
+  padding-right: 4px;
+  gap: 3px;
 }
 
 .btn-quick-bet {
   background: var(--bg-tertiary);
   border: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  padding: 6px 12px;
-  border-radius: var(--border-radius-sm);
+  padding: 3px 8px;
+  border-radius: 6px;
   cursor: pointer;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -945,22 +957,23 @@ body {
 
 .btn-stake-primary {
   width: 100%;
-  padding: 16px;
-  border-radius: var(--border-radius-md);
+  height: 44px;
+  padding: 0;
+  border-radius: 10px;
   border: none;
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -1263,6 +1276,7 @@ body {
 .game-arena:has(.dragontiger-view.active),
 .game-arena:has(.colortrading-view.active),
 .game-arena:has(.stock-view.active),
+.game-arena:has(.pump-view.active),
 .game-arena:has(.dice-view.active) {
   display: block !important;
   grid-template-columns: 1fr !important;
@@ -1272,6 +1286,7 @@ body {
 .game-arena:has(.dragontiger-view.active) .controls-panel,
 .game-arena:has(.colortrading-view.active) .controls-panel,
 .game-arena:has(.stock-view.active) .controls-panel,
+.game-arena:has(.pump-view.active) .controls-panel,
 .game-arena:has(.dice-view.active) .controls-panel {
   display: none !important;
 }
@@ -1629,20 +1644,24 @@ body {
 
 .deposit-quick-chips {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
 }
 
 .chip-btn {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 8px 10px;
-  border-radius: var(--border-radius-md);
+  padding: 4px 2px;
+  height: 30px;
+  border-radius: 6px;
   font-family: var(--font-sans);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 11.5px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
 }
 
@@ -2405,7 +2424,7 @@ body {
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
   border-radius: var(--border-radius-md);
-  padding: 8px 4px;
+  padding: 7px 4px;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 800;
@@ -2415,6 +2434,17 @@ body {
   align-items: center;
   gap: 2px;
   transition: all 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 2;
+}
+
+.btn-diff-mode * {
+  pointer-events: none;
 }
 
 .btn-diff-mode small {
@@ -2428,32 +2458,37 @@ body {
   transform: translateY(-1px);
 }
 
-.btn-diff-mode.active[data-diff="easy"] {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: #10b981;
-  color: #10b981;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+.btn-diff-mode.active,
+.btn-diff-mode.active[data-diff="easy"],
+.btn-diff-mode[data-diff="easy"].active {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35) !important;
 }
 
-.btn-diff-mode.active[data-diff="medium"] {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: #f59e0b;
-  color: #f59e0b;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+.btn-diff-mode.active[data-diff="medium"],
+.btn-diff-mode[data-diff="medium"].active {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: #f59e0b !important;
+  color: #f59e0b !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35) !important;
 }
 
-.btn-diff-mode.active[data-diff="hard"] {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: #ef4444;
-  color: #ef4444;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+.btn-diff-mode.active[data-diff="hard"],
+.btn-diff-mode[data-diff="hard"].active {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35) !important;
 }
 
-.btn-diff-mode.active[data-diff="daredevil"] {
-  background: rgba(255, 51, 102, 0.25);
-  border-color: #ff3366;
-  color: #ff3366;
-  box-shadow: 0 0 12px rgba(255, 51, 102, 0.4);
+.btn-diff-mode.active[data-diff="daredevil"],
+.btn-diff-mode[data-diff="daredevil"].active {
+  background: rgba(255, 51, 102, 0.25) !important;
+  border-color: #ff3366 !important;
+  color: #ff3366 !important;
+  box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
 }
 
 /* Dedicated Moles 1 to 5 Traps Selector */
@@ -3729,36 +3764,37 @@ body {
     display: flex;
   }
   .main-layout {
-    padding-bottom: 84px !important;
+    padding-bottom: 64px !important;
   }
   .bottom-corner-dock {
-    bottom: 74px !important; /* Float above the bottom dock */
+    bottom: 58px !important; /* Float above the bottom dock */
   }
   
   /* Classy Glassmorphic Game Arena on Phone */
   .game-arena {
-    border-radius: var(--border-radius-lg);
+    border-radius: 14px;
     background: linear-gradient(180deg, rgba(17, 25, 39, 0.85) 0%, rgba(12, 19, 34, 0.95) 100%);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
     overflow: hidden;
   }
   
   .controls-panel {
-    border-radius: var(--border-radius-md);
+    border-radius: 10px;
     background: rgba(14, 21, 35, 0.75);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 14px 12px;
+    padding: 8px 10px;
+    gap: 6px;
   }
   
   /* Vibrant Big Action Bet & Cashout Buttons for Thumbs */
-  .btn-action-primary, .btn-action-cashout {
-    height: 52px !important;
-    font-size: 16px !important;
+  .btn-action-primary, .btn-action-cashout, .btn-stake-primary, .btn-bet, .btn-cashout {
+    height: 44px !important;
+    font-size: 15px !important;
     letter-spacing: 0.5px;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 20px rgba(0, 245, 155, 0.35) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 16px rgba(0, 245, 155, 0.35) !important;
   }
 
   /* Smooth Zero-Overlap Mobile Tabs */
