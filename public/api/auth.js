@@ -1,5 +1,5 @@
 // /api/auth.js - Secure Authentication, Session Management, and Server-Side OTP Dispatch
-import crypto from 'crypto';
+const crypto = require('crypto');
 
 // In-memory registered users & sessions
 const registeredUsers = new Map();
@@ -10,7 +10,7 @@ function hashPassword(pwd) {
   return crypto.createHash('sha256').update(pwd + 'VP_SALT_9981').digest('hex');
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');

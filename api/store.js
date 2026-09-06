@@ -215,7 +215,13 @@ function isNotificationSent(notifKey) {
   return current && current.status === 'SENT';
 }
 
-module.exports = {
+function handler(req, res) {
+  if (res && typeof res.status === 'function') {
+    return res.status(200).json({ ok: true, service: 'store' });
+  }
+}
+
+module.exports = Object.assign(handler, {
   loadStore,
   saveStore,
   getWallet,
@@ -232,4 +238,4 @@ module.exports = {
   claimNotificationLock,
   markNotificationSent,
   isNotificationSent
-};
+});

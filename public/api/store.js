@@ -39,6 +39,27 @@ function saveStore() {
   } catch (e) {}
 }
 
+function setWalletBalance(userId, balance) {
+  const store = loadStore();
+  const uid = String(userId || 'user_default').trim();
+  const bal = Math.max(0, Math.round(parseFloat(balance || 0) * 100) / 100);
+  if (!store.wallets[uid]) {
+    store.wallets[uid] = {
+      userId: uid,
+      balance: bal,
+      totalDeposited: 0.00,
+      totalWithdrawn: 0.00,
+      currency: '₹',
+      updatedAt: Date.now()
+    };
+  } else {
+    store.wallets[uid].balance = bal;
+    store.wallets[uid].updatedAt = Date.now();
+  }
+  saveStore();
+  return store.wallets[uid];
+}
+
 function getWallet(userId) {
   const store = loadStore();
   const uid = String(userId || 'user_default').trim();
@@ -194,10 +215,17 @@ function isNotificationSent(notifKey) {
   return current && current.status === 'SENT';
 }
 
-module.exports = {
+function handler(req, res) {
+  if (res && typeof res.status === 'function') {
+    return res.status(200).json({ ok: true, service: 'store' });
+  }
+}
+
+module.exports = Object.assign(handler, {
   loadStore,
   saveStore,
   getWallet,
+  setWalletBalance,
   updateWalletBalance,
   getDeposit,
   saveDeposit,
@@ -210,4 +238,4 @@ module.exports = {
   claimNotificationLock,
   markNotificationSent,
   isNotificationSent
-};
+});
