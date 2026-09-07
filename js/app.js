@@ -7665,46 +7665,48 @@ class AppController {
     const isSuccess = type === 'success';
     const isWarn = type === 'warning' || type === 'warn';
 
-    let bg = 'linear-gradient(135deg, #0088cc, #00b4d8)';
-    let color = '#ffffff';
-    let border = '2px solid rgba(0, 180, 216, 0.8)';
-    let shadow = '0 16px 45px rgba(0, 180, 216, 0.45), 0 0 25px rgba(0, 0, 0, 0.8)';
+    let bg = 'rgba(10, 22, 38, 0.65)';
+    let color = '#38bdf8';
+    let border = '1px solid rgba(56, 189, 248, 0.4)';
+    let shadow = '0 16px 45px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2)';
     let icon = 'ℹ️';
 
     if (isError) {
-      bg = 'linear-gradient(135deg, #1e090f, #2d0b14)';
+      bg = 'rgba(30, 10, 18, 0.68)';
       color = '#ff4d6d';
-      border = '2px solid #fe2c55';
-      shadow = '0 18px 50px rgba(254, 44, 85, 0.5), 0 0 30px rgba(0, 0, 0, 0.9)';
+      border = '1px solid rgba(254, 44, 85, 0.55)';
+      shadow = '0 16px 45px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 20px rgba(254, 44, 85, 0.25)';
       icon = '❌';
     } else if (isSuccess) {
-      bg = 'linear-gradient(135deg, #062b16, #093b1e)';
+      bg = 'rgba(8, 28, 18, 0.68)';
       color = '#00f59b';
-      border = '2px solid #00e701';
-      shadow = '0 20px 55px rgba(0, 231, 1, 0.55), 0 0 35px rgba(0, 0, 0, 0.95)';
+      border = '1px solid rgba(0, 231, 1, 0.55)';
+      shadow = '0 16px 45px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 0 20px rgba(0, 231, 1, 0.25)';
       icon = '🎉';
     } else if (isWarn) {
-      bg = 'linear-gradient(135deg, #2b1d07, #3b280a)';
+      bg = 'rgba(28, 20, 8, 0.68)';
       color = '#fbbf24';
-      border = '2px solid #f59e0b';
-      shadow = '0 18px 50px rgba(245, 158, 11, 0.5), 0 0 30px rgba(0, 0, 0, 0.9)';
+      border = '1px solid rgba(245, 158, 11, 0.55)';
+      shadow = '0 16px 45px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 20px rgba(245, 158, 11, 0.25)';
       icon = '⚠️';
     }
 
     toast.style.cssText = `
       position: fixed;
-      top: 28px;
+      top: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(-35px) scale(0.95);
-      background: ${bg};
+      background: ${bg} !important;
+      backdrop-filter: blur(16px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
       color: ${color};
       border: ${border};
-      padding: 16px 28px;
+      padding: 13px 22px;
       border-radius: 16px;
       font-family: var(--font-display, sans-serif);
-      font-weight: 900;
-      font-size: 16px;
-      line-height: 1.45;
+      font-weight: 800;
+      font-size: 14.5px;
+      line-height: 1.4;
       text-align: center;
       max-width: 92vw;
       width: max-content;
@@ -7714,10 +7716,10 @@ class AppController {
       transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       letter-spacing: 0.3px;
     `;
-    toast.innerHTML = `<span style="font-size: 22px; flex-shrink:0;">${icon}</span> <span>${msg}</span>`;
+    toast.innerHTML = `<span style="font-size: 20px; flex-shrink:0;">${icon}</span> <span>${msg}</span>`;
     document.body.appendChild(toast);
 
     setTimeout(() => {
