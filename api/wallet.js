@@ -149,12 +149,18 @@ module.exports = async function handler(req, res) {
     const history = getUserHistory(userId);
     history.unshift(depRecord);
 
-    // Secure server-side telegram alert if configured in env (non-blocking async)
-    dispatchServerTelegramAlert(depRecord, 'DEPOSIT').catch(() => {});
+    // Secure server-side telegram alert (AWAITED to guarantee delivery before Serverless function terminates)
+    let tgResult = null;
+    try {
+      tgResult = await dispatchServerTelegramAlert(depRecord, 'DEPOSIT');
+    } catch (e) {
+      console.error("Telegram alert error:", e);
+    }
 
     return res.status(200).json({
       success: true,
-      deposit: depRecord
+      deposit: depRecord,
+      telegramAlertSent: !!(tgResult && tgResult.success)
     });
   }
 
