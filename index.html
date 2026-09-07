@@ -213,6 +213,9 @@
     window.submitDepositUtr = function() {
       if (window.app && window.app.submitDepositUtr) return window.app.submitDepositUtr();
     };
+    window.openDirectUpiApp = function(app) {
+      if (window.app && window.app.openDirectUpiApp) return window.app.openDirectUpiApp(app);
+    };
     window.submitWithdrawRequest = function() {
       if (window.app && window.app.submitWithdrawRequest) return window.app.submitWithdrawRequest();
     };
