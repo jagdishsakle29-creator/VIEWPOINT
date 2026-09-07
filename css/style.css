@@ -1459,16 +1459,16 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
   display: none !important;
   align-items: center;
   justify-content: center;
   z-index: 1000000;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.2s ease;
   padding: 20px;
 }
 
@@ -1479,15 +1479,15 @@ body {
 }
 
 .modal-card {
-  background: rgba(15, 28, 44, 0.72) !important;
-  backdrop-filter: blur(24px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: rgba(12, 21, 36, 0.52) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
   border-radius: var(--border-radius-xl);
   max-width: 500px;
   width: 100%;
   padding: 24px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -1496,13 +1496,13 @@ body {
   scrollbar-width: thin;
 }
 
+/* Modal Inner Sub-Boxes & Glass Cards */
 .deposit-nav-tabs,
-.auth-tabs,
 .admin-nav-tabs {
-  background: rgba(10, 20, 32, 0.55) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 .deposit-box,
@@ -1512,17 +1512,17 @@ body {
 .seed-box,
 .deposit-amount-card,
 .modal-body .info-card {
-  background: rgba(10, 20, 32, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  background: rgba(6, 14, 24, 0.40) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 .modal-card input,
 .modal-card select,
 .modal-card textarea {
-  background: rgba(8, 16, 26, 0.6) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(6, 14, 24, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
   color: #ffffff !important;
@@ -1532,7 +1532,157 @@ body {
 .modal-card select:focus,
 .modal-card textarea:focus {
   border-color: #00e701 !important;
-  box-shadow: 0 0 14px rgba(0, 231, 1, 0.3) !important;
+  box-shadow: 0 0 14px rgba(0, 231, 1, 0.35) !important;
+}
+
+/* ================= AUTH MODAL (LOGIN & SIGN UP POPUP) ================= */
+.modal-auth-card {
+  max-width: 420px !important;
+  width: 95% !important;
+  background: rgba(12, 21, 36, 0.52) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 20px !important;
+  padding: 22px 20px !important;
+}
+
+.auth-tabs {
+  display: flex !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+  gap: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  margin: 4px 0 10px !important;
+}
+
+.auth-tab-btn {
+  flex: 1 !important;
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  color: #94a3b8 !important;
+  font-family: var(--font-display) !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.auth-tab-btn:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.auth-tab-btn.active {
+  background: linear-gradient(135deg, #00e701 0%, #00b0ff 100%) !important;
+  color: #0b1523 !important;
+  font-weight: 900 !important;
+  box-shadow: 0 4px 14px rgba(0, 231, 1, 0.35) !important;
+}
+
+.auth-form-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.auth-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+}
+
+.auth-field .control-label {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #cbd5e1 !important;
+  letter-spacing: 0.3px !important;
+}
+
+.phone-prefix {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(6, 14, 24, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: var(--border-radius-md) !important;
+  padding: 0 12px !important;
+  color: #00e701 !important;
+  font-family: monospace !important;
+  font-weight: 800 !important;
+  font-size: 13.5px !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  min-width: 48px !important;
+}
+
+.auth-gate-divider {
+  display: flex !important;
+  align-items: center !important;
+  color: #64748b !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.8px !important;
+  margin: 12px 0 10px !important;
+}
+
+.auth-gate-divider::before,
+.auth-gate-divider::after {
+  content: '' !important;
+  flex: 1 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.auth-gate-divider span {
+  padding: 0 10px !important;
+}
+
+.social-login-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+}
+
+.btn-social-auth {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  height: 42px !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: var(--border-radius-md) !important;
+  color: #ffffff !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-social-auth:hover {
+  background: rgba(255, 255, 255, 0.13) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-social-google:hover {
+  border-color: rgba(66, 133, 244, 0.6) !important;
+  box-shadow: 0 4px 14px rgba(66, 133, 244, 0.3) !important;
+}
+
+.btn-social-facebook:hover {
+  border-color: rgba(24, 119, 242, 0.6) !important;
+  box-shadow: 0 4px 14px rgba(24, 119, 242, 0.3) !important;
 }
 
 .modal-title-row {
