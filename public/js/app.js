@@ -2052,36 +2052,88 @@ class AppController {
     if (this.dom.displayUpiId) this.dom.displayUpiId.innerText = upiId;
 
     if (this.dom.linkGPay) {
-      this.dom.linkGPay.href = gpayUrl;
-      this.dom.linkGPay.onclick = (e) => this.handleUpiAppClick(e, gpayUrl, standardUpiUrl, 'Google Pay');
+      this.dom.linkGPay.onclick = (e) => this.openDirectUpiApp('gpay', e);
     }
     if (this.dom.linkPhonePe) {
-      this.dom.linkPhonePe.href = phonepeUrl;
-      this.dom.linkPhonePe.onclick = (e) => this.handleUpiAppClick(e, phonepeUrl, standardUpiUrl, 'PhonePe');
+      this.dom.linkPhonePe.onclick = (e) => this.openDirectUpiApp('phonepe', e);
     }
     if (this.dom.linkPaytm) {
-      this.dom.linkPaytm.href = paytmUrl;
-      this.dom.linkPaytm.onclick = (e) => this.handleUpiAppClick(e, paytmUrl, standardUpiUrl, 'Paytm');
+      this.dom.linkPaytm.onclick = (e) => this.openDirectUpiApp('paytm', e);
     }
     if (this.dom.linkAnyUpi) {
-      this.dom.linkAnyUpi.href = standardUpiUrl;
-      this.dom.linkAnyUpi.onclick = (e) => this.handleUpiAppClick(e, standardUpiUrl, standardUpiUrl, 'UPI');
+      this.dom.linkAnyUpi.onclick = (e) => this.openDirectUpiApp('upi', e);
+    }
+  }
+
+  openDirectUpiApp(appName, e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+
+    const amountInput = document.getElementById('depositAmountInput');
+    const amount = (amountInput ? parseFloat(amountInput.value) : 199) || 199;
+    const upiId = (window.wallet && window.wallet.upiSettings && window.wallet.upiSettings.upiId) || 'adrenox1@axl';
+    const payeeName = (window.wallet && window.wallet.upiSettings && window.wallet.upiSettings.payeeName) || 'VIEWPOINT Official';
+
+    const pa = encodeURIComponent(upiId);
+    const pn = encodeURIComponent(payeeName);
+    const am = amount.toFixed(2);
+    const cu = 'INR';
+    const tn = encodeURIComponent('VIEWPOINTDeposit');
+
+    // Auto-copy UPI ID to clipboard
+    this.copyUpiId();
+
+    const ua = navigator.userAgent || '';
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+    const isMobile = isAndroid || isIOS;
+
+    const readableName = appName === 'phonepe' ? 'PhonePe' : appName === 'gpay' ? 'Google Pay' : appName === 'paytm' ? 'Paytm' : 'UPI App';
+
+    if (!isMobile) {
+      this.showNotification(`📋 UPI ID (${upiId}) copied! Please open ${readableName} on your phone or scan the QR code to complete payment of ₹${amount}.`, "info");
+      return;
+    }
+
+    let targetUrl = '';
+    const genericUpi = `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
+
+    if (appName === 'phonepe') {
+      if (isAndroid) {
+        targetUrl = `intent://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}#Intent;scheme=phonepe;package=com.phonepe.app;end`;
+      } else {
+        targetUrl = `phonepe://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
+      }
+    } else if (appName === 'gpay') {
+      if (isAndroid) {
+        targetUrl = `intent://upi/pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}#Intent;scheme=tez;package=com.google.android.apps.nbu.paisa.user;end`;
+      } else {
+        targetUrl = `tez://upi/pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
+      }
+    } else if (appName === 'paytm') {
+      if (isAndroid) {
+        targetUrl = `intent://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}#Intent;scheme=paytmmp;package=net.one97.paytm;end`;
+      } else {
+        targetUrl = `paytmmp://pay?pa=${pa}&pn=${pn}&am=${am}&cu=${cu}&tn=${tn}`;
+      }
+    } else {
+      targetUrl = genericUpi;
+    }
+
+    this.showNotification(`🚀 Opening ${readableName} for ₹${amount}...`, "success");
+
+    // Launch the specific app directly
+    try {
+      window.location.href = targetUrl;
+    } catch (err) {
+      window.location.href = genericUpi;
     }
   }
 
   handleUpiAppClick(e, primaryUrl, fallbackUrl, appName) {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (!isMobile) {
-      e.preventDefault();
-      this.copyUpiId();
-      this.showNotification(`📋 UPI ID copied! Open ${appName} on your phone to transfer.`, "info");
-      return;
-    }
-    e.preventDefault();
-    window.location.href = primaryUrl;
-    setTimeout(() => {
-      window.location.href = fallbackUrl;
-    }, 1000);
+    if (e && e.preventDefault) e.preventDefault();
+    const appKey = appName.toLowerCase().includes('phone') ? 'phonepe' : appName.toLowerCase().includes('paytm') ? 'paytm' : appName.toLowerCase().includes('google') || appName.toLowerCase().includes('gpay') ? 'gpay' : 'upi';
+    return this.openDirectUpiApp(appKey, e);
   }
 
   copyUpiId() {
