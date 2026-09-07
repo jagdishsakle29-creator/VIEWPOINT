@@ -1453,20 +1453,20 @@ body {
   color: var(--text-muted);
 }
 
-/* ================= MODALS ================= */
+/* ================= MODALS (Transparent Glassmorphic Design) ================= */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: none !important;
   align-items: center;
   justify-content: center;
   z-index: 1000000;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s ease;
   padding: 20px;
 }
 
@@ -1477,19 +1477,60 @@ body {
 }
 
 .modal-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: rgba(15, 28, 44, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
   border-radius: var(--border-radius-xl);
   max-width: 500px;
   width: 100%;
   padding: 24px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
   display: flex;
   flex-direction: column;
   gap: 16px;
   max-height: 90vh;
   overflow-y: auto;
   scrollbar-width: thin;
+}
+
+.deposit-nav-tabs,
+.auth-tabs,
+.admin-nav-tabs {
+  background: rgba(10, 20, 32, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.deposit-box,
+.deposit-instructions-box,
+.qr-preview-box,
+.bank-details-grid,
+.seed-box,
+.deposit-amount-card,
+.modal-body .info-card {
+  background: rgba(10, 20, 32, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.modal-card input,
+.modal-card select,
+.modal-card textarea {
+  background: rgba(8, 16, 26, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  color: #ffffff !important;
+}
+
+.modal-card input:focus,
+.modal-card select:focus,
+.modal-card textarea:focus {
+  border-color: #00e701 !important;
+  box-shadow: 0 0 14px rgba(0, 231, 1, 0.3) !important;
 }
 
 .modal-title-row {
