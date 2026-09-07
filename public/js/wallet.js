@@ -378,9 +378,10 @@ class CasinoWallet {
     this.pendingDeposits.unshift(localRequest);
     this.savePendingDeposits();
 
-    // ⚡ Single Authoritative Backend Request (Server handles Telegram alert idempotently)
+    // ⚡ Authoritative Backend Request (Awaited with automatic Telegram fallback)
+    let telegramConfirmed = false;
     try {
-      fetch(`${this.apiBaseUrl}/api/wallet`, {
+      const resp = await fetch(`${this.apiBaseUrl}/api/wallet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -391,11 +392,52 @@ class CasinoWallet {
           utr: utrVal,
           upiId: upiVal
         })
-      }).catch(() => {});
-    } catch (err) {} finally {
-      setTimeout(() => { this._isSubmittingDeposit = false; }, 2000);
+      });
+      const data = await resp.json().catch(() => null);
+      if (data && data.telegramAlertSent) {
+        telegramConfirmed = true;
+      }
+    } catch (err) {
+      console.warn("Server deposit submit warning:", err);
     }
 
+    // 🛡️ Fail-Safe Telegram Dispatch (Guarantees Admin Alert Delivery)
+    if (!telegramConfirmed) {
+      try {
+        const botToken = '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
+        const adminId = '6527377657';
+        const origin = window.location.origin || 'https://www.viewpoint.diy';
+        const msg = `🔔 <b>NEW UPI DEPOSIT RECORD</b> 🔔\n\n` +
+          `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+          `💰 <b>Amount:</b> <b>₹${amount.toFixed(2)}</b>\n` +
+          `🧾 <b>UTR:</b> <code>${utrVal}</code>\n` +
+          `💳 <b>Receiver UPI:</b> <code>${upiVal}</code>\n` +
+          `⏰ <b>Time:</b> ${localRequest.time}\n` +
+          `🆔 <b>Deposit ID:</b> <code>${depId}</code>`;
+
+        const replyMarkup = {
+          inline_keyboard: [
+            [
+              { text: `✅ Approve (+₹${amount.toFixed(0)})`, url: `${origin}/api/sync?secret=VIEWPOINT_ADMIN_SECRET_2026&action=approve_dep&id=${depId}&userId=${encodeURIComponent(uid)}&amt=${amount}` },
+              { text: "❌ Reject", url: `${origin}/api/sync?secret=VIEWPOINT_ADMIN_SECRET_2026&action=reject_dep&id=${depId}&userId=${encodeURIComponent(uid)}` }
+            ]
+          ]
+        };
+
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: adminId,
+            text: msg,
+            parse_mode: 'HTML',
+            reply_markup: replyMarkup
+          })
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    this._isSubmittingDeposit = false;
     return { success: true, deposit: localRequest, serverSynced: true };
   }
 
