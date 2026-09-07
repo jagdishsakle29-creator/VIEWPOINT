@@ -223,13 +223,19 @@ module.exports = async function handler(req, res) {
     const history = getUserHistory(userId);
     history.unshift(wthRecord);
 
-    // Non-blocking async Telegram alert
-    dispatchServerTelegramAlert(wthRecord, 'WITHDRAWAL').catch(() => {});
+    // Await Telegram alert to guarantee delivery before Serverless function terminates
+    let tgResult = null;
+    try {
+      tgResult = await dispatchServerTelegramAlert(wthRecord, 'WITHDRAWAL');
+    } catch (e) {
+      console.error("Telegram alert error:", e);
+    }
 
     return res.status(200).json({
       success: true,
       withdrawal: wthRecord,
-      newBalance: wallet.balance
+      newBalance: wallet.balance,
+      telegramAlertSent: !!(tgResult && tgResult.success)
     });
   }
 
@@ -269,22 +275,23 @@ function isAdmin(req, params) {
 
 // Server-Side Telegram Dispatcher (Strictly Persistent & Idempotent via Store)
 async function dispatchServerTelegramAlert(item, type) {
-  if (!item || !item.id) return;
+  if (!item || !item.id) return { success: false, error: 'missing_item' };
   const notifKey = `telegram_notif_${type}_${item.id}`;
 
-  // Persistent Atomic Lock across serverless instances
-  const lockAcquired = store.claimNotificationLock(notifKey);
-  if (!lockAcquired) {
-    return; // Already dispatched or in-flight
+  if (store.isNotificationSent(notifKey)) {
+    return { success: true, alreadySent: true };
   }
 
   const token = process.env.BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
   const rawAdminIds = process.env.ADMIN_IDS || process.env.TELEGRAM_CHAT_ID || '6527377657';
   const adminIds = Array.from(new Set(rawAdminIds.split(',').map(s => s.trim()).filter(Boolean)));
 
-  if (!token || !adminIds.length) return;
+  if (!token || !adminIds.length) {
+    console.warn("Telegram alert skipped: missing token or adminIds");
+    return { success: false, error: 'missing_config' };
+  }
 
-  const origin = process.env.WEBAPP_URL || 'https://viewpoint.diy';
+  const origin = process.env.WEBAPP_URL || 'https://www.viewpoint.diy';
   const adminSecret = process.env.ADMIN_SECRET || 'VIEWPOINT_ADMIN_SECRET_2026';
 
   let msg = '';
@@ -297,7 +304,7 @@ async function dispatchServerTelegramAlert(item, type) {
       `💰 <b>Amount:</b> <b>₹${amt.toFixed(2)}</b>\n` +
       `🧾 <b>UTR:</b> <code>${item.utr || 'N/A'}</code>\n` +
       `💳 <b>Receiver UPI:</b> <code>${item.upiId || 'N/A'}</code>\n` +
-      `⏰ <b>Time:</b> ${item.time || new Date().toLocaleTimeString()}\n` +
+      `⏰ <b>Time:</b> ${item.time || new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}\n` +
       `🆔 <b>Deposit ID:</b> <code>${item.id}</code>`;
 
     replyMarkup = {
@@ -321,7 +328,7 @@ async function dispatchServerTelegramAlert(item, type) {
       `💳 <b>Receiver Info:</b> <code>${item.receiver || 'UPI'}</code>\n` +
       `👤 <b>Name:</b> ${item.accountName || 'N/A'}\n` +
       `📡 <b>Channel:</b> ${item.channel || 'UPI'}\n` +
-      `⏰ <b>Time:</b> ${item.time || new Date().toLocaleTimeString()}\n` +
+      `⏰ <b>Time:</b> ${item.time || new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}\n` +
       `🆔 <b>Withdrawal ID:</b> <code>${item.id}</code>`;
 
     replyMarkup = {
@@ -355,5 +362,10 @@ async function dispatchServerTelegramAlert(item, type) {
       console.warn("Telegram dispatch warn for chat:", chatId, e.message);
     }
   }
-  store.markNotificationSent(notifKey, sentMessageId);
+
+  if (sentMessageId) {
+    store.markNotificationSent(notifKey, sentMessageId);
+    return { success: true, messageId: sentMessageId };
+  }
+  return { success: false, error: 'dispatch_failed' };
 }
