@@ -72,14 +72,16 @@
 }
 
 .modal-dt-rules-card {
-  background: linear-gradient(145deg, #131c2c 0%, #0c1420 100%);
-  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  background: rgba(15, 28, 44, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1.5px solid rgba(212, 175, 55, 0.4) !important;
   border-radius: 20px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 20px rgba(212, 175, 55, 0.2) !important;
 }
 
 .dt-rule-card {
-  background: rgba(10, 16, 26, 0.85);
+  background: rgba(10, 16, 26, 0.5) !important;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 12px 14px;
