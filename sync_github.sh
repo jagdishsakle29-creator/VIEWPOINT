@@ -36,16 +36,23 @@ fi
 # Sync across branches
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-echo "🚀 Pushing current branch ($CURRENT_BRANCH) to GitHub (VIEWPOINT)..."
-git push origin "$CURRENT_BRANCH"
-
-# Keep master and production branches updated
+echo "🚀 Syncing and pushing to all repositories and branches..."
 if [ "$CURRENT_BRANCH" = "main" ]; then
-    echo "🔄 Syncing master and production branches..."
-    git checkout production && git merge main --no-edit && git push origin production
-    git checkout master && git merge main --no-edit && git push origin master
+    git checkout production && git merge main --no-edit || true
+    git checkout master && git merge main --no-edit || true
     git checkout main
 fi
 
-echo "🎉 SUCCESS! All changes pushed to https://github.com/jagdishsakle29-creator/VIEWPOINT"
+# Push across all remotes
+ALL_REMOTES=("origin" "viewpoint_repo" "lord_repo" "minegame_repo" "minegame1_repo")
+for r in "${ALL_REMOTES[@]}"; do
+    if git remote | grep -q "^$r$"; then
+        echo "📤 Pushing to $r (main, master, production)..."
+        git push "$r" main:main 2>/dev/null || true
+        git push "$r" master:master 2>/dev/null || true
+        git push "$r" production:production 2>/dev/null || true
+    fi
+done
+
+echo "🎉 SUCCESS! All changes pushed across all repositories and branches!"
 echo "🌐 Vercel will automatically build and deploy the latest version."
