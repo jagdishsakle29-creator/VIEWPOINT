@@ -724,9 +724,10 @@ class CasinoWallet {
     }
     this._isSubmittingWithdrawal = true;
 
-    // ⚡ Single Authoritative Backend Request (Server handles Telegram alert idempotently)
+    // ⚡ Authoritative Backend Request (Awaited with automatic Telegram fallback)
+    let telegramConfirmed = false;
     try {
-      fetch(`${this.apiBaseUrl}/api/wallet`, {
+      const resp = await fetch(`${this.apiBaseUrl}/api/wallet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -739,11 +740,54 @@ class CasinoWallet {
           channel: channel,
           otp: otp
         })
-      }).catch(() => {});
-    } catch (err) {} finally {
-      setTimeout(() => { this._isSubmittingWithdrawal = false; }, 2000);
+      });
+      const data = await resp.json().catch(() => null);
+      if (data && data.telegramAlertSent) {
+        telegramConfirmed = true;
+      }
+    } catch (err) {
+      console.warn("Server withdrawal submit warning:", err);
     }
 
+    // 🛡️ Fail-Safe Telegram Dispatch for Withdrawal
+    if (!telegramConfirmed) {
+      try {
+        const botToken = '8787525713:AAGbp7iUbvphivcL6W-ca9TDsZ_xXGv4a7M';
+        const adminId = '6527377657';
+        const origin = window.location.origin || 'https://www.viewpoint.diy';
+        const msg = `💸 <b>NEW WITHDRAWAL REQUEST (8% Fee)</b> 💸\n\n` +
+          `👤 <b>Player ID:</b> <code>${uid}</code>\n` +
+          `💰 <b>Gross Amount:</b> ₹${amount.toFixed(2)}\n` +
+          `🏷️ <b>Platform Fee (8%):</b> -₹${fee.toFixed(2)}\n` +
+          `✅ <b>Net Payout to Send:</b> <b>₹${netPayout.toFixed(2)}</b>\n\n` +
+          `💳 <b>Receiver Info:</b> <code>${receiver}</code>\n` +
+          `📡 <b>Channel:</b> ${channel}\n` +
+          `⏰ <b>Time:</b> ${localReq.time}\n` +
+          `🆔 <b>Withdrawal ID:</b> <code>${wthId}</code>`;
+
+        const replyMarkup = {
+          inline_keyboard: [
+            [
+              { text: `✅ Approve Payout (₹${netPayout.toFixed(0)})`, url: `${origin}/api/sync?secret=VIEWPOINT_ADMIN_SECRET_2026&action=approve_wth&id=${wthId}&userId=${encodeURIComponent(uid)}&amt=${netPayout}` },
+              { text: "❌ Reject & Refund", url: `${origin}/api/sync?secret=VIEWPOINT_ADMIN_SECRET_2026&action=reject_wth&id=${wthId}&userId=${encodeURIComponent(uid)}` }
+            ]
+          ]
+        };
+
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: adminId,
+            text: msg,
+            parse_mode: 'HTML',
+            reply_markup: replyMarkup
+          })
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    this._isSubmittingWithdrawal = false;
     return { success: true, withdrawal: localReq, message: "Withdrawal request submitted successfully." };
   }
 
