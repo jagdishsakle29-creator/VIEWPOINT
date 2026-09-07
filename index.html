@@ -2661,18 +2661,22 @@
 
             <!-- UPI App Fast Links for Mobile -->
             <div class="upi-apps-row">
-              <a id="linkGPay" href="#" class="upi-app-btn gpay" target="_blank">
-                <span>GPay</span>
-              </a>
-              <a id="linkPhonePe" href="#" class="upi-app-btn phonepe" target="_blank">
+              <button type="button" id="linkPhonePe" class="upi-app-btn phonepe" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('phonepe') : (window.app && window.app.openDirectUpiApp('phonepe'))">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 2H4.5C3.12 2 2 3.12 2 4.5v15C2 20.88 3.12 22 4.5 22h15c1.38 0 2.5-1.12 2.5-2.5v-15C22 3.12 20.88 2 19.5 2zm-5.2 13.7c-.5.4-1.2.6-2 .6h-1.6v2.4H9.2V5.3h3.1c1.5 0 2.7.4 3.5 1.2.8.8 1.2 1.9 1.2 3.3 0 1.6-.6 2.8-1.7 3.6zm-1.8-4.2c.4-.3.6-.8.6-1.5 0-.6-.2-1.1-.6-1.4-.4-.3-1-.5-1.8-.5h-1.2v3.8h1.2c.8 0 1.4-.1 1.8-.4z"/></svg>
                 <span>PhonePe</span>
-              </a>
-              <a id="linkPaytm" href="#" class="upi-app-btn paytm" target="_blank">
+              </button>
+              <button type="button" id="linkGPay" class="upi-app-btn gpay" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('gpay') : (window.app && window.app.openDirectUpiApp('gpay'))">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.7 12.3c0-.8-.1-1.5-.2-2.2H12v4.5h6.6c-.3 1.5-1.1 2.8-2.4 3.7v3.1h3.9c2.3-2.1 3.6-5.2 3.6-9.1z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3.1c-1.1.7-2.5 1.2-4 1.2-3.1 0-5.8-2.1-6.7-4.9H1.3v3.1C3.3 21.4 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.3c-.2-.7-.4-1.5-.4-2.3s.1-1.6.4-2.3V6.6H1.3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.4l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.3 0 3.3 2.6 1.3 6.6l4 3.1c1-2.8 3.6-4.9 6.7-4.9z"/></svg>
+                <span>GPay</span>
+              </button>
+              <button type="button" id="linkPaytm" class="upi-app-btn paytm" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('paytm') : (window.app && window.app.openDirectUpiApp('paytm'))">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="#002970"/><path fill="#00b9f1" d="M7 8h4v8H7zm6 0h4v8h-4z"/></svg>
                 <span>Paytm</span>
-              </a>
-              <a id="linkAnyUpi" href="#" class="upi-app-btn other-upi" target="_blank">
+              </button>
+              <button type="button" id="linkAnyUpi" class="upi-app-btn other-upi" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('upi') : (window.app && window.app.openDirectUpiApp('upi'))">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 <span>Other UPI</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
