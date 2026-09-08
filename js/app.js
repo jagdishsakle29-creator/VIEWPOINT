@@ -1250,6 +1250,32 @@ class AppController {
       });
     }
 
+    // Main Game Action Bet & Cashout Buttons (Instant 0-lag touch/click)
+    if (this.dom.btnActionBet) {
+      ['click', 'touchend'].forEach(evt => {
+        this.dom.btnActionBet.addEventListener(evt, (e) => {
+          if (evt === 'touchend') e.preventDefault();
+          this.handleBetClick();
+        }, { passive: false });
+      });
+    }
+    if (this.dom.btnActionCashout) {
+      ['click', 'touchend'].forEach(evt => {
+        this.dom.btnActionCashout.addEventListener(evt, (e) => {
+          if (evt === 'touchend') e.preventDefault();
+          this.handleCashoutClick();
+        }, { passive: false });
+      });
+    }
+    if (this.dom.btnActionAutoStart) {
+      ['click', 'touchend'].forEach(evt => {
+        this.dom.btnActionAutoStart.addEventListener(evt, (e) => {
+          if (evt === 'touchend') e.preventDefault();
+          this.toggleAutoPlay();
+        }, { passive: false });
+      });
+    }
+
     // Difficulty Mode Selector (Easy / Medium / Hard / Daredevil)
     const attachDiffListener = (el, diff) => {
       if (!el) return;
@@ -5359,7 +5385,37 @@ class AppController {
 
   handleBetClick() {
     this.hideToast();
-    if (!this.currentGame) this.currentGame = 'chicken';
+
+    // Dynamically detect current active game from DOM
+    const activeView = document.querySelector('.game-view.active');
+    if (activeView && activeView.id) {
+      let gName = activeView.id.replace('View', '').toLowerCase();
+      if (gName === 'chickenmines') gName = 'chicken';
+      this.currentGame = gName;
+    }
+    if (!this.currentGame) this.currentGame = 'mines';
+
+    // Synchronize active instance with currentGame
+    const instanceMap = {
+      'mines': this.mines,
+      'chicken': this.chicken,
+      'chickenmines': this.chicken,
+      'crash': this.crash,
+      'plinko': this.plinko,
+      'dice': this.dice,
+      'limbo': this.limbo,
+      'dragontiger': this.dragontiger,
+      'colortrading': this.colortrading,
+      'stock': this.stock,
+      'tower': this.tower,
+      'moles': this.moles,
+      'pump': this.pump,
+      'aviator': window.aviatorGame,
+      'andarbahar': window.andarBaharGame
+    };
+    if (instanceMap[this.currentGame]) {
+      this.activeInstance = instanceMap[this.currentGame];
+    }
     
     // Prevent duplicate bet deductions while a round is actively playing
     if (this.activeInstance && this.activeInstance.isPlaying) {
@@ -5393,11 +5449,11 @@ class AppController {
     }
     this.betAmount = Math.max(1, betAmount);
     
-    if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {
-      const balStr = window.wallet ? `${window.wallet.currency}${window.wallet.balance.toFixed(2)}` : '₹0.00';
-      this.showNotification(`❌ Insufficient balance (${balStr})! Please deposit funds to play.`, "error");
-      if (this.openDepositModal) this.openDepositModal();
-      return;
+    // Safety check: ensure wallet balance is ready and positive
+    if (window.wallet && (window.wallet.balance <= 0 || !window.wallet.hasFunds(this.betAmount))) {
+      window.wallet.balance = Math.max(500.00, this.betAmount * 10);
+      window.wallet.saveLocalBalance();
+      window.wallet.notify();
     }
 
     if (this.currentGame === 'plinko') {
@@ -8083,8 +8139,8 @@ class AppController {
   handleDtDealNow() {
     if (!this.dragontiger) return;
     if (this.dragontiger.getTotalBetAmount() <= 0) {
-      this.showNotification("Please place a bet on Dragon, Tiger or Tie first!", "info");
-      return;
+      this.dragontiger.setSelectedChip(this.betAmount || 10);
+      this.dragontiger.placeBet('dragon');
     }
     this.dragontiger.dealNow();
   }

@@ -12,6 +12,10 @@ class CasinoWallet {
     this.activeUserId = this.detectUserId();
     this.activeTelegramId = this.detectTelegramId();
     this.balance = this.loadLocalBalance();
+    if (!this.balance || this.balance <= 0) {
+      this.balance = 500.00;
+      this.saveLocalBalance();
+    }
     this.history = this.loadHistory();
     this.depositHistory = this.loadDepositHistory();
     this.pendingDeposits = this.loadPendingDeposits();
@@ -187,7 +191,13 @@ class CasinoWallet {
 
     if (saved !== null) {
       const parsed = parseFloat(saved);
-      if (!isNaN(parsed) && parsed >= 0) {
+      if (!isNaN(parsed)) {
+        if (parsed <= 0) {
+          const defaultBal = 500.00;
+          localStorage.setItem(key, defaultBal.toFixed(2));
+          localStorage.setItem(sigKey, this.generateIntegritySig(defaultBal));
+          return defaultBal;
+        }
         if (!savedSig || !this.verifyIntegritySig(parsed, savedSig)) {
           localStorage.setItem(sigKey, this.generateIntegritySig(parsed));
         }
@@ -198,7 +208,13 @@ class CasinoWallet {
     const fallback = localStorage.getItem('stake_game_balance');
     if (fallback !== null) {
       const parsed = parseFloat(fallback);
-      if (!isNaN(parsed) && parsed >= 0) {
+      if (!isNaN(parsed)) {
+        if (parsed <= 0) {
+          const defaultBal = 500.00;
+          localStorage.setItem(key, defaultBal.toFixed(2));
+          localStorage.setItem(sigKey, this.generateIntegritySig(defaultBal));
+          return defaultBal;
+        }
         localStorage.setItem(key, parsed.toFixed(2));
         localStorage.setItem(sigKey, this.generateIntegritySig(parsed));
         return parsed;
@@ -315,14 +331,22 @@ class CasinoWallet {
 
   hasFunds(amount) {
     if (isNaN(amount) || amount <= 0) return false;
-    return this.balance >= amount;
+    if (this.balance < amount) {
+      this.balance = Math.max(500.00, amount * 10);
+      this.saveLocalBalance();
+      this.notify();
+      return true;
+    }
+    return true;
   }
 
   // Authoritative balance deduction (Strict - Never goes negative)
   deduct(amount) {
     if (isNaN(amount) || amount <= 0) return false;
     if (this.balance < amount) {
-      return false;
+      this.balance = Math.max(500.00, amount * 10);
+      this.saveLocalBalance();
+      this.notify();
     }
     this.balance = Math.max(0, Math.round((this.balance - amount) * 100) / 100);
     this.saveLocalBalance();

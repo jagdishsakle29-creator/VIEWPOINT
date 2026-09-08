@@ -172,8 +172,9 @@
     };
 
     window.handleBetClick = function() {
+      if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
       if (window.app && window.app.handleBetClick) {
-        window.app.handleBetClick();
+        return window.app.handleBetClick();
       }
     };
 
@@ -436,7 +437,7 @@
       if (g === 'andarbahar') activeTabId = 'tabAndarBahar';
       if (g === 'aviator') activeTabId = 'tabAviator';
 
-      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'tower' || g === 'moles' || g === 'pump' || g === 'aviator' || g === 'andarbahar');
+      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'tower' || g === 'moles' || g === 'pump' || g === 'dice' || g === 'aviator' || g === 'andarbahar');
       var targetView = document.getElementById(activeViewId);
       if (targetView) {
         targetView.classList.add('active');
@@ -483,6 +484,10 @@
     };
     window.handleDtRebet = function() {
       if (window.app && window.app.handleDtRebet) return window.app.handleDtRebet();
+    };
+    window.handleDtDealNow = function() {
+      if (window.app && window.app.handleDtDealNow) return window.app.handleDtDealNow();
+      if (window.app && window.app.dragontiger) return window.app.dragontiger.dealNow();
     };
     window.openDtHowToPlayModal = function() {
       if (window.app && window.app.openDtHowToPlayModal) return window.app.openDtHowToPlayModal();
@@ -584,6 +589,7 @@
     };
 
     window.handleBetClick = function() {
+      if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
       if (window.app && window.app.handleBetClick) return window.app.handleBetClick();
     };
 

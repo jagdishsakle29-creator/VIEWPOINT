@@ -18,7 +18,7 @@ class CasinoPlinko {
     this.pegs = [];
     this.buckets = [];
     this.animId = null;
-    this.lastTime = performance.now();
+    this.lastTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     this.betAmount = 10;
     this.isDropping = false;
     this.activeBallCount = 0;
@@ -311,7 +311,7 @@ class CasinoPlinko {
           const peg = this.pegs.find(p => Math.abs(p.x - target.x) < 4 && Math.abs(p.y - target.y) < 4);
           if (peg) peg.glow = 1.0;
 
-          const now = performance.now();
+          const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
           if (window.soundEngine && (!this.lastSoundTime || now - this.lastSoundTime > 75)) {
             this.lastSoundTime = now;
             window.soundEngine.playChickenHop && window.soundEngine.playChickenHop();

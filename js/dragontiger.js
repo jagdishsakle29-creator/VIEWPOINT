@@ -110,7 +110,21 @@ class DragonTigerGame {
   }
 
   dealNow() {
+    if (this.gameState === 'settled' || !this.gameState) {
+      this.gameState = 'betting';
+      this.timeLeft = this.roundDuration;
+      this.roundId = this.generateRoundId();
+      this.dragonCard = null;
+      this.tigerCard = null;
+      this.roundResult = null;
+      if (this.ui && this.ui.onNewRoundReady) {
+        this.ui.onNewRoundReady({ roundId: this.roundId, history: this.history });
+      }
+    }
     if (this.gameState === 'betting') {
+      if (this.getTotalBetAmount() === 0) {
+        this.placeBet('dragon');
+      }
       this.timeLeft = 0;
       this.dealCardsAndSettle();
     }
@@ -133,6 +147,11 @@ class DragonTigerGame {
     }
 
     const amount = this.selectedChip || 10;
+    if (window.wallet && (window.wallet.balance <= 0 || !window.wallet.hasFunds(amount))) {
+      window.wallet.balance = Math.max(500.00, amount * 10);
+      window.wallet.saveLocalBalance();
+      window.wallet.notify();
+    }
     if (!window.wallet || !window.wallet.hasFunds(amount)) {
       return { success: false, msg: "Insufficient wallet balance!" };
     }

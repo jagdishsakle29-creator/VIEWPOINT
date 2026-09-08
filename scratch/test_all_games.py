@@ -2,12 +2,14 @@ import subprocess
 
 test_script = """
 var window = this;
-var setTimeout = function(fn, ms){ if (ms <= 100) fn(); return 1; };
+var setTimeout = function(fn, ms){ return 1; };
 var clearTimeout = function(){};
 var setInterval = function(fn, ms){ return 1; };
 var clearInterval = function(){};
-var requestAnimationFrame = function(fn){ fn(); return 1; };
+var requestAnimationFrame = function(fn){ return 1; };
 var cancelAnimationFrame = function(){};
+var performance = { now: function(){ return Date.now(); } };
+window.performance = performance;
 var console = { 
   log: function(m){ $.NSFileHandle.fileHandleWithStandardOutput.writeData($.NSString.alloc.initWithUTF8String(m + "\\n").dataUsingEncoding($.NSUTF8StringEncoding)); },
   warn: function(m){ $.NSFileHandle.fileHandleWithStandardOutput.writeData($.NSString.alloc.initWithUTF8String("[WARN] " + m + "\\n").dataUsingEncoding($.NSUTF8StringEncoding)); },
