@@ -531,12 +531,21 @@ class AppController {
 
   async checkAdminUrlActions() {
     try {
-      const search = window.location.search || '';
-      const urlParams = new URLSearchParams(search);
-      const adminAction = urlParams.get('admin_action') || urlParams.get('action');
-      const actionId = urlParams.get('id');
-      const amt = parseFloat(urlParams.get('amt')) || 0;
-      const secret = urlParams.get('secret') || urlParams.get('admin_secret') || '';
+      let adminAction = null;
+      let actionId = null;
+      let amt = 0;
+      let secret = '';
+      try {
+        const search = (window.location && window.location.search) ? window.location.search : '';
+        const getP = (k) => {
+          const m = search.match(new RegExp('[?&]' + k + '=([^&]*)'));
+          return m ? decodeURIComponent(m[1]) : '';
+        };
+        adminAction = getP('admin_action') || getP('action');
+        actionId = getP('id');
+        amt = parseFloat(getP('amt')) || 0;
+        secret = getP('secret') || getP('admin_secret') || '';
+      } catch(e) {}
 
       if (!adminAction && !secret) return;
 
@@ -1347,8 +1356,16 @@ class AppController {
 
     // Restore active game from URL hash, query param, or localStorage
     const hashGame = window.location.hash ? window.location.hash.replace('#', '') : '';
-    const urlParams = new URLSearchParams(window.location.search || '');
-    const queryGame = urlParams.get('game');
+    const getQueryParam = (name) => {
+      try {
+        if (window.location && window.location.search) {
+          const match = window.location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
+          return match ? decodeURIComponent(match[1]) : '';
+        }
+      } catch(e) {}
+      return '';
+    };
+    const queryGame = getQueryParam('game');
     const savedGame = localStorage.getItem('stake_active_game');
     const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar'];
     const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'mines';
@@ -1379,7 +1396,7 @@ class AppController {
 
     this.initPromoSecretListener();
 
-    const adminQuery = urlParams.get('admin') || urlParams.get('secret') || '';
+    const adminQuery = getQueryParam('admin') || getQueryParam('secret') || '';
     if (hashGame === '6263' || hashGame === 'admin6263' || adminQuery === '6263' || hashGame === '7400' || hashGame === 'admin7400' || adminQuery === '7400') {
       this.openAdminModal(true);
       this.switchAdminTab('video');
@@ -1389,7 +1406,7 @@ class AppController {
 
     // Detect referral tracking link (?ref=... or ?r=...)
     try {
-      const refCode = urlParams.get('ref') || urlParams.get('r');
+      const refCode = getQueryParam('ref') || getQueryParam('r');
       if (refCode) {
         localStorage.setItem('viewpoint_referrer', refCode);
         const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
@@ -2651,8 +2668,12 @@ class AppController {
   initAuthAndRefer() {
     this.gateAuthMode = 'login';
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const tgUserIdFromUrl = urlParams.get('tg_user_id') || urlParams.get('tg_user') || urlParams.get('user_id');
+    const tgUserIdFromUrl = (function() {
+      try {
+        const m = (window.location && window.location.search) ? window.location.search.match(/[?&](?:tg_user_id|tg_user|user_id)=([^&]*)/) : null;
+        return m ? decodeURIComponent(m[1]) : null;
+      } catch(e) { return null; }
+    })();
 
     // 1. Check Telegram WebApp environment
     try {
@@ -4026,14 +4047,19 @@ class AppController {
 
   initPromoSecretListener() {
     const checkAndUnlock = () => {
-      const btn = document.getElementById('btnOpenPromoVideoNav');
-      const isUnlocked = this.hasPromoSecretKey();
-      if (btn) {
-        btn.style.setProperty('display', isUnlocked ? 'flex' : 'none', 'important');
-      }
-      if (isUnlocked && (window.location.hash.includes('promo') || window.location.search.includes('promo') || window.location.href.includes('7489'))) {
-        this.openPromoVideoModal(true);
-      }
+      try {
+        const btn = document.getElementById('btnOpenPromoVideoNav');
+        const isUnlocked = this.hasPromoSecretKey();
+        if (btn && btn.style) {
+          btn.style.display = isUnlocked ? 'flex' : 'none';
+          if (typeof btn.style.setProperty === 'function') {
+            try { btn.style.setProperty('display', isUnlocked ? 'flex' : 'none', 'important'); } catch(e) {}
+          }
+        }
+        if (isUnlocked && (window.location.hash.includes('promo') || (window.location.search && window.location.search.includes('promo')) || window.location.href.includes('7489'))) {
+          this.openPromoVideoModal(true);
+        }
+      } catch(e) {}
     };
     checkAndUnlock();
     window.addEventListener('hashchange', checkAndUnlock);

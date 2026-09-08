@@ -13,7 +13,7 @@ window.performance = performance;
 var console = { 
   log: function(m){ $.NSFileHandle.fileHandleWithStandardOutput.writeData($.NSString.alloc.initWithUTF8String(m + "\\n").dataUsingEncoding($.NSUTF8StringEncoding)); },
   warn: function(m){ $.NSFileHandle.fileHandleWithStandardOutput.writeData($.NSString.alloc.initWithUTF8String("[WARN] " + m + "\\n").dataUsingEncoding($.NSUTF8StringEncoding)); },
-  error: function(m, e){ $.NSFileHandle.fileHandleWithStandardOutput.writeData($.NSString.alloc.initWithUTF8String("[ERROR] " + m + " " + (e ? (e.stack || e) : "") + "\\n").dataUsingEncoding($.NSUTF8StringEncoding)); }
+  error: function(m, e){ $.NSFileHandle.fileHandleWithStandardOutput.writeData($.NSString.alloc.initWithUTF8String("[ERROR] " + m + " " + (e ? ((e.message || String(e)) + " " + (e.stack || "")) : "") + "\\n").dataUsingEncoding($.NSUTF8StringEncoding)); }
 };
 window.console = console;
 window.addEventListener = function(){};

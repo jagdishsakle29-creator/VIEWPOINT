@@ -120,30 +120,6 @@ class MinesGame {
     window.soundEngine && window.soundEngine.playBet && window.soundEngine.playBet();
     this.updateNextMultiplierPreview();
 
-    // Authoritative Server-Side Round Creation
-    try {
-      const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
-      const res = await fetch(`${this.apiBaseUrl}/api/games?action=mines_start`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': String(uid) },
-        body: JSON.stringify({
-          action: 'mines_start',
-          userId: uid,
-          telegram_id: uid,
-          bet_amount: this.betAmount,
-          hazard_count: this.mineCount
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          this.roundId = data.roundId || data.round_id;
-          this.serverSeedHash = data.serverSeedHash || data.hash;
-          this.isServerSynced = true;
-        }
-      }
-    } catch (e) {}
-
     this.saveActiveRoundSession();
 
     if (this.ui && this.ui.onGameStart) {
@@ -154,6 +130,29 @@ class MinesGame {
         hash: this.serverSeedHash
       });
     }
+
+    // Authoritative Server-Side Round Creation (Non-blocking background sync)
+    try {
+      const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
+      fetch(`${this.apiBaseUrl}/api/games?action=mines_start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': String(uid) },
+        body: JSON.stringify({
+          action: 'mines_start',
+          userId: uid,
+          telegram_id: uid,
+          bet_amount: this.betAmount,
+          hazard_count: this.mineCount
+        })
+      }).then(res => res.ok ? res.json() : null).then(data => {
+        if (data && data.success) {
+          this.roundId = data.roundId || data.round_id;
+          this.serverSeedHash = data.serverSeedHash || data.hash;
+          this.isServerSynced = true;
+          this.saveActiveRoundSession();
+        }
+      }).catch(() => {});
+    } catch (e) {}
 
     return true;
   }

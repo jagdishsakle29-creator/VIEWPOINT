@@ -121,26 +121,6 @@ class ChickenGame {
     window.wallet.deduct(this.betAmount);
     window.soundEngine && window.soundEngine.playBet && window.soundEngine.playBet();
 
-    const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
-    try {
-      const res = await fetch(`${this.apiBaseUrl}/api/games?action=chicken_start`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
-        body: JSON.stringify({
-          action: 'chicken_start',
-          userId: uid,
-          betAmount: this.betAmount,
-          hazardCount: this.hazardCount
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          this.roundId = data.roundId || data.round_id;
-        }
-      }
-    } catch (e) {}
-
     this.saveActiveRoundSession();
 
     if (this.ui && this.ui.onGameStart) {
@@ -152,6 +132,27 @@ class ChickenGame {
     }
 
     this.updateNextMultiplierPreview();
+
+    // Non-blocking background server sync
+    const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
+    try {
+      fetch(`${this.apiBaseUrl}/api/games?action=chicken_start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
+        body: JSON.stringify({
+          action: 'chicken_start',
+          userId: uid,
+          betAmount: this.betAmount,
+          hazardCount: this.hazardCount
+        })
+      }).then(res => res.ok ? res.json() : null).then(data => {
+        if (data && data.success && data.roundId) {
+          this.roundId = data.roundId;
+          this.saveActiveRoundSession();
+        }
+      }).catch(() => {});
+    } catch (e) {}
+
     return true;
   }
 
@@ -240,7 +241,7 @@ class ChickenGame {
     let isHazard = Math.random() < effectiveHazardRate;
 
     try {
-      const res = await fetch(`${this.apiBaseUrl}/api/games?action=chicken_reveal`, {
+      fetch(`${this.apiBaseUrl}/api/games?action=chicken_reveal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
         body: JSON.stringify({
@@ -249,13 +250,7 @@ class ChickenGame {
           tileIndex: nextStep - 1,
           userId: uid
         })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          isHazard = !!(data.isBomb || data.is_bomb);
-        }
-      }
+      }).catch(() => {});
     } catch (e) {}
 
     if (isHazard) {
