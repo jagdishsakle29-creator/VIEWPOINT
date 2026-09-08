@@ -74,7 +74,7 @@
       if (btnAndar) btnAndar.classList.toggle('selected-side', side === 'ANDAR');
       if (btnBahar) btnBahar.classList.toggle('selected-side', side === 'BAHAR');
 
-      if (window.audio && window.audio.play) window.audio.play('click');
+      if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     }
 
     getRandomCard() {
@@ -107,8 +107,10 @@
       const btnDeal = document.getElementById('btnAndarBaharDeal');
       if (btnDeal) {
         btnDeal.disabled = true;
-        btnDeal.innerText = 'DEALING...';
+        btnDeal.innerText = 'DEALING CARDS...';
       }
+
+      if (window.soundEngine && window.soundEngine.playBet) window.soundEngine.playBet();
 
       // Reset card areas
       this.andarCards = [];
@@ -120,7 +122,7 @@
       this.jokerCard = this.getRandomCard();
       this.renderJoker(this.jokerCard);
 
-      if (window.audio && window.audio.play) window.audio.play('card');
+      if (window.soundEngine && window.soundEngine.playCardFlip) window.soundEngine.playCardFlip();
 
       // 2. Start alternating dealing
       let currentTurn = 'ANDAR';
@@ -160,7 +162,7 @@
           this.renderCards('baharCardsArea', this.baharCards);
         }
 
-        if (window.audio && window.audio.play) window.audio.play('card');
+        if (window.soundEngine && window.soundEngine.playCardFlip) window.soundEngine.playCardFlip();
 
         // Check if this card matches Joker
         if (card.rank === this.jokerCard.rank) {
@@ -188,11 +190,17 @@
       if (won) {
         const winAmount = parseFloat((this.betAmount * 1.95).toFixed(2));
         this.awardBalance(winAmount, `Andar Bahar Win (${winningSide})`);
-        if (window.audio && window.audio.play) window.audio.play('win');
-        this.notify(`🎉 ${winningSide} MATCHED! You won ₹${winAmount}!`, 'success');
+        if (window.soundEngine && window.soundEngine.playWin) window.soundEngine.playWin();
+        if (window.app && window.app.showToast) {
+          window.app.showToast({ won: true, payout: winAmount, multiplier: 1.95 });
+        }
+        this.notify(`🎉 ${winningSide} MATCHED! You won ₹${winAmount.toFixed(2)}!`, 'success');
       } else {
-        if (window.audio && window.audio.play) window.audio.play('lose');
-        this.notify(`💔 ${winningSide} matched! You lost ₹${this.betAmount}.`, 'error');
+        if (window.soundEngine && window.soundEngine.playBomb) window.soundEngine.playBomb();
+        if (window.app && window.app.showToast) {
+          window.app.showToast({ won: false, payout: 0, multiplier: 0 });
+        }
+        this.notify(`💔 ${winningSide} matched! Round lost: -₹${this.betAmount.toFixed(2)}.`, 'error');
       }
 
       // Re-enable deal button
@@ -203,7 +211,7 @@
           btnDeal.disabled = false;
           btnDeal.innerText = 'PLACE BET & DEAL';
         }
-      }, 1500);
+      }, 1200);
     }
 
     renderJoker(card) {

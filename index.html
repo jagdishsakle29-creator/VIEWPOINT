@@ -2226,8 +2226,8 @@
                   <button type="button" class="aviator-chip-btn" data-val="1000">+₹1000</button>
                 </div>
 
-                <button type="button" id="btnAviatorBet" class="btn-aviator-main">BET ₹50</button>
-                <button type="button" id="btnAviatorCashout" class="btn-aviator-main" style="display: none;">
+                <button type="button" id="btnAviatorBet" class="btn-aviator-main" onclick="window.aviatorGame && window.aviatorGame.placeBetAndStart()">BET ₹50</button>
+                <button type="button" id="btnAviatorCashout" class="btn-aviator-main" style="display: none;" onclick="window.aviatorGame && window.aviatorGame.cashOut()">
                   CASHOUT <span class="cashout-amt" id="aviatorCashoutPreview">₹0.00</span>
                 </button>
 
@@ -2282,7 +2282,7 @@
                 <!-- Andar Track -->
                 <div class="ab-track-card">
                   <div class="ab-track-header andar-title">
-                    <span>🔵 ANDAR (अंदर)</span>
+                    <span>🔵 ANDAR (INSIDE)</span>
                     <span style="font-size: 0.8rem; opacity: 0.8;">1.95x</span>
                   </div>
                   <div class="ab-cards-tray" id="andarCardsArea"></div>
@@ -2291,7 +2291,7 @@
                 <!-- Bahar Track -->
                 <div class="ab-track-card">
                   <div class="ab-track-header bahar-title">
-                    <span>🔴 BAHAR (बाहर)</span>
+                    <span>🔴 BAHAR (OUTSIDE)</span>
                     <span style="font-size: 0.8rem; opacity: 0.8;">1.95x</span>
                   </div>
                   <div class="ab-cards-tray" id="baharCardsArea"></div>
@@ -2303,11 +2303,11 @@
             <div class="ab-bet-panel">
               <!-- Side Choice Buttons -->
               <div class="ab-sides-row">
-                <button type="button" id="btnBetAndar" class="btn-ab-side andar selected-side" data-side="ANDAR">
+                <button type="button" id="btnBetAndar" class="btn-ab-side andar selected-side" data-side="ANDAR" onclick="window.andarBaharGame && window.andarBaharGame.selectSide('ANDAR')">
                   <span>🔵 BET ANDAR</span>
                   <span class="payout-rate">Win 1.95x Payout</span>
                 </button>
-                <button type="button" id="btnBetBahar" class="btn-ab-side bahar" data-side="BAHAR">
+                <button type="button" id="btnBetBahar" class="btn-ab-side bahar" data-side="BAHAR" onclick="window.andarBaharGame && window.andarBaharGame.selectSide('BAHAR')">
                   <span>🔴 BET BAHAR</span>
                   <span class="payout-rate">Win 1.95x Payout</span>
                 </button>
@@ -2332,7 +2332,7 @@
               </div>
 
               <!-- Main Deal Button -->
-              <button type="button" id="btnAndarBaharDeal" class="btn-deal-main">PLACE BET & DEAL</button>
+              <button type="button" id="btnAndarBaharDeal" class="btn-deal-main" onclick="window.andarBaharGame && window.andarBaharGame.startDeal()">PLACE BET & DEAL</button>
             </div>
           </div>
         </div>

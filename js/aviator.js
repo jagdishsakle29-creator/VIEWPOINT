@@ -73,15 +73,26 @@
       const inputAuto = document.getElementById('inputAviatorAutoMult');
 
       if (btnBet) {
-        btnBet.addEventListener('click', () => this.placeBetAndStart());
+        btnBet.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.placeBetAndStart();
+        });
       }
       if (btnCashout) {
-        btnCashout.addEventListener('click', () => this.cashOut());
+        const handleCashout = (e) => {
+          if (e) e.preventDefault();
+          this.cashOut();
+        };
+        btnCashout.addEventListener('click', handleCashout);
+        btnCashout.addEventListener('pointerdown', handleCashout);
       }
       if (inputBet) {
-        inputBet.addEventListener('change', (e) => {
+        const updateAmt = (e) => {
           this.betAmount = Math.max(10, parseFloat(e.target.value) || 10);
-        });
+          this.updateBetButtonText();
+        };
+        inputBet.addEventListener('change', updateAmt);
+        inputBet.addEventListener('input', updateAmt);
       }
       chipBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -89,6 +100,7 @@
           if (inputBet) {
             inputBet.value = val;
             this.betAmount = val;
+            this.updateBetButtonText();
           }
         });
       });
@@ -101,6 +113,13 @@
         inputAuto.addEventListener('change', (e) => {
           this.autoCashoutAt = Math.max(1.05, parseFloat(e.target.value) || 2.00);
         });
+      }
+    }
+
+    updateBetButtonText() {
+      const btnBet = document.getElementById('btnAviatorBet');
+      if (btnBet && (this.gameState === 'IDLE' || this.gameState === 'CRASHED')) {
+        btnBet.innerText = `BET ₹${this.betAmount}`;
       }
     }
 
@@ -137,10 +156,13 @@
       if (btnCashout) {
         btnCashout.style.display = 'block';
         btnCashout.disabled = true;
+        btnCashout.style.background = '';
+        btnCashout.classList.remove('active-cashout');
         btnCashout.innerText = 'WAITING FOR TAKEOFF...';
       }
 
-      if (window.audio && window.audio.play) window.audio.play('click');
+      if (window.soundEngine && window.soundEngine.playBet) window.soundEngine.playBet();
+      else if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
 
       const timer = setInterval(() => {
         if (countNum) countNum.innerText = count;
@@ -165,10 +187,17 @@
       const btnCashout = document.getElementById('btnAviatorCashout');
       if (btnCashout) {
         btnCashout.disabled = false;
+        btnCashout.style.background = '';
         btnCashout.classList.add('active-cashout');
+        const amtSpan = document.getElementById('aviatorCashoutPreview');
+        if (amtSpan) {
+          amtSpan.textContent = `₹${this.betAmount.toFixed(2)}`;
+        } else {
+          btnCashout.innerHTML = `CASHOUT <span class="cashout-amt" id="aviatorCashoutPreview">₹${this.betAmount.toFixed(2)}</span>`;
+        }
       }
 
-      if (window.audio && window.audio.play) window.audio.play('spin');
+      if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
 
       this.loop(performance.now());
     }
@@ -200,17 +229,23 @@
       if (this.gameState !== 'FLYING') return;
 
       const elapsed = (now - this.startTime) / 1000; // seconds
-      // Exponential curve: multiplier = e^(0.065 * elapsed^1.15)
+      // Exponential curve: multiplier = e^(0.075 * elapsed^1.15)
       this.multiplier = parseFloat((Math.pow(Math.E, 0.075 * Math.pow(elapsed, 1.15))).toFixed(2));
 
-      // Update UI button
-      const btnCashout = document.getElementById('btnAviatorCashout');
+      // Update multiplier display
       const multDisplay = document.getElementById('aviatorMultiplierText');
       if (multDisplay) multDisplay.innerText = `${this.multiplier.toFixed(2)}x`;
 
+      // Update cashout button live amount safely without destroying inner DOM nodes
+      const btnCashout = document.getElementById('btnAviatorCashout');
       if (btnCashout && this.hasBet && !this.hasCashedOut) {
         const potentialWin = (this.betAmount * this.multiplier).toFixed(2);
-        btnCashout.innerHTML = `CASHOUT <span class="cashout-amt">₹${potentialWin}</span>`;
+        const amtSpan = document.getElementById('aviatorCashoutPreview');
+        if (amtSpan) {
+          amtSpan.textContent = `₹${potentialWin}`;
+        } else {
+          btnCashout.innerHTML = `CASHOUT <span class="cashout-amt" id="aviatorCashoutPreview">₹${potentialWin}</span>`;
+        }
       }
 
       // Check Auto-Cashout
@@ -234,18 +269,26 @@
 
       this.hasCashedOut = true;
       this.cashedOutMultiplier = this.multiplier;
-      const winAmount = parseFloat((this.betAmount * this.multiplier).toFixed(2));
+      const winAmount = parseFloat((this.betAmount * this.cashedOutMultiplier).toFixed(2));
 
-      this.awardBalance(winAmount, `Aviator Win: ${this.multiplier.toFixed(2)}x`);
+      this.awardBalance(winAmount, `Aviator Win: ${this.cashedOutMultiplier.toFixed(2)}x`);
 
-      if (window.audio && window.audio.play) window.audio.play('win');
-      this.notify(`🎉 CASHED OUT! Won ₹${winAmount} at ${this.multiplier.toFixed(2)}x!`, 'success');
+      if (window.soundEngine) {
+        if (window.soundEngine.playCashout) window.soundEngine.playCashout();
+        else if (window.soundEngine.playWin) window.soundEngine.playWin();
+      }
+      if (window.app && window.app.showToast) {
+        window.app.showToast({ won: true, payout: winAmount, multiplier: this.cashedOutMultiplier });
+      }
+
+      this.notify(`🎉 CASHED OUT! Won ₹${winAmount.toFixed(2)} at ${this.cashedOutMultiplier.toFixed(2)}x!`, 'success');
 
       const btnCashout = document.getElementById('btnAviatorCashout');
       if (btnCashout) {
         btnCashout.disabled = true;
-        btnCashout.innerHTML = `CASHED OUT ₹${winAmount}`;
         btnCashout.classList.remove('active-cashout');
+        btnCashout.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+        btnCashout.innerHTML = `WON ₹${winAmount.toFixed(2)} (${this.cashedOutMultiplier.toFixed(2)}x)`;
       }
     }
 
@@ -264,18 +307,20 @@
         multDisplay.classList.add('crashed-text');
       }
 
-      if (window.audio && window.audio.play) window.audio.play('lose');
-
       if (this.hasBet && !this.hasCashedOut) {
+        if (window.soundEngine && window.soundEngine.playBomb) window.soundEngine.playBomb();
         this.notify(`💥 Plane flew away at ${finalMult.toFixed(2)}x! Better luck next round!`, 'error');
+        if (window.app && window.app.showToast) {
+          window.app.showToast({ won: false, payout: 0, multiplier: 0 });
+        }
       }
 
       this.drawCrashedFrame();
 
-      // Reset after 3 seconds
+      // Clean reset after 1.5 seconds
       setTimeout(() => {
         this.resetToIdle();
-      }, 3000);
+      }, 1500);
     }
 
     resetToIdle() {
@@ -287,8 +332,18 @@
       const btnCashout = document.getElementById('btnAviatorCashout');
       const multDisplay = document.getElementById('aviatorMultiplierText');
 
-      if (btnBet) btnBet.style.display = 'block';
-      if (btnCashout) btnCashout.style.display = 'none';
+      if (btnBet) {
+        btnBet.style.display = 'block';
+        btnBet.disabled = false;
+        btnBet.innerText = `BET ₹${this.betAmount}`;
+      }
+      if (btnCashout) {
+        btnCashout.style.display = 'none';
+        btnCashout.disabled = false;
+        btnCashout.style.background = '';
+        btnCashout.classList.remove('active-cashout');
+        btnCashout.innerHTML = `CASHOUT <span class="cashout-amt" id="aviatorCashoutPreview">₹0.00</span>`;
+      }
       if (multDisplay) {
         multDisplay.innerText = '1.00x';
         multDisplay.classList.remove('crashed-text');
@@ -404,6 +459,27 @@
       }
 
       this.drawPlane(curX, curY, angle);
+
+      // If player cashed out during flight, render victory badge on canvas
+      if (this.hasCashedOut) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.92)';
+        const bannerW = Math.min(w - 40, 260);
+        const bannerH = 34;
+        const bx = (w - bannerW) / 2;
+        const by = 18;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(bx, by, bannerW, bannerH, 8);
+        else ctx.rect(bx, by, bannerW, bannerH);
+        ctx.fill();
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const winAmt = (this.betAmount * this.cashedOutMultiplier).toFixed(2);
+        ctx.fillText(`CASHED OUT @ ${this.cashedOutMultiplier.toFixed(2)}x (+₹${winAmt})`, w / 2, by + bannerH / 2);
+        ctx.restore();
+      }
     }
 
     drawPlane(x, y, angle) {
