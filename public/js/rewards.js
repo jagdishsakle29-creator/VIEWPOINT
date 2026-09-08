@@ -544,7 +544,10 @@
       const spinTimerEl = document.getElementById('spinCooldownTimer');
       const spinBtn = document.getElementById('btnSpinWheelAction');
 
+      // 1. Lucky Spin 24-Hour Auto-Hide & Countdown
+      const spinNavBtn = document.getElementById('btnNavLuckySpin');
       if (this.canSpin()) {
+        if (spinNavBtn) spinNavBtn.style.display = 'inline-flex';
         if (spinTimerEl) {
           spinTimerEl.innerText = 'Ready to Spin! 1 Free Daily Spin';
           spinTimerEl.style.color = '#22c55e';
@@ -556,6 +559,8 @@
           spinBtn.style.cursor = 'pointer';
         }
       } else {
+        // Once used, hide completely from navbar for 24 hours!
+        if (spinNavBtn) spinNavBtn.style.display = 'none';
         const rem = this.getTimeUntilSpin();
         const hrs = Math.floor(rem / 3600000);
         const mins = Math.floor((rem % 3600000) / 60000);
@@ -573,15 +578,15 @@
         }
       }
 
-      // 2. Daily Streak 24-Hour Cooldown & Countdown
+      // 2. Daily Streak 24-Hour Auto-Hide & Countdown
       const navStreakBtn = document.getElementById('btnNavDailyStreak');
       const streakStatus = this.getStreakStatus();
       const btnClaimStreak = document.getElementById('btnClaimStreakAction');
 
       if (streakStatus.canClaim) {
         if (navStreakBtn) {
+          navStreakBtn.style.display = 'inline-flex';
           navStreakBtn.innerHTML = '<span>🎁 Daily Bonus</span>';
-          navStreakBtn.style.opacity = '1';
         }
         if (btnClaimStreak && btnClaimStreak.disabled) {
           btnClaimStreak.disabled = false;
@@ -590,13 +595,11 @@
           btnClaimStreak.style.cursor = 'pointer';
         }
       } else {
+        // Once claimed, hide completely from navbar for 24 hours!
+        if (navStreakBtn) navStreakBtn.style.display = 'none';
         const hrs = Math.floor(streakStatus.remainingMs / 3600000);
         const mins = Math.floor((streakStatus.remainingMs % 3600000) / 60000);
         const secs = Math.floor((streakStatus.remainingMs % 60000) / 1000);
-        if (navStreakBtn) {
-          navStreakBtn.innerHTML = `<span>⏳ Bonus (${hrs}h ${mins}m)</span>`;
-          navStreakBtn.style.opacity = '0.75';
-        }
         if (btnClaimStreak) {
           btnClaimStreak.disabled = true;
           btnClaimStreak.innerText = `Claimed! Next Day in ${hrs}h ${mins}m ${secs}s`;

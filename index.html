@@ -628,10 +628,6 @@
           <span>🎁 Daily Bonus</span>
         </button>
 
-        <!-- Master Sound Mute/Unmute Toggle Button -->
-        <button id="btnToggleSound" class="btn-refer-nav" style="padding: 0 10px; font-size: 13px;" onclick="window.toggleMasterAudio && window.toggleMasterAudio()" title="Mute / Unmute Casino Sound">
-          <span id="soundToggleIcon">🔊</span>
-        </button>
 
         <!-- Admin Button (Hidden by default, only shown via ?secret=6263 private link) -->
         <button id="btnNavAdminPanel" class="btn-refer-nav" style="display: none !important; background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.4); color: #c084fc;" onclick="window.adminDashboard && window.adminDashboard.openAdmin();" title="Admin Control Dashboard">
@@ -1249,19 +1245,6 @@
         <div id="crashView" class="game-view crash-view">
           <div class="crash-history-bar" id="crashHistoryBar">
             <!-- Crash multiplier pills -->
-          </div>
-          <!-- Live Market Volatility & Momentum Hint Bar -->
-          <div class="crash-ai-signal-bar" id="crashAiSignalBar">
-            <div class="ai-signal-badge">
-              <span class="ai-pulse-dot"></span>
-              <span>📈 VOLATILITY INDEX</span>
-            </div>
-            <div class="ai-signal-info">
-              <span class="ai-signal-label">Momentum:</span>
-              <span class="ai-signal-target" id="crashAiPredictedTarget">Dynamic Curve</span>
-              <span class="ai-signal-conf" id="crashAiConfidence">Algorithmic</span>
-            </div>
-          </div>
           <div class="crash-canvas-wrapper">
             <canvas id="crashCanvas"></canvas>
             <div class="crash-multiplier-overlay">
@@ -1270,52 +1253,24 @@
             </div>
           </div>
 
-          <!-- BC.Game Style Crash 3-Way Color Prediction Betting Card -->
-          <div class="crash-color-prediction-card" style="margin-top: 12px; background: radial-gradient(circle at 50% 0%, #152538 0%, #0c1824 100%); border: 1.5px solid rgba(0, 229, 255, 0.35); border-radius: 14px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <span style="font-size: 13px; font-weight: 900; color: #00e5ff; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-                <span>🎯 Color Multiplier Prediction</span>
-              </span>
-              <span id="crashSelectedColorTag" style="font-size: 11px; color: #10b981; font-weight: 800;">Set Amount & Tap Color to Bet</span>
+          <!-- Compact 3-Way Color Multiplier Prediction Bar -->
+          <div class="crash-color-prediction-card" style="margin-top: 8px; background: rgba(14, 18, 28, 0.85); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 12px; padding: 8px 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 11.5px; font-weight: 800; color: #fcd34d;">🎯 Quick Color Prediction</span>
+              <span id="crashSelectedColorTag" style="font-size: 10.5px; color: var(--text-muted);">Tap color to bet</span>
             </div>
-
-            <!-- Dedicated Bet Amount Input Row (BC.Game style) -->
-            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
-              <div style="display: flex; flex: 1; align-items: center; background: rgba(0,0,0,0.6); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 0 10px; height: 42px;">
-                <span style="color: #00e5ff; font-weight: 900; font-size: 15px; margin-right: 6px;">₹</span>
-                <input type="number" id="crashColorBetAmountInput" value="10" min="1" step="1" oninput="window.app && window.app.syncCrashColorBetInput(this.value)" style="width: 100%; background: transparent; border: none; outline: none; color: #fff; font-size: 16px; font-weight: 900;" placeholder="Bet Amount">
-              </div>
-              <button type="button" onclick="window.app && window.app.halfCrashColorBet()" style="padding: 0 10px; height: 42px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #cbd5e1; font-size: 12px; font-weight: 800; cursor: pointer;">½</button>
-              <button type="button" onclick="window.app && window.app.doubleCrashColorBet()" style="padding: 0 10px; height: 42px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #cbd5e1; font-size: 12px; font-weight: 800; cursor: pointer;">2×</button>
-              <button type="button" onclick="window.app && window.app.maxCrashColorBet()" style="padding: 0 10px; height: 42px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #00e5ff; font-size: 12px; font-weight: 900; cursor: pointer;">MAX</button>
-            </div>
-
-            <!-- Quick Bet Amount Chips Row -->
-            <div style="display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px;">
-              <button type="button" class="crash-bet-chip" onclick="window.app && window.app.setCrashColorBetAmount(10)" style="flex: 1; min-width: 45px; padding: 6px 2px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff; font-size: 11px; font-weight: 800; cursor: pointer;">₹10</button>
-              <button type="button" class="crash-bet-chip" onclick="window.app && window.app.setCrashColorBetAmount(50)" style="flex: 1; min-width: 45px; padding: 6px 2px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff; font-size: 11px; font-weight: 800; cursor: pointer;">₹50</button>
-              <button type="button" class="crash-bet-chip" onclick="window.app && window.app.setCrashColorBetAmount(100)" style="flex: 1; min-width: 45px; padding: 6px 2px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff; font-size: 11px; font-weight: 800; cursor: pointer;">₹100</button>
-              <button type="button" class="crash-bet-chip" onclick="window.app && window.app.setCrashColorBetAmount(500)" style="flex: 1; min-width: 45px; padding: 6px 2px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff; font-size: 11px; font-weight: 800; cursor: pointer;">₹500</button>
-              <button type="button" class="crash-bet-chip" onclick="window.app && window.app.setCrashColorBetAmount(1000)" style="flex: 1; min-width: 45px; padding: 6px 2px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #fff; font-size: 11px; font-weight: 800; cursor: pointer;">₹1,000</button>
-            </div>
-
-            <!-- 3-Way BC.Game Style Action Buttons (Tap to Place Bet Instantly) -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-              <button type="button" id="btnCrashColorRed" class="btn-crash-color" onclick="window.app && window.app.placeCrashColorDirectBet('red')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(180deg, rgba(254, 44, 85, 0.3), rgba(254, 44, 85, 0.1)); border: 2px solid #fe2c55; border-radius: 10px; padding: 12px 4px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(254, 44, 85, 0.35);">
-                <span style="color: #fe2c55; font-size: 14px; font-weight: 900;">🔴 UNDER 2x</span>
-                <span style="color: #cbd5e1; font-size: 10px; margin-top: 2px;">Crash &lt; 2.00x</span>
-                <span style="color: #ffb703; font-size: 13px; font-weight: 900; margin-top: 4px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 4px;">1.95x Win</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+              <button type="button" id="btnCrashColorRed" class="btn-crash-color" onclick="window.app && window.app.placeCrashColorDirectBet('red')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(254, 44, 85, 0.15); border: 1.5px solid #fe2c55; border-radius: 8px; padding: 6px 2px; cursor: pointer;">
+                <span style="color: #fe2c55; font-size: 12px; font-weight: 900;">🔴 &lt; 2x</span>
+                <span style="color: #fcd34d; font-size: 11px; font-weight: 800;">1.95x Win</span>
               </button>
-              <button type="button" id="btnCrashColorGreen" class="btn-crash-color" onclick="window.app && window.app.placeCrashColorDirectBet('green')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(180deg, rgba(0, 231, 1, 0.3), rgba(0, 231, 1, 0.1)); border: 2px solid #00e701; border-radius: 10px; padding: 12px 4px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(0, 231, 1, 0.35);">
-                <span style="color: #00e701; font-size: 14px; font-weight: 900;">🟢 OVER 2x</span>
-                <span style="color: #cbd5e1; font-size: 10px; margin-top: 2px;">Flies &ge; 2.00x</span>
-                <span style="color: #ffb703; font-size: 13px; font-weight: 900; margin-top: 4px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 4px;">2.00x Win</span>
+              <button type="button" id="btnCrashColorGreen" class="btn-crash-color" onclick="window.app && window.app.placeCrashColorDirectBet('green')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16, 185, 129, 0.15); border: 1.5px solid #10b981; border-radius: 8px; padding: 6px 2px; cursor: pointer;">
+                <span style="color: #10b981; font-size: 12px; font-weight: 900;">🟢 &ge; 2x</span>
+                <span style="color: #fcd34d; font-size: 11px; font-weight: 800;">2.00x Win</span>
               </button>
-              <button type="button" id="btnCrashColorBlue" class="btn-crash-color" onclick="window.app && window.app.placeCrashColorDirectBet('blue')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(180deg, rgba(0, 229, 255, 0.3), rgba(0, 229, 255, 0.1)); border: 2px solid #00e5ff; border-radius: 10px; padding: 12px 4px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(0, 229, 255, 0.35);">
-                <span style="color: #00e5ff; font-size: 14px; font-weight: 900;">🔵 MOON 10x+</span>
-                <span style="color: #cbd5e1; font-size: 10px; margin-top: 2px;">Rocket &ge; 10x</span>
-                <span style="color: #00f59b; font-size: 13px; font-weight: 900; margin-top: 4px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 4px;">10.00x Win</span>
+              <button type="button" id="btnCrashColorBlue" class="btn-crash-color" onclick="window.app && window.app.placeCrashColorDirectBet('blue')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(139, 92, 246, 0.18); border: 1.5px solid #8b5cf6; border-radius: 8px; padding: 6px 2px; cursor: pointer;">
+                <span style="color: #c084fc; font-size: 12px; font-weight: 900;">🔵 MOON 10x+</span>
+                <span style="color: #fcd34d; font-size: 11px; font-weight: 800;">10.00x Win</span>
               </button>
             </div>
           </div>
@@ -3833,5 +3788,14 @@
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+  <script>
+    // Prevent accidental multi-touch pinch zoom & gesture delays on mobile
+    (function() {
+      if (typeof window === 'undefined') return;
+      document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+      document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+      document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
+    })();
+  </script>
 </body>
 </html>

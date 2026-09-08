@@ -260,8 +260,8 @@
       }
 
       // Jet Flight Sound Effect
-      if (!this.lastAudioTick || timestamp - this.lastAudioTick >= 160) {
-        this.lastAudioTick = timestamp;
+      if (!this.lastAudioTick || now - this.lastAudioTick >= 160) {
+        this.lastAudioTick = now;
         if (window.soundEngine && window.soundEngine.playJetFlight) {
           window.soundEngine.playJetFlight(this.multiplier);
         }

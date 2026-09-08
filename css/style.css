@@ -4047,4 +4047,19 @@ body {
   }
 }
 
+/* ================= ULTRA FAST TOUCH & MOBILE AUTO-ZOOM FIX ================= */
+html, body, button, a, input, select, textarea, [role="button"],
+.nav-item, .nav-btn, .game-tab, .game-card, .btn-action, .chip-btn, .btn, .tab-btn, .btn-page-pill {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+}
+
+@media screen and (max-width: 768px) {
+  input, select, textarea, .bet-input-field, .input-field, .amount-input, .auth-input {
+    font-size: 16px !important;
+  }
+}
+
+
 
