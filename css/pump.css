@@ -25,8 +25,8 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  background: rgba(0, 231, 1, 0.08);
-  border: 1.5px solid rgba(0, 231, 1, 0.35);
+  background: rgba(139, 92, 246, 0.08);
+  border: 1.5px solid rgba(139, 92, 246, 0.3);
   border-radius: 10px;
   padding: 5px 12px;
   box-sizing: border-box;
@@ -50,9 +50,9 @@
 }
 
 .pump-hist-pill.win {
-  background: rgba(0, 231, 1, 0.15);
-  color: #00e701;
-  border: 1px solid #00e701;
+  background: rgba(139, 92, 246, 0.2);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
 .pump-hist-pill.loss {
@@ -66,8 +66,8 @@
   width: 100%;
   height: clamp(170px, 26vh, 210px);
   min-height: 170px;
-  background: radial-gradient(circle at 50% 40%, #152238 0%, #070d18 100%);
-  border: 1.5px solid rgba(0, 229, 255, 0.35);
+  background: radial-gradient(circle at 50% 40%, #151128 0%, #080710 100%);
+  border: 1.5px solid rgba(139, 92, 246, 0.3);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -80,7 +80,7 @@
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.8), transparent);
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), transparent);
 }
 
 .pump-balloon {

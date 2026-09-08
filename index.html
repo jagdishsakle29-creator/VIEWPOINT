@@ -604,7 +604,7 @@
           <div class="brand-logo-icon" style="width: 36px; height: 36px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: transparent;">
             <img src="assets/viewpoint_logo.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
           </div>
-          <div class="brand-name" style="font-family: var(--font-display); font-weight: 900; font-size: 19px; letter-spacing: -0.5px;">VIEW<span style="color: #00e701;">POINT</span></div>
+          <div class="brand-name" style="font-family: var(--font-display); font-weight: 900; font-size: 19px; letter-spacing: -0.5px;">VIEW<span style="color: #fcd34d; text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">POINT</span></div>
         </div>
 
         <!-- Promo Video & Redeem Code Button (Secret link 7489 only) -->
@@ -620,11 +620,11 @@
         </button>
 
         <!-- Quick Action Buttons: Lucky Spin, Daily Streak, Promo Code, Admin Panel -->
-        <button id="btnNavLuckySpin" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(245,158,11,0.22)); border: 1px solid #ffd700; color: #ffd700;" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" title="Daily Lucky Spin Wheel">
+        <button id="btnNavLuckySpin" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(180,83,9,0.22)); border: 1px solid rgba(245,158,11,0.45); color: #fcd34d;" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" title="Daily Lucky Spin Wheel">
           <span>🎡 Spin & Win</span>
         </button>
 
-        <button id="btnNavDailyStreak" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(34,197,94,0.18), rgba(16,185,129,0.22)); border: 1px solid #22c55e; color: #4ade80;" onclick="window.openDailyStreakModal ? window.openDailyStreakModal() : (window.Rewards && window.Rewards.openDailyStreakModal ? window.Rewards.openDailyStreakModal() : null);" title="Daily 7-Day Login Streak Bonus">
+        <button id="btnNavDailyStreak" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(76,29,149,0.22)); border: 1px solid rgba(139,92,246,0.45); color: #c4b5fd;" onclick="window.openDailyStreakModal ? window.openDailyStreakModal() : (window.Rewards && window.Rewards.openDailyStreakModal ? window.Rewards.openDailyStreakModal() : null);" title="Daily 7-Day Login Streak Bonus">
           <span>🎁 Daily Bonus</span>
         </button>
 
@@ -652,7 +652,7 @@
 
         <div id="authLoggedInBox" class="user-profile-badge" style="display: none;">
           <span class="user-avatar-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </span>
           <span id="displayUsername" class="display-username">VIP Player</span>
           <button id="btnLogout" class="btn-logout-mini" title="Logout" onclick="window.app && window.app.logoutUser()">
@@ -727,28 +727,28 @@
         <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" style="position:relative;">
           <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="#ff3b30"/><path d="M12 2v4M12 20v2M2 13h4M18 13h4M5.5 6.5l2.8 2.8M15.7 16.7l2.8 2.8M18.5 6.5l-2.8 2.8M8.3 16.7l-2.8 2.8" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="2" fill="#fff" opacity="0.6"/></svg>
           <span style="font-weight: 900;">Mines</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 7.6k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 7.6k</span>
         </button>
 
         <!-- 2. Dragon Tiger -->
         <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
           <span style="font-weight: 900;">Dragon Tiger</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 5.1k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 5.1k</span>
         </button>
 
         <!-- 3. Limbo Turbo -->
         <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎯⚡</span>
           <span style="font-weight: 900;">Limbo</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 3.0k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 3.0k</span>
         </button>
 
         <!-- 4. Stake Pump (Page 1) -->
         <button id="tabPump" class="tab-btn" data-game="pump" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎈💨</span>
           <span style="font-weight: 900;">Pump</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #00e5ff, #0077ff); color: #000; font-size: 8.5px; font-weight: 900;">🟢 2.1k</span>
+          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 8.5px; font-weight: 800;">🔥 2.1k</span>
         </button>
       </div>
 
@@ -758,28 +758,28 @@
         <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🍗🚗</span>
           <span style="font-weight: 900;">Chicken</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 5.9k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 5.9k</span>
         </button>
 
         <!-- 6. Plinko -->
         <button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🔴🔺</span>
           <span style="font-weight: 900;">Plinko</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 4.7k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 4.7k</span>
         </button>
 
         <!-- 7. Crash Rocket -->
         <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🚀✨</span>
           <span style="font-weight: 900;">Crash</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 6.8k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 6.8k</span>
         </button>
 
         <!-- 8. Stake Moles (Page 2) -->
         <button id="tabMoles" class="tab-btn" data-game="moles" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🐹🔨</span>
           <span style="font-weight: 900;">Moles</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size: 8.5px; font-weight: 900;">🟢 1.7k</span>
+          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 8.5px; font-weight: 800;">🔥 1.7k</span>
         </button>
       </div>
 
@@ -789,28 +789,28 @@
         <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎲</span>
           <span style="font-weight: 900;">Dice</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 850</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 850</span>
         </button>
 
         <!-- 10. Tower Legend (Page 3 - 2nd) -->
         <button id="tabTower" class="tab-btn" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🏰💎</span>
           <span style="font-weight: 900;">Tower</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #10b981, #00e701); color: #000; font-size: 8.5px; font-weight: 900;">🟢 1.3k</span>
+          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 8.5px; font-weight: 800;">🔥 1.3k</span>
         </button>
 
         <!-- 11. Win Go 30s (Page 3 - 3rd) -->
         <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎨</span>
           <span style="font-weight: 800;">Win Go</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 2.5k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 2.5k</span>
         </button>
 
         <!-- 12. Stock BTC (Page 3 - 4th) -->
         <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">📈</span>
           <span style="font-weight: 800;">Stock BTC</span>
-          <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 850</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 850</span>
         </button>
       </div>
 
@@ -820,21 +820,21 @@
         <button id="tabAviator" class="tab-btn" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">✈️🚀</span>
           <span style="font-weight: 900;">Aviator</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #ef4444, #f97316); color: #fff; font-size: 8.5px; font-weight: 900;">🔥 HOT</span>
+          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); font-size: 8.5px; font-weight: 900;">🔥 HOT</span>
         </button>
 
         <!-- 14. Andar Bahar Royal Cards -->
         <button id="tabAndarBahar" class="tab-btn" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🃏👑</span>
           <span style="font-weight: 900;">Andar Bahar</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #3b82f6, #10b981); color: #fff; font-size: 8.5px; font-weight: 900;">🟢 6.2k</span>
+          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); font-size: 8.5px; font-weight: 900;">⚡ 6.2k</span>
         </button>
 
         <!-- 15. Daily Lucky Spin & Win -->
         <button id="tabLuckySpin" class="tab-btn" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" style="position:relative;">
           <span style="font-size: 16px; line-height: 1;">🎡💰</span>
           <span style="font-weight: 900;">Spin &amp; Win</span>
-          <span class="tab-badge" style="background: linear-gradient(135deg, #ffd700, #f59e0b); color: #000; font-size: 8.5px; font-weight: 900;">🎁 FREE</span>
+          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); font-size: 8.5px; font-weight: 900;">🎁 FREE</span>
         </button>
       </div>
     </div>
@@ -1097,7 +1097,7 @@
             <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
           </button>
 
-          <button type="button" id="btnMinesPickRandom" class="btn-stake-primary" style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; margin-top: 6px; font-weight: 800;" onclick="window.pickRandomMineTile && window.pickRandomMineTile()">
+          <button type="button" id="btnMinesPickRandom" class="btn-stake-primary" style="background: rgba(124, 58, 237, 0.18); border: 1px solid rgba(139, 92, 246, 0.4); color: #c4b5fd; margin-top: 6px; font-weight: 800;" onclick="window.pickRandomMineTile && window.pickRandomMineTile()">
             <span>⚡ PICK RANDOM TILE</span>
           </button>
         </div>
@@ -1381,7 +1381,7 @@
             </div>
 
             <div style="display: flex; gap: 8px; justify-content: center; margin-top: 8px;">
-              <button type="button" class="chip-btn" style="padding: 7px 18px; font-weight: 900; font-size: 12px; background: linear-gradient(135deg, rgba(0,231,1,0.22), rgba(16,185,129,0.22)); border: 1px solid #00e701; color: #00e701; cursor: pointer; border-radius: 8px;" onclick="for(let i=0;i<5;i++){ setTimeout(()=>window.app && window.app.handleBetClick && window.app.handleBetClick(), i*240); }">⚡ 5x Rapid Drop</button>
+              <button type="button" class="chip-btn" style="padding: 7px 18px; font-weight: 900; font-size: 12px; background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(76,29,149,0.25)); border: 1px solid #8b5cf6; color: #e9d5ff; cursor: pointer; border-radius: 8px; box-shadow: 0 4px 14px rgba(109,40,217,0.3);" onclick="for(let i=0;i<5;i++){ setTimeout(()=>window.app && window.app.handleBetClick && window.app.handleBetClick(), i*240); }">⚡ 5x Rapid Drop</button>
             </div>
 
 
@@ -1423,16 +1423,16 @@
             <div class="dice-stats-grid">
               <div class="dice-stat-box">
                 <div class="dice-stat-label">Multiplier</div>
-                <div class="dice-stat-val" id="diceMultiplierDisplay" style="color: #00e701;">1.9800x</div>
+                <div class="dice-stat-val" id="diceMultiplierDisplay" style="color: #fcd34d;">1.9800x</div>
               </div>
               <div class="dice-stat-box">
                 <div class="dice-stat-label">Roll Target</div>
-                <button type="button" id="btnDiceRollMode" style="margin-top: 2px; font-size: 11px; padding: 2px 6px; background: rgba(0,229,255,0.15); color: #00e5ff; border: 1px solid #00e5ff; border-radius: 4px; font-weight: 800; cursor: pointer;" onclick="window.app && window.app.toggleDiceMode()">Roll Under &lt;</button>
+                <button type="button" id="btnDiceRollMode" style="margin-top: 2px; font-size: 11px; padding: 2px 6px; background: rgba(139,92,246,0.18); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.4); border-radius: 4px; font-weight: 800; cursor: pointer;" onclick="window.app && window.app.toggleDiceMode()">Roll Under &lt;</button>
                 <div class="dice-stat-val" id="diceTargetDisplay">50.50</div>
               </div>
               <div class="dice-stat-box">
                 <div class="dice-stat-label">Win Chance</div>
-                <div class="dice-stat-val" id="diceWinChanceDisplay" style="color: #00e5ff;">50.00%</div>
+                <div class="dice-stat-val" id="diceWinChanceDisplay" style="color: #c4b5fd;">50.00%</div>
               </div>
             </div>
 
@@ -1440,8 +1440,8 @@
             <div class="dice-action-row" style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 480px; margin-left: auto; margin-right: auto;">
               <div style="display: flex; gap: 8px; align-items: center;">
                 <div style="flex: 1; position: relative;">
-                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #00e701;">₹</span>
-                  <input type="number" id="diceDirectBetInput" class="bet-input-field" value="10.00" min="1" step="5" style="padding-left: 28px; width: 100%; height: 44px; font-size: 15px; font-weight: 800; background: rgba(15, 33, 46, 0.9); border: 1.5px solid rgba(0, 231, 1, 0.3); border-radius: 8px; color: #fff;" oninput="document.getElementById('betAmountInput').value = this.value">
+                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #fcd34d;">₹</span>
+                  <input type="number" id="diceDirectBetInput" class="bet-input-field" value="10.00" min="1" step="5" style="padding-left: 28px; width: 100%; height: 44px; font-size: 15px; font-weight: 800; background: #080a11; border: 1.5px solid rgba(139, 92, 246, 0.25); border-radius: 8px; color: #fff;" oninput="document.getElementById('betAmountInput').value = this.value">
                 </div>
                 <div style="display: flex; gap: 4px;">
                   <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = Math.max(1, (parseFloat(document.getElementById('diceDirectBetInput').value)||10)/2); document.getElementById('diceDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">½</button>
@@ -1449,7 +1449,7 @@
                   <button type="button" class="btn-quick-bet" style="height: 44px; padding: 0 10px; border-radius: 8px;" onclick="let val = (window.wallet ? window.wallet.balance : 100); document.getElementById('diceDirectBetInput').value = val.toFixed(0); document.getElementById('betAmountInput').value = val.toFixed(0);">MAX</button>
                 </div>
               </div>
-              <button type="button" id="btnDirectRollDice" class="btn-stake-primary btn-bet" style="width: 100%; height: 50px; font-size: 16px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4); display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.app && window.app.handleBetClick()">
+              <button type="button" id="btnDirectRollDice" class="btn-stake-primary btn-bet" style="width: 100%; height: 50px; font-size: 16px; font-weight: 900; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #fff; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(109, 40, 217, 0.4); display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.app && window.app.handleBetClick()">
                 <span>🎲 ROLL DICE / BET</span>
               </button>
             </div>
@@ -1826,7 +1826,7 @@
             </div>
 
             <!-- PROMINENT WIN GO BET BUTTON -->
-            <button type="button" id="btnColortradingBet" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4); margin-bottom: 8px;" onclick="window.app && window.app.handleColorTradingSubmitBet && window.app.handleColorTradingSubmitBet()">
+            <button type="button" id="btnColortradingBet" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #ffffff; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(109, 40, 217, 0.4); margin-bottom: 8px;" onclick="window.app && window.app.handleColorTradingSubmitBet && window.app.handleColorTradingSubmitBet()">
               <span>🎨 PLACE BET (Win Go 30s)</span>
             </button>
 
@@ -1998,7 +1998,7 @@
                 </button>
               </div>
 
-              <button type="button" id="btnPumpStart" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4);" onclick="window.app && window.app.pump ? window.app.pump.startGame() : (window.app && window.app.handleBetClick())">
+              <button type="button" id="btnPumpStart" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #ffffff; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(109, 40, 217, 0.4);" onclick="window.app && window.app.pump ? window.app.pump.startGame() : (window.app && window.app.handleBetClick())">
                 <span>🎈 START PUMP BET</span>
               </button>
 
@@ -2182,10 +2182,10 @@
               </div>
 
               <div style="display: flex; gap: 8px; width: 100%;">
-                <button type="button" id="btnTowerStart" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(0, 231, 1, 0.4);" onclick="window.app && window.app.tower ? window.app.tower.startGame() : (window.app && window.app.handleBetClick())">
+                <button type="button" id="btnTowerStart" class="btn-stake-primary btn-bet" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #ffffff; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 10px; cursor: pointer; box-shadow: 0 4px 18px rgba(109, 40, 217, 0.4);" onclick="window.app && window.app.tower ? window.app.tower.startGame() : (window.app && window.app.handleBetClick())">
                   <span>🏰 START TOWER CLIMB</span>
                 </button>
-                <button type="button" id="btnTowerCashout" class="btn-stake-primary" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000; border-radius: 10px; cursor: pointer; display: none;" onclick="window.app && window.app.tower && window.app.tower.cashOut()">
+                <button type="button" id="btnTowerCashout" class="btn-stake-primary" style="width: 100%; height: 44px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 50%, #b45309 100%); color: #07080d; border-radius: 10px; cursor: pointer; display: none; box-shadow: 0 4px 18px rgba(245, 158, 11, 0.4);" onclick="window.app && window.app.tower && window.app.tower.cashOut()">
                   <span id="towerCashoutText">👑 CASHOUT FLOOR</span>
                 </button>
               </div>
@@ -3092,10 +3092,10 @@
             <span>2. Enter 12-Digit UTR / Transaction ID:</span>
             <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 800;">● Instant Verification</span>
           </label>
-          <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423456789012" maxlength="16" style="font-family: monospace; font-size: 16px; letter-spacing: 1.5px; text-align: center; font-weight: 800; background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(0, 231, 1, 0.4); color: #00e701;">
+          <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423456789012" maxlength="16" style="font-family: monospace; font-size: 16px; letter-spacing: 1.5px; text-align: center; font-weight: 800; background: rgba(0, 0, 0, 0.5); border: 1.5px solid rgba(139, 92, 246, 0.45); color: #fcd34d;">
           <p class="utr-hint" style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">📌 Payment app (GPay/PhonePe/Paytm) ki "Transaction History" me se 12-digit UTR number copy karke yahan paste karein.</p>
           
-          <button id="btnSubmitDeposit" class="btn-action-primary" style="margin-top: 10px; height: 50px; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; box-shadow: 0 6px 24px rgba(0, 231, 1, 0.45); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer;">
+          <button id="btnSubmitDeposit" class="btn-action-primary" style="margin-top: 10px; height: 50px; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; box-shadow: 0 6px 24px rgba(124, 58, 237, 0.45); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer;">
             <span style="font-size: 18px;">⚡</span>
             <span>SUBMIT DEPOSIT REQUEST</span>
           </button>
@@ -3153,7 +3153,7 @@
             <span id="withdrawDailyRemainingText" style="color: #00e5ff; font-weight: 700;">₹1,00,000.00 / ₹1,00,000.00</span>
           </div>
           <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
-            <div id="withdrawLimitProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #00e701, #00e5ff);"></div>
+            <div id="withdrawLimitProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #8b5cf6, #fcd34d);"></div>
           </div>
         </div>
 
@@ -3368,7 +3368,7 @@
           </button>
         </div>
 
-        <button type="button" id="btnVerifyWithdrawOtp" class="btn-stake-primary" style="width: 100%; height: 48px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #00e701, #00b301); border: none; border-radius: 8px; color: #0f212e; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="window.app && window.app.verifyWithdrawOtpAndSubmit()">
+        <button type="button" id="btnVerifyWithdrawOtp" class="btn-stake-primary" style="width: 100%; height: 48px; font-size: 15px; font-weight: 900; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 8px; color: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 18px rgba(109, 40, 217, 0.4);" onclick="window.app && window.app.verifyWithdrawOtpAndSubmit()">
           <span>🛡️ VERIFY OTP & COMPLETE PAYOUT</span>
         </button>
       </div>
@@ -3424,7 +3424,7 @@
         <!-- Redeem Promo Code Input -->
         <div style="display: flex; gap: 6px;">
           <input type="text" id="supportPromoCodeInput" placeholder="Enter Admin 1-Time Promo Code" style="flex: 1; height: 38px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0 10px; color: #00e5ff; font-weight: 800; font-size: 13px; text-transform: uppercase;">
-          <button type="button" onclick="window.app && window.app.redeemSupportPromoCode()" style="height: 38px; padding: 0 16px; background: linear-gradient(135deg, #00e701 0%, #00b001 100%); color: #000; font-weight: 900; font-size: 13px; border: none; border-radius: 8px; cursor: pointer;">
+          <button type="button" onclick="window.app && window.app.redeemSupportPromoCode()" style="height: 38px; padding: 0 16px; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #ffffff; font-weight: 900; font-size: 13px; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 8px; cursor: pointer; box-shadow: 0 2px 10px rgba(109, 40, 217, 0.35);">
             <span>🎁 Redeem</span>
           </button>
         </div>

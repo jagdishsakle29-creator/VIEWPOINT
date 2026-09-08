@@ -1,5 +1,6 @@
 /* ===================================================
-   MINES GAME - ULTRA PREMIUM VIP 3D STYLING & ANIMATIONS
+   MINES GAME - LUXURY DARK VIP 3D STYLING & ANIMATIONS
+   80% Charcoal / 15% Royal Purple / 5% Metallic Gold
    =================================================== */
 
 .mines-grid {
@@ -11,10 +12,10 @@
   max-width: 360px;
   margin: 0 auto;
   padding: 8px;
-  background: rgba(11, 15, 30, 0.75); border: 1px solid rgba(168, 85, 247, 0.25); box-shadow: inset 0 4px 25px rgba(0, 0, 0, 0.7), 0 0 20px rgba(168, 85, 247, 0.12);
+  background: rgba(11, 14, 23, 0.85);
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  box-shadow: inset 0 4px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(109, 40, 217, 0.1);
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 600px) {
@@ -28,15 +29,15 @@
 
 /* Individual 3D Luxury Tile */
 .mine-tile {
-  background: linear-gradient(180deg, #1b2438 0%, #101726 100%); border: 1px solid rgba(168, 85, 247, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #181d2c 0%, #0e111a 100%);
+  border: 1px solid rgba(139, 92, 246, 0.18);
   border-radius: 8px;
   position: relative;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 3px 0 #0d1522, 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 0 #07090f, 0 4px 10px rgba(0, 0, 0, 0.5);
   transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, border-color 0.2s, box-shadow 0.15s;
   overflow: hidden;
   user-select: none;
@@ -53,21 +54,21 @@
   left: 0;
   right: 0;
   height: 40%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15), transparent);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
   border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
   pointer-events: none;
 }
 
 .mine-tile:hover:not(.revealed):not(.disabled) {
-  background: linear-gradient(180deg, #2f4260 0%, #1e2c42 100%);
+  background: linear-gradient(180deg, #22293d 0%, #141826 100%);
   transform: translateY(-3px);
-  border-color: #00f0ff; box-shadow: 0 4px 0 #070a12, 0 0 15px rgba(0, 240, 255, 0.35);
-  box-shadow: 0 8px 0 #0d1522, 0 12px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 245, 155, 0.2);
+  border-color: #8b5cf6;
+  box-shadow: 0 5px 0 #07090f, 0 0 16px rgba(139, 92, 246, 0.35);
 }
 
 .mine-tile:active:not(.revealed):not(.disabled) {
   transform: translateY(3px);
-  box-shadow: 0 2px 0 #0d1522, 0 4px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 0 #07090f, 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .mine-tile.disabled {
@@ -77,18 +78,18 @@
 
 /* Revealed States */
 .mine-tile.revealed {
-  background: #0b111a;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.8);
+  background: #080a11;
+  border-color: rgba(139, 92, 246, 0.12);
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.85);
   cursor: default;
   transform: translateY(3px);
 }
 
 /* Gem Reveal Animation */
 .mine-tile.gem-revealed {
-  background: radial-gradient(circle, rgba(0, 245, 155, 0.2) 0%, #0b111a 80%);
-  border-color: #00f0ff; box-shadow: 0 4px 0 #070a12, 0 0 15px rgba(0, 240, 255, 0.35);
-  box-shadow: inset 0 0 20px rgba(0, 245, 155, 0.25);
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, #080a11 80%);
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.3), 0 0 15px rgba(16, 185, 129, 0.2);
 }
 
 .gem-icon-wrapper {
@@ -98,7 +99,7 @@
   align-items: center;
   justify-content: center;
   animation: gem-pop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  filter: drop-shadow(0 0 14px rgba(0, 245, 155, 0.85));
+  filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.85));
 }
 
 .gem-svg {
@@ -114,9 +115,9 @@
 
 /* Mine / Bomb Reveal Animation */
 .mine-tile.bomb-revealed {
-  background: radial-gradient(circle, rgba(255, 51, 102, 0.35) 0%, #0b111a 85%);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, #080a11 85%);
   border-color: var(--accent-red);
-  box-shadow: inset 0 0 25px rgba(255, 51, 102, 0.4);
+  box-shadow: inset 0 0 25px rgba(239, 68, 68, 0.4);
   animation: bomb-shake 0.5s ease;
 }
 
@@ -127,7 +128,7 @@
   align-items: center;
   justify-content: center;
   animation: bomb-pop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  filter: drop-shadow(0 0 18px rgba(255, 51, 102, 0.9));
+  filter: drop-shadow(0 0 18px rgba(239, 68, 68, 0.9));
 }
 
 .bomb-svg {
@@ -155,9 +156,9 @@
 
 /* ================= 25 CLOCHE DISH CHICKEN MINES LUXURY STYLING & ANIMATIONS ================= */
 .cloche-tile {
-  background: radial-gradient(circle at 35% 35%, #2a3d53 0%, #131c28 100%);
-  border: 1.5px solid rgba(251, 191, 36, 0.35);
-  box-shadow: 0 5px 0 #0b111a, 0 8px 18px rgba(0, 0, 0, 0.7);
+  background: radial-gradient(circle at 35% 35%, #241e3d 0%, #100d1c 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 5px 0 #07060e, 0 8px 18px rgba(0, 0, 0, 0.7);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -190,8 +191,8 @@
 
 .cloche-tile:hover:not(.revealed):not(.disabled) {
   transform: translateY(-3px) scale(1.04);
-  border-color: #fbbf24;
-  box-shadow: 0 8px 0 #0b111a, 0 12px 24px rgba(245, 158, 11, 0.35);
+  border-color: #fcd34d;
+  box-shadow: 0 8px 0 #07060e, 0 12px 24px rgba(245, 158, 11, 0.35);
 }
 
 .cloche-tile:hover:not(.revealed):not(.disabled)::after {
@@ -200,7 +201,7 @@
 
 .cloche-tile:active:not(.revealed):not(.disabled) {
   transform: translateY(2px) scale(0.97);
-  box-shadow: 0 2px 0 #0b111a, 0 4px 10px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 2px 0 #07060e, 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 .cloche-tile.revealed::after {
@@ -209,9 +210,9 @@
 
 /* Roast Chicken Reveal Animation */
 .cloche-tile.chicken-revealed {
-  background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.3) 0%, #0d1622 85%);
-  border-color: #fbbf24;
-  box-shadow: 0 0 25px rgba(245, 158, 11, 0.55), inset 0 0 15px rgba(251, 191, 36, 0.4);
+  background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.3) 0%, #0d0c18 85%);
+  border-color: #fcd34d;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.55), inset 0 0 15px rgba(253, 211, 77, 0.4);
   animation: cloche-chicken-flip 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
@@ -222,7 +223,7 @@
   align-items: center;
   justify-content: center;
   animation: chicken-pop-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.95)) drop-shadow(0 0 25px rgba(251, 191, 36, 0.6));
+  filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.95)) drop-shadow(0 0 25px rgba(253, 211, 77, 0.6));
   font-size: 32px;
 }
 
@@ -241,7 +242,7 @@
 
 /* Bone Trap Reveal Animation */
 .cloche-tile.bone-revealed {
-  background: radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.4) 0%, #15090e 85%);
+  background: radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.35) 0%, #15090e 85%);
   border-color: #ef4444;
   box-shadow: 0 0 30px rgba(239, 68, 68, 0.65), inset 0 0 20px rgba(239, 68, 68, 0.45);
   animation: bone-shock-shake 0.5s ease-in-out;

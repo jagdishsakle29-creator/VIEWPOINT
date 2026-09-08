@@ -17,7 +17,7 @@
 
 /* Master Live Stage Card */
 .dt-live-stage {
-  background: radial-gradient(ellipse at center 20%, #152433 0%, #0c1622 60%, #070d14 100%);
+  background: radial-gradient(ellipse at center 20%, #1a122e 0%, #0c0f18 60%, #07080d 100%);
   border: 1.5px solid rgba(212, 175, 55, 0.35);
   border-radius: 20px;
   padding: 16px;
