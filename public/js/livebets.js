@@ -91,13 +91,14 @@
     betsHistory: [],
     maxHistory: 12,
     timerTicker: null,
+    timerHide: null,
     timerFeed: null,
 
     init: function() {
       this.initInitialRows();
       this.startFloatingTicker();
       this.startFeedStream();
-      console.log('✅ [LiveBets] Real-time winning stream initialized.');
+      console.log('✅ [LiveBets] Real-time winning stream initialized with delayed popup timing.');
     },
 
     initInitialRows: function() {
@@ -136,7 +137,7 @@
               <span>${item.game}</span>
             </div>
           </td>
-          <td><span class="tbl-user-cell">${item.user}</span></td>
+          <td><span class="tbl-user-cell ${item.user.includes('You') ? 'user-self' : ''}">${item.user}</span></td>
           <td><span class="tbl-time-cell">${item.time}</span></td>
           <td><span class="tbl-bet-cell">₹${item.bet.toLocaleString('en-IN')}</span></td>
           <td>
@@ -171,7 +172,7 @@
               <span>${betItem.game}</span>
             </div>
           </td>
-          <td><span class="tbl-user-cell">${betItem.user}</span></td>
+          <td><span class="tbl-user-cell ${betItem.user.includes('You') ? 'user-self' : ''}">${betItem.user}</span></td>
           <td><span class="tbl-time-cell">Just now</span></td>
           <td><span class="tbl-bet-cell">₹${betItem.bet.toLocaleString('en-IN')}</span></td>
           <td>
@@ -190,12 +191,11 @@
           tbody.removeChild(tbody.lastChild);
         }
       }
-
-      // Also trigger floating win ticker if win is high or random
-      this.displayFloatingWin(betItem);
+      // Note: Floating popup is deliberately NOT triggered on every background bet
+      // to keep the experience clean, non-spammy, and properly delayed.
     },
 
-    displayFloatingWin: function(betItem) {
+    showFloatingWin: function(betItem, displayDuration = 5000) {
       const widget = document.getElementById('floatingLiveWinWidget');
       if (!widget) return;
 
@@ -204,23 +204,42 @@
       const amtEl = document.getElementById('winTickerAmount');
       const multEl = document.getElementById('winTickerMult');
 
+      if (userEl) userEl.innerText = betItem.user;
+      if (gameEl) gameEl.innerText = `${betItem.icon} ${betItem.game}`;
+      if (amtEl) amtEl.innerText = `+₹${betItem.payout.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (multEl) multEl.innerText = `(${betItem.mult.toFixed(2)}x)`;
+
+      widget.classList.remove('anim-exit');
+      widget.classList.add('anim-enter');
+
+      // Auto-hide popup after display duration (5s standard, 7s for user win)
+      if (this.timerHide) clearTimeout(this.timerHide);
+      this.timerHide = setTimeout(() => {
+        this.hideFloatingWin();
+      }, displayDuration);
+    },
+
+    hideFloatingWin: function() {
+      const widget = document.getElementById('floatingLiveWinWidget');
+      if (!widget) return;
       widget.classList.remove('anim-enter');
       widget.classList.add('anim-exit');
+    },
 
-      setTimeout(() => {
-        if (userEl) userEl.innerText = betItem.user;
-        if (gameEl) gameEl.innerText = `${betItem.icon} ${betItem.game}`;
-        if (amtEl) amtEl.innerText = `+₹${betItem.payout.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        if (multEl) multEl.innerText = `(${betItem.mult.toFixed(2)}x)`;
+    dismissTicker: function(e) {
+      if (e) e.stopPropagation();
+      this.hideFloatingWin();
+    },
 
-        widget.classList.remove('anim-exit');
-        widget.classList.add('anim-enter');
-      }, 350);
+    handleTickerClick: function(e) {
+      // If clicked outside close button, scroll to feed table
+      this.scrollToFeed();
     },
 
     startFeedStream: function() {
       const scheduleNext = () => {
-        const delay = randomBetween(2800, 4800);
+        // Table stream adds background bets every 4s to 8s
+        const delay = randomBetween(4000, 8000);
         this.timerFeed = setTimeout(() => {
           const bet = generateBetItem();
           this.pushNewBet(bet);
@@ -231,11 +250,26 @@
     },
 
     startFloatingTicker: function() {
-      // First floating win after 1.2s
-      setTimeout(() => {
-        const bet = generateBetItem();
-        this.displayFloatingWin(bet);
-      }, 1200);
+      // Show first floating win with comfortable initial delay of 6.5s
+      const scheduleNextPopup = (delayMs) => {
+        if (this.timerTicker) clearTimeout(this.timerTicker);
+        this.timerTicker = setTimeout(() => {
+          // Pick high win / lucky multiplier or fresh exciting winner
+          const pool = this.betsHistory.filter(b => b.isLucky || b.isHigh || b.mult >= 2.0);
+          const bet = pool.length > 0
+            ? pool[Math.floor(Math.random() * pool.length)]
+            : generateBetItem();
+
+          // Show for 5 seconds
+          this.showFloatingWin(bet, 5000);
+
+          // Delay next popup by 14s to 22s
+          const nextWait = randomBetween(14000, 22000);
+          scheduleNextPopup(nextWait + 5000);
+        }, delayMs);
+      };
+
+      scheduleNextPopup(6500);
     },
 
     setFilter: function(filter) {
@@ -268,6 +302,9 @@
         isLucky: multiplier >= 5.0
       };
       this.pushNewBet(item);
+
+      // Immediately pop up with personal win and celebrate for 7 seconds!
+      this.showFloatingWin(item, 7000);
     }
   };
 

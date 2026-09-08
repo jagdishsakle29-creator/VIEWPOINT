@@ -2475,7 +2475,7 @@
     </section>
 
     <!-- Floating Live Winning Stream Widget (Stake.com / 1xBet Style) -->
-    <div id="floatingLiveWinWidget" class="floating-win-ticker" onclick="window.LiveBets && window.LiveBets.scrollToFeed()" title="Click to view live bets feed">
+    <div id="floatingLiveWinWidget" class="floating-win-ticker" onclick="window.LiveBets && window.LiveBets.handleTickerClick(event)" title="Click to view live bets feed">
       <div class="win-ticker-inner">
         <div class="win-ticker-dot-wrap">
           <div class="win-ticker-dot"></div>
@@ -2492,6 +2492,7 @@
             <span class="win-ticker-mult" id="winTickerMult">(2.90x)</span>
           </div>
         </div>
+        <button type="button" class="win-ticker-close" onclick="window.LiveBets && window.LiveBets.dismissTicker(event)" title="Close popup">×</button>
       </div>
     </div>
 
