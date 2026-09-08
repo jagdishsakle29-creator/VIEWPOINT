@@ -84,6 +84,21 @@
       return { suit, rank, isRed };
     }
 
+    createShuffledDeck() {
+      const deck = [];
+      for (const suit of SUITS) {
+        for (const rank of RANKS) {
+          const isRed = (suit === '♥' || suit === '♦');
+          deck.push({ suit, rank, isRed });
+        }
+      }
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      return deck;
+    }
+
     startDeal() {
       if (this.isPlaying) return;
 
@@ -118,38 +133,35 @@
       this.renderCards('andarCardsArea', []);
       this.renderCards('baharCardsArea', []);
 
-      // 1. Deal Joker Card
-      this.jokerCard = this.getRandomCard();
+      // Create standard shuffled deck
+      const deck = this.createShuffledDeck();
+
+      // 1. Deal Trump Joker Card from top of deck
+      this.jokerCard = deck.pop();
       this.renderJoker(this.jokerCard);
 
       if (window.soundEngine && window.soundEngine.playCardFlip) window.soundEngine.playCardFlip();
 
-      // 2. Start alternating dealing
-      let currentTurn = 'ANDAR';
+      // 2. Start alternating dealing:
+      // Authentic rule: Black Joker starts with ANDAR, Red Joker starts with BAHAR
+      let currentTurn = this.jokerCard.isRed ? 'BAHAR' : 'ANDAR';
       let cardsDealt = 0;
-      const maxCards = 40;
 
       // Admin RTP tuning
       const rtpSetting = localStorage.getItem('vp_admin_rtp_andarbahar') || 'fair';
-      let targetWinner = null;
+      let forceWinner = null;
       if (rtpSetting === 'house_edge') {
-        // Player loses more often
-        targetWinner = this.selectedSide === 'ANDAR' ? 'BAHAR' : 'ANDAR';
+        forceWinner = this.selectedSide === 'ANDAR' ? 'BAHAR' : 'ANDAR';
       } else if (rtpSetting === 'player_win') {
-        // Player wins more often
-        targetWinner = this.selectedSide;
+        forceWinner = this.selectedSide;
       }
 
       const dealInterval = setInterval(() => {
         cardsDealt++;
-        let card = this.getRandomCard();
+        let card = deck.length > 0 ? deck.pop() : this.getRandomCard();
 
-        // Check if we force a match based on target or random limit
-        const shouldMatchNow = (targetWinner && currentTurn === targetWinner && cardsDealt >= 4) ||
-                               (!targetWinner && card.rank === this.jokerCard.rank) ||
-                               (cardsDealt >= 12 && currentTurn === (targetWinner || 'ANDAR'));
-
-        if (shouldMatchNow) {
+        // Optional admin RTP tuning override
+        if (forceWinner && currentTurn === forceWinner && cardsDealt >= 4 && Math.random() < 0.35) {
           card = { ...this.jokerCard, suit: card.suit, isRed: card.isRed };
         }
 
@@ -164,21 +176,23 @@
 
         if (window.soundEngine && window.soundEngine.playCardFlip) window.soundEngine.playCardFlip();
 
-        // Check if this card matches Joker
+        // Check if this card matches Joker rank
         if (card.rank === this.jokerCard.rank) {
           clearInterval(dealInterval);
           this.resolveGame(currentTurn);
           return;
         }
 
-        // Alternate turn
+        // Alternate turn between ANDAR and BAHAR
         currentTurn = currentTurn === 'ANDAR' ? 'BAHAR' : 'ANDAR';
 
-        if (cardsDealt >= maxCards) {
+        if (cardsDealt >= 48) {
           clearInterval(dealInterval);
-          this.resolveGame(currentTurn);
+          // Fair 50/50 resolution if deck runs low
+          const finalWinner = Math.random() < 0.5 ? 'ANDAR' : 'BAHAR';
+          this.resolveGame(finalWinner);
         }
-      }, 450);
+      }, 420);
     }
 
     resolveGame(winningSide) {

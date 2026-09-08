@@ -303,8 +303,19 @@
 
       const multDisplay = document.getElementById('aviatorMultiplierText');
       if (multDisplay) {
-        multDisplay.innerText = `FLEW AWAY! (${finalMult.toFixed(2)}x)`;
         multDisplay.classList.add('crashed-text');
+        multDisplay.innerHTML = `
+          <div style="font-size: 1.15rem; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #f87171; margin-bottom: 2px;">FLEW AWAY</div>
+          <div style="font-size: 3.2rem; font-weight: 900; line-height: 1; color: #ef4444;">${finalMult.toFixed(2)}x</div>
+        `;
+      }
+
+      const btnCashout = document.getElementById('btnAviatorCashout');
+      if (btnCashout && !this.hasCashedOut) {
+        btnCashout.disabled = true;
+        btnCashout.classList.remove('active-cashout');
+        btnCashout.style.background = 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)';
+        btnCashout.innerText = `FLEW AWAY (${finalMult.toFixed(2)}x)`;
       }
 
       if (this.hasBet && !this.hasCashedOut) {
@@ -317,7 +328,7 @@
 
       this.drawCrashedFrame();
 
-      // Clean reset after 1.5 seconds
+      // Clean reset after 1.5 seconds so player can immediately bet on next flight
       setTimeout(() => {
         this.resetToIdle();
       }, 1500);
@@ -327,6 +338,7 @@
       this.gameState = 'IDLE';
       this.hasBet = false;
       this.hasCashedOut = false;
+      this.multiplier = 1.00;
 
       const btnBet = document.getElementById('btnAviatorBet');
       const btnCashout = document.getElementById('btnAviatorCashout');
@@ -342,11 +354,11 @@
         btnCashout.disabled = false;
         btnCashout.style.background = '';
         btnCashout.classList.remove('active-cashout');
-        btnCashout.innerHTML = `CASHOUT <span class="cashout-amt" id="aviatorCashoutPreview">₹0.00</span>`;
+        btnCashout.innerHTML = `CASHOUT <span class="cashout-amt" id="aviatorCashoutPreview">₹${this.betAmount.toFixed(2)}</span>`;
       }
       if (multDisplay) {
-        multDisplay.innerText = '1.00x';
         multDisplay.classList.remove('crashed-text');
+        multDisplay.innerHTML = '1.00x';
       }
 
       this.drawIdleState();
@@ -537,19 +549,10 @@
       const w = this.canvas.width;
       const h = this.canvas.height;
 
-      // Explosion flash
+      // Soft red atmospheric glow on crash
       ctx.save();
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
       ctx.fillRect(0, 0, w, h);
-
-      // Crash icon in center
-      ctx.font = 'bold 36px sans-serif';
-      ctx.fillStyle = '#ef4444';
-      ctx.textAlign = 'center';
-      ctx.fillText('💥 FLEW AWAY', w / 2, h / 2 - 20);
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillStyle = '#ffd700';
-      ctx.fillText(`@ ${this.crashMultiplier.toFixed(2)}x`, w / 2, h / 2 + 15);
       ctx.restore();
     }
 
