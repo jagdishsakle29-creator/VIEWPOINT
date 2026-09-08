@@ -5552,7 +5552,7 @@ class AppController {
       return;
     }
 
-    const localAdminPins = ['7400', '9191', '2026', '9999', 'VIEWPOINT_ADMIN_SECRET_2026', 'admin'];
+    const localAdminPins = ['6263', '7400', '9191', '2026', '9999', 'VIEWPOINT_ADMIN_SECRET_2026', 'admin'];
     const isLocalMatch = localAdminPins.includes(enteredPin);
 
     // Authoritative Server-Side Admin Authentication Check

@@ -1,22 +1,21 @@
 /**
  * VIEWPOINT - Protected Admin Control Dashboard (admin.js)
- * Master PIN: 7777
+ * Master PIN: 6263 (Private Secret Mode Only)
  * Features:
- * 1. Security Pin Authentication
- * 2. Live Win-Rate / RTP House Edge Controls per Game
- * 3. Deposit & Withdrawal Request Management (Approve/Reject)
- * 4. User Balance Manager
- * 5. Instant Promo Code Generator
+ * 1. Security PIN Authentication (6263)
+ * 2. Secret URL Parameter Guard: ?secret=6263 or ?admin=6263
+ * 3. Live Win-Rate / RTP House Edge Controls per Game
+ * 4. Deposit & Withdrawal Request Management (Approve/Reject)
+ * 5. User Balance Manager
  */
 
 (function(window) {
   'use strict';
 
-  const DEFAULT_PIN = '7777';
+  const DEFAULT_PIN = '6263';
   const STORAGE_KEYS = {
     ADMIN_PIN: 'vp_admin_pin',
     ADMIN_AUTH: 'vp_admin_authenticated',
-    CUSTOM_CODES: 'vp_admin_custom_codes',
     PENDING_TXNS: 'vp_admin_pending_txns'
   };
 
@@ -29,7 +28,31 @@
     init() {
       this.bindEvents();
       this.initDefaultTransactions();
-      console.log('✅ [Admin] Dashboard module loaded.');
+      this.checkPrivateAdminLink();
+      console.log('✅ [Admin] Private Dashboard module loaded.');
+    }
+
+    checkPrivateAdminLink() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hash = window.location.hash;
+      const isSecret = urlParams.get('secret') === '6263' ||
+                       urlParams.get('admin') === '6263' ||
+                       hash === '#admin6263' ||
+                       sessionStorage.getItem('vp_admin_secret') === '6263';
+
+      const adminBtn = document.getElementById('btnNavAdminPanel');
+      const supportBar = document.getElementById('floatingSupportBar');
+
+      if (isSecret) {
+        sessionStorage.setItem('vp_admin_secret', '6263');
+        if (adminBtn) adminBtn.style.setProperty('display', 'flex', 'important');
+        if (supportBar) supportBar.style.setProperty('display', 'flex', 'important');
+        console.log('🔓 [Admin] Private Admin Access Unlocked via Secret Link (?secret=6263)');
+      } else {
+        // Completely hidden from regular members
+        if (adminBtn) adminBtn.style.setProperty('display', 'none', 'important');
+        if (supportBar) supportBar.style.setProperty('display', 'none', 'important');
+      }
     }
 
     bindEvents() {
@@ -75,34 +98,10 @@
           this.notify(`Player balance manually updated to ₹${val.toFixed(2)}!`, 'success');
         });
       }
-
-      // Promo Code Generator
-      const btnCreateCode = document.getElementById('btnAdminCreateCode');
-      const inputCodeName = document.getElementById('inputAdminNewCodeName');
-      const inputCodeAmt = document.getElementById('inputAdminNewCodeAmt');
-
-      if (btnCreateCode && inputCodeName && inputCodeAmt) {
-        btnCreateCode.addEventListener('click', () => {
-          const code = inputCodeName.value.trim().toUpperCase();
-          const amt = parseFloat(inputCodeAmt.value);
-          if (!code || isNaN(amt) || amt <= 0) {
-            this.notify('Please provide valid Code Name and Amount!', 'warning');
-            return;
-          }
-
-          let custom = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_CODES) || '{}');
-          custom[code] = { amount: amt, title: `Admin Special Code (${code})` };
-          localStorage.setItem(STORAGE_KEYS.CUSTOM_CODES, JSON.stringify(custom));
-
-          this.notify(`🎁 Promo Code "${code}" for ₹${amt} created successfully!`, 'success');
-          inputCodeName.value = '';
-          inputCodeAmt.value = '';
-          this.renderCustomCodesList();
-        });
-      }
     }
 
     openAdmin() {
+      // Allow opening only if secret is authorized or via pin
       const pinModal = document.getElementById('modalAdminPin');
       const panelModal = document.getElementById('modalAdminPanel');
       const inputPin = document.getElementById('inputAdminPin');
@@ -111,7 +110,10 @@
         if (panelModal) panelModal.classList.add('active');
         this.refreshAdminData();
       } else {
-        if (pinModal) pinModal.classList.add('active');
+        if (pinModal) {
+          pinModal.classList.add('active');
+          pinModal.style.display = 'flex';
+        }
         if (inputPin) {
           inputPin.value = '';
           setTimeout(() => inputPin.focus(), 150);
@@ -127,22 +129,34 @@
 
       if (entered === master) {
         this.isAuthenticated = true;
+        sessionStorage.setItem('vp_admin_secret', '6263');
         const pinModal = document.getElementById('modalAdminPin');
         const panelModal = document.getElementById('modalAdminPanel');
 
-        if (pinModal) pinModal.classList.remove('active');
-        if (panelModal) panelModal.classList.add('active');
+        if (pinModal) {
+          pinModal.classList.remove('active');
+          pinModal.style.display = 'none';
+        }
+        if (panelModal) {
+          panelModal.classList.add('active');
+          panelModal.style.display = 'flex';
+        }
 
-        this.notify('🔓 Admin Access Granted!', 'success');
+        // Also ensure secret buttons are visible
+        const adminBtn = document.getElementById('btnNavAdminPanel');
+        const supportBar = document.getElementById('floatingSupportBar');
+        if (adminBtn) adminBtn.style.setProperty('display', 'flex', 'important');
+        if (supportBar) supportBar.style.setProperty('display', 'flex', 'important');
+
+        this.notify('🔓 Admin Access Granted! (PIN: 6263)', 'success');
         this.refreshAdminData();
       } else {
-        this.notify('❌ Incorrect Master PIN! (Default: 7777)', 'error');
+        this.notify('❌ Incorrect Master PIN!', 'error');
       }
     }
 
     refreshAdminData() {
       this.renderPendingTransactions();
-      this.renderCustomCodesList();
 
       const balInput = document.getElementById('inputAdminSetBalance');
       const curBal = parseFloat(localStorage.getItem('vp_user_balance') || '500');
@@ -208,33 +222,6 @@
       txns.splice(idx, 1);
       localStorage.setItem(STORAGE_KEYS.PENDING_TXNS, JSON.stringify(txns));
       this.renderPendingTransactions();
-    }
-
-    renderCustomCodesList() {
-      const container = document.getElementById('adminCustomCodesList');
-      if (!container) return;
-
-      const codes = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_CODES) || '{}');
-      const keys = Object.keys(codes);
-      if (keys.length === 0) {
-        container.innerHTML = '<span style="color:#94a3b8; font-size:0.85rem;">No custom codes created yet.</span>';
-        return;
-      }
-
-      container.innerHTML = keys.map(k => `
-        <div class="admin-code-pill">
-          <span><strong>${k}</strong>: ₹${codes[k].amount}</span>
-          <button class="btn-del-code" onclick="window.adminDashboard.deleteCode('${k}')">×</button>
-        </div>
-      `).join('');
-    }
-
-    deleteCode(code) {
-      let codes = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOM_CODES) || '{}');
-      delete codes[code];
-      localStorage.setItem(STORAGE_KEYS.CUSTOM_CODES, JSON.stringify(codes));
-      this.renderCustomCodesList();
-      this.notify(`Promo Code ${code} deleted!`, 'warning');
     }
 
     notify(msg, type) {

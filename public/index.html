@@ -88,24 +88,66 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <!-- CSS Stylesheets (Cache-Busted v=104.0) -->
-  <link rel="stylesheet" href="css/style.css?v=104.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=104.0">
-  <link rel="stylesheet" href="css/mines.css?v=104.0">
-  <link rel="stylesheet" href="css/chicken.css?v=104.0">
-  <link rel="stylesheet" href="css/plinko.css?v=104.0">
-  <link rel="stylesheet" href="css/crash.css?v=104.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=104.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=104.0">
-  <link rel="stylesheet" href="css/dice.css?v=104.0">
-  <link rel="stylesheet" href="css/limbo.css?v=104.0">
-  <link rel="stylesheet" href="css/pump.css?v=104.0">
-  <link rel="stylesheet" href="css/moles.css?v=104.0">
-  <link rel="stylesheet" href="css/tower.css?v=104.0">
-  <link rel="stylesheet" href="css/aviator.css?v=104.0">
-  <link rel="stylesheet" href="css/andarbahar.css?v=104.0">
-  <link rel="stylesheet" href="css/rewards.css?v=104.0">
-  <link rel="stylesheet" href="css/admin.css?v=104.0">
+  <!-- CSS Stylesheets (Cache-Busted v=105.0) -->
+  <link rel="stylesheet" href="css/style.css?v=105.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=105.0">
+  <link rel="stylesheet" href="css/mines.css?v=105.0">
+  <link rel="stylesheet" href="css/chicken.css?v=105.0">
+  <link rel="stylesheet" href="css/plinko.css?v=105.0">
+  <link rel="stylesheet" href="css/crash.css?v=105.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=105.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=105.0">
+  <link rel="stylesheet" href="css/dice.css?v=105.0">
+  <link rel="stylesheet" href="css/limbo.css?v=105.0">
+  <link rel="stylesheet" href="css/pump.css?v=105.0">
+  <link rel="stylesheet" href="css/moles.css?v=105.0">
+  <link rel="stylesheet" href="css/tower.css?v=105.0">
+  <link rel="stylesheet" href="css/aviator.css?v=105.0">
+  <link rel="stylesheet" href="css/andarbahar.css?v=105.0">
+  <link rel="stylesheet" href="css/rewards.css?v=105.0">
+  <link rel="stylesheet" href="css/admin.css?v=105.0">
+
+  <!-- Secret Admin & Support Guard: Only unlocked via ?secret=6263 or ?admin=6263 -->
+  <script>
+    (function() {
+      function checkAdminGuard() {
+        var params = new URLSearchParams(window.location.search);
+        var hash = window.location.hash;
+        var isSecret = params.get("secret") === "6263" ||
+                       params.get("admin") === "6263" ||
+                       hash === "#admin6263" ||
+                       sessionStorage.getItem("vp_admin_secret") === "6263";
+
+        var adminBtn = document.getElementById("btnNavAdminPanel");
+        var supportBar = document.getElementById("floatingSupportBar");
+
+        if (isSecret) {
+          sessionStorage.setItem("vp_admin_secret", "6263");
+          if (adminBtn) adminBtn.style.setProperty("display", "flex", "important");
+          if (supportBar) supportBar.style.setProperty("display", "flex", "important");
+
+          if (params.get("secret") === "6263" || params.get("admin") === "6263") {
+            var pinModal = document.getElementById("modalAdminPinGate");
+            if (pinModal) {
+              pinModal.classList.add("open");
+              pinModal.style.display = "flex";
+              var inp = document.getElementById("inputAdminPin");
+              if (inp) { inp.value = ""; setTimeout(function(){ inp.focus(); }, 300); }
+            }
+          }
+        } else {
+          if (adminBtn) adminBtn.style.setProperty("display", "none", "important");
+          if (supportBar) supportBar.style.setProperty("display", "none", "important");
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", checkAdminGuard);
+      } else {
+        checkAdminGuard();
+      }
+    })();
+  </script>
 
 </head>
 <body role="application" translate="no" data-reader-ignore="true">
@@ -570,12 +612,9 @@
           <span>🎁 Daily Bonus</span>
         </button>
 
-        <button id="btnNavPromoCode" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(168,85,247,0.18), rgba(236,72,153,0.22)); border: 1px solid #c084fc; color: #e879f9;" onclick="var m=document.getElementById('modalPromoCode'); if(m){m.classList.add('open'); m.style.display='flex';}" title="Redeem Promo Code Voucher">
-          <span>🏷️ Promo Code</span>
-        </button>
-
-        <button id="btnNavAdminPanel" class="btn-refer-nav" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1;" onclick="window.adminDashboard && window.adminDashboard.openAdmin();" title="Admin Control Dashboard">
-          <span>⚙️ Admin (7777)</span>
+        <!-- Admin Button (Hidden by default, only shown via ?secret=6263 private link) -->
+        <button id="btnNavAdminPanel" class="btn-refer-nav" style="display: none !important; background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.4); color: #c084fc;" onclick="window.adminDashboard && window.adminDashboard.openAdmin();" title="Admin Control Dashboard">
+          <span>⚙️ Admin</span>
         </button>
 
         <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
@@ -3470,30 +3509,30 @@
     </button>
   </nav>
 
-  <!-- Core Casino JavaScript Modules (High Priority Local Execution - v=104.0) -->
-  <script src="js/config.js?v=104.0"></script>
-  <script src="js/security.js?v=104.0"></script>
-  <script src="js/audio.js?v=104.0"></script>
-  <script src="js/wallet.js?v=104.0"></script>
-  <script src="js/provablyFair.js?v=104.0"></script>
-  <script src="js/dragontiger.js?v=104.0"></script>
-  <script src="js/mines.js?v=104.0"></script>
-  <script src="js/limbo.js?v=104.0"></script>
-  <script src="js/chicken.js?v=104.0"></script>
-  <script src="js/plinko.js?v=104.0"></script>
-  <script src="js/crash.js?v=104.0"></script>
-  <script src="js/colortrading.js?v=104.0"></script>
-  <script src="js/stocktrading.js?v=104.0"></script>
-  <script src="js/dice.js?v=104.0"></script>
-  <script src="js/pump.js?v=104.0"></script>
-  <script src="js/moles.js?v=104.0"></script>
-  <script src="js/tower.js?v=104.0"></script>
-  <script src="js/aviator.js?v=104.0"></script>
-  <script src="js/andarbahar.js?v=104.0"></script>
-  <script src="js/rewards.js?v=104.0"></script>
-  <script src="js/admin.js?v=104.0"></script>
+  <!-- Core Casino JavaScript Modules (High Priority Local Execution - v=105.0) -->
+  <script src="js/config.js?v=105.0"></script>
+  <script src="js/security.js?v=105.0"></script>
+  <script src="js/audio.js?v=105.0"></script>
+  <script src="js/wallet.js?v=105.0"></script>
+  <script src="js/provablyFair.js?v=105.0"></script>
+  <script src="js/dragontiger.js?v=105.0"></script>
+  <script src="js/mines.js?v=105.0"></script>
+  <script src="js/limbo.js?v=105.0"></script>
+  <script src="js/chicken.js?v=105.0"></script>
+  <script src="js/plinko.js?v=105.0"></script>
+  <script src="js/crash.js?v=105.0"></script>
+  <script src="js/colortrading.js?v=105.0"></script>
+  <script src="js/stocktrading.js?v=105.0"></script>
+  <script src="js/dice.js?v=105.0"></script>
+  <script src="js/pump.js?v=105.0"></script>
+  <script src="js/moles.js?v=105.0"></script>
+  <script src="js/tower.js?v=105.0"></script>
+  <script src="js/aviator.js?v=105.0"></script>
+  <script src="js/andarbahar.js?v=105.0"></script>
+  <script src="js/rewards.js?v=105.0"></script>
+  <script src="js/admin.js?v=105.0"></script>
 
-  <script src="js/app.js?v=104.0"></script>
+  <script src="js/app.js?v=105.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
