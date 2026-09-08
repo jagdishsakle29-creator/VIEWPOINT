@@ -343,6 +343,10 @@ class CasinoWallet {
     return this.addWin(amount);
   }
 
+  addBalance(amount, reason = '') {
+    return this.addWin(amount);
+  }
+
   // Create a new deposit request requiring Server Confirmation (SEC-02 Duplicate UTR Prevention)
   async submitDepositRequest(amount, utr = '', upiId = '') {
     amount = parseFloat(amount);

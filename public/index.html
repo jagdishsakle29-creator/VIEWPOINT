@@ -619,11 +619,11 @@
         </button>
 
         <!-- Quick Action Buttons: Lucky Spin, Daily Streak, Promo Code, Admin Panel -->
-        <button id="btnNavLuckySpin" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(245,158,11,0.22)); border: 1px solid #ffd700; color: #ffd700;" onclick="var m=document.getElementById('modalLuckySpin'); if(m){m.classList.add('open'); m.style.display='flex';} window.Rewards && window.Rewards.drawWheel(window.Rewards.currentRotation);" title="Daily Lucky Spin Wheel">
+        <button id="btnNavLuckySpin" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(245,158,11,0.22)); border: 1px solid #ffd700; color: #ffd700;" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" title="Daily Lucky Spin Wheel">
           <span>🎡 Spin & Win</span>
         </button>
 
-        <button id="btnNavDailyStreak" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(34,197,94,0.18), rgba(16,185,129,0.22)); border: 1px solid #22c55e; color: #4ade80;" onclick="var m=document.getElementById('modalDailyStreak'); if(m){m.classList.add('open'); m.style.display='flex';} window.Rewards && window.Rewards.renderDailyStreakUI();" title="Daily 7-Day Login Streak Bonus">
+        <button id="btnNavDailyStreak" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(34,197,94,0.18), rgba(16,185,129,0.22)); border: 1px solid #22c55e; color: #4ade80;" onclick="window.openDailyStreakModal ? window.openDailyStreakModal() : (window.Rewards && window.Rewards.openDailyStreakModal ? window.Rewards.openDailyStreakModal() : null);" title="Daily 7-Day Login Streak Bonus">
           <span>🎁 Daily Bonus</span>
         </button>
 
@@ -822,6 +822,13 @@
           <span style="font-size: 16px; line-height: 1;">🃏👑</span>
           <span style="font-weight: 900;">Andar Bahar</span>
           <span class="tab-badge" style="background: linear-gradient(135deg, #3b82f6, #10b981); color: #fff; font-size: 8.5px; font-weight: 900;">🟢 6.2k</span>
+        </button>
+
+        <!-- 15. Daily Lucky Spin & Win -->
+        <button id="tabLuckySpin" class="tab-btn" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🎡💰</span>
+          <span style="font-weight: 900;">Spin &amp; Win</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #ffd700, #f59e0b); color: #000; font-size: 8.5px; font-weight: 900;">🎁 FREE</span>
         </button>
       </div>
     </div>
@@ -2698,6 +2705,70 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal: Daily Lucky Spin & Win -->
+  <div id="modalLuckySpin" class="modal-backdrop" onclick="if(event.target === this) window.closeLuckySpinModal ? window.closeLuckySpinModal() : (window.Rewards && window.Rewards.closeLuckySpinModal())">
+    <div class="modal-card" style="max-width: 380px; text-align: center; position: relative;">
+      <div class="modal-title-row" style="margin-bottom: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🎡</span>
+          <h3 class="modal-title" style="color: #ffd700; font-size: 1.15rem; margin: 0;">Daily Lucky Spin &amp; Win</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.closeLuckySpinModal ? window.closeLuckySpinModal() : (window.Rewards && window.Rewards.closeLuckySpinModal())">&times;</button>
+      </div>
+
+      <div class="spin-modal-content">
+        <p style="color: #94a3b8; font-size: 0.85rem; margin: 0; line-height: 1.4;">
+          Spin the wheel daily for a chance to win instant real cash up to ₹500!
+        </p>
+
+        <div class="wheel-wrapper">
+          <div class="wheel-pointer"></div>
+          <canvas id="luckyWheelCanvas" width="280" height="280"></canvas>
+        </div>
+
+        <div id="spinCooldownTimer" class="spin-timer-sub" style="font-size: 0.88rem; font-weight: 700; color: #22c55e;">Ready to Spin!</div>
+
+        <button type="button" id="btnSpinWheelAction" class="btn-spin-action" onclick="window.Rewards && window.Rewards.spinWheel()">
+          SPIN WHEEL FREE
+        </button>
+
+        <div style="font-size: 0.75rem; color: #64748b; margin-top: -4px;">
+          🔒 100% Provably Fair RNG • 1 Free Daily Spin (24h Cooldown)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: 7-Day Login Streak Bonus -->
+  <div id="modalDailyStreak" class="modal-backdrop" onclick="if(event.target === this) window.closeDailyStreakModal ? window.closeDailyStreakModal() : (window.Rewards && window.Rewards.closeDailyStreakModal())">
+    <div class="modal-card" style="max-width: 440px; text-align: center; position: relative;">
+      <div class="modal-title-row" style="margin-bottom: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 22px;">🎁</span>
+          <h3 class="modal-title" style="color: #22c55e; font-size: 1.15rem; margin: 0;">7-Day Login Streak Bonus</h3>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="window.closeDailyStreakModal ? window.closeDailyStreakModal() : (window.Rewards && window.Rewards.closeDailyStreakModal())">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 6px 0 0 0;">
+        <p style="color: #94a3b8; font-size: 0.85rem; margin: 0 0 12px; line-height: 1.4;">
+          Login daily to unlock higher rewards! Claim up to ₹300 on Day 7.
+        </p>
+
+        <div id="dailyStreakGrid" class="streak-grid"></div>
+
+        <button type="button" id="btnClaimStreakAction" class="btn-spin-action" style="margin-top: 14px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff;" onclick="window.Rewards && window.Rewards.claimDailyStreak()">
+          Claim Daily Bonus
+        </button>
+
+        <div style="font-size: 0.75rem; color: #64748b; margin-top: 8px;">
+          Resets if consecutive daily check-in is broken.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="modalRefer" class="modal-backdrop">
     <div class="modal-card modal-refer-card">
       <div class="modal-title-row">

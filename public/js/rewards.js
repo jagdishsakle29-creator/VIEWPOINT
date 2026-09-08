@@ -65,6 +65,53 @@
       console.log('✅ [Rewards] Retention & Rewards System initialized.');
     },
 
+    openLuckySpinModal: function() {
+      const modal = document.getElementById('modalLuckySpin');
+      if (!modal) return;
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+      this.initLuckyWheelCanvas();
+      this.drawWheel(this.currentRotation);
+      this.updateTimers();
+      if (window.soundEngine && window.soundEngine.playClick) {
+        window.soundEngine.playClick();
+      }
+    },
+
+    closeLuckySpinModal: function() {
+      const modal = document.getElementById('modalLuckySpin');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    },
+
+    openDailyStreakModal: function() {
+      const modal = document.getElementById('modalDailyStreak');
+      if (!modal) return;
+      modal.classList.add('open');
+      modal.style.display = 'flex';
+      this.renderDailyStreakUI();
+      if (window.soundEngine && window.soundEngine.playClick) {
+        window.soundEngine.playClick();
+      }
+    },
+
+    closeDailyStreakModal: function() {
+      const modal = document.getElementById('modalDailyStreak');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.style.display = 'none';
+      }
+    },
+
+    resetCooldown: function() {
+      localStorage.removeItem(STORAGE_KEYS.SPIN_LAST);
+      localStorage.removeItem(STORAGE_KEYS.STREAK_LAST);
+      this.updateTimers();
+      this.notify('Daily bonuses and lucky spin cooldown reset!', 'success');
+    },
+
     // -------------------------------------------------------------
     // 1. LUCKY SPIN & WIN
     // -------------------------------------------------------------
@@ -77,6 +124,9 @@
     },
 
     drawWheel: function(deg) {
+      if (!this.wheelCanvas) {
+        this.initLuckyWheelCanvas();
+      }
       const canvas = this.wheelCanvas;
       if (!canvas) return;
       const ctx = this.wheelCtx;
@@ -169,7 +219,8 @@
         const rem = this.getTimeUntilSpin();
         const hrs = Math.floor(rem / 3600000);
         const mins = Math.floor((rem % 3600000) / 60000);
-        this.notify(`Next free spin available in ${hrs}h ${mins}m!`, 'warning');
+        const secs = Math.floor((rem % 60000) / 1000);
+        this.notify(`Next free spin available in ${hrs}h ${mins}m ${secs}s!`, 'warning');
         return;
       }
 
@@ -199,23 +250,40 @@
       // Winning slice angle must align with 270 deg
       const targetSliceCenter = winningIndex * sliceDeg + sliceDeg / 2;
       const finalDeg = (270 - targetSliceCenter + 360) % 360;
-      const totalRotations = 360 * 5 + finalDeg;
+
+      const currentMod = ((this.currentRotation % 360) + 360) % 360;
+      const diff = ((finalDeg - currentMod) % 360 + 360) % 360;
+      const totalDelta = 360 * 5 + diff; // 5 full revolutions + exact offset to slice
+      const startRot = this.currentRotation;
 
       const startTime = performance.now();
       const duration = 4500;
-      const startDeg = this.currentRotation % 360;
+      let lastSliceTick = -1;
 
-      if (window.audio && window.audio.play) window.audio.play('click');
+      if (window.soundEngine && window.soundEngine.playClick) {
+        window.soundEngine.playClick();
+      } else if (window.audio && window.audio.play) {
+        window.audio.play('click');
+      }
 
       const animate = (now) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
         // Ease out cubic
         const ease = 1 - Math.pow(1 - progress, 3);
-        const current = startDeg + totalRotations * ease;
+        const current = startRot + totalDelta * ease;
 
         this.currentRotation = current;
         this.drawWheel(current);
+
+        // Sound clicks on slice boundaries
+        const curSlice = Math.floor((((270 - (current % 360) + 360) % 360)) / sliceDeg);
+        if (curSlice !== lastSliceTick) {
+          lastSliceTick = curSlice;
+          if (window.soundEngine && window.soundEngine.playClick) {
+            window.soundEngine.playClick();
+          }
+        }
 
         if (progress < 1) {
           requestAnimationFrame(animate);
@@ -226,7 +294,11 @@
           const prize = WHEEL_PRIZES[winningIndex];
           this.awardBalance(prize.amount, `Daily Lucky Spin Win: ${prize.label}`);
 
-          if (window.audio && window.audio.play) window.audio.play('win');
+          if (window.soundEngine && window.soundEngine.playWin) {
+            window.soundEngine.playWin();
+          } else if (window.audio && window.audio.play) {
+            window.audio.play('win');
+          }
           this.notify(`🎉 CONGRATULATIONS! You won ${prize.label} in Lucky Spin!`, 'success');
 
           if (spinBtn) {
@@ -425,7 +497,11 @@
     // HELPER: AWARD BALANCE & NOTIFICATIONS
     // -------------------------------------------------------------
     awardBalance: function(amount, reason) {
-      if (window.wallet && window.wallet.addBalance) {
+      if (window.wallet && typeof window.wallet.addWin === 'function') {
+        window.wallet.addWin(amount);
+      } else if (window.wallet && typeof window.wallet.add === 'function') {
+        window.wallet.add(amount);
+      } else if (window.wallet && typeof window.wallet.addBalance === 'function') {
         window.wallet.addBalance(amount, reason);
       } else if (window.app && window.app.wallet && window.app.wallet.addBalance) {
         window.app.wallet.addBalance(amount, reason);
@@ -439,8 +515,10 @@
     },
 
     notify: function(msg, type) {
-      if (window.app && window.app.showNotification) {
+      if (window.app && typeof window.app.showNotification === 'function') {
         window.app.showNotification(msg, type);
+      } else if (window.app && typeof window.app.showToast === 'function') {
+        window.app.showToast({ won: type === 'success', payout: 0, multiplier: 0, msg: msg });
       } else {
         alert(msg);
       }
@@ -451,10 +529,15 @@
       const spinBtn = document.getElementById('btnSpinWheelAction');
 
       if (this.canSpin()) {
-        if (spinTimerEl) spinTimerEl.innerText = 'Ready to Spin!';
+        if (spinTimerEl) {
+          spinTimerEl.innerText = 'Ready to Spin! 1 Free Daily Spin';
+          spinTimerEl.style.color = '#22c55e';
+        }
         if (spinBtn && !this.isSpinning) {
           spinBtn.disabled = false;
           spinBtn.innerText = 'SPIN WHEEL FREE';
+          spinBtn.style.opacity = '1';
+          spinBtn.style.cursor = 'pointer';
         }
       } else {
         const rem = this.getTimeUntilSpin();
@@ -462,10 +545,15 @@
         const mins = Math.floor((rem % 3600000) / 60000);
         const secs = Math.floor((rem % 60000) / 1000);
         const timeStr = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        if (spinTimerEl) spinTimerEl.innerText = `Next Spin in ${timeStr}`;
-        if (spinBtn) {
+        if (spinTimerEl) {
+          spinTimerEl.innerText = `Next Spin in ${timeStr}`;
+          spinTimerEl.style.color = '#f59e0b';
+        }
+        if (spinBtn && !this.isSpinning) {
           spinBtn.disabled = true;
           spinBtn.innerText = `Wait (${timeStr})`;
+          spinBtn.style.opacity = '0.6';
+          spinBtn.style.cursor = 'not-allowed';
         }
       }
     }
@@ -473,9 +561,59 @@
 
   window.Rewards = Rewards;
 
+  // Global window helpers for direct button onclicks
+  window.openLuckySpinModal = function() {
+    if (window.Rewards && window.Rewards.openLuckySpinModal) {
+      window.Rewards.openLuckySpinModal();
+    } else {
+      var m = document.getElementById('modalLuckySpin');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+      if (window.Rewards && window.Rewards.drawWheel) window.Rewards.drawWheel(window.Rewards.currentRotation || 0);
+    }
+  };
+
+  window.closeLuckySpinModal = function() {
+    if (window.Rewards && window.Rewards.closeLuckySpinModal) {
+      window.Rewards.closeLuckySpinModal();
+    } else {
+      var m = document.getElementById('modalLuckySpin');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    }
+  };
+
+  window.openDailyStreakModal = function() {
+    if (window.Rewards && window.Rewards.openDailyStreakModal) {
+      window.Rewards.openDailyStreakModal();
+    } else {
+      var m = document.getElementById('modalDailyStreak');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+      if (window.Rewards && window.Rewards.renderDailyStreakUI) window.Rewards.renderDailyStreakUI();
+    }
+  };
+
+  window.closeDailyStreakModal = function() {
+    if (window.Rewards && window.Rewards.closeDailyStreakModal) {
+      window.Rewards.closeDailyStreakModal();
+    } else {
+      var m = document.getElementById('modalDailyStreak');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    }
+  };
+
+  window.spinLuckyWheel = function() {
+    if (window.Rewards && window.Rewards.spinWheel) {
+      window.Rewards.spinWheel();
+    }
+  };
+
   // Auto-init on DOM ready
   document.addEventListener('DOMContentLoaded', () => {
     Rewards.init();
   });
+
+  // Also init immediately if document is already loaded
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(() => Rewards.init(), 100);
+  }
 
 })(window);

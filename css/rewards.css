@@ -39,6 +39,17 @@
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
   z-index: 15;
 }
+.wheel-pointer::after {
+  content: '';
+  position: absolute;
+  top: -28px;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
 .spin-timer-sub {
   font-size: 0.9rem;
   color: #94a3b8;
