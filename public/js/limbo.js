@@ -147,8 +147,10 @@ class CasinoLimbo {
     const chip = document.createElement('div');
     chip.className = `limbo-history-chip ${entry.won ? 'won' : 'lost'}`;
     chip.innerText = `${entry.crashResult.toFixed(2)}x`;
-    list.prepend(chip);
-    if (list.children.length > 8) {
+    if (list.prepend) list.prepend(chip);
+    else if (list.firstChild) list.insertBefore(chip, list.firstChild);
+    else list.appendChild(chip);
+    if (list.children && list.children.length > 8) {
       list.removeChild(list.lastChild);
     }
   }

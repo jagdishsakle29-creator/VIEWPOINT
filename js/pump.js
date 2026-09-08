@@ -364,8 +364,10 @@ class CasinoPump {
     const pill = document.createElement('div');
     pill.className = `pump-hist-pill ${entry.won ? 'win' : 'loss'}`;
     pill.innerText = entry.won ? `${entry.multiplier.toFixed(2)}x` : '💥 POP';
-    list.prepend(pill);
-    if (list.children.length > 8) list.removeChild(list.lastChild);
+    if (list.prepend) list.prepend(pill);
+    else if (list.firstChild) list.insertBefore(pill, list.firstChild);
+    else list.appendChild(pill);
+    if (list.children && list.children.length > 8) list.removeChild(list.lastChild);
   }
 
   reset() {

@@ -4703,7 +4703,7 @@ class AppController {
     if (!this.mines && window.MinesGame && document.getElementById('minesView')) this.mines = new window.MinesGame({
       onMultiplierUpdate: (data) => this.onGameMultiplierUpdate(data),
       onTileReveal: (idx, type, isMine) => this.onMineTileReveal(idx, type, isMine),
-      onGameOver: (win, profit) => this.onMinesGameOver(win, profit)
+      onGameOver: (result) => this.onGameOverResult(result)
     });
     if (!this.plinko && window.CasinoPlinko && document.getElementById('plinkoCanvas')) this.plinko = new window.CasinoPlinko('plinkoCanvas');
     if (!this.limbo && window.CasinoLimbo && document.getElementById('limboView')) this.limbo = new window.CasinoLimbo('limboView');
