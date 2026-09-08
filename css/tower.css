@@ -121,13 +121,13 @@
 .tower-floor-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 6px;
-  border-radius: 8px;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   transition: all 0.2s ease;
-  min-height: 28px;
+  min-height: 22px;
 }
 
 .tower-floor-row.active-floor {

@@ -19,7 +19,7 @@
   background: linear-gradient(135deg, rgba(24, 34, 52, 0.8) 0%, rgba(13, 20, 34, 0.9) 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--border-radius-lg);
-  padding: 16px 20px;
+  padding: 8px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,17 +30,17 @@
 .stock-asset-info {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .stock-asset-select {
   background: var(--bg-tertiary);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 10px 16px;
+  padding: 6px 12px;
   border-radius: var(--border-radius-md);
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
   outline: none;
@@ -60,7 +60,7 @@
 
 .stock-live-price {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 900;
   color: #00f59b;
   letter-spacing: -0.5px;
@@ -74,7 +74,7 @@
 }
 
 .stock-change-tag {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   color: #00f59b;
 }
@@ -87,12 +87,18 @@
 .stock-chart-container {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 220px;
   background: radial-gradient(circle at 50% 100%, #152238 0%, #090e18 100%);
   border-radius: var(--border-radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 640px) {
+  .stock-chart-container {
+    height: 165px;
+  }
 }
 
 #stockCanvas {

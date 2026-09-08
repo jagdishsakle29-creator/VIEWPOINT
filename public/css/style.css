@@ -443,7 +443,7 @@ body {
 .main-layout {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 12px 16px 36px;
+  padding: 6px 12px 24px;
   width: 100%;
   flex: 1;
 }
@@ -453,8 +453,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  gap: 8px;
+  margin-bottom: 6px;
+  gap: 6px;
   width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
@@ -486,15 +486,16 @@ body {
   background: rgba(18, 22, 34, 0.6);
   border: 1px solid rgba(139, 92, 246, 0.16);
   color: var(--text-secondary);
-  padding: 10px 18px;
-  border-radius: 30px;
+  padding: 6px 14px;
+  height: 34px;
+  border-radius: 20px;
   font-family: var(--font-display);
-  font-size: 14.5px;
+  font-size: 12.5px;
   font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
   flex-shrink: 0;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -538,8 +539,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
-  margin: 6px auto 12px auto;
+  gap: 6px;
+  margin: 3px auto 6px auto;
   width: 100%;
   max-width: 540px;
   padding: 0 4px;
@@ -550,10 +551,10 @@ body {
   background: rgba(18, 22, 34, 0.6);
   border: 1px solid rgba(139, 92, 246, 0.16);
   color: var(--text-secondary);
-  padding: 8px 6px;
-  border-radius: 12px;
+  padding: 5px 6px;
+  border-radius: 9px;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 800;
   cursor: pointer;
   text-align: center;
@@ -697,9 +698,9 @@ body {
   overflow: hidden;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 30px rgba(109, 40, 217, 0.08);
   display: grid;
-  grid-template-columns: 310px 1fr;
+  grid-template-columns: 265px 1fr;
   align-items: stretch;
-  min-height: 520px;
+  min-height: 390px;
   position: relative;
   backdrop-filter: blur(16px);
   will-change: transform;
@@ -710,13 +711,13 @@ body {
     display: flex;
     flex-direction: column;
     min-height: auto;
-    border-radius: 14px;
-    margin-bottom: 8px;
+    border-radius: 12px;
+    margin-bottom: 4px;
   }
   .game-stage {
     order: 1;
     width: 100%;
-    padding: 4px 6px 8px 6px;
+    padding: 3px 5px;
     min-height: auto;
   }
   .controls-panel {
@@ -724,16 +725,16 @@ body {
     border-right: none;
     border-top: 1px solid rgba(139, 92, 246, 0.16);
     border-bottom: none;
-    padding: 6px 10px;
-    gap: 4px;
+    padding: 5px 8px;
+    gap: 3px;
     width: 100%;
   }
   .multiplier-bar-container {
-    margin-bottom: 6px;
-    padding: 5px 8px;
+    margin-bottom: 3px;
+    padding: 3px 6px;
   }
   .bottom-section {
-    margin-top: 14px;
+    margin-top: 10px;
   }
 }
 
@@ -741,10 +742,10 @@ body {
 .controls-panel {
   background: linear-gradient(180deg, #111420 0%, #0c0e17 100%);
   border-right: 1px solid rgba(139, 92, 246, 0.14);
-  padding: 10px 12px;
+  padding: 6px 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
   justify-content: flex-start;
 }
 
@@ -784,7 +785,7 @@ body {
   transition: all 0.25s ease;
   overflow: hidden;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-  height: 38px;
+  height: 32px;
 }
 
 .input-with-actions:focus-within {
@@ -793,10 +794,10 @@ body {
 }
 
 .input-currency-prefix {
-  padding-left: 10px;
+  padding-left: 8px;
   color: #fcd34d;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .bet-input-field {
@@ -804,30 +805,30 @@ body {
   border: none;
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
-  padding: 6px 8px;
+  padding: 4px 6px;
   width: 100%;
   outline: none;
-  height: 36px;
+  height: 30px;
 }
 
 .bet-quick-actions {
   display: flex;
-  padding-right: 4px;
-  gap: 3px;
+  padding-right: 3px;
+  gap: 2px;
 }
 
 .btn-quick-bet {
   background: var(--bg-tertiary);
   border: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 6px;
+  padding: 2px 6px;
+  border-radius: 5px;
   cursor: pointer;
-  height: 28px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -926,18 +927,18 @@ body {
 .action-button-area {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
   margin-top: auto;
 }
 
 .btn-stake-primary {
   width: 100%;
-  height: 44px;
+  height: 38px;
   padding: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 13.5px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -3977,29 +3978,61 @@ body {
   
   /* Classy Glassmorphic Game Arena on Phone */
   .game-arena {
-    border-radius: 14px;
+    border-radius: 12px;
     background: linear-gradient(180deg, rgba(14, 18, 30, 0.88) 0%, rgba(9, 12, 22, 0.96) 100%);
     border: 1px solid rgba(139, 92, 246, 0.16);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
     overflow: hidden;
+    margin-bottom: 4px;
   }
   
   .controls-panel {
-    border-radius: 10px;
+    border-radius: 9px;
     background: rgba(12, 15, 25, 0.82);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(139, 92, 246, 0.14);
-    padding: 8px 10px;
-    gap: 6px;
+    padding: 4px 6px !important;
+    gap: 3px !important;
+  }
+
+  .bet-mode-toggle-row {
+    height: 26px !important;
+    padding: 1px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .btn-mode-tab {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+  }
+
+  .chip-btn, .btn-chip, .ab-chip-btn, .aviator-chip-btn {
+    height: 22px !important;
+    padding: 1px 5px !important;
+    font-size: 9.5px !important;
+  }
+
+  .input-with-actions {
+    height: 30px !important;
+  }
+
+  .bet-input-field {
+    height: 28px !important;
+  }
+
+  .btn-quick-bet {
+    height: 22px !important;
+    padding: 1px 4px !important;
+    font-size: 9.5px !important;
   }
   
-  /* Vibrant Big Action Bet & Cashout Buttons for Thumbs */
+  /* Vibrant Action Bet & Cashout Buttons for Thumbs - Compact Zero-Scroll */
   .btn-action-primary, .btn-action-cashout, .btn-stake-primary, .btn-bet, .btn-cashout {
-    height: 44px !important;
-    font-size: 15px !important;
+    height: 38px !important;
+    font-size: 13.5px !important;
     letter-spacing: 0.5px;
-    border-radius: 10px !important;
-    box-shadow: 0 4px 16px rgba(0, 245, 155, 0.35) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(0, 245, 155, 0.35) !important;
   }
 
   /* Smooth Zero-Overlap Mobile Tabs */
@@ -4007,7 +4040,7 @@ body {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin-bottom: 10px;
+    margin-bottom: 4px !important;
   }
   .game-tabs-wrapper::-webkit-scrollbar {
     display: none;
@@ -4016,16 +4049,31 @@ body {
   .game-tabs {
     display: flex !important;
     flex-wrap: nowrap !important;
-    gap: 8px !important;
+    gap: 4px !important;
     min-width: max-content;
   }
 
   .tab-btn {
     flex-shrink: 0 !important;
     white-space: nowrap !important;
-    height: 42px !important;
-    font-size: 12px !important;
-    padding: 0 14px !important;
+    height: 30px !important;
+    font-size: 11px !important;
+    padding: 0 8px !important;
+    border-radius: 8px !important;
+  }
+
+  .game-pages-nav-bar {
+    margin: 2px auto 4px auto !important;
+    gap: 4px !important;
+  }
+
+  .btn-game-page-pill {
+    padding: 3px 2px !important;
+    font-size: 10px !important;
+    border-radius: 7px !important;
+  }
+  .btn-game-page-pill small {
+    display: none !important;
   }
 
   .page-nav-bar {
@@ -4033,7 +4081,7 @@ body {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     flex-wrap: nowrap;
-    gap: 6px;
+    gap: 4px;
   }
   .page-nav-bar::-webkit-scrollbar {
     display: none;
@@ -4042,8 +4090,8 @@ body {
   .btn-page-pill {
     flex-shrink: 0;
     white-space: nowrap;
-    font-size: 11.5px;
-    padding: 6px 12px;
+    font-size: 11px;
+    padding: 4px 8px;
   }
 }
 

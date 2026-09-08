@@ -16,7 +16,7 @@
 .plinko-canvas-container {
   position: relative;
   width: 100%;
-  max-width: 440px;
+  max-width: 320px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,8 +25,19 @@
 
 #plinkoCanvas {
   display: block;
-  border-radius: 10px;
+  border-radius: 8px;
   background: transparent;
+  max-height: 240px;
+  width: auto;
+}
+
+@media (max-width: 600px) {
+  .plinko-canvas-container {
+    max-width: 260px;
+  }
+  #plinkoCanvas {
+    max-height: 190px;
+  }
 }
 
 .plinko-quick-settings {

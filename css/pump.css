@@ -14,9 +14,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  max-width: 480px;
+  max-width: 440px;
   margin: 0 auto;
 }
 
@@ -27,14 +27,14 @@
   width: 100%;
   background: rgba(139, 92, 246, 0.08);
   border: 1.5px solid rgba(139, 92, 246, 0.3);
-  border-radius: 10px;
-  padding: 5px 12px;
+  border-radius: 9px;
+  padding: 4px 10px;
   box-sizing: border-box;
 }
 
 .pump-history-row {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   overflow-x: auto;
   width: 100%;
   padding-bottom: 2px;
@@ -42,9 +42,9 @@
 }
 
 .pump-hist-pill {
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 8px;
+  font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -64,11 +64,11 @@
 .pump-chamber {
   position: relative;
   width: 100%;
-  height: clamp(170px, 26vh, 210px);
-  min-height: 170px;
+  height: clamp(130px, 18vh, 160px);
+  min-height: 130px;
   background: radial-gradient(circle at 50% 40%, #151128 0%, #080710 100%);
   border: 1.5px solid rgba(139, 92, 246, 0.3);
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,8 +84,8 @@
 }
 
 .pump-balloon {
-  width: 90px;
-  height: 90px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #ff1493 0%, #a855f7 60%, #4c1d95 100%);
   box-shadow: 0 0 30px rgba(255, 20, 147, 0.6), inset -8px -8px 16px rgba(0, 0, 0, 0.5), inset 8px 8px 16px rgba(255, 255, 255, 0.5);

@@ -19,9 +19,9 @@
 .dt-live-stage {
   background: radial-gradient(ellipse at center 20%, #1a122e 0%, #0c0f18 60%, #07080d 100%);
   border: 1.5px solid rgba(212, 175, 55, 0.35);
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -228,16 +228,16 @@
 
 /* 3D Realistic Card Spot & Card Flip (Sleek Compact Size) */
 .dt-card-slot {
-  width: 68px;
-  height: 96px;
+  width: 44px;
+  height: 60px;
   perspective: 1000px;
   position: relative;
 }
 
 @media (max-width: 600px) {
   .dt-card-slot {
-    width: 54px;
-    height: 76px;
+    width: 36px;
+    height: 50px;
   }
 }
 
@@ -445,17 +445,24 @@
 .dt-bet-spot {
   background: linear-gradient(135deg, rgba(17, 24, 39, 0.9) 0%, rgba(10, 15, 26, 0.95) 100%);
   border: 1.5px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 12px 8px;
+  border-radius: 9px;
+  padding: 6px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   cursor: pointer;
   position: relative;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 80px;
+  min-height: 48px;
+}
+
+@media (max-width: 600px) {
+  .dt-bet-spot {
+    min-height: 40px;
+    padding: 4px 2px;
+  }
 }
 
 .dt-bet-spot:hover {
