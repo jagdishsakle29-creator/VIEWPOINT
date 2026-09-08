@@ -282,8 +282,8 @@
 
     scrollToFeed: function() {
       const el = document.getElementById('liveBetsSection');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (el && typeof el.scrollIntoView === 'function') {
+        try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
       }
     },
 

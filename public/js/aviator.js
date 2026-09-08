@@ -58,9 +58,18 @@
 
     resizeCanvas() {
       if (!this.canvas) return;
-      const rect = this.canvas.parentElement.getBoundingClientRect();
-      this.canvas.width = rect.width || 600;
-      this.canvas.height = 320;
+      const parent = this.canvas.parentElement;
+      let w = 600;
+      let h = 320;
+      if (parent) {
+        const rect = parent.getBoundingClientRect ? parent.getBoundingClientRect() : null;
+        if (rect && rect.width > 50) w = rect.width;
+        else if (parent.clientWidth && parent.clientWidth > 50) w = parent.clientWidth;
+        if (rect && rect.height > 50) h = rect.height;
+        else if (parent.clientHeight && parent.clientHeight > 50) h = parent.clientHeight;
+      }
+      this.canvas.width = w;
+      this.canvas.height = h;
       if (this.gameState === 'IDLE') this.drawIdleState();
     }
 

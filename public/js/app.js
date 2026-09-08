@@ -515,9 +515,9 @@ class AppController {
     this.limboAutoSessionProfit = 0;
     this.limboAutoTimer = null;
 
-    try { this.initGames(); } catch(e) { console.error("initGames error:", e); }
-    try { this.bindEvents(); } catch(e) { console.error("bindEvents error:", e); }
-    try { this.renderGrids(); } catch(e) { console.error("renderGrids error:", e); }
+    try { this.initGames(); } catch(e) { if (typeof console !== 'undefined' && console.error) console.error("initGames error:", e); }
+    try { this.bindEvents(); } catch(e) { if (typeof console !== 'undefined' && console.error) console.error("bindEvents error:", e); }
+    try { this.renderGrids(); } catch(e) { if (typeof console !== 'undefined' && console.error) console.error("renderGrids error:", e); }
     try { this.updateWalletUI(window.wallet.balance, window.wallet.currency); } catch(e) {}
     try { this.renderHistoryTable(); } catch(e) {}
     try { this.syncProvablyFairUI(); } catch(e) {}
@@ -6422,8 +6422,8 @@ class AppController {
         }
       }
       const activeLane = document.getElementById(`${prefix}roadLane_${currentStep > 0 ? currentStep : 1}`);
-      if (activeLane) {
-        activeLane.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (activeLane && typeof activeLane.scrollIntoView === 'function') {
+        try { activeLane.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e) {}
       }
     });
   }
@@ -6544,7 +6544,9 @@ class AppController {
         targetLane.classList.add('active-hen-lane');
         const slot = document.getElementById(`${prefix}henSlot_${lane}`);
         if (slot) slot.innerHTML = henSvg;
-        targetLane.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (targetLane && typeof targetLane.scrollIntoView === 'function') {
+          try { targetLane.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e) {}
+        }
       }
     });
 
@@ -8540,7 +8542,7 @@ function initViewpointApp() {
     try {
       window.app = new AppController();
     } catch(err) {
-      console.error("AppController initialization error:", err);
+      if (typeof console !== 'undefined' && console.error) console.error("AppController initialization error:", err);
     }
   }
 }
@@ -8594,12 +8596,15 @@ window.openReferModal = function() {
 };
 
 window.switchGame = function(gameType) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
   if (window.app && window.app.switchGame) return window.app.switchGame(gameType);
 };
 window.switchGamePage = function(pageNum) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
   if (window.app && window.app.switchGamePage) return window.app.switchGamePage(pageNum);
 };
 window.switchMainPage = function(pageNum) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
   if (window.app && window.app.switchMainPage) return window.app.switchMainPage(pageNum);
 };
 window.placeColorBet = function(type, choice, customAmt) {
