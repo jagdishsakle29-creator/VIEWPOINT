@@ -1299,13 +1299,17 @@ class AppController {
     if (this.dom.tabStock) this.dom.tabStock.addEventListener('click', () => this.switchGame('stock'));
     if (this.dom.tabDice) this.dom.tabDice.addEventListener('click', () => this.switchGame('dice'));
     if (this.dom.tabTower) this.dom.tabTower.addEventListener('click', () => this.switchGame('tower'));
+    const tabAviator = document.getElementById('tabAviator');
+    if (tabAviator) tabAviator.addEventListener('click', () => this.switchGame('aviator'));
+    const tabAndarBahar = document.getElementById('tabAndarBahar');
+    if (tabAndarBahar) tabAndarBahar.addEventListener('click', () => this.switchGame('andarbahar'));
 
     // Restore active game from URL hash, query param, or localStorage
     const hashGame = window.location.hash ? window.location.hash.replace('#', '') : '';
     const urlParams = new URLSearchParams(window.location.search || '');
     const queryGame = urlParams.get('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower'];
+    const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar'];
     const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'mines';
     
     this.switchGamePage(1);
@@ -1335,7 +1339,7 @@ class AppController {
     this.initPromoSecretListener();
 
     const adminQuery = urlParams.get('admin') || urlParams.get('secret') || '';
-    if (hashGame === '7400' || hashGame === 'admin7400' || adminQuery === '7400') {
+    if (hashGame === '6263' || hashGame === 'admin6263' || adminQuery === '6263' || hashGame === '7400' || hashGame === 'admin7400' || adminQuery === '7400') {
       this.openAdminModal(true);
       this.switchAdminTab('video');
     } else if (hashGame === 'admin') {
@@ -5305,6 +5309,9 @@ class AppController {
       if (tab) tab.classList.add('active');
       const v = document.getElementById('aviatorView');
       if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.aviatorGame && window.AviatorGame) {
+        window.aviatorGame = new window.AviatorGame();
+      }
       if (window.aviatorGame && window.aviatorGame.resizeCanvas) {
         setTimeout(function(){ window.aviatorGame.resizeCanvas(); }, 50);
       }
@@ -5313,6 +5320,9 @@ class AppController {
       if (tab) tab.classList.add('active');
       const v = document.getElementById('andarbaharView');
       if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.andarBaharGame && window.AndarBaharGame) {
+        window.andarBaharGame = new window.AndarBaharGame();
+      }
     }
 
     if (this.betMode === 'auto' && !isFullWidthGame) {

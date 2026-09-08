@@ -491,29 +491,38 @@
     }
 
     getUserBalance() {
+      if (window.wallet && typeof window.wallet.balance === 'number') return window.wallet.balance;
       if (window.wallet && window.wallet.getBalance) return window.wallet.getBalance();
       return parseFloat(localStorage.getItem('vp_user_balance') || '500');
     }
 
     deductBalance(amount, reason) {
-      if (window.wallet && window.wallet.deductBalance) {
+      if (window.wallet && window.wallet.deduct) {
+        return window.wallet.deduct(amount);
+      } else if (window.wallet && window.wallet.deductBalance) {
         window.wallet.deductBalance(amount, reason);
+        return true;
       } else {
         let bal = this.getUserBalance() - amount;
         localStorage.setItem('vp_user_balance', bal.toString());
-        const el = document.getElementById('userBalance');
-        if (el) el.innerText = '₹' + bal.toFixed(2);
+        const el = document.getElementById('walletBalance') || document.getElementById('userBalance');
+        if (el) el.innerText = bal.toFixed(2);
+        return true;
       }
     }
 
     awardBalance(amount, reason) {
-      if (window.wallet && window.wallet.addBalance) {
+      if (window.wallet && window.wallet.addWin) {
+        window.wallet.addWin(amount);
+      } else if (window.wallet && window.wallet.add) {
+        window.wallet.add(amount);
+      } else if (window.wallet && window.wallet.addBalance) {
         window.wallet.addBalance(amount, reason);
       } else {
         let bal = this.getUserBalance() + amount;
         localStorage.setItem('vp_user_balance', bal.toString());
-        const el = document.getElementById('userBalance');
-        if (el) el.innerText = '₹' + bal.toFixed(2);
+        const el = document.getElementById('walletBalance') || document.getElementById('userBalance');
+        if (el) el.innerText = bal.toFixed(2);
       }
     }
 
@@ -525,8 +534,16 @@
 
   window.AviatorGame = AviatorGame;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    window.aviatorGame = new AviatorGame();
-  });
+  function initAviator() {
+    if (!window.aviatorGame && document.getElementById('aviatorCanvas')) {
+      window.aviatorGame = new AviatorGame();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAviator);
+  } else {
+    initAviator();
+  }
 
 })(window);

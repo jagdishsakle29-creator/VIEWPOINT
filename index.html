@@ -387,30 +387,35 @@
       var p1Btn = document.getElementById('btnGamePage1');
       var p2Btn = document.getElementById('btnGamePage2');
       var p3Btn = document.getElementById('btnGamePage3');
+      var p4Btn = document.getElementById('btnGamePage4');
       var g1 = document.getElementById('gamePageGroup1');
       var g2 = document.getElementById('gamePageGroup2');
       var g3 = document.getElementById('gamePageGroup3');
+      var g4 = document.getElementById('gamePageGroup4');
       if (p1Btn) p1Btn.classList.toggle('active', pageNum === 1);
       if (p2Btn) p2Btn.classList.toggle('active', pageNum === 2);
       if (p3Btn) p3Btn.classList.toggle('active', pageNum === 3);
+      if (p4Btn) p4Btn.classList.toggle('active', pageNum === 4);
       if (g1) g1.style.display = (pageNum === 1) ? 'flex' : 'none';
       if (g2) g2.style.display = (pageNum === 2) ? 'flex' : 'none';
       if (g3) g3.style.display = (pageNum === 3) ? 'flex' : 'none';
+      if (g4) g4.style.display = (pageNum === 4) ? 'flex' : 'none';
 
       if (pageNum === 1) window.switchGame('mines');
       else if (pageNum === 2) window.switchGame('plinko');
       else if (pageNum === 3) window.switchGame('colortrading');
+      else if (pageNum === 4) window.switchGame('aviator');
     };
 
     window.switchGame = function(g) {
       if (window.app && window.app.switchGame) return window.app.switchGame(g);
       // Standalone Instant DOM Fallback
-      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView'];
+      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView', 'towerView', 'molesView', 'pumpView', 'aviatorView', 'andarbaharView'];
       views.forEach(function(vId) {
         var el = document.getElementById(vId);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
       });
-      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabPlinko', 'tabDice', 'tabLimbo', 'tabDragonTiger', 'tabColorTrading', 'tabStock'];
+      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabPlinko', 'tabDice', 'tabLimbo', 'tabDragonTiger', 'tabColorTrading', 'tabStock', 'tabTower', 'tabMoles', 'tabPump', 'tabAviator', 'tabAndarBahar'];
       tabs.forEach(function(tId) {
         var el = document.getElementById(tId);
         if (el) el.classList.remove('active');
@@ -419,12 +424,18 @@
       var activeViewId = g + 'View';
       if (g === 'colortrading') activeViewId = 'colortradingView';
       if (g === 'stock') activeViewId = 'stockView';
+      if (g === 'dragontiger') activeViewId = 'dragontigerView';
+      if (g === 'andarbahar') activeViewId = 'andarbaharView';
+      if (g === 'aviator') activeViewId = 'aviatorView';
+
       var activeTabId = 'tab' + g.charAt(0).toUpperCase() + g.slice(1);
       if (g === 'colortrading') activeTabId = 'tabColorTrading';
       if (g === 'stock') activeTabId = 'tabStock';
       if (g === 'dragontiger') activeTabId = 'tabDragonTiger';
+      if (g === 'andarbahar') activeTabId = 'tabAndarBahar';
+      if (g === 'aviator') activeTabId = 'tabAviator';
 
-      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock');
+      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'tower' || g === 'moles' || g === 'pump' || g === 'aviator' || g === 'andarbahar');
       var targetView = document.getElementById(activeViewId);
       if (targetView) {
         targetView.classList.add('active');
@@ -432,6 +443,10 @@
       }
       var targetTab = document.getElementById(activeTabId);
       if (targetTab) targetTab.classList.add('active');
+
+      if (g === 'aviator' && window.aviatorGame && window.aviatorGame.resizeCanvas) {
+        setTimeout(function(){ window.aviatorGame.resizeCanvas(); }, 50);
+      }
 
       var cp = document.querySelector('.controls-panel');
       var ga = document.querySelector('.game-arena');
@@ -790,6 +805,23 @@
           <span style="font-size: 16px; line-height: 1;">📈</span>
           <span style="font-weight: 800;">Stock BTC</span>
           <span class="tab-badge" style="background: rgba(0, 231, 1, 0.2); color: #00e701; font-size: 8.5px; font-weight: 900;">🟢 850</span>
+        </button>
+      </div>
+
+      <!-- Page 4 Group (Games 13-14: Aviator & Andar Bahar) -->
+      <div id="gamePageGroup4" class="game-page-group" style="display: none;">
+        <!-- 13. Aviator Rocket Flight -->
+        <button id="tabAviator" class="tab-btn" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">✈️🚀</span>
+          <span style="font-weight: 900;">Aviator</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #ef4444, #f97316); color: #fff; font-size: 8.5px; font-weight: 900;">🔥 HOT</span>
+        </button>
+
+        <!-- 14. Andar Bahar Royal Cards -->
+        <button id="tabAndarBahar" class="tab-btn" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))" style="position:relative;">
+          <span style="font-size: 16px; line-height: 1;">🃏👑</span>
+          <span style="font-weight: 900;">Andar Bahar</span>
+          <span class="tab-badge" style="background: linear-gradient(135deg, #3b82f6, #10b981); color: #fff; font-size: 8.5px; font-weight: 900;">🟢 6.2k</span>
         </button>
       </div>
     </div>
@@ -2150,6 +2182,158 @@
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- Game 13: Aviator Rocket View -->
+        <div id="aviatorView" class="game-view" style="display: none; width: 100%;">
+          <div class="aviator-container">
+            <!-- Multiplier History Bar -->
+            <div class="aviator-history-bar" id="aviatorHistoryList"></div>
+
+            <!-- Main Canvas Flight Screen -->
+            <div class="aviator-flight-screen">
+              <canvas id="aviatorCanvas"></canvas>
+
+              <!-- Live Multiplier Display -->
+              <div class="aviator-multiplier-display">
+                <div id="aviatorMultiplierText">1.00x</div>
+              </div>
+
+              <!-- Countdown Overlay -->
+              <div class="aviator-countdown-overlay" id="aviatorCountdownOverlay">
+                <div class="countdown-title">NEXT ROUND IN</div>
+                <div id="aviatorCountdownNum">3</div>
+              </div>
+            </div>
+
+            <!-- Betting Controls Panel -->
+            <div class="aviator-bet-panel">
+              <!-- Left Bet Section -->
+              <div class="aviator-bet-card">
+                <div class="aviator-bet-controls-row">
+                  <div class="aviator-input-wrap">
+                    <span>₹</span>
+                    <input type="number" id="inputAviatorBet" value="50" min="10" step="10">
+                  </div>
+                </div>
+
+                <div class="aviator-chips-row">
+                  <button type="button" class="aviator-chip-btn" data-val="10">+₹10</button>
+                  <button type="button" class="aviator-chip-btn" data-val="50">+₹50</button>
+                  <button type="button" class="aviator-chip-btn" data-val="100">+₹100</button>
+                  <button type="button" class="aviator-chip-btn" data-val="500">+₹500</button>
+                  <button type="button" class="aviator-chip-btn" data-val="1000">+₹1000</button>
+                </div>
+
+                <button type="button" id="btnAviatorBet" class="btn-aviator-main">BET ₹50</button>
+                <button type="button" id="btnAviatorCashout" class="btn-aviator-main" style="display: none;">
+                  CASHOUT <span class="cashout-amt" id="aviatorCashoutPreview">₹0.00</span>
+                </button>
+
+                <div class="aviator-auto-row">
+                  <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="checkbox" id="toggleAviatorAuto">
+                    <span>Auto Cashout</span>
+                  </label>
+                  <div style="display:flex; align-items:center; gap:4px;">
+                    <span>at</span>
+                    <input type="number" id="inputAviatorAutoMult" class="aviator-auto-input" value="2.00" min="1.05" step="0.1">
+                    <span>x</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Provably Fair Info Card -->
+              <div class="aviator-bet-card" style="justify-content: center; text-align: center;">
+                <div style="font-size: 1.1rem; font-weight: 800; color: #ffd700; margin-bottom: 4px;">🚀 100% PROVABLY FAIR</div>
+                <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4; margin: 0;">
+                  Watch the red jet take off! Cash out before it flies away to multiply your wager. Real-time physics engine and instantaneous automated UPI payouts.
+                </p>
+                <div style="margin-top: 10px; font-size: 0.8rem; color: #10b981; font-weight: 700;">
+                  ⚡ Instant Dual Payouts Enabled
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 14: Andar Bahar Royal Cards View -->
+        <div id="andarbaharView" class="game-view" style="display: none; width: 100%;">
+          <div class="ab-container">
+            <!-- Trend History Bar -->
+            <div class="ab-history-bar" id="andarBaharHistoryList"></div>
+
+            <!-- Table Screen -->
+            <div class="ab-table-screen">
+              <!-- Joker Center Box -->
+              <div class="ab-joker-section">
+                <span class="ab-joker-title">🃏 TRUMP JOKER CARD</span>
+                <div id="jokerCardDisplay" style="min-height: 76px;">
+                  <div class="ab-card black-card">
+                    <span class="card-rank">?</span>
+                    <span class="card-suit">♠</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Andar vs Bahar Tracks -->
+              <div class="ab-tracks-container">
+                <!-- Andar Track -->
+                <div class="ab-track-card">
+                  <div class="ab-track-header andar-title">
+                    <span>🔵 ANDAR (अंदर)</span>
+                    <span style="font-size: 0.8rem; opacity: 0.8;">1.95x</span>
+                  </div>
+                  <div class="ab-cards-tray" id="andarCardsArea"></div>
+                </div>
+
+                <!-- Bahar Track -->
+                <div class="ab-track-card">
+                  <div class="ab-track-header bahar-title">
+                    <span>🔴 BAHAR (बाहर)</span>
+                    <span style="font-size: 0.8rem; opacity: 0.8;">1.95x</span>
+                  </div>
+                  <div class="ab-cards-tray" id="baharCardsArea"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Betting Controls Panel -->
+            <div class="ab-bet-panel">
+              <!-- Side Choice Buttons -->
+              <div class="ab-sides-row">
+                <button type="button" id="btnBetAndar" class="btn-ab-side andar selected-side" data-side="ANDAR">
+                  <span>🔵 BET ANDAR</span>
+                  <span class="payout-rate">Win 1.95x Payout</span>
+                </button>
+                <button type="button" id="btnBetBahar" class="btn-ab-side bahar" data-side="BAHAR">
+                  <span>🔴 BET BAHAR</span>
+                  <span class="payout-rate">Win 1.95x Payout</span>
+                </button>
+              </div>
+
+              <!-- Bet Amount Controls -->
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="aviator-input-wrap" style="flex:1;">
+                    <span>₹</span>
+                    <input type="number" id="inputAndarBaharBet" value="50" min="10" step="10">
+                  </div>
+                </div>
+
+                <div class="aviator-chips-row">
+                  <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="10">+₹10</button>
+                  <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="50">+₹50</button>
+                  <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="100">+₹100</button>
+                  <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="500">+₹500</button>
+                  <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="1000">+₹1000</button>
+                </div>
+              </div>
+
+              <!-- Main Deal Button -->
+              <button type="button" id="btnAndarBaharDeal" class="btn-deal-main">PLACE BET & DEAL</button>
+            </div>
           </div>
         </div>
 
