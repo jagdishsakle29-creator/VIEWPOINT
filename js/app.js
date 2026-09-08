@@ -8349,7 +8349,29 @@ class AppController {
       }
     } catch(e) {}
   }
+
+  pickRandomMineTile() {
+    if (this.gameState !== 'PLAYING') {
+      this.handleBetClick();
+      setTimeout(() => {
+        const tiles = Array.from(document.querySelectorAll('.mine-tile:not(.revealed):not(.gem):not(.bomb)'));
+        if (tiles.length) {
+          tiles[Math.floor(Math.random() * tiles.length)].click();
+        }
+      }, 350);
+      return;
+    }
+    const tiles = Array.from(document.querySelectorAll('.mine-tile:not(.revealed):not(.gem):not(.bomb)'));
+    if (!tiles.length) return;
+    tiles[Math.floor(Math.random() * tiles.length)].click();
+  }
 }
+
+window.pickRandomMineTile = function() {
+  if (window.app && window.app.pickRandomMineTile) {
+    window.app.pickRandomMineTile();
+  }
+};
 
 window.AppController = AppController;
 

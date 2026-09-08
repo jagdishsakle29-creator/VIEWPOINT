@@ -628,6 +628,11 @@
           <span>🎁 Daily Bonus</span>
         </button>
 
+        <!-- Master Sound Mute/Unmute Toggle Button -->
+        <button id="btnToggleSound" class="btn-refer-nav" style="padding: 0 10px; font-size: 13px;" onclick="window.toggleMasterAudio && window.toggleMasterAudio()" title="Mute / Unmute Casino Sound">
+          <span id="soundToggleIcon">🔊</span>
+        </button>
+
         <!-- Admin Button (Hidden by default, only shown via ?secret=6263 private link) -->
         <button id="btnNavAdminPanel" class="btn-refer-nav" style="display: none !important; background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.4); color: #c084fc;" onclick="window.adminDashboard && window.adminDashboard.openAdmin();" title="Admin Control Dashboard">
           <span>⚙️ Admin</span>
@@ -971,6 +976,13 @@
             </select>
             <span class="select-arrow">▼</span>
           </div>
+          <div class="deposit-quick-chips" style="margin-top: 6px;">
+            <button type="button" class="chip-btn" onclick="document.getElementById('minesCountSelect').value='1'; document.getElementById('minesCountSelect').dispatchEvent(new Event('change'));">1</button>
+            <button type="button" class="chip-btn active" onclick="document.getElementById('minesCountSelect').value='3'; document.getElementById('minesCountSelect').dispatchEvent(new Event('change'));">3</button>
+            <button type="button" class="chip-btn" onclick="document.getElementById('minesCountSelect').value='5'; document.getElementById('minesCountSelect').dispatchEvent(new Event('change'));">5</button>
+            <button type="button" class="chip-btn" onclick="document.getElementById('minesCountSelect').value='10'; document.getElementById('minesCountSelect').dispatchEvent(new Event('change'));">10</button>
+            <button type="button" class="chip-btn" onclick="document.getElementById('minesCountSelect').value='24'; document.getElementById('minesCountSelect').dispatchEvent(new Event('change'));">24</button>
+          </div>
         </div>
 
         <!-- Plinko Pyramid Rows Selector (Visible on Plinko Tab) -->
@@ -1083,6 +1095,10 @@
           <button type="button" id="btnActionCashout" class="btn-stake-primary btn-cashout" style="display: none;" onclick="window.handleCashoutClick ? window.handleCashoutClick() : (window.app && window.app.handleCashoutClick())">
             <span>CASHOUT</span>
             <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
+          </button>
+
+          <button type="button" id="btnMinesPickRandom" class="btn-stake-primary" style="background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa; margin-top: 6px; font-weight: 800;" onclick="window.pickRandomMineTile && window.pickRandomMineTile()">
+            <span>⚡ PICK RANDOM TILE</span>
           </button>
         </div>
 
@@ -1362,6 +1378,10 @@
             <!-- Plinko Canvas at the Top -->
             <div class="plinko-canvas-container">
               <canvas id="plinkoCanvas" width="460" height="400"></canvas>
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: center; margin-top: 8px;">
+              <button type="button" class="chip-btn" style="padding: 7px 18px; font-weight: 900; font-size: 12px; background: linear-gradient(135deg, rgba(0,231,1,0.22), rgba(16,185,129,0.22)); border: 1px solid #00e701; color: #00e701; cursor: pointer; border-radius: 8px;" onclick="for(let i=0;i<5;i++){ setTimeout(()=>window.app && window.app.handleBetClick && window.app.handleBetClick(), i*240); }">⚡ 5x Rapid Drop</button>
             </div>
 
 
@@ -2336,6 +2356,7 @@
                   <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="100">+₹100</button>
                   <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="500">+₹500</button>
                   <button type="button" class="ab-chip-btn aviator-chip-btn" data-val="1000">+₹1000</button>
+                  <button type="button" id="btnAndarTurboToggle" class="ab-chip-btn" style="margin-left: auto; background: rgba(245,158,11,0.18); border: 1px solid #f59e0b; color: #fbbf24; font-weight: 800;" onclick="window.andarBaharGame && window.andarBaharGame.toggleTurbo()">⚡ Turbo: OFF</button>
                 </div>
               </div>
 

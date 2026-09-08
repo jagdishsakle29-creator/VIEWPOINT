@@ -421,6 +421,42 @@ class CasinoAudioEngine {
       osc.stop(this.ctx.currentTime + 0.08);
     } catch(e) {}
   }
+
+  playJetFlight(mult = 1.0) {
+    if (!this.canPlay()) return;
+    this.init();
+    if (!this.ctx || !this.canPlay()) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      const baseFreq = 85 + Math.min(mult * 28, 480);
+      osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.035, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.12);
+    } catch(e) {}
+  }
 }
 
 window.soundEngine = new CasinoAudioEngine();
+
+window.toggleMasterAudio = function() {
+  if (!window.soundEngine) return false;
+  const newState = !window.soundEngine.enabled;
+  window.soundEngine.toggleSound(newState);
+  const icon = document.getElementById('soundToggleIcon');
+  if (icon) icon.innerText = newState ? '🔊' : '🔇';
+  const btn = document.getElementById('btnToggleSound');
+  if (btn) {
+    btn.style.opacity = newState ? '1' : '0.6';
+    btn.title = newState ? 'Mute Sound' : 'Unmute Sound';
+  }
+  if (window.app && window.app.showNotification) {
+    window.app.showNotification(newState ? '🔊 Casino sound unmuted' : '🔇 Casino sound muted', 'info');
+  }
+  return newState;
+};

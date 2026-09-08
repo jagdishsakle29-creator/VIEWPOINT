@@ -192,7 +192,7 @@
           const finalWinner = Math.random() < 0.5 ? 'ANDAR' : 'BAHAR';
           this.resolveGame(finalWinner);
         }
-      }, 420);
+      }, this.turboMode ? 190 : 420);
     }
 
     resolveGame(winningSide) {
@@ -228,7 +228,22 @@
           btnDeal.disabled = false;
           btnDeal.innerText = 'PLACE BET & DEAL';
         }
-      }, 1200);
+      }, this.turboMode ? 600 : 1200);
+    }
+
+    toggleTurbo() {
+      this.turboMode = !this.turboMode;
+      const btn = document.getElementById('btnAndarTurboToggle');
+      if (btn) {
+        btn.innerHTML = this.turboMode ? '⚡ Turbo: ON' : '⚡ Turbo: OFF';
+        btn.style.color = this.turboMode ? '#00e701' : '#fbbf24';
+        btn.style.borderColor = this.turboMode ? '#00e701' : '#f59e0b';
+        btn.style.background = this.turboMode ? 'rgba(0,231,1,0.2)' : 'rgba(245,158,11,0.18)';
+      }
+      if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+      if (window.app && window.app.showNotification) {
+        window.app.showNotification(this.turboMode ? '⚡ Turbo Mode ON: Fast 2x card deals active' : 'Turbo Mode OFF: Normal deal speed', 'info');
+      }
     }
 
     renderJoker(card) {

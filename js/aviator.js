@@ -259,6 +259,14 @@
         return;
       }
 
+      // Jet Flight Sound Effect
+      if (!this.lastAudioTick || timestamp - this.lastAudioTick >= 160) {
+        this.lastAudioTick = timestamp;
+        if (window.soundEngine && window.soundEngine.playJetFlight) {
+          window.soundEngine.playJetFlight(this.multiplier);
+        }
+      }
+
       // Draw frame
       this.drawFlightFrame(elapsed);
       this.animationFrameId = requestAnimationFrame((t) => this.loop(t));
