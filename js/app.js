@@ -5443,14 +5443,26 @@ class AppController {
       this.activeInstance = instanceMap[this.currentGame];
     }
     
-    // Prevent duplicate bet deductions while a round is actively playing
+    // Prevent duplicate bet deductions while a round is actively playing with progress
     if (this.activeInstance && this.activeInstance.isPlaying) {
-      if (this.activeInstance.cashOut && (this.activeInstance.currentMultiplier > 1.0 || (this.activeInstance.revealedCount && this.activeInstance.revealedCount > 0) || (this.activeInstance.currentStep && this.activeInstance.currentStep > 0))) {
-        this.handleCashoutClick();
+      const hasProgress = (this.activeInstance.revealedCount && this.activeInstance.revealedCount > 0) ||
+                          (this.activeInstance.currentStep && this.activeInstance.currentStep > 0) ||
+                          (this.activeInstance.pumpCount && this.activeInstance.pumpCount > 0) ||
+                          (this.activeInstance.currentFloor && this.activeInstance.currentFloor > 0) ||
+                          (this.activeInstance.currentMultiplier && this.activeInstance.currentMultiplier > 1.01);
+      if (hasProgress) {
+        if (this.activeInstance.cashOut) {
+          this.handleCashoutClick();
+          return;
+        }
+        this.showNotification("⚠️ Round in progress! Pick your step or cash out.", "info");
         return;
       }
-      this.showNotification("⚠️ Round in progress! Pick your step or cash out.", "info");
-      return;
+      // If 0 progress has been made, safely reset stale round and allow fresh bet!
+      if (this.activeInstance.reset) {
+        try { this.activeInstance.reset(); } catch(e) {}
+      }
+      this.activeInstance.isPlaying = false;
     }
     
     let betAmount = 10;

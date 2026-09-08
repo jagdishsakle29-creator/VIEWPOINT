@@ -189,7 +189,7 @@ class ChickenGame {
         }
       }
 
-      if (data && data.roundId) {
+      if (data && data.roundId && (parseInt(data.currentStep) > 0 || (data.revealedIndices && data.revealedIndices.length > 0))) {
         this.roundId = data.roundId;
         this.betAmount = parseFloat(data.betAmount) || 10;
         this.setDifficulty(data.difficulty || 'medium');
@@ -215,6 +215,8 @@ class ChickenGame {
 
         this.updateNextMultiplierPreview();
         return true;
+      } else {
+        sessionStorage.removeItem('stake_active_round_chicken');
       }
     } catch (e) {
       console.warn("restoreActiveRound chicken error:", e);
@@ -241,6 +243,7 @@ class ChickenGame {
     let isHazard = Math.random() < effectiveHazardRate;
 
     try {
+      const uid = window.wallet ? (window.wallet.activeUserId || window.wallet.activeTelegramId) : 'guest_default';
       fetch(`${this.apiBaseUrl}/api/games?action=chicken_reveal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
@@ -311,9 +314,12 @@ class ChickenGame {
     let totalWin = Math.round(this.betAmount * this.currentMultiplier * 100) / 100;
     const profit = Math.round((totalWin - this.betAmount) * 100) / 100;
 
+    // Immediate zero-lag win credit
+    window.wallet.addWin(totalWin);
+
     const uid = window.wallet.activeUserId || window.wallet.activeTelegramId;
     try {
-      const res = await fetch(`${this.apiBaseUrl}/api/games?action=chicken_cashout`, {
+      fetch(`${this.apiBaseUrl}/api/games?action=chicken_cashout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-User-Id': uid },
         body: JSON.stringify({
@@ -321,25 +327,12 @@ class ChickenGame {
           roundId: this.roundId,
           userId: uid
         })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          totalWin = data.payout || totalWin;
-          if (data.newBalance !== undefined) {
-            window.wallet.setServerBalance(data.newBalance);
-          } else {
-            window.wallet.add(totalWin);
-          }
-        } else {
-          window.wallet.add(totalWin);
+      }).then(res => res.ok ? res.json() : null).then(data => {
+        if (data && data.success && data.newBalance !== undefined) {
+          window.wallet.setServerBalance(data.newBalance);
         }
-      } else {
-        window.wallet.add(totalWin);
-      }
-    } catch (e) {
-      window.wallet.add(totalWin);
-    }
+      }).catch(() => {});
+    } catch (e) {}
 
     window.soundEngine && window.soundEngine.playCashout && window.soundEngine.playCashout();
 

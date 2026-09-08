@@ -181,7 +181,7 @@ class MinesGame {
       const saved = sessionStorage.getItem('stake_active_round_mines');
       let data = saved ? JSON.parse(saved) : null;
 
-      if (data && data.roundId) {
+      if (data && data.roundId && data.revealedIndices && data.revealedIndices.length > 0) {
         this.roundId = data.roundId;
         this.betAmount = parseFloat(data.betAmount) || 10;
         this.mineCount = parseInt(data.hazardCount || data.mineCount) || 3;
@@ -209,6 +209,8 @@ class MinesGame {
 
         this.updateNextMultiplierPreview();
         return true;
+      } else {
+        sessionStorage.removeItem('stake_active_round_mines');
       }
     } catch (e) {}
     return false;
