@@ -1472,7 +1472,8 @@ body {
   padding: 20px;
 }
 
-.modal-backdrop.open {
+.modal-backdrop.open,
+.modal-backdrop.active {
   display: flex !important;
   opacity: 1 !important;
   pointer-events: auto !important;

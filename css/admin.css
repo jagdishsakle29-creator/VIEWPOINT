@@ -1,0 +1,199 @@
+/* ==============================================================================
+   VIEWPOINT - Admin Dashboard Stylesheet (admin.css)
+   Glassmorphic Frosted Card, Dark Slate & Neon Amber Accent
+============================================================================== */
+
+.admin-panel-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+
+.admin-section {
+  background: rgba(18, 29, 48, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.admin-section-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffd700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+}
+
+/* RTP Controls Grid */
+.admin-rtp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .admin-rtp-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.admin-rtp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(7, 14, 25, 0.55);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.admin-rtp-row label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+.admin-rtp-select {
+  background: #0f172a;
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-weight: 700;
+  outline: none;
+}
+
+/* Pending Transactions List */
+.admin-txns-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.admin-txn-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(7, 14, 25, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.txn-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+.txn-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.txn-badge.dep { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.txn-badge.with { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.txn-amt { color: #ffd700; font-size: 1.05rem; }
+.txn-sub { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+
+.txn-actions-col {
+  display: flex;
+  gap: 8px;
+}
+.btn-txn-action {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-txn-action.approve {
+  background: #16a34a;
+  color: #fff;
+}
+.btn-txn-action.approve:hover { background: #22c55e; }
+.btn-txn-action.reject {
+  background: #dc2626;
+  color: #fff;
+}
+.btn-txn-action.reject:hover { background: #ef4444; }
+
+/* Promo Codes Controls */
+.admin-code-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.admin-code-form input {
+  flex: 1;
+  min-width: 130px;
+  background: rgba(7, 14, 25, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #fff;
+  padding: 8px 12px;
+  outline: none;
+}
+.btn-admin-submit {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-codes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.admin-code-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 20px;
+  padding: 4px 10px;
+  color: #fef08a;
+  font-size: 0.85rem;
+}
+.btn-del-code {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* PIN Verification Modal */
+.admin-pin-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+.admin-pin-input {
+  width: 180px;
+  letter-spacing: 12px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 900;
+  background: rgba(7, 14, 25, 0.75);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  border-radius: 12px;
+  color: #ffd700;
+  padding: 10px;
+  outline: none;
+}

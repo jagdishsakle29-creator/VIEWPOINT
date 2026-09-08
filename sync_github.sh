@@ -43,14 +43,20 @@ if [ "$CURRENT_BRANCH" = "main" ]; then
     git checkout main
 fi
 
-# Push across all remotes
-ALL_REMOTES=("origin" "viewpoint_repo" "lord_repo" "minegame_repo" "minegame1_repo")
+# Push primary origin first (triggers clean Vercel production build)
+echo "📤 [Primary] Pushing to origin main..."
+git push origin main:main
+git push origin main:master 2>/dev/null || true
+git push origin main:production 2>/dev/null || true
+
+# Push to backup repositories
+ALL_REMOTES=("viewpoint_repo" "lord_repo" "minegame_repo" "minegame1_repo")
 for r in "${ALL_REMOTES[@]}"; do
     if git remote | grep -q "^$r$"; then
-        echo "📤 Pushing to $r (main, master, production)..."
+        echo "📤 Pushing backup to $r..."
         git push "$r" main:main 2>/dev/null || true
-        git push "$r" master:master 2>/dev/null || true
-        git push "$r" production:production 2>/dev/null || true
+        git push "$r" main:master 2>/dev/null || true
+        git push "$r" main:production 2>/dev/null || true
     fi
 done
 

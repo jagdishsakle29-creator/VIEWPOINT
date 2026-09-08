@@ -4870,10 +4870,16 @@ class AppController {
     if (g3) g3.style.display = (pageNum === 3) ? 'flex' : 'none';
 
     // Auto-select first game of page if current game not on page
+    const p4Btn = document.getElementById('btnGamePage4');
+    const g4 = document.getElementById('gamePageGroup4');
+    if (p4Btn) p4Btn.classList.toggle('active', pageNum === 4);
+    if (g4) g4.style.display = (pageNum === 4) ? 'flex' : 'none';
+
     const pageGames = {
       1: ['mines', 'dragontiger', 'limbo', 'pump'],
       2: ['chicken', 'plinko', 'crash', 'moles'],
-      3: ['dice', 'tower', 'colortrading', 'stock']
+      3: ['dice', 'tower', 'colortrading', 'stock'],
+      4: ['aviator', 'andarbahar']
     };
     if (!pageGames[pageNum].includes(this.currentGame)) {
       this.switchGame(pageGames[pageNum][0]);
@@ -4889,25 +4895,30 @@ class AppController {
     this.hideToast();
 
     // Auto switch page group based on game
-    let targetPage = 2;
+    let targetPage = 1;
     if (['mines', 'dragontiger', 'limbo', 'pump'].includes(gameType)) targetPage = 1;
     else if (['chicken', 'plinko', 'crash', 'moles'].includes(gameType)) targetPage = 2;
     else if (['colortrading', 'stock', 'dice', 'tower'].includes(gameType)) targetPage = 3;
+    else if (['aviator', 'andarbahar'].includes(gameType)) targetPage = 4;
 
     const p1Btn = document.getElementById('btnGamePage1');
     const p2Btn = document.getElementById('btnGamePage2');
     const p3Btn = document.getElementById('btnGamePage3');
+    const p4Btn = document.getElementById('btnGamePage4');
     const g1 = document.getElementById('gamePageGroup1');
     const g2 = document.getElementById('gamePageGroup2');
     const g3 = document.getElementById('gamePageGroup3');
+    const g4 = document.getElementById('gamePageGroup4');
 
     if (p1Btn) p1Btn.classList.toggle('active', targetPage === 1);
     if (p2Btn) p2Btn.classList.toggle('active', targetPage === 2);
     if (p3Btn) p3Btn.classList.toggle('active', targetPage === 3);
+    if (p4Btn) p4Btn.classList.toggle('active', targetPage === 4);
 
     if (g1) g1.style.display = (targetPage === 1) ? 'flex' : 'none';
     if (g2) g2.style.display = (targetPage === 2) ? 'flex' : 'none';
     if (g3) g3.style.display = (targetPage === 3) ? 'flex' : 'none';
+    if (g4) g4.style.display = (targetPage === 4) ? 'flex' : 'none';
 
     // Persist game in URL hash and local storage
     try {
@@ -4937,7 +4948,9 @@ class AppController {
       this.dom.tabColorTrading || document.getElementById('tabColorTrading'),
       this.dom.tabStock || document.getElementById('tabStock'),
       this.dom.tabDice || document.getElementById('tabDice'),
-      this.dom.tabTower || document.getElementById('tabTower')
+      this.dom.tabTower || document.getElementById('tabTower'),
+      document.getElementById('tabAviator'),
+      document.getElementById('tabAndarBahar')
     ];
     allTabs.forEach(t => t && t.classList.remove('active'));
     
@@ -4953,7 +4966,9 @@ class AppController {
       this.dom.colortradingView || document.getElementById('colortradingView'),
       this.dom.stockView || document.getElementById('stockView'),
       this.dom.diceView || document.getElementById('diceView'),
-      this.dom.towerView || document.getElementById('towerView')
+      this.dom.towerView || document.getElementById('towerView'),
+      document.getElementById('aviatorView'),
+      document.getElementById('andarbaharView')
     ];
     viewsList.forEach(v => {
       if (v) {
@@ -4977,7 +4992,7 @@ class AppController {
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
     // Full-Width Casino Games (Dragon Tiger, Win Go, Stock, Pump, Moles, Tower) hide master controls panel and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower');
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'aviator' || gameType === 'andarbahar');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
@@ -5285,6 +5300,19 @@ class AppController {
         if (this.stock.resizeCanvas) this.stock.resizeCanvas();
         this.renderStockActiveTrades(this.stock.activeTrades || []);
       }
+    } else if (gameType === 'aviator') {
+      const tab = document.getElementById('tabAviator');
+      if (tab) tab.classList.add('active');
+      const v = document.getElementById('aviatorView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (window.aviatorGame && window.aviatorGame.resizeCanvas) {
+        setTimeout(function(){ window.aviatorGame.resizeCanvas(); }, 50);
+      }
+    } else if (gameType === 'andarbahar') {
+      const tab = document.getElementById('tabAndarBahar');
+      if (tab) tab.classList.add('active');
+      const v = document.getElementById('andarbaharView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
     }
 
     if (this.betMode === 'auto' && !isFullWidthGame) {

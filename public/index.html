@@ -88,20 +88,25 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <!-- CSS Stylesheets (Cache-Busted v=103.0) -->
-  <link rel="stylesheet" href="css/style.css?v=103.0">
-  <link rel="stylesheet" href="css/dragontiger.css?v=103.0">
-  <link rel="stylesheet" href="css/mines.css?v=103.0">
-  <link rel="stylesheet" href="css/chicken.css?v=103.0">
-  <link rel="stylesheet" href="css/plinko.css?v=103.0">
-  <link rel="stylesheet" href="css/crash.css?v=103.0">
-  <link rel="stylesheet" href="css/colortrading.css?v=103.0">
-  <link rel="stylesheet" href="css/stocktrading.css?v=103.0">
-  <link rel="stylesheet" href="css/dice.css?v=103.0">
-  <link rel="stylesheet" href="css/limbo.css?v=103.0">
-  <link rel="stylesheet" href="css/pump.css?v=103.0">
-  <link rel="stylesheet" href="css/moles.css?v=103.0">
-  <link rel="stylesheet" href="css/tower.css?v=103.0">
+  <!-- CSS Stylesheets (Cache-Busted v=104.0) -->
+  <link rel="stylesheet" href="css/style.css?v=104.0">
+  <link rel="stylesheet" href="css/dragontiger.css?v=104.0">
+  <link rel="stylesheet" href="css/mines.css?v=104.0">
+  <link rel="stylesheet" href="css/chicken.css?v=104.0">
+  <link rel="stylesheet" href="css/plinko.css?v=104.0">
+  <link rel="stylesheet" href="css/crash.css?v=104.0">
+  <link rel="stylesheet" href="css/colortrading.css?v=104.0">
+  <link rel="stylesheet" href="css/stocktrading.css?v=104.0">
+  <link rel="stylesheet" href="css/dice.css?v=104.0">
+  <link rel="stylesheet" href="css/limbo.css?v=104.0">
+  <link rel="stylesheet" href="css/pump.css?v=104.0">
+  <link rel="stylesheet" href="css/moles.css?v=104.0">
+  <link rel="stylesheet" href="css/tower.css?v=104.0">
+  <link rel="stylesheet" href="css/aviator.css?v=104.0">
+  <link rel="stylesheet" href="css/andarbahar.css?v=104.0">
+  <link rel="stylesheet" href="css/rewards.css?v=104.0">
+  <link rel="stylesheet" href="css/admin.css?v=104.0">
+
 </head>
 <body role="application" translate="no" data-reader-ignore="true">
 
@@ -190,16 +195,15 @@
     };
     window.switchDepositTab = function(t) {
       if (window.app && window.app.switchDepositTab) return window.app.switchDepositTab(t);
-      var isForm = (t === 'form');
-      var tf = document.getElementById('tabDepositForm');
-      var th = document.getElementById('tabDepositHistory');
-      var vf = document.getElementById('viewDepositForm');
-      var vh = document.getElementById('viewDepositHistory');
-      if (tf) tf.classList.toggle('active', isForm);
-      if (th) th.classList.toggle('active', !isForm);
-      if (vf) { vf.classList.toggle('active', isForm); vf.style.display = isForm ? 'block' : 'none'; }
-      if (vh) { vh.classList.toggle('active', !isForm); vh.style.display = !isForm ? 'block' : 'none'; }
-      if (!isForm && window.app && window.app.renderDepositHistoryTable) window.app.renderDepositHistoryTable();
+      var tabs = [form, history, utr, crypto];
+      tabs.forEach(function(tab) {
+        var btn = document.getElementById(tabDeposit + (tab === form ? Form : (tab === history ? History : (tab === utr ? Utr : Crypto))));
+        var view = document.getElementById(viewDeposit + (tab === form ? Form : (tab === history ? History : (tab === utr ? Utr : Crypto))));
+        var active = (tab === t);
+        if (btn) btn.classList.toggle(active, active);
+        if (view) { view.classList.toggle(active, active); view.style.display = active ? block : none; }
+      });
+      if (t === history && window.app && window.app.renderDepositHistoryTable) window.app.renderDepositHistoryTable();
     };
     window.setDepositAmount = function(amt) {
       var inp = document.getElementById('depositAmountInput');
@@ -557,6 +561,23 @@
           <span>Refer & Earn</span>
         </button>
 
+        <!-- Quick Action Buttons: Lucky Spin, Daily Streak, Promo Code, Admin Panel -->
+        <button id="btnNavLuckySpin" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(245,158,11,0.22)); border: 1px solid #ffd700; color: #ffd700;" onclick="var m=document.getElementById('modalLuckySpin'); if(m){m.classList.add('open'); m.style.display='flex';} window.Rewards && window.Rewards.drawWheel(window.Rewards.currentRotation);" title="Daily Lucky Spin Wheel">
+          <span>🎡 Spin & Win</span>
+        </button>
+
+        <button id="btnNavDailyStreak" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(34,197,94,0.18), rgba(16,185,129,0.22)); border: 1px solid #22c55e; color: #4ade80;" onclick="var m=document.getElementById('modalDailyStreak'); if(m){m.classList.add('open'); m.style.display='flex';} window.Rewards && window.Rewards.renderDailyStreakUI();" title="Daily 7-Day Login Streak Bonus">
+          <span>🎁 Daily Bonus</span>
+        </button>
+
+        <button id="btnNavPromoCode" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(168,85,247,0.18), rgba(236,72,153,0.22)); border: 1px solid #c084fc; color: #e879f9;" onclick="var m=document.getElementById('modalPromoCode'); if(m){m.classList.add('open'); m.style.display='flex';}" title="Redeem Promo Code Voucher">
+          <span>🏷️ Promo Code</span>
+        </button>
+
+        <button id="btnNavAdminPanel" class="btn-refer-nav" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1;" onclick="window.adminDashboard && window.adminDashboard.openAdmin();" title="Admin Control Dashboard">
+          <span>⚙️ Admin (7777)</span>
+        </button>
+
         <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
         <div id="authLoggedOutBox" class="auth-buttons-group">
           <button id="btnOpenLogin" class="btn-auth-login" onclick="window.openAuthModal ? window.openAuthModal('login') : (window.app && window.app.openAuthModal('login'))">
@@ -631,6 +652,10 @@
       <button type="button" id="btnGamePage3" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(3) : (window.app && window.app.switchGamePage(3))">
         <span>📈 PAGE 3</span>
         <small style="display:block; font-size:10px; opacity:0.8;">Trading & Dice</small>
+      </button>
+      <button type="button" id="btnGamePage4" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(4) : (window.app && window.app.switchGamePage(4))">
+        <span>✈️ PAGE 4</span>
+        <small style="display:block; font-size:10px; opacity:0.8;">Aviator & Cards</small>
       </button>
     </div>
 
@@ -3445,25 +3470,30 @@
     </button>
   </nav>
 
-  <!-- Core Casino JavaScript Modules (High Priority Local Execution - v=103.0) -->
-  <script src="js/config.js?v=103.0"></script>
-  <script src="js/security.js?v=103.0"></script>
-  <script src="js/audio.js?v=103.0"></script>
-  <script src="js/wallet.js?v=103.0"></script>
-  <script src="js/provablyFair.js?v=103.0"></script>
-  <script src="js/dragontiger.js?v=103.0"></script>
-  <script src="js/mines.js?v=103.0"></script>
-  <script src="js/limbo.js?v=103.0"></script>
-  <script src="js/chicken.js?v=103.0"></script>
-  <script src="js/plinko.js?v=103.0"></script>
-  <script src="js/crash.js?v=103.0"></script>
-  <script src="js/colortrading.js?v=103.0"></script>
-  <script src="js/stocktrading.js?v=103.0"></script>
-  <script src="js/dice.js?v=103.0"></script>
-  <script src="js/pump.js?v=103.0"></script>
-  <script src="js/moles.js?v=103.0"></script>
-  <script src="js/tower.js?v=103.0"></script>
-  <script src="js/app.js?v=103.0"></script>
+  <!-- Core Casino JavaScript Modules (High Priority Local Execution - v=104.0) -->
+  <script src="js/config.js?v=104.0"></script>
+  <script src="js/security.js?v=104.0"></script>
+  <script src="js/audio.js?v=104.0"></script>
+  <script src="js/wallet.js?v=104.0"></script>
+  <script src="js/provablyFair.js?v=104.0"></script>
+  <script src="js/dragontiger.js?v=104.0"></script>
+  <script src="js/mines.js?v=104.0"></script>
+  <script src="js/limbo.js?v=104.0"></script>
+  <script src="js/chicken.js?v=104.0"></script>
+  <script src="js/plinko.js?v=104.0"></script>
+  <script src="js/crash.js?v=104.0"></script>
+  <script src="js/colortrading.js?v=104.0"></script>
+  <script src="js/stocktrading.js?v=104.0"></script>
+  <script src="js/dice.js?v=104.0"></script>
+  <script src="js/pump.js?v=104.0"></script>
+  <script src="js/moles.js?v=104.0"></script>
+  <script src="js/tower.js?v=104.0"></script>
+  <script src="js/aviator.js?v=104.0"></script>
+  <script src="js/andarbahar.js?v=104.0"></script>
+  <script src="js/rewards.js?v=104.0"></script>
+  <script src="js/admin.js?v=104.0"></script>
+
+  <script src="js/app.js?v=104.0"></script>
 
   <!-- Non-Blocking Optional Third-Party Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>

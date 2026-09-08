@@ -1,0 +1,218 @@
+/* ==============================================================================
+   VIEWPOINT - Andar Bahar Stylesheet (andarbahar.css)
+   Frosted Glass, Realistic Card Decks & Mobile Table Felt
+============================================================================== */
+
+.ab-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
+  gap: 16px;
+  user-select: none;
+}
+
+/* History Bar */
+.ab-history-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 12px;
+  background: rgba(12, 21, 36, 0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+.ab-history-pill {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+.ab-history-pill.andar-pill {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+.ab-history-pill.bahar-pill {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+/* Main Table Felt Screen */
+.ab-table-screen {
+  position: relative;
+  width: 100%;
+  min-height: 330px;
+  background: radial-gradient(circle at center, #0f2e22 0%, #061811 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(16, 185, 129, 0.35);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9), 0 8px 32px rgba(0, 0, 0, 0.6);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Joker Center Section */
+.ab-joker-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.ab-joker-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Cards Rows (Andar vs Bahar) */
+.ab-tracks-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .ab-tracks-container {
+    grid-template-columns: 1fr;
+  }
+}
+.ab-track-card {
+  background: rgba(4, 20, 14, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ab-track-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.ab-track-header.andar-title { color: #60a5fa; }
+.ab-track-header.bahar-title { color: #f87171; }
+
+.ab-cards-tray {
+  min-height: 85px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px;
+  scrollbar-width: thin;
+}
+
+/* Realistic Card Representation */
+.ab-card {
+  width: 54px;
+  height: 76px;
+  background: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
+  border: 1px solid #cbd5e1;
+  transition: transform 0.2s;
+}
+.ab-card.red-card { color: #dc2626; }
+.ab-card.black-card { color: #0f172a; }
+.card-rank { font-size: 1.1rem; font-weight: 900; line-height: 1; }
+.card-suit { font-size: 1.4rem; line-height: 1; }
+
+.deal-anim {
+  animation: cardFlipIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes cardFlipIn {
+  0% { transform: scale(0.3) translateY(-30px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Bet Controls Panel */
+.ab-bet-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(12, 21, 36, 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 16px;
+}
+.ab-sides-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.btn-ab-side {
+  padding: 16px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  font-size: 1.15rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+.btn-ab-side.andar {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+.btn-ab-side.bahar {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.btn-ab-side.selected-side {
+  transform: scale(1.03);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  border-color: #ffd700 !important;
+}
+.btn-ab-side span.payout-rate {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.btn-deal-main {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+}
+.btn-deal-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+}
