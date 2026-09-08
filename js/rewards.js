@@ -300,6 +300,9 @@
             window.audio.play('win');
           }
           this.notify(`🎉 CONGRATULATIONS! You won ${prize.label} in Lucky Spin!`, 'success');
+          if (window.LiveBets && window.LiveBets.recordUserWin) {
+            window.LiveBets.recordUserWin('Spin & Win', 0, 1.0, prize.amount);
+          }
 
           if (spinBtn) {
             spinBtn.innerText = 'Claimed Today';

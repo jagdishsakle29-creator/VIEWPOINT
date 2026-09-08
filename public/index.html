@@ -106,6 +106,7 @@
   <link rel="stylesheet" href="css/andarbahar.css?v=105.0">
   <link rel="stylesheet" href="css/rewards.css?v=105.0">
   <link rel="stylesheet" href="css/admin.css?v=105.0">
+  <link rel="stylesheet" href="css/livebets.css?v=105.0">
 
   <!-- Secret Admin & Support Guard: Only unlocked via ?secret=6263 or ?admin=6263 -->
   <script>
@@ -2412,11 +2413,64 @@
     </section>
 
     <!-- Floating Live Win Toast (Bottom-Left) -->
-    <div id="liveWinFloatingToast" class="live-win-floating-toast" style="display:none;">
-      <div class="win-toast-icon">⚡</div>
-      <div class="win-toast-info">
-        <span id="winToastUser" class="win-toast-user">Player***</span>
-        <span id="winToastPayout" class="win-toast-payout">Live Win</span>
+    <!-- Real-Time Stake.com Style Live Bets Feed & High Rollers Table -->
+    <section class="live-bets-section" id="liveBetsSection">
+      <div class="live-bets-header">
+        <div class="live-bets-tabs">
+          <button type="button" class="live-tab-btn active" data-filter="all" onclick="window.LiveBets && window.LiveBets.setFilter('all')">
+            <span class="live-pulse-dot"></span>
+            <span>All Bets</span>
+          </button>
+          <button type="button" class="live-tab-btn" data-filter="high" onclick="window.LiveBets && window.LiveBets.setFilter('high')">
+            <span>🔥 High Rollers</span>
+          </button>
+          <button type="button" class="live-tab-btn" data-filter="lucky" onclick="window.LiveBets && window.LiveBets.setFilter('lucky')">
+            <span>⭐ Lucky Wins</span>
+          </button>
+        </div>
+        <div class="live-bets-stats">
+          <span class="live-badge-glow">🔴 LIVE STREAM</span>
+          <span class="live-stats-text" id="liveBetsTotalVolume">24h Bets: ₹4.8M+</span>
+        </div>
+      </div>
+
+      <div class="live-bets-table-wrap">
+        <table class="live-bets-table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Player</th>
+              <th>Time</th>
+              <th>Bet Amount</th>
+              <th>Multiplier</th>
+              <th style="text-align: right;">Payout</th>
+            </tr>
+          </thead>
+          <tbody id="liveBetsTableBody">
+            <!-- Dynamic Real-Time Animated Rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Floating Live Winning Stream Widget (Stake.com / 1xBet Style) -->
+    <div id="floatingLiveWinWidget" class="floating-win-ticker" onclick="window.LiveBets && window.LiveBets.scrollToFeed()" title="Click to view live bets feed">
+      <div class="win-ticker-inner">
+        <div class="win-ticker-dot-wrap">
+          <div class="win-ticker-dot"></div>
+          <div class="win-ticker-ping"></div>
+        </div>
+        <div class="win-ticker-content">
+          <div class="win-ticker-top">
+            <span class="win-ticker-user" id="winTickerUser">User 98***41</span>
+            <span class="win-ticker-game" id="winTickerGame">✈️ Aviator</span>
+          </div>
+          <div class="win-ticker-bottom">
+            <span class="win-ticker-won-lbl">won</span>
+            <span class="win-ticker-amount" id="winTickerAmount">₹1,450.00</span>
+            <span class="win-ticker-mult" id="winTickerMult">(2.90x)</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3786,6 +3840,7 @@
   <script src="js/andarbahar.js?v=105.0"></script>
   <script src="js/rewards.js?v=105.0"></script>
   <script src="js/admin.js?v=105.0"></script>
+  <script src="js/livebets.js?v=105.0"></script>
 
   <script src="js/app.js?v=105.0"></script>
 

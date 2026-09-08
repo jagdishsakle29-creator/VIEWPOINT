@@ -1,0 +1,420 @@
+/* ==============================================================================
+   VIEWPOINT - Real-Time Live Bets & Win Stream Stylesheet (livebets.css)
+   Stake.com / 1xBet Style Live Winning Stream & High Rollers Feed
+============================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. FLOATING LIVE WIN TICKER WIDGET (Bottom-Left Corner)
+-------------------------------------------------------------------------- */
+.floating-win-ticker {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  background: rgba(11, 15, 30, 0.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(0, 231, 1, 0.35);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 231, 1, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateY(0);
+  opacity: 1;
+  max-width: 320px;
+  user-select: none;
+}
+
+.floating-win-ticker:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: #00e701;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 231, 1, 0.35);
+}
+
+.floating-win-ticker.anim-enter {
+  animation: winTickerSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.floating-win-ticker.anim-exit {
+  animation: winTickerSlideOut 0.35s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes winTickerSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes winTickerSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.92);
+  }
+}
+
+.win-ticker-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.win-ticker-dot-wrap {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.win-ticker-dot {
+  width: 10px;
+  height: 10px;
+  background: #00e701;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #00e701;
+  position: relative;
+  z-index: 2;
+}
+
+.win-ticker-ping {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: rgba(0, 231, 1, 0.5);
+  animation: tickerPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: 1;
+}
+
+@keyframes tickerPing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.win-ticker-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.win-ticker-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.win-ticker-user {
+  font-weight: 700;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+
+.win-ticker-game {
+  color: #94a3b8;
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.win-ticker-bottom {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.win-ticker-won-lbl {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.win-ticker-amount {
+  font-weight: 900;
+  color: #00e701;
+  text-shadow: 0 0 12px rgba(0, 231, 1, 0.4);
+  letter-spacing: 0.3px;
+}
+
+.win-ticker-mult {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.12);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   2. UNDER-GAME LIVE BETS & HIGH ROLLERS FEED TABLE (Stake.com Style)
+-------------------------------------------------------------------------- */
+.live-bets-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 32px auto 20px;
+  background: rgba(11, 15, 30, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.live-bets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(15, 23, 42, 0.5);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.live-bets-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.live-tab-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.live-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.live-tab-btn.active {
+  background: linear-gradient(135deg, rgba(0, 231, 1, 0.18), rgba(16, 185, 129, 0.12));
+  color: #00e701;
+  border-color: rgba(0, 231, 1, 0.4);
+  box-shadow: 0 0 15px rgba(0, 231, 1, 0.15);
+}
+
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #00e701;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00e701;
+  display: inline-block;
+  animation: liveDotBlink 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes liveDotBlink {
+  from { opacity: 0.4; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1.15); }
+}
+
+.live-bets-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-badge-glow {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.live-stats-text {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Live Bets Table */
+.live-bets-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.live-bets-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.live-bets-table th {
+  padding: 12px 20px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(8, 14, 28, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.live-bets-table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: #cbd5e1;
+  font-weight: 600;
+  vertical-align: middle;
+  transition: background 0.15s ease;
+}
+
+.live-bets-row {
+  transition: all 0.3s ease;
+}
+
+.live-bets-row:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.live-bets-row.row-new {
+  animation: rowSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes rowSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+    background: rgba(0, 231, 1, 0.12);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    background: transparent;
+  }
+}
+
+.tbl-game-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tbl-game-icon {
+  font-size: 16px;
+}
+
+.tbl-user-cell {
+  color: #94a3b8;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.tbl-time-cell {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.tbl-bet-cell {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.tbl-mult-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  background: rgba(255, 215, 0, 0.12);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
+.tbl-mult-pill.high {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(245, 158, 11, 0.2));
+  color: #ff6b6b;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.tbl-payout-cell {
+  text-align: right;
+  font-weight: 900;
+  color: #00e701;
+  font-size: 14px;
+  text-shadow: 0 0 10px rgba(0, 231, 1, 0.25);
+}
+
+/* --------------------------------------------------------------------------
+   3. MOBILE RESPONSIVE ADJUSTMENTS
+-------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .floating-win-ticker {
+    bottom: 78px;
+    left: 12px;
+    max-width: calc(100% - 130px);
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+  .win-ticker-top {
+    font-size: 10px;
+  }
+  .win-ticker-bottom {
+    font-size: 11.5px;
+  }
+  .win-ticker-amount {
+    font-size: 12px;
+  }
+  .live-bets-section {
+    margin: 20px 8px 16px;
+    border-radius: 12px;
+  }
+  .live-bets-header {
+    padding: 10px 14px;
+  }
+  .live-tab-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  .live-bets-table th,
+  .live-bets-table td {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}

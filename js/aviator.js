@@ -280,6 +280,9 @@
       if (window.app && window.app.showToast) {
         window.app.showToast({ won: true, payout: winAmount, multiplier: this.cashedOutMultiplier });
       }
+      if (window.LiveBets && window.LiveBets.recordUserWin) {
+        window.LiveBets.recordUserWin('Aviator', this.betAmount, this.cashedOutMultiplier, winAmount);
+      }
 
       this.notify(`🎉 CASHED OUT! Won ₹${winAmount.toFixed(2)} at ${this.cashedOutMultiplier.toFixed(2)}x!`, 'success');
 

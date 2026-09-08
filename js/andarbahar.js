@@ -208,6 +208,9 @@
         if (window.app && window.app.showToast) {
           window.app.showToast({ won: true, payout: winAmount, multiplier: 1.95 });
         }
+        if (window.LiveBets && window.LiveBets.recordUserWin) {
+          window.LiveBets.recordUserWin('Andar Bahar', this.betAmount, 1.95, winAmount);
+        }
         this.notify(`🎉 ${winningSide} MATCHED! You won ₹${winAmount.toFixed(2)}!`, 'success');
       } else {
         if (window.soundEngine && window.soundEngine.playBomb) window.soundEngine.playBomb();
