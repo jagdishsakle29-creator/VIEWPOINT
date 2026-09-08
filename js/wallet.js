@@ -205,9 +205,10 @@ class CasinoWallet {
       }
     }
 
-    localStorage.setItem(key, "0.00");
-    localStorage.setItem(sigKey, this.generateIntegritySig(0));
-    return 0.00;
+    const initialDemoBalance = 500.00;
+    localStorage.setItem(key, initialDemoBalance.toFixed(2));
+    localStorage.setItem(sigKey, this.generateIntegritySig(initialDemoBalance));
+    return initialDemoBalance;
   }
 
   saveLocalBalance() {

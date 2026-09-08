@@ -112,6 +112,56 @@ class DevServerHandler(SimpleHTTPRequestHandler):
                     save_dev_state(state)
                 return self._send_json({"success": True, "balance": wallet['balance']})
 
+            if 'dragontiger' in parsed.path or action in ['dragontiger_play', 'dt_play']:
+                import random
+                suits = [{'name': 'spades', 'symbol': '♠', 'isRed': False}, {'name': 'hearts', 'symbol': '♥', 'isRed': True}, {'name': 'diamonds', 'symbol': '♦', 'isRed': True}, {'name': 'clubs', 'symbol': '♣', 'isRed': False}]
+                ranks = [{'name': 'A', 'value': 1}, {'name': '2', 'value': 2}, {'name': '3', 'value': 3}, {'name': '4', 'value': 4}, {'name': '5', 'value': 5}, {'name': '6', 'value': 6}, {'name': '7', 'value': 7}, {'name': '8', 'value': 8}, {'name': '9', 'value': 9}, {'name': '10', 'value': 10}, {'name': 'J', 'value': 11}, {'name': 'Q', 'value': 12}, {'name': 'K', 'value': 13}]
+                d_rank = random.choice(ranks)
+                d_suit = random.choice(suits)
+                t_rank = random.choice(ranks)
+                t_suit = random.choice(suits)
+                winner = 'D' if d_rank['value'] > t_rank['value'] else ('T' if t_rank['value'] > d_rank['value'] else 'TIE')
+                bets = body.get('bets', {})
+                payout = 0
+                if bets.get('dragon') and winner == 'D':
+                    payout += bets['dragon'] * 2.0
+                elif bets.get('dragon') and winner == 'TIE':
+                    payout += bets['dragon'] * 0.5
+                if bets.get('tiger') and winner == 'T':
+                    payout += bets['tiger'] * 2.0
+                elif bets.get('tiger') and winner == 'TIE':
+                    payout += bets['tiger'] * 0.5
+                if bets.get('tie') and winner == 'TIE':
+                    payout += bets['tie'] * 12.0
+                wallet['balance'] = round(wallet.get('balance', 0) + payout, 2)
+                save_dev_state(state)
+                return self._send_json({
+                    "success": True,
+                    "dragon_card": {
+                        "rank": d_rank['name'],
+                        "value": d_rank['value'],
+                        "suit": d_suit['symbol'],
+                        "suitName": d_suit['name'],
+                        "isRed": d_suit['isRed'],
+                        "isBig": d_rank['value'] >= 8,
+                        "isSmall": d_rank['value'] <= 6,
+                        "isSeven": d_rank['value'] == 7
+                    },
+                    "tiger_card": {
+                        "rank": t_rank['name'],
+                        "value": t_rank['value'],
+                        "suit": t_suit['symbol'],
+                        "suitName": t_suit['name'],
+                        "isRed": t_suit['isRed'],
+                        "isBig": t_rank['value'] >= 8,
+                        "isSmall": t_rank['value'] <= 6,
+                        "isSeven": t_rank['value'] == 7
+                    },
+                    "winner": winner,
+                    "payout": payout,
+                    "balance": wallet['balance']
+                })
+
             # Simulate deposit / wallet / sync
             if 'deposit' in parsed.path or action == 'deposit':
                 amount = float(body.get('amount') or 100)

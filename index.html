@@ -404,7 +404,7 @@
 
       if (pageNum === 1) window.switchGame('mines');
       else if (pageNum === 2) window.switchGame('plinko');
-      else if (pageNum === 3) window.switchGame('colortrading');
+      else if (pageNum === 3) window.switchGame('dice');
       else if (pageNum === 4) window.switchGame('aviator');
     };
 
@@ -900,13 +900,6 @@
               <button id="btnDoubleBet" class="btn-quick-bet">2X</button>
               <button id="btnMaxBet" class="btn-quick-bet">MAX</button>
             </div>
-          </div>
-          <div class="deposit-quick-chips" style="margin-top: 6px;">
-            <button type="button" class="chip-btn active" onclick="document.getElementById('betAmountInput').value='10'; window.app && window.app.updateBetValue && window.app.updateBetValue(10);">₹10</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='50'; window.app && window.app.updateBetValue && window.app.updateBetValue(50);">₹50</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='100'; window.app && window.app.updateBetValue && window.app.updateBetValue(100);">₹100</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='500'; window.app && window.app.updateBetValue && window.app.updateBetValue(500);">₹500</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='1000'; window.app && window.app.updateBetValue && window.app.updateBetValue(1000);">₹1000</button>
           </div>
         </div>
 
@@ -1597,9 +1590,10 @@
                 <div class="dt-casino-chip chip-5000" data-chip="5000" onclick="window.app && window.app.selectDtChip(5000)">₹5K</div>
               </div>
               <div class="dt-chip-tools">
-                <button class="dt-tool-btn btn-clear" onclick="window.app && window.app.handleDtClearBets()">✕ Clear</button>
-                <button class="dt-tool-btn btn-double" onclick="window.app && window.app.handleDtDoubleBets()">2X Double</button>
-                <button class="dt-tool-btn btn-rebet" onclick="window.app && window.app.handleDtRebet()">↺ Rebet</button>
+                <button type="button" class="dt-tool-btn btn-clear" onclick="window.app && window.app.handleDtClearBets()">✕ Clear</button>
+                <button type="button" class="dt-tool-btn btn-double" onclick="window.app && window.app.handleDtDoubleBets()">2X Double</button>
+                <button type="button" class="dt-tool-btn btn-rebet" onclick="window.app && window.app.handleDtRebet()">↺ Rebet</button>
+                <button type="button" class="dt-tool-btn btn-deal" onclick="window.app && window.app.handleDtDealNow ? window.app.handleDtDealNow() : (window.app && window.app.dragontiger && window.app.dragontiger.dealNow())" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 800; border: 1px solid rgba(16,185,129,0.5); box-shadow: 0 2px 10px rgba(16,185,129,0.35);">⚡ Deal Now</button>
               </div>
             </div>
           </div>

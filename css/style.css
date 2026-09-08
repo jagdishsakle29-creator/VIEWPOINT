@@ -1029,10 +1029,11 @@ body {
   display: flex;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: 4px;
-  gap: 4px;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 3px;
   margin-bottom: 2px;
+  max-height: 28px;
 }
 
 .btn-mode-tab {
@@ -1041,16 +1042,17 @@ body {
   border: none;
   color: var(--text-secondary);
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 9px 12px;
-  border-radius: var(--border-radius-sm);
+  padding: 3px 8px;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
+  line-height: 1.2;
 }
 
 .btn-mode-tab:hover {
@@ -1228,6 +1230,11 @@ body {
 .colortrading-view.active,
 .stock-view.active,
 .dice-view.active,
+.tower-view.active,
+.moles-view.active,
+.pump-view.active,
+.aviator-view.active,
+.andarbahar-view.active,
 .plinko-view.active,
 .crash-view.active,
 .limbo-view.active,
@@ -1244,7 +1251,12 @@ body {
 .game-stage:has(.dragontiger-view.active),
 .game-stage:has(.colortrading-view.active),
 .game-stage:has(.stock-view.active),
-.game-stage:has(.dice-view.active) {
+.game-stage:has(.dice-view.active),
+.game-stage:has(.tower-view.active),
+.game-stage:has(.moles-view.active),
+.game-stage:has(.pump-view.active),
+.game-stage:has(.aviator-view.active),
+.game-stage:has(.andarbahar-view.active) {
   padding: 8px 4px !important;
   width: 100% !important;
   max-width: 100% !important;
@@ -1257,7 +1269,11 @@ body {
 .game-arena:has(.colortrading-view.active),
 .game-arena:has(.stock-view.active),
 .game-arena:has(.pump-view.active),
-.game-arena:has(.dice-view.active) {
+.game-arena:has(.moles-view.active),
+.game-arena:has(.tower-view.active),
+.game-arena:has(.dice-view.active),
+.game-arena:has(.aviator-view.active),
+.game-arena:has(.andarbahar-view.active) {
   display: block !important;
   grid-template-columns: 1fr !important;
   width: 100% !important;
@@ -1267,7 +1283,11 @@ body {
 .game-arena:has(.colortrading-view.active) .controls-panel,
 .game-arena:has(.stock-view.active) .controls-panel,
 .game-arena:has(.pump-view.active) .controls-panel,
-.game-arena:has(.dice-view.active) .controls-panel {
+.game-arena:has(.moles-view.active) .controls-panel,
+.game-arena:has(.tower-view.active) .controls-panel,
+.game-arena:has(.dice-view.active) .controls-panel,
+.game-arena:has(.aviator-view.active) .controls-panel,
+.game-arena:has(.andarbahar-view.active) .controls-panel {
   display: none !important;
 }
 
@@ -3996,14 +4016,22 @@ body {
   }
 
   .bet-mode-toggle-row {
-    height: 26px !important;
+    height: 24px !important;
     padding: 1px !important;
+    gap: 2px !important;
     margin-bottom: 2px !important;
   }
 
   .btn-mode-tab {
-    padding: 2px 6px !important;
-    font-size: 10px !important;
+    padding: 1.5px 5px !important;
+    font-size: 9.5px !important;
+    border-radius: 3px !important;
+    gap: 3px !important;
+  }
+
+  .btn-mode-tab svg {
+    width: 11px !important;
+    height: 11px !important;
   }
 
   .chip-btn, .btn-chip, .ab-chip-btn, .aviator-chip-btn {

@@ -109,13 +109,31 @@ class DragonTigerGame {
     return Object.values(this.currentBets).reduce((acc, curr) => acc + curr, 0);
   }
 
+  dealNow() {
+    if (this.gameState === 'betting') {
+      this.timeLeft = 0;
+      this.dealCardsAndSettle();
+    }
+  }
+
   placeBet(spotId) {
-    if (this.gameState !== 'betting' || this.timeLeft <= 3) {
-      return { success: false, msg: "Betting locked for this round!" };
+    if (this.gameState === 'settled') {
+      // Immediately start new round if user bets right after settlement
+      this.gameState = 'betting';
+      this.timeLeft = this.roundDuration;
+      this.roundId = this.generateRoundId();
+      this.dragonCard = null;
+      this.tigerCard = null;
+      this.roundResult = null;
+      if (this.ui && this.ui.onNewRoundReady) {
+        this.ui.onNewRoundReady({ roundId: this.roundId, history: this.history });
+      }
+    } else if (this.gameState !== 'betting') {
+      return { success: false, msg: "Dealing in progress, cards coming up!" };
     }
 
-    const amount = this.selectedChip;
-    if (!window.wallet.hasFunds(amount)) {
+    const amount = this.selectedChip || 10;
+    if (!window.wallet || !window.wallet.hasFunds(amount)) {
       return { success: false, msg: "Insufficient wallet balance!" };
     }
 
@@ -247,14 +265,18 @@ class DragonTigerGame {
       try {
         const uid = window.wallet.activeTelegramId || window.wallet.activeUserId;
         const apiBase = window.wallet.apiBaseUrl;
+        const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 1000) : null;
         const res = await fetch(`${apiBase}/api/game/dragontiger/play`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller ? controller.signal : undefined,
           body: JSON.stringify({
             telegram_id: uid,
             bets: this.currentBets
           })
         });
+        if (timeoutId) clearTimeout(timeoutId);
 
         if (res.ok) {
           const data = await res.json();

@@ -1286,6 +1286,21 @@ class AppController {
       });
     }
 
+    // Game Page Selection Pills (Page 1, Page 2, Page 3, Page 4)
+    [1, 2, 3, 4].forEach(pNum => {
+      const btn = document.getElementById(`btnGamePage${pNum}`);
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.switchGamePage(pNum);
+        });
+        btn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          this.switchGamePage(pNum);
+        }, { passive: false });
+      }
+    });
+
     // Game Tabs
     if (this.dom.tabDragonTiger) this.dom.tabDragonTiger.addEventListener('click', () => this.switchGame('dragontiger'));
     if (this.dom.tabMines) this.dom.tabMines.addEventListener('click', () => this.switchGame('mines'));
@@ -4995,8 +5010,8 @@ class AppController {
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock, Pump, Moles, Tower) hide master controls panel and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'aviator' || gameType === 'andarbahar');
+    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock, Pump, Moles, Tower, Dice, Aviator, Andar Bahar) hide master controls panel and take 100% width
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
@@ -5312,6 +5327,7 @@ class AppController {
       if (!window.aviatorGame && window.AviatorGame) {
         window.aviatorGame = new window.AviatorGame();
       }
+      this.activeInstance = window.aviatorGame;
       if (window.aviatorGame && window.aviatorGame.resizeCanvas) {
         setTimeout(function(){ window.aviatorGame.resizeCanvas(); }, 50);
       }
@@ -5323,6 +5339,7 @@ class AppController {
       if (!window.andarBaharGame && window.AndarBaharGame) {
         window.andarBaharGame = new window.AndarBaharGame();
       }
+      this.activeInstance = window.andarBaharGame;
     }
 
     if (this.betMode === 'auto' && !isFullWidthGame) {
@@ -5424,6 +5441,31 @@ class AppController {
       if (this.moles) this.moles.startGame(this.betAmount);
     } else if (this.currentGame === 'tower') {
       if (this.tower) this.tower.startGame(this.betAmount);
+    } else if (this.currentGame === 'dragontiger') {
+      if (this.dragontiger) {
+        if (this.dragontiger.getTotalBetAmount() === 0) {
+          this.dragontiger.setSelectedChip(this.betAmount);
+          this.dragontiger.placeBet('dragon');
+        }
+        this.dragontiger.dealNow();
+      }
+    } else if (this.currentGame === 'colortrading') {
+      if (this.colortrading) {
+        this.colortrading.placeBet('green', this.betAmount);
+      }
+    } else if (this.currentGame === 'stock') {
+      if (this.stock) {
+        this.stock.placeTrade('up', this.betAmount);
+      }
+    } else if (this.currentGame === 'aviator') {
+      if (window.aviatorGame && window.aviatorGame.placeBetAndStart) {
+        window.aviatorGame.placeBetAndStart(this.betAmount);
+      }
+    } else if (this.currentGame === 'andarbahar') {
+      if (window.andarBaharGame) {
+        if (!window.andarBaharGame.selectedSide) window.andarBaharGame.selectSide('ANDAR');
+        window.andarBaharGame.startDeal();
+      }
     } else if (this.activeInstance && this.activeInstance.startGame) {
       if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(this.betAmount);
       this.activeInstance.startGame(this.betAmount);
@@ -8038,6 +8080,15 @@ class AppController {
     }
   }
 
+  handleDtDealNow() {
+    if (!this.dragontiger) return;
+    if (this.dragontiger.getTotalBetAmount() <= 0) {
+      this.showNotification("Please place a bet on Dragon, Tiger or Tie first!", "info");
+      return;
+    }
+    this.dragontiger.dealNow();
+  }
+
   revealDtCard(side, card) {
     if (!card) return;
     const isDragon = side === 'dragon';
@@ -8274,7 +8325,7 @@ class AppController {
       const badge = document.getElementById(`dtChip_${spotId}`);
       if (badge && amt > 0) {
         badge.innerText = `${window.wallet.currency}${amt >= 1000 ? (amt/1000)+'k' : amt}`;
-        const parentSpot = badge.closest('.dt-bet-spot, .dt-side-bet-btn');
+        const parentSpot = (badge && badge.closest) ? badge.closest('.dt-bet-spot, .dt-side-bet-btn') : null;
         if (parentSpot) parentSpot.classList.add('has-bet');
       }
     }
