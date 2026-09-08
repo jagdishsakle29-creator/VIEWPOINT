@@ -619,16 +619,6 @@
           <span>Refer & Earn</span>
         </button>
 
-        <!-- Quick Action Buttons: Lucky Spin, Daily Streak, Promo Code, Admin Panel -->
-        <button id="btnNavLuckySpin" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(180,83,9,0.22)); border: 1px solid rgba(245,158,11,0.45); color: #fcd34d;" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" title="Daily Lucky Spin Wheel">
-          <span>🎡 Spin & Win</span>
-        </button>
-
-        <button id="btnNavDailyStreak" class="btn-refer-nav" style="background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(76,29,149,0.22)); border: 1px solid rgba(139,92,246,0.45); color: #c4b5fd;" onclick="window.openDailyStreakModal ? window.openDailyStreakModal() : (window.Rewards && window.Rewards.openDailyStreakModal ? window.Rewards.openDailyStreakModal() : null);" title="Daily 7-Day Login Streak Bonus">
-          <span>🎁 Daily Bonus</span>
-        </button>
-
-
         <!-- Admin Button (Hidden by default, only shown via ?secret=6263 private link) -->
         <button id="btnNavAdminPanel" class="btn-refer-nav" style="display: none !important; background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.4); color: #c084fc;" onclick="window.adminDashboard && window.adminDashboard.openAdmin();" title="Admin Control Dashboard">
           <span>⚙️ Admin</span>
@@ -2248,7 +2238,7 @@
               <!-- Joker Center Box -->
               <div class="ab-joker-section">
                 <span class="ab-joker-title">🃏 TRUMP JOKER CARD</span>
-                <div id="jokerCardDisplay" style="min-height: 76px;">
+                <div id="jokerCardDisplay" style="min-height: 48px;">
                   <div class="ab-card black-card">
                     <span class="card-rank">?</span>
                     <span class="card-suit">♠</span>
@@ -2326,6 +2316,27 @@
 
       </section>
 
+    </div>
+
+    <!-- VIP Rewards Hub Dock (Spin & Win + Daily Bonus - Moved to Bottom of Page) -->
+    <div id="bottomRewardsHub" class="bottom-rewards-hub">
+      <button id="btnNavLuckySpin" class="btn-bottom-vip-reward spin-reward" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" title="Daily Lucky Spin Wheel">
+        <span class="vip-reward-icon">🎡</span>
+        <div class="vip-reward-info">
+          <span class="vip-reward-title">Spin & Win</span>
+          <span class="vip-reward-desc">Daily Free Spin Wheel</span>
+        </div>
+        <span class="vip-reward-badge gold">SPIN</span>
+      </button>
+
+      <button id="btnNavDailyStreak" class="btn-bottom-vip-reward bonus-reward" onclick="window.openDailyStreakModal ? window.openDailyStreakModal() : (window.Rewards && window.Rewards.openDailyStreakModal ? window.Rewards.openDailyStreakModal() : null);" title="Daily 7-Day Login Streak Bonus">
+        <span class="vip-reward-icon">🎁</span>
+        <div class="vip-reward-info">
+          <span class="vip-reward-title">Daily Bonus</span>
+          <span class="vip-reward-desc">7-Day Streak Rewards</span>
+        </div>
+        <span class="vip-reward-badge purple">BONUS</span>
+      </button>
     </div>
 
     <!-- Bottom Live Community Wins & Personal Bet History Section -->

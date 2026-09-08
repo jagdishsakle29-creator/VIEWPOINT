@@ -4061,5 +4061,136 @@ html, body, button, a, input, select, textarea, [role="button"],
   }
 }
 
+/* ================= BOTTOM VIP REWARDS HUB (SPIN & WIN + DAILY BONUS) ================= */
+.bottom-rewards-hub {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 14px auto 10px;
+  max-width: 720px;
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.btn-bottom-vip-reward {
+  flex: 1;
+  min-width: 140px;
+  max-width: 320px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation !important;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.btn-bottom-vip-reward.spin-reward {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(180, 83, 9, 0.22) 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.btn-bottom-vip-reward.spin-reward:hover {
+  border-color: #f59e0b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+}
+
+.btn-bottom-vip-reward.bonus-reward {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.18) 0%, rgba(76, 29, 149, 0.24) 100%);
+  border: 1.5px solid rgba(139, 92, 246, 0.45);
+  box-shadow: 0 4px 16px rgba(109, 40, 217, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.btn-bottom-vip-reward.bonus-reward:hover {
+  border-color: #a78bfa;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(109, 40, 217, 0.4);
+}
+
+.vip-reward-icon {
+  font-size: 24px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.vip-reward-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  flex: 1;
+}
+
+.vip-reward-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.vip-reward-desc {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.vip-reward-badge {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.vip-reward-badge.gold {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.vip-reward-badge.purple {
+  background: rgba(139, 92, 246, 0.25);
+  color: #c4b5fd;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+}
+
+@media (max-width: 480px) {
+  .bottom-rewards-hub {
+    gap: 8px;
+    margin: 10px auto 6px;
+  }
+  .btn-bottom-vip-reward {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .vip-reward-icon {
+    font-size: 20px;
+  }
+  .vip-reward-title {
+    font-size: 12px;
+  }
+  .vip-reward-desc {
+    font-size: 9.5px;
+  }
+  .vip-reward-badge {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+}
+
+
 
 

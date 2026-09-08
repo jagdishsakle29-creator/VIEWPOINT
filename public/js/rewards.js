@@ -586,7 +586,6 @@
       if (streakStatus.canClaim) {
         if (navStreakBtn) {
           navStreakBtn.style.display = 'inline-flex';
-          navStreakBtn.innerHTML = '<span>🎁 Daily Bonus</span>';
         }
         if (btnClaimStreak && btnClaimStreak.disabled) {
           btnClaimStreak.disabled = false;
@@ -595,7 +594,7 @@
           btnClaimStreak.style.cursor = 'pointer';
         }
       } else {
-        // Once claimed, hide completely from navbar for 24 hours!
+        // Once claimed, hide completely for 24 hours!
         if (navStreakBtn) navStreakBtn.style.display = 'none';
         const hrs = Math.floor(streakStatus.remainingMs / 3600000);
         const mins = Math.floor((streakStatus.remainingMs % 3600000) / 60000);
@@ -606,6 +605,14 @@
           btnClaimStreak.style.opacity = '0.6';
           btnClaimStreak.style.cursor = 'not-allowed';
         }
+      }
+
+      // 3. Auto-hide bottom rewards hub if both rewards are currently on 24h cooldown
+      const bottomHub = document.getElementById('bottomRewardsHub');
+      if (bottomHub) {
+        const canSpin = this.canSpin();
+        const canBonus = streakStatus.canClaim;
+        bottomHub.style.display = (canSpin || canBonus) ? 'flex' : 'none';
       }
     }
   };
