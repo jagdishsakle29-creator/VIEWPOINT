@@ -1326,13 +1326,9 @@ class AppController {
       const btn = document.getElementById(`btnGamePage${pNum}`);
       if (btn) {
         btn.addEventListener('click', (e) => {
-          e.preventDefault();
+          if (e && e.preventDefault) e.preventDefault();
           this.switchGamePage(pNum);
         });
-        btn.addEventListener('touchend', (e) => {
-          e.preventDefault();
-          this.switchGamePage(pNum);
-        }, { passive: false });
       }
     });
 
@@ -4127,7 +4123,8 @@ class AppController {
   // ================= MULTI-PAGE SWITCHER (DEDICATED PAGES) =================
   switchMainPage(pageNumber) {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
-    this.currentPage = pageNumber;
+    const p = parseInt(pageNumber, 10) || 1;
+    this.currentPage = p;
     
     // Ensure mainPage1 is always visible
     if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
@@ -4137,27 +4134,25 @@ class AppController {
     const mNav2 = document.getElementById('mNavCrash');
     const mNavCasino = document.getElementById('mNavCasino') || document.getElementById('mNavTrading');
     const mNavLiveBet = document.getElementById('mNavLiveBet');
-    if (mNav1) mNav1.classList.toggle('active', pageNumber === 1);
-    if (mNav2) mNav2.classList.toggle('active', pageNumber === 2);
-    if (mNavCasino) mNavCasino.classList.toggle('active', pageNumber === 3);
-    if (mNavLiveBet) mNavLiveBet.classList.toggle('active', pageNumber === 4);
+    if (mNav1) mNav1.classList.toggle('active', p === 1);
+    if (mNav2) mNav2.classList.toggle('active', p === 2);
+    if (mNavCasino) mNavCasino.classList.toggle('active', p === 3);
+    if (mNavLiveBet) mNavLiveBet.classList.toggle('active', p === 4);
 
-    if (pageNumber === 1) {
+    if (p === 1) {
       this.switchGamePage(1);
-      this.switchGame('dragontiger');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (pageNumber === 2) {
+      this.switchGame('mines');
+    } else if (p === 2) {
       this.switchGamePage(2);
-      this.switchGame('plinko');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (pageNumber === 3) {
+      this.switchGame('crash');
+    } else if (p === 3) {
       this.switchGamePage(3);
-      this.switchGame('colortrading');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (pageNumber === 4) {
-      const bottomSec = document.querySelector('.bottom-section');
-      if (bottomSec) bottomSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this.switchGame('dice');
+    } else if (p === 4) {
+      this.switchGamePage(4);
+      this.switchGame('aviator');
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   setMobileNavActive(el) {
@@ -4925,26 +4920,35 @@ class AppController {
 
   switchGamePage(pageNum) {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const p = parseInt(pageNum, 10) || 1;
     const p1Btn = document.getElementById('btnGamePage1');
     const p2Btn = document.getElementById('btnGamePage2');
     const p3Btn = document.getElementById('btnGamePage3');
+    const p4Btn = document.getElementById('btnGamePage4');
     const g1 = document.getElementById('gamePageGroup1');
     const g2 = document.getElementById('gamePageGroup2');
     const g3 = document.getElementById('gamePageGroup3');
-
-    if (p1Btn) p1Btn.classList.toggle('active', pageNum === 1);
-    if (p2Btn) p2Btn.classList.toggle('active', pageNum === 2);
-    if (p3Btn) p3Btn.classList.toggle('active', pageNum === 3);
-
-    if (g1) g1.style.display = (pageNum === 1) ? 'flex' : 'none';
-    if (g2) g2.style.display = (pageNum === 2) ? 'flex' : 'none';
-    if (g3) g3.style.display = (pageNum === 3) ? 'flex' : 'none';
-
-    // Auto-select first game of page if current game not on page
-    const p4Btn = document.getElementById('btnGamePage4');
     const g4 = document.getElementById('gamePageGroup4');
-    if (p4Btn) p4Btn.classList.toggle('active', pageNum === 4);
-    if (g4) g4.style.display = (pageNum === 4) ? 'flex' : 'none';
+
+    if (p1Btn) p1Btn.classList.toggle('active', p === 1);
+    if (p2Btn) p2Btn.classList.toggle('active', p === 2);
+    if (p3Btn) p3Btn.classList.toggle('active', p === 3);
+    if (p4Btn) p4Btn.classList.toggle('active', p === 4);
+
+    if (g1) g1.style.display = (p === 1) ? '' : 'none';
+    if (g2) g2.style.display = (p === 2) ? '' : 'none';
+    if (g3) g3.style.display = (p === 3) ? '' : 'none';
+    if (g4) g4.style.display = (p === 4) ? '' : 'none';
+
+    // Sync Bottom Mobile Navigation Bar
+    const mNav1 = document.getElementById('mNavOriginals');
+    const mNav2 = document.getElementById('mNavCrash');
+    const mNavCasino = document.getElementById('mNavCasino') || document.getElementById('mNavTrading');
+    const mNavLiveBet = document.getElementById('mNavLiveBet');
+    if (mNav1) mNav1.classList.toggle('active', p === 1);
+    if (mNav2) mNav2.classList.toggle('active', p === 2);
+    if (mNavCasino) mNavCasino.classList.toggle('active', p === 3);
+    if (mNavLiveBet) mNavLiveBet.classList.toggle('active', p === 4);
 
     const pageGames = {
       1: ['mines', 'dragontiger', 'limbo', 'pump'],
@@ -4952,9 +4956,8 @@ class AppController {
       3: ['dice', 'tower', 'colortrading', 'stock'],
       4: ['aviator', 'andarbahar']
     };
-    if (!pageGames[pageNum].includes(this.currentGame)) {
-      this.switchGame(pageGames[pageNum][0]);
-    }
+    const targetGame = (pageGames[p] && pageGames[p].includes(this.currentGame)) ? this.currentGame : ((pageGames[p] && pageGames[p][0]) || 'mines');
+    this.switchGame(targetGame);
   }
 
   switchGame(gameType) {
@@ -4986,10 +4989,20 @@ class AppController {
     if (p3Btn) p3Btn.classList.toggle('active', targetPage === 3);
     if (p4Btn) p4Btn.classList.toggle('active', targetPage === 4);
 
-    if (g1) g1.style.display = (targetPage === 1) ? 'flex' : 'none';
-    if (g2) g2.style.display = (targetPage === 2) ? 'flex' : 'none';
-    if (g3) g3.style.display = (targetPage === 3) ? 'flex' : 'none';
-    if (g4) g4.style.display = (targetPage === 4) ? 'flex' : 'none';
+    if (g1) g1.style.display = (targetPage === 1) ? '' : 'none';
+    if (g2) g2.style.display = (targetPage === 2) ? '' : 'none';
+    if (g3) g3.style.display = (targetPage === 3) ? '' : 'none';
+    if (g4) g4.style.display = (targetPage === 4) ? '' : 'none';
+
+    // Sync Bottom Mobile Navigation Bar
+    const mNav1 = document.getElementById('mNavOriginals');
+    const mNav2 = document.getElementById('mNavCrash');
+    const mNavCasino = document.getElementById('mNavCasino') || document.getElementById('mNavTrading');
+    const mNavLiveBet = document.getElementById('mNavLiveBet');
+    if (mNav1) mNav1.classList.toggle('active', targetPage === 1);
+    if (mNav2) mNav2.classList.toggle('active', targetPage === 2);
+    if (mNavCasino) mNavCasino.classList.toggle('active', targetPage === 3);
+    if (mNavLiveBet) mNavLiveBet.classList.toggle('active', targetPage === 4);
 
     // Persist game in URL hash and local storage
     try {
@@ -5226,6 +5239,7 @@ class AppController {
       this.resetGridUI();
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = this.betMode === 'auto' ? 'none' : 'flex';
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = this.betMode === 'auto' ? 'flex' : 'none';
+      if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
       if (this.chicken) {
         this.chicken.setDifficulty(this.dom.bonesCountSelect ? this.dom.bonesCountSelect.value : 'medium');
         this.renderHighwayLanes();

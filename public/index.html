@@ -386,6 +386,7 @@
     };
     window.switchGamePage = function(pageNum) {
       if (window.app && window.app.switchGamePage) return window.app.switchGamePage(pageNum);
+      var p = parseInt(pageNum, 10) || 1;
       var p1Btn = document.getElementById('btnGamePage1');
       var p2Btn = document.getElementById('btnGamePage2');
       var p3Btn = document.getElementById('btnGamePage3');
@@ -394,19 +395,29 @@
       var g2 = document.getElementById('gamePageGroup2');
       var g3 = document.getElementById('gamePageGroup3');
       var g4 = document.getElementById('gamePageGroup4');
-      if (p1Btn) p1Btn.classList.toggle('active', pageNum === 1);
-      if (p2Btn) p2Btn.classList.toggle('active', pageNum === 2);
-      if (p3Btn) p3Btn.classList.toggle('active', pageNum === 3);
-      if (p4Btn) p4Btn.classList.toggle('active', pageNum === 4);
-      if (g1) g1.style.display = (pageNum === 1) ? 'flex' : 'none';
-      if (g2) g2.style.display = (pageNum === 2) ? 'flex' : 'none';
-      if (g3) g3.style.display = (pageNum === 3) ? 'flex' : 'none';
-      if (g4) g4.style.display = (pageNum === 4) ? 'flex' : 'none';
+      if (p1Btn) p1Btn.classList.toggle('active', p === 1);
+      if (p2Btn) p2Btn.classList.toggle('active', p === 2);
+      if (p3Btn) p3Btn.classList.toggle('active', p === 3);
+      if (p4Btn) p4Btn.classList.toggle('active', p === 4);
+      if (g1) g1.style.display = (p === 1) ? '' : 'none';
+      if (g2) g2.style.display = (p === 2) ? '' : 'none';
+      if (g3) g3.style.display = (p === 3) ? '' : 'none';
+      if (g4) g4.style.display = (p === 4) ? '' : 'none';
 
-      if (pageNum === 1) window.switchGame('mines');
-      else if (pageNum === 2) window.switchGame('plinko');
-      else if (pageNum === 3) window.switchGame('dice');
-      else if (pageNum === 4) window.switchGame('aviator');
+      // Sync Mobile Bottom Nav
+      var mNav1 = document.getElementById('mNavOriginals');
+      var mNav2 = document.getElementById('mNavCrash');
+      var mNavCasino = document.getElementById('mNavCasino') || document.getElementById('mNavTrading');
+      var mNavLiveBet = document.getElementById('mNavLiveBet');
+      if (mNav1) mNav1.classList.toggle('active', p === 1);
+      if (mNav2) mNav2.classList.toggle('active', p === 2);
+      if (mNavCasino) mNavCasino.classList.toggle('active', p === 3);
+      if (mNavLiveBet) mNavLiveBet.classList.toggle('active', p === 4);
+
+      if (p === 1) window.switchGame('mines');
+      else if (p === 2) window.switchGame('crash');
+      else if (p === 3) window.switchGame('dice');
+      else if (p === 4) window.switchGame('aviator');
     };
 
     window.switchGame = function(g) {
@@ -699,11 +710,11 @@
       </button>
       <button type="button" id="btnGamePage2" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))">
         <span>🚀 PAGE 2</span>
-        <small style="display:block; font-size:10px; opacity:0.8;">Plinko & Crash</small>
+        <small style="display:block; font-size:10px; opacity:0.8;">Chicken & Crash</small>
       </button>
       <button type="button" id="btnGamePage3" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(3) : (window.app && window.app.switchGamePage(3))">
         <span>📈 PAGE 3</span>
-        <small style="display:block; font-size:10px; opacity:0.8;">Trading & Dice</small>
+        <small style="display:block; font-size:10px; opacity:0.8;">Dice & Win Go</small>
       </button>
       <button type="button" id="btnGamePage4" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(4) : (window.app && window.app.switchGamePage(4))">
         <span>✈️ PAGE 4</span>
@@ -1150,7 +1161,7 @@
         </div>
 
         <!-- Game 2: Chicken Road Crossing Highway View -->
-        <div id="chickenView" class="game-view">
+        <div id="chickenView" class="game-view chicken-view">
           <div class="chicken-road-arena">
             
             <!-- Highway Stadium Container -->
@@ -2155,7 +2166,7 @@
         </div>
 
         <!-- Game 13: Aviator Rocket View -->
-        <div id="aviatorView" class="game-view" style="display: none; width: 100%;">
+        <div id="aviatorView" class="game-view aviator-view" style="display: none; width: 100%;">
           <div class="aviator-container">
             <!-- Multiplier History Bar -->
             <div class="aviator-history-bar" id="aviatorHistoryList"></div>
@@ -2228,7 +2239,7 @@
         </div>
 
         <!-- Game 14: Andar Bahar Royal Cards View -->
-        <div id="andarbaharView" class="game-view" style="display: none; width: 100%;">
+        <div id="andarbaharView" class="game-view andarbahar-view" style="display: none; width: 100%;">
           <div class="ab-container">
             <!-- Trend History Bar -->
             <div class="ab-history-bar" id="andarBaharHistoryList"></div>
