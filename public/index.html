@@ -1096,10 +1096,6 @@
             <span>CASHOUT</span>
             <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
           </button>
-
-          <button type="button" id="btnMinesPickRandom" class="btn-stake-primary" style="background: rgba(124, 58, 237, 0.18); border: 1px solid rgba(139, 92, 246, 0.4); color: #c4b5fd; margin-top: 6px; font-weight: 800;" onclick="window.pickRandomMineTile && window.pickRandomMineTile()">
-            <span>⚡ PICK RANDOM TILE</span>
-          </button>
         </div>
 
       </section>
@@ -3399,39 +3395,8 @@
         </div>
       </div>
 
-      <!-- 🎁 1-Time Promo Video Code Request Section in Support -->
-      <div style="margin-top: 12px; background: linear-gradient(135deg, rgba(239,68,68,0.18), rgba(245,158,11,0.18)); border: 1.5px solid rgba(239,68,68,0.45); border-radius: 12px; padding: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span style="font-weight: 900; font-size: 13px; color: #ff6b6b; display: flex; align-items: center; gap: 6px;">
-            <span>🎬 Request Admin for 1-Time Promo Code</span>
-          </span>
-          <span style="font-size: 10px; background: #fe2c55; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 800;">1-TIME USE (1-DAY)</span>
-        </div>
-        <p style="font-size: 11px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.4;">
-          Request Admin to promo video code for 1 time. Promo code is single-use and changes daily.
-        </p>
-
-        <!-- Request Code Button to Admin Telegram -->
-        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
-          <button type="button" onclick="window.app && window.app.requestPromoCodeFromAdmin()" style="flex: 1; height: 38px; background: linear-gradient(135deg, #229ED9, #0088cc); color: #fff; border: none; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-            <span>✈️ Request Code from Admin (@VIEWPOINT78)</span>
-          </button>
-          <button type="button" onclick="window.app && window.app.openPromoVideoModal()" style="padding: 0 12px; height: 38px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer;">
-            <span>🎥 Watch Video</span>
-          </button>
-        </div>
-
-        <!-- Redeem Promo Code Input -->
-        <div style="display: flex; gap: 6px;">
-          <input type="text" id="supportPromoCodeInput" placeholder="Enter Admin 1-Time Promo Code" style="flex: 1; height: 38px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0 10px; color: #00e5ff; font-weight: 800; font-size: 13px; text-transform: uppercase;">
-          <button type="button" onclick="window.app && window.app.redeemSupportPromoCode()" style="height: 38px; padding: 0 16px; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); color: #ffffff; font-weight: 900; font-size: 13px; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 8px; cursor: pointer; box-shadow: 0 2px 10px rgba(109, 40, 217, 0.35);">
-            <span>🎁 Redeem</span>
-          </button>
-        </div>
-      </div>
-
       <!-- Quick Action Question Chips -->
-      <div class="chat-quick-actions" style="margin-top: 10px;">
+      <div class="chat-quick-actions" style="margin-top: 14px;">
         <button class="chip-chat-quick" data-query="check_deposit">🔍 Check My Deposit Status</button>
         <button class="chip-chat-quick" data-query="how_to_add">💳 How to Add Money</button>
         <button class="chip-chat-quick" data-query="promo_code" onclick="window.app && window.app.requestPromoCodeFromAdmin()">🎁 Request Promo Code</button>

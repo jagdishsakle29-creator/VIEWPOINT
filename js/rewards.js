@@ -316,41 +316,42 @@
     },
 
     // -------------------------------------------------------------
-    // 2. DAILY 7-DAY LOGIN STREAK
+    // 2. DAILY 7-DAY LOGIN STREAK (24-HOUR COOLDOWN)
     // -------------------------------------------------------------
     getStreakStatus: function() {
       const lastStr = localStorage.getItem(STORAGE_KEYS.STREAK_LAST);
       let currentDay = parseInt(localStorage.getItem(STORAGE_KEYS.STREAK_DAY) || '1', 10);
 
       if (!lastStr) {
-        return { currentDay: 1, canClaim: true };
+        return { currentDay: 1, canClaim: true, remainingMs: 0 };
       }
 
-      const lastDate = new Date(parseInt(lastStr, 10));
-      const now = new Date();
+      const lastTime = parseInt(lastStr, 10);
+      const now = Date.now();
+      const elapsed = now - lastTime;
+      const cooldown = 24 * 60 * 60 * 1000; // Strict 24 hours
 
-      // Check calendar day difference
-      const lastDayStart = new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate()).getTime();
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-      const dayDiff = Math.round((todayStart - lastDayStart) / (24 * 60 * 60 * 1000));
+      if (elapsed < cooldown) {
+        // Claimed within last 24 hours: must wait
+        return { currentDay, canClaim: false, remainingMs: cooldown - elapsed };
+      }
 
-      if (dayDiff === 0) {
-        // Already claimed today
-        return { currentDay, canClaim: false };
-      } else if (dayDiff === 1) {
-        // Consecutive day
+      // 24 hours have passed! Next day's bonus is ready
+      if (elapsed < 48 * 60 * 60 * 1000) {
         const nextDay = currentDay >= 7 ? 1 : currentDay + 1;
-        return { currentDay: nextDay, canClaim: true };
+        return { currentDay: nextDay, canClaim: true, remainingMs: 0 };
       } else {
-        // Streak broken, reset to Day 1
-        return { currentDay: 1, canClaim: true };
+        // More than 48 hours passed: streak resets to Day 1
+        return { currentDay: 1, canClaim: true, remainingMs: 0 };
       }
     },
 
     claimDailyStreak: function() {
       const status = this.getStreakStatus();
       if (!status.canClaim) {
-        this.notify('You have already claimed your daily bonus today! Come back tomorrow.', 'warning');
+        const hrs = Math.floor(status.remainingMs / 3600000);
+        const mins = Math.floor((status.remainingMs % 3600000) / 60000);
+        this.notify(`Daily bonus already claimed! Next reward available in ${hrs}h ${mins}m (24-hour cooldown).`, 'warning');
         return;
       }
 
@@ -363,6 +364,7 @@
       this.notify(`🎁 Day ${status.currentDay} Claimed! ₹${reward.amount} added to your wallet!`, 'success');
 
       this.renderDailyStreakUI();
+      this.updateTimers();
     },
 
     renderDailyStreakUI: function() {
@@ -389,7 +391,18 @@
       const btnClaim = document.getElementById('btnClaimStreakAction');
       if (btnClaim) {
         btnClaim.disabled = !status.canClaim;
-        btnClaim.innerText = status.canClaim ? `Claim Day ${status.currentDay} (₹${STREAK_REWARDS[status.currentDay - 1].amount})` : 'Claimed for Today';
+        if (status.canClaim) {
+          btnClaim.innerText = `Claim Day ${status.currentDay} (₹${STREAK_REWARDS[status.currentDay - 1].amount})`;
+          btnClaim.style.opacity = '1';
+          btnClaim.style.cursor = 'pointer';
+        } else {
+          const hrs = Math.floor(status.remainingMs / 3600000);
+          const mins = Math.floor((status.remainingMs % 3600000) / 60000);
+          const secs = Math.floor((status.remainingMs % 60000) / 1000);
+          btnClaim.innerText = `Claimed! Next Day in ${hrs}h ${mins}m ${secs}s`;
+          btnClaim.style.opacity = '0.6';
+          btnClaim.style.cursor = 'not-allowed';
+        }
       }
     },
 
@@ -557,6 +570,38 @@
           spinBtn.innerText = `Wait (${timeStr})`;
           spinBtn.style.opacity = '0.6';
           spinBtn.style.cursor = 'not-allowed';
+        }
+      }
+
+      // 2. Daily Streak 24-Hour Cooldown & Countdown
+      const navStreakBtn = document.getElementById('btnNavDailyStreak');
+      const streakStatus = this.getStreakStatus();
+      const btnClaimStreak = document.getElementById('btnClaimStreakAction');
+
+      if (streakStatus.canClaim) {
+        if (navStreakBtn) {
+          navStreakBtn.innerHTML = '<span>🎁 Daily Bonus</span>';
+          navStreakBtn.style.opacity = '1';
+        }
+        if (btnClaimStreak && btnClaimStreak.disabled) {
+          btnClaimStreak.disabled = false;
+          btnClaimStreak.innerText = `Claim Day ${streakStatus.currentDay} (₹${STREAK_REWARDS[streakStatus.currentDay - 1].amount})`;
+          btnClaimStreak.style.opacity = '1';
+          btnClaimStreak.style.cursor = 'pointer';
+        }
+      } else {
+        const hrs = Math.floor(streakStatus.remainingMs / 3600000);
+        const mins = Math.floor((streakStatus.remainingMs % 3600000) / 60000);
+        const secs = Math.floor((streakStatus.remainingMs % 60000) / 1000);
+        if (navStreakBtn) {
+          navStreakBtn.innerHTML = `<span>⏳ Bonus (${hrs}h ${mins}m)</span>`;
+          navStreakBtn.style.opacity = '0.75';
+        }
+        if (btnClaimStreak) {
+          btnClaimStreak.disabled = true;
+          btnClaimStreak.innerText = `Claimed! Next Day in ${hrs}h ${mins}m ${secs}s`;
+          btnClaimStreak.style.opacity = '0.6';
+          btnClaimStreak.style.cursor = 'not-allowed';
         }
       }
     }
