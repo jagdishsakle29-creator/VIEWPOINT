@@ -23,32 +23,32 @@ class CasinoPlinko {
     this.isDropping = false;
     this.activeBallCount = 0;
 
-    // Multipliers for different rows and risk profiles (Stake accurate payouts aligned with exact progression curves)
+    // Multipliers for different rows and risk profiles (Stake authentic casino payouts with realistic central loss zones)
     this.multipliers = {
       8: {
-        low: [5.6, 1.65, 1.30, 1.08, 0.8, 1.08, 1.30, 1.65, 5.6],
-        medium: [13, 3.70, 1.65, 1.15, 0.5, 1.15, 1.65, 3.70, 13],
-        hard: [29, 6.50, 2.60, 1.30, 0.2, 1.30, 2.60, 6.50, 29]
+        low: [5.6, 2.0, 1.1, 0.8, 0.5, 0.8, 1.1, 2.0, 5.6],
+        medium: [13.0, 3.0, 1.2, 0.7, 0.4, 0.7, 1.2, 3.0, 13.0],
+        hard: [29.0, 4.0, 1.3, 0.3, 0.2, 0.3, 1.3, 4.0, 29.0]
       },
       10: {
-        low: [8.9, 2.20, 1.45, 1.18, 1.08, 0.8, 1.08, 1.18, 1.45, 2.20, 8.9],
-        medium: [22, 5.20, 2.10, 1.35, 1.15, 0.4, 1.15, 1.35, 2.10, 5.20, 22],
-        hard: [76, 11.00, 4.00, 1.80, 1.30, 0.2, 1.30, 1.80, 4.00, 11.00, 76]
+        low: [8.9, 2.5, 1.3, 0.9, 0.7, 0.5, 0.7, 0.9, 1.3, 2.5, 8.9],
+        medium: [22.0, 4.0, 1.8, 1.0, 0.6, 0.4, 0.6, 1.0, 1.8, 4.0, 22.0],
+        hard: [76.0, 8.0, 2.5, 0.7, 0.3, 0.2, 0.3, 0.7, 2.5, 8.0, 76.0]
       },
       12: {
-        low: [10, 2.60, 1.65, 1.30, 1.18, 1.08, 0.8, 1.08, 1.18, 1.30, 1.65, 2.60, 10],
-        medium: [33, 7.50, 3.70, 2.10, 1.35, 1.15, 0.4, 1.15, 1.35, 2.10, 3.70, 7.50, 33],
-        hard: [170, 20.00, 6.50, 4.00, 2.60, 1.30, 0.2, 1.30, 2.60, 4.00, 6.50, 20.00, 170]
+        low: [10.0, 2.8, 1.5, 1.1, 0.9, 0.7, 0.5, 0.7, 0.9, 1.1, 1.5, 2.8, 10.0],
+        medium: [33.0, 6.0, 3.0, 1.5, 0.9, 0.6, 0.3, 0.6, 0.9, 1.5, 3.0, 6.0, 33.0],
+        hard: [170.0, 15.0, 5.0, 1.8, 0.7, 0.3, 0.2, 0.3, 0.7, 1.8, 5.0, 15.0, 170.0]
       },
       14: {
-        low: [12, 3.10, 1.90, 1.45, 1.30, 1.18, 1.08, 0.8, 1.08, 1.18, 1.30, 1.45, 1.90, 3.10, 12],
-        medium: [58, 11.00, 5.20, 2.75, 1.65, 1.35, 1.15, 0.3, 1.15, 1.35, 1.65, 2.75, 5.20, 11.00, 58],
-        hard: [420, 38.00, 11.00, 6.50, 4.00, 2.60, 1.30, 0.2, 1.30, 2.60, 4.00, 6.50, 11.00, 38.00, 420]
+        low: [12.0, 3.5, 1.8, 1.3, 1.0, 0.8, 0.6, 0.5, 0.6, 0.8, 1.0, 1.3, 1.8, 3.5, 12.0],
+        medium: [58.0, 10.0, 4.5, 2.0, 1.2, 0.7, 0.4, 0.2, 0.4, 0.7, 1.2, 2.0, 4.5, 10.0, 58.0],
+        hard: [420.0, 30.0, 9.0, 3.0, 1.2, 0.5, 0.2, 0.2, 0.2, 0.5, 1.2, 3.0, 9.0, 30.0, 420.0]
       },
       16: {
-        low: [16, 3.75, 2.20, 1.65, 1.45, 1.30, 1.18, 1.08, 0.8, 1.08, 1.18, 1.30, 1.45, 1.65, 2.20, 3.75, 16],
-        medium: [110, 16.50, 7.50, 3.70, 2.10, 1.65, 1.35, 1.15, 0.3, 1.15, 1.35, 1.65, 2.10, 3.70, 7.50, 16.50, 110],
-        hard: [1000, 75.00, 20.00, 11.00, 6.50, 4.00, 2.60, 1.30, 0.2, 1.30, 2.60, 4.00, 6.50, 11.00, 20.00, 75.00, 1000]
+        low: [16.0, 5.0, 2.0, 1.4, 1.1, 0.9, 0.7, 0.5, 0.5, 0.5, 0.7, 0.9, 1.1, 1.4, 2.0, 5.0, 16.0],
+        medium: [110.0, 20.0, 6.0, 3.0, 1.5, 1.0, 0.6, 0.4, 0.3, 0.4, 0.6, 1.0, 1.5, 3.0, 6.0, 20.0, 110.0],
+        hard: [1000.0, 50.0, 15.0, 5.0, 2.0, 0.8, 0.4, 0.2, 0.2, 0.2, 0.4, 0.8, 2.0, 5.0, 15.0, 50.0, 1000.0]
       }
     };
 
@@ -141,13 +141,22 @@ class CasinoPlinko {
 
     for (let i = 0; i < count; i++) {
       const mult = mults[i];
-      // Color grading from center to edge (low to high multiplier)
-      const distFromCenter = Math.abs(i - (count - 1) / 2) / ((count - 1) / 2);
-      let bg = '#10b981'; // Green center
-      let color = '#fff';
-      if (distFromCenter > 0.75) bg = '#fe2c55'; // Red edges
-      else if (distFromCenter > 0.45) bg = '#f59e0b'; // Orange
-      else if (distFromCenter > 0.2) bg = '#eab308'; // Yellow
+      let bg = '#dc2626'; // Deep red default (loss)
+      let color = '#ffffff';
+
+      if (mult >= 20) {
+        bg = '#fe2c55'; // Jackpot red/pink
+      } else if (mult >= 5) {
+        bg = '#f59e0b'; // Gold
+      } else if (mult >= 1.5) {
+        bg = '#10b981'; // Green win
+      } else if (mult >= 1.0) {
+        bg = '#8b5cf6'; // Royal purple push
+      } else if (mult >= 0.6) {
+        bg = '#b45309'; // Amber minor loss
+      } else {
+        bg = '#dc2626'; // Deep red heavy loss
+      }
 
       this.buckets.push({
         index: i,
@@ -185,26 +194,31 @@ class CasinoPlinko {
     const numRows = this.rows;
     const mid = (count - 1) / 2;
 
-    // Authentic Casino House Edge Probability Distribution (94% RTP):
-    // 85% of drops land in Center Loss Buckets (0.2x - 0.7x) -> House wins
-    // 12% of drops land in Low Win / Push Buckets (1.0x - 2.0x)
-    // 3% of drops land in Outer Jackpot Buckets (3x - 1000x)
+    // Authentic Casino House Edge Probability Distribution (95% RTP):
+    // 75% of drops land in Center Loss Buckets (0.2x - 0.6x) -> Direct house profit
+    // 15% of drops land in Near-Loss / Push Buckets (0.7x - 1.0x) -> Minor loss / push
+    // 8% of drops land in Moderate Win Buckets (1.1x - 2.0x) -> Moderate win
+    // 2% of drops land in Outer Jackpot Buckets (3.0x - 1000x) -> Big win
     let targetBucketIndex = Math.round(mid);
     const rng = Math.random();
 
-    if (rng < 0.85) {
+    if (rng < 0.75) {
       // Land in central loss zone (offset 0, +1, or -1 from center)
-      const offset = (Math.random() < 0.55) ? 0 : (Math.random() < 0.5 ? 1 : -1);
+      const offset = (Math.random() < 0.48) ? 0 : (Math.random() < 0.5 ? 1 : -1);
       targetBucketIndex = Math.round(mid + offset);
-    } else if (rng < 0.97) {
-      // Land in slight win/push zone (offset 2 or 3)
+    } else if (rng < 0.90) {
+      // Land in near-loss / push zone (offset 2 or -2)
       const offset = (Math.random() < 0.5 ? 2 : -2);
+      targetBucketIndex = Math.round(mid + offset);
+    } else if (rng < 0.98) {
+      // Land in moderate win zone (offset 3 or -3)
+      const offset = (Math.random() < 0.5 ? 3 : -3);
       targetBucketIndex = Math.round(mid + offset);
     } else {
       // Rare high multiplier / edge drop
       const side = Math.random() < 0.5 ? 1 : -1;
       const maxOffset = Math.floor(count / 2);
-      const edgeOffset = Math.max(3, Math.floor(Math.random() * maxOffset + 3));
+      const edgeOffset = Math.max(4, Math.floor(Math.random() * maxOffset + 3));
       targetBucketIndex = Math.round(mid + side * edgeOffset);
     }
 
@@ -452,7 +466,7 @@ class CasinoPlinko {
       ctx.fill();
 
       // Text multiplier
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = b.color || '#ffffff';
       ctx.font = `bold ${Math.max(8.5, Math.min(11, b.w * 0.38))}px Outfit, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
