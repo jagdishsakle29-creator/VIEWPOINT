@@ -1395,6 +1395,7 @@ class AppController {
     });
 
     this.initPromoSecretListener();
+    this.initCasinoRedesign();
 
     // Detect referral tracking link (?ref=... or ?r=...)
     try {
@@ -4024,21 +4025,229 @@ class AppController {
     }
   }
 
-  openPromoVideoModal(force = false) {
-    if (!this.hasPromoSecretKey() && !force) {
-      // 100% Locked unless secret 7489 is in the URL link
+  getPromoSettings() {
+    const defaultSettings = {
+      enabled: false,
+      showNavButton: true,
+      showVideoPlayer: true,
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      allowPromoCodes: true,
+      allowVideoSubmission: true
+    };
+    try {
+      const saved = localStorage.getItem('vp_promo_settings');
+      if (saved) {
+        return Object.assign({}, defaultSettings, JSON.parse(saved));
+      }
+      const legacy = localStorage.getItem('vp_promo_video_enabled');
+      if (legacy !== null) {
+        defaultSettings.enabled = (legacy === 'true');
+      }
+    } catch(e) {}
+    return defaultSettings;
+  }
+
+  savePromoSettings(settings) {
+    try {
+      localStorage.setItem('vp_promo_settings', JSON.stringify(settings));
+      localStorage.setItem('vp_promo_video_enabled', settings.enabled ? 'true' : 'false');
+      const apiBase = (window.wallet && window.wallet.apiBaseUrl) ? window.wallet.apiBaseUrl : window.location.origin;
+      fetch(`${apiBase}/api/admin?action=save_promo_settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ promo_settings: settings })
+      }).catch(() => {});
+    } catch(e) {}
+  }
+
+  async fetchPromoSettingsFromServer() {
+    try {
+      const apiBase = (window.wallet && window.wallet.apiBaseUrl) ? window.wallet.apiBaseUrl : window.location.origin;
+      const res = await fetch(`${apiBase}/api/admin?action=get_promo_settings`);
+      const data = await res.json();
+      if (data && data.success && data.promo_settings) {
+        const current = this.getPromoSettings();
+        const merged = Object.assign({}, current, data.promo_settings);
+        localStorage.setItem('vp_promo_settings', JSON.stringify(merged));
+        localStorage.setItem('vp_promo_video_enabled', merged.enabled ? 'true' : 'false');
+        this.updatePromoVideoUI();
+      }
+    } catch(e) {}
+  }
+
+  isPromoVideoEnabled() {
+    return Boolean(this.getPromoSettings().enabled);
+  }
+
+  togglePromoVideoMaster() {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const settings = this.getPromoSettings();
+    settings.enabled = !settings.enabled;
+    this.savePromoSettings(settings);
+    this.updatePromoVideoUI();
+    this.showNotification(
+      settings.enabled ? "✅ Promo Video turned ON! Visible to players." : "🔴 Promo Video turned OFF! Hidden from players.",
+      settings.enabled ? "success" : "info"
+    );
+  }
+
+  togglePromoOption(key, checked) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const settings = this.getPromoSettings();
+    settings[key] = Boolean(checked);
+    this.savePromoSettings(settings);
+    this.updatePromoVideoUI();
+    const labelMap = {
+      showNavButton: "Header Navbar Button",
+      showVideoPlayer: "In-Modal Video Player",
+      allowPromoCodes: "Promo Code Redemption",
+      allowVideoSubmission: "Video Link Submission"
+    };
+    const name = labelMap[key] || key;
+    this.showNotification(`${checked ? '🟢 Enabled' : '🔴 Disabled'}: ${name}`, checked ? 'success' : 'info');
+  }
+
+  savePromoOptionsFromForm() {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const settings = this.getPromoSettings();
+    const chkNav = document.getElementById('chkPromoNavBtn');
+    const chkPlayer = document.getElementById('chkPromoVideoPlayer');
+    const inputUrl = document.getElementById('inputPromoVideoUrl');
+    const chkCodes = document.getElementById('chkPromoRedeemCodes');
+    const chkSubmit = document.getElementById('chkPromoVideoSubmission');
+
+    if (chkNav) settings.showNavButton = chkNav.checked;
+    if (chkPlayer) settings.showVideoPlayer = chkPlayer.checked;
+    if (inputUrl && inputUrl.value.trim()) settings.videoUrl = inputUrl.value.trim();
+    if (chkCodes) settings.allowPromoCodes = chkCodes.checked;
+    if (chkSubmit) settings.allowVideoSubmission = chkSubmit.checked;
+
+    this.savePromoSettings(settings);
+    this.updatePromoVideoUI();
+    this.showNotification("✅ All Promo Video settings saved successfully!", "success");
+  }
+
+  formatVideoEmbedUrl(url) {
+    if (!url) return '';
+    try {
+      if (url.includes('youtube.com/watch?v=')) {
+        const vId = url.split('v=')[1].split('&')[0];
+        return `https://www.youtube.com/embed/${vId}`;
+      } else if (url.includes('youtu.be/')) {
+        const vId = url.split('youtu.be/')[1].split('?')[0];
+        return `https://www.youtube.com/embed/${vId}`;
+      } else if (url.includes('youtube.com/shorts/')) {
+        const vId = url.split('shorts/')[1].split('?')[0];
+        return `https://www.youtube.com/embed/${vId}`;
+      }
+      return url;
+    } catch(e) {
+      return url;
+    }
+  }
+
+  previewPromoVideo() {
+    const inputUrl = document.getElementById('inputPromoVideoUrl');
+    const url = inputUrl ? inputUrl.value.trim() : '';
+    if (!url) {
+      this.showNotification("Please enter a video URL first!", "warning");
       return;
     }
-    window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+    const settings = this.getPromoSettings();
+    settings.videoUrl = url;
+    settings.showVideoPlayer = true;
+    this.savePromoSettings(settings);
+    this.openPromoVideoModal(true);
+  }
+
+  updatePromoVideoUI() {
+    const settings = this.getPromoSettings();
+    const enabled = Boolean(settings.enabled);
+
+    // 1. Navbar Button for players
+    const navBtn = document.getElementById('btnOpenPromoVideoNav');
+    if (navBtn) {
+      navBtn.style.display = (enabled && settings.showNavButton) ? 'inline-flex' : 'none';
+    }
+
+    // 2. Admin Tab badge
+    const navBadge = document.getElementById('adminPromoNavBadge');
+    if (navBadge) {
+      navBadge.innerText = enabled ? 'ON' : 'OFF';
+      navBadge.style.background = enabled ? '#00e701' : '#ef4444';
+      navBadge.style.color = '#fff';
+    }
+
+    // 3. Admin Panel Master Status Badge
+    const badge = document.getElementById('badgePromoStatus');
+    if (badge) {
+      badge.innerText = enabled ? '🟢 ON' : '🔴 OFF';
+      badge.style.background = enabled ? 'rgba(0, 231, 1, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+      badge.style.color = enabled ? '#00e701' : '#ef4444';
+      badge.style.borderColor = enabled ? '#00e701' : '#ef4444';
+    }
+
+    // 4. Admin Panel Master Toggle Button
+    const toggleBtn = document.getElementById('btnTogglePromoVideo');
+    if (toggleBtn) {
+      toggleBtn.innerHTML = enabled ? '<span>🔴 Turn OFF</span>' : '<span>🟢 Turn ON</span>';
+      toggleBtn.style.background = enabled ? 'rgba(239, 68, 68, 0.25)' : 'rgba(0, 231, 1, 0.25)';
+      toggleBtn.style.borderColor = enabled ? '#ef4444' : '#00e701';
+      toggleBtn.style.color = enabled ? '#ff4d4d' : '#00e701';
+    }
+
+    // 5. Admin Form Checkboxes & Inputs
+    const chkNav = document.getElementById('chkPromoNavBtn');
+    if (chkNav) chkNav.checked = Boolean(settings.showNavButton);
+    const chkPlayer = document.getElementById('chkPromoVideoPlayer');
+    if (chkPlayer) chkPlayer.checked = Boolean(settings.showVideoPlayer);
+    const inputUrl = document.getElementById('inputPromoVideoUrl');
+    if (inputUrl && (document.activeElement !== inputUrl)) inputUrl.value = settings.videoUrl || '';
+    const chkCodes = document.getElementById('chkPromoRedeemCodes');
+    if (chkCodes) chkCodes.checked = Boolean(settings.allowPromoCodes);
+    const chkSubmit = document.getElementById('chkPromoVideoSubmission');
+    if (chkSubmit) chkSubmit.checked = Boolean(settings.allowVideoSubmission);
+
+    // 6. Modal Elements
+    const playerContainer = document.getElementById('promoVideoPlayerContainer');
+    const iframe = document.getElementById('promoVideoIframe');
+    if (playerContainer) {
+      const showPlayer = settings.showVideoPlayer && Boolean(settings.videoUrl);
+      playerContainer.style.display = showPlayer ? 'block' : 'none';
+      if (iframe && showPlayer) {
+        const embedUrl = this.formatVideoEmbedUrl(settings.videoUrl);
+        if (iframe.src !== embedUrl) iframe.src = embedUrl;
+      }
+    }
+    const codeSection = document.getElementById('promoCodeSection');
+    if (codeSection) {
+      codeSection.style.display = settings.allowPromoCodes ? 'block' : 'none';
+    }
+    const submitSection = document.getElementById('promoSubmitLinkSection');
+    if (submitSection) {
+      submitSection.style.display = settings.allowVideoSubmission ? 'block' : 'none';
+    }
+  }
+
+  openPromoVideoModal(force = false) {
+    const settings = this.getPromoSettings();
+    if (!settings.enabled && !force) {
+      this.showNotification("Promo Video is currently turned OFF by Admin.", "info");
+      return;
+    }
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    this.updatePromoVideoUI();
     const modal = document.getElementById('modalPromoVideo');
     if (modal) {
       modal.classList.add('open');
       modal.style.display = 'flex';
+      modal.style.zIndex = '100006';
     }
   }
 
   initPromoSecretListener() {
-    // Promo video is exclusively inside Admin Panel now
+    this.updatePromoVideoUI();
+    this.fetchPromoSettingsFromServer();
   }
 
   closePromoVideoModal() {
@@ -4897,6 +5106,269 @@ class AppController {
     }
   }
 
+  // ================= VIEW POINT CASINO REDESIGN METHODS =================
+
+  initCasinoRedesign() {
+    this.initCarouselSwipe('featuredCarouselTrack', 'featuredCarouselDots');
+
+    ['featuredCarouselTrack', 'popularCarouselTrack', 'originalsCarouselTrack', 'crashCarouselTrack', 'tableCarouselTrack', 'slotsCarouselTrack'].forEach(trackId => {
+      this.initTrackDrag(trackId);
+    });
+
+    const searchInput = document.getElementById('inputCasinoSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => this.searchCasinoGames(e.target.value));
+    }
+  }
+
+  initTrackDrag(trackId) {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    track.addEventListener('mousedown', (e) => {
+      isDown = true;
+      startX = e.pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
+    });
+    track.addEventListener('mouseleave', () => { isDown = false; });
+    track.addEventListener('mouseup', () => { isDown = false; });
+    track.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - track.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      track.scrollLeft = scrollLeft - walk;
+    });
+  }
+
+  scrollCarousel(trackId, dir) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    const scrollAmount = 340 * dir;
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+
+  jumpCarousel(trackId, idx) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    const cards = track.querySelectorAll('.game-poster-card');
+    if (cards && cards.length > 0) {
+      const cardWidth = cards[0].offsetWidth + 12;
+      const targetScroll = (idx * 3) * cardWidth;
+      track.scrollTo({ left: targetScroll, behavior: 'smooth' });
+    }
+  }
+
+  initCarouselSwipe(trackId, dotsRowId) {
+    const track = document.getElementById(trackId);
+    const dotsRow = document.getElementById(dotsRowId);
+    if (!track || !dotsRow) return;
+
+    track.addEventListener('scroll', () => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      if (maxScroll <= 0) return;
+      const progress = track.scrollLeft / maxScroll;
+      const dots = dotsRow.querySelectorAll('.carousel-dot');
+      const activeIdx = Math.min(dots.length - 1, Math.floor(progress * dots.length + 0.3));
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === activeIdx);
+      });
+    }, { passive: true });
+  }
+
+  searchCasinoGames(query) {
+    const q = (query || '').trim().toLowerCase();
+    const allCards = document.querySelectorAll('.game-poster-card');
+    allCards.forEach(card => {
+      if (!q) {
+        card.style.display = '';
+        return;
+      }
+      const gName = (card.querySelector('.game-poster-name')?.textContent || '').toLowerCase();
+      const gProv = (card.querySelector('.game-poster-provider')?.textContent || '').toLowerCase();
+      const gId = (card.dataset.game || '').toLowerCase();
+      if (gName.includes(q) || gProv.includes(q) || gId.includes(q)) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  filterCasinoCategory(cat, btn) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    document.querySelectorAll('.casino-cat-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const heroTrack = document.getElementById('featuredCarouselTrack');
+    if (heroTrack) {
+      heroTrack.scrollTo({ left: 0, behavior: 'smooth' });
+      const cards = heroTrack.querySelectorAll('.game-poster-card');
+      cards.forEach(card => {
+        if (cat === 'all') {
+          card.style.display = '';
+        } else {
+          const cardCats = (card.dataset.category || '').toLowerCase();
+          card.style.display = cardCats.includes(cat.toLowerCase()) ? '' : 'none';
+        }
+      });
+    }
+  }
+
+  openBetSlipPanel(tab = 'slip') {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const panel = document.getElementById('panelBetSlip');
+    if (!panel) return;
+    panel.classList.add('open');
+    this._betSlipOpen = true;
+    this.switchBetSlipTab(tab);
+  }
+
+  closeBetSlipPanel() {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const panel = document.getElementById('panelBetSlip');
+    if (panel) panel.classList.remove('open');
+    this._betSlipOpen = false;
+  }
+
+  switchBetSlipTab(tab) {
+    this._activeBetSlipTab = tab;
+    const tabSlip = document.getElementById('tabBetSlipBets');
+    const tabHist = document.getElementById('tabBetSlipHistory');
+    if (tabSlip) tabSlip.classList.toggle('active', tab === 'slip');
+    if (tabHist) tabHist.classList.toggle('active', tab === 'history');
+    this.renderBetSlipContent(tab);
+  }
+
+  renderBetSlipContent(tab = this._activeBetSlipTab || 'slip') {
+    const body = document.getElementById('betSlipPanelBody');
+    if (!body) return;
+
+    if (tab === 'slip') {
+      const gName = (this.currentGame || 'mines').toUpperCase();
+      const betAmt = (this.dom.betAmountInput ? parseFloat(this.dom.betAmountInput.value) : 10) || 10;
+      const isRoundActive = !!(this.activeInstance && this.activeInstance.isRoundActive);
+      const curMult = (this.activeInstance && this.activeInstance.currentMultiplier) ? this.activeInstance.currentMultiplier.toFixed(2) + 'x' : '1.00x';
+
+      body.innerHTML = `
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 16px;">🎮</span>
+              <strong style="color: #fff; font-size: 14px;">${gName}</strong>
+            </div>
+            <span style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: ${isRoundActive ? 'rgba(0, 231, 1, 0.2)' : 'rgba(99, 102, 241, 0.2)'}; color: ${isRoundActive ? '#00e701' : '#a5b4fc'}; border: 1px solid ${isRoundActive ? '#00e701' : '#6366f1'};">
+              ${isRoundActive ? '🔴 ACTIVE ROUND' : 'READY'}
+            </span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 13px;">
+            <span style="color: #94a3b8;">Bet Amount:</span>
+            <strong style="color: #00e701;">₹${betAmt.toFixed(2)}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 13px;">
+            <span style="color: #94a3b8;">Current Multiplier:</span>
+            <strong style="color: #fbbf24;">${curMult}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 13px;">
+            <span style="color: #94a3b8;">Potential Payout:</span>
+            <strong style="color: #fff;">₹${(betAmt * (parseFloat(curMult) || 1)).toFixed(2)}</strong>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <button type="button" class="chip-btn" style="flex: 1; height: 36px; border-radius: 8px; background: rgba(30, 41, 69, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-weight: 800;" onclick="window.app && window.app.dom.betAmountInput && (window.app.dom.betAmountInput.value = 10, window.app.dom.betAmountInput.dispatchEvent(new Event('input')))">₹10</button>
+          <button type="button" class="chip-btn" style="flex: 1; height: 36px; border-radius: 8px; background: rgba(30, 41, 69, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-weight: 800;" onclick="window.app && window.app.dom.betAmountInput && (window.app.dom.betAmountInput.value = 50, window.app.dom.betAmountInput.dispatchEvent(new Event('input')))">₹50</button>
+          <button type="button" class="chip-btn" style="flex: 1; height: 36px; border-radius: 8px; background: rgba(30, 41, 69, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-weight: 800;" onclick="window.app && window.app.dom.betAmountInput && (window.app.dom.betAmountInput.value = 100, window.app.dom.betAmountInput.dispatchEvent(new Event('input')))">₹100</button>
+          <button type="button" class="chip-btn" style="flex: 1; height: 36px; border-radius: 8px; background: rgba(30, 41, 69, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-weight: 800;" onclick="window.app && window.app.dom.betAmountInput && (window.app.dom.betAmountInput.value = 500, window.app.dom.betAmountInput.dispatchEvent(new Event('input')))">₹500</button>
+        </div>
+
+        <button type="button" class="btn-stake-primary" style="width: 100%; height: 46px; border-radius: 10px; font-size: 15px; font-weight: 900;" onclick="window.app && window.app.closeBetSlipPanel(); window.handleBetClick ? window.handleBetClick() : (window.app && window.app.handleBetClick())">
+          ${isRoundActive ? 'VIEW ACTIVE ROUND' : 'PLACE BET NOW'}
+        </button>
+      `;
+    } else {
+      const history = (window.wallet && window.wallet.history) ? window.wallet.history : [];
+      if (!history || history.length === 0) {
+        body.innerHTML = `
+          <div class="bet-slip-empty">
+            <div class="bet-slip-empty-icon">📜</div>
+            <div style="font-weight: 800; font-size: 14px; color: #fff; margin-bottom: 4px;">No Bets Placed Yet</div>
+            <div style="font-size: 12px; color: #64748b;">Place a bet in any of our 14 games to view your live round history here.</div>
+          </div>
+        `;
+      } else {
+        const rows = history.slice(0, 20).map(item => {
+          const isWin = (item.payout && item.payout > 0) || (item.profit && item.profit > 0) || (item.type === 'win') || (item.status === 'won');
+          const mult = item.multiplier ? (typeof item.multiplier === 'number' ? item.multiplier.toFixed(2) + 'x' : item.multiplier) : '-';
+          const amt = item.amount ? `₹${parseFloat(item.amount).toFixed(2)}` : (item.bet ? `₹${parseFloat(item.bet).toFixed(2)}` : '₹0.00');
+          const payout = item.payout ? `+₹${parseFloat(item.payout).toFixed(2)}` : (isWin ? amt : `₹0.00`);
+          const time = item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent';
+          const gName = (item.game || item.title || 'Bet').toUpperCase();
+
+          return `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 6px;">
+              <div>
+                <div style="font-size: 12.5px; font-weight: 800; color: #fff;">${gName}</div>
+                <div style="font-size: 10.5px; color: #64748b;">${time} • Bet: ${amt}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 12px; font-weight: 800; color: ${isWin ? '#00e701' : '#ef4444'};">
+                  ${isWin ? payout : '- ' + amt}
+                </div>
+                <span style="font-size: 9.5px; padding: 1px 5px; border-radius: 4px; background: ${isWin ? 'rgba(0, 231, 1, 0.15)' : 'rgba(239, 68, 68, 0.15)'}; color: ${isWin ? '#00e701' : '#ef4444'}; font-weight: 800;">
+                  ${mult}
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        body.innerHTML = `
+          <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; font-weight: 800; color: #94a3b8;">Recent Bets (${history.length})</span>
+            <button type="button" style="background: none; border: none; color: #60a5fa; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="window.openTxHistoryModal && window.openTxHistoryModal()">View Full Ledger</button>
+          </div>
+          <div>${rows}</div>
+        `;
+      }
+    }
+  }
+
+  handleBottomNav(action) {
+    if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
+    const navItems = document.querySelectorAll('.mobile-bottom-nav .mobile-nav-item');
+    navItems.forEach(item => item.classList.remove('active'));
+
+    if (action === 'browse') {
+      const bBtn = document.getElementById('mNavBrowse');
+      if (bBtn) bBtn.classList.add('active');
+      const catNav = document.getElementById('casinoCategoryNav');
+      if (catNav) catNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (action === 'casino') {
+      const cBtn = document.getElementById('mNavCasino');
+      if (cBtn) cBtn.classList.add('active');
+      const arena = document.getElementById('featuredCarouselSection') || document.querySelector('.game-arena');
+      if (arena) arena.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (action === 'betslip') {
+      const sBtn = document.getElementById('mNavBetSlip');
+      if (sBtn) sBtn.classList.add('active');
+      this.openBetSlipPanel('slip');
+    } else if (action === 'sports') {
+      const spBtn = document.getElementById('mNavSports');
+      if (spBtn) spBtn.classList.add('active');
+      this.showToast('⚽ Sportsbook coming soon! Enjoy our 14 Casino Games in the meantime!', 'info');
+    } else if (action === 'chat') {
+      const chBtn = document.getElementById('mNavChat');
+      if (chBtn) chBtn.classList.add('active');
+      if (window.openSupportModal) window.openSupportModal();
+    }
+  }
+
   switchGamePage(pageNum) {
     if (window.soundEngine && window.soundEngine.playClick) window.soundEngine.playClick();
     const p = parseInt(pageNum, 10) || 1;
@@ -5003,6 +5475,14 @@ class AppController {
     if (mNav2) mNav2.classList.toggle('active', targetPage === 2);
     if (mNavCasino) mNavCasino.classList.toggle('active', targetPage === 3);
     if (mNavLiveBet) mNavLiveBet.classList.toggle('active', targetPage === 4);
+
+    // Sync Game Poster Cards
+    document.querySelectorAll('.game-poster-card').forEach(card => {
+      card.classList.toggle('active', card.dataset.game === gameType);
+    });
+    if (this._betSlipOpen) {
+      this.renderBetSlipContent();
+    }
 
     // Persist game in URL hash and local storage
     try {
@@ -5814,6 +6294,7 @@ class AppController {
 
     try {
       this.syncAdminSettingsUI();
+      this.updatePromoVideoUI();
       this.renderAdminPendingDeposits();
       this.renderAdminUsersList();
     } catch(e) {
@@ -5986,52 +6467,82 @@ class AppController {
     ];
 
     tabs.forEach(t => t && t.classList.remove('active'));
-    views.forEach(v => v && v.classList.remove('active'));
+    views.forEach(v => {
+      if (v) {
+        v.classList.remove('active');
+        v.style.display = 'none';
+      }
+    });
 
     if (tab === 'video') {
       const t = document.getElementById('tabAdminVideo');
       const v = document.getElementById('viewAdminVideo');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
+      this.updatePromoVideoUI();
     } else if (tab === 'pending') {
       const t = document.getElementById('tabAdminPending');
       const v = document.getElementById('viewAdminPending');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
       this.renderAdminPendingDeposits();
     } else if (tab === 'withdraw') {
       const t = document.getElementById('tabAdminWithdraw');
       const v = document.getElementById('viewAdminWithdraw');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
       this.renderAdminWithdrawList();
     } else if (tab === 'analytics') {
       const t = document.getElementById('tabAdminAnalytics');
       const v = document.getElementById('viewAdminAnalytics');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
       this.renderAdminAnalytics();
     } else if (tab === 'users') {
       const t = document.getElementById('tabAdminUsers');
       const v = document.getElementById('viewAdminUsers');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
       this.renderAdminUsersList();
     } else if (tab === 'upi') {
       const t = document.getElementById('tabAdminUpi');
       const v = document.getElementById('viewAdminUpi');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
     } else if (tab === 'telegram') {
       const t = document.getElementById('tabAdminTelegram');
       const v = document.getElementById('viewAdminTelegram');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
     } else if (tab === 'sms') {
       const t = document.getElementById('tabAdminSms');
       const v = document.getElementById('viewAdminSms');
       if (t) t.classList.add('active');
-      if (v) v.classList.add('active');
+      if (v) {
+        v.classList.add('active');
+        v.style.display = 'block';
+      }
       const smsInput = document.getElementById('settingFast2SmsKey');
       const emailServiceInput = document.getElementById('settingEmailJsService');
       const emailKeyInput = document.getElementById('settingEmailJsKey');
@@ -8677,4 +9188,17 @@ window.handleBetClick = function() {
 window.handleCashoutClick = function() {
   if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
   if (window.app && window.app.handleCashoutClick) return window.app.handleCashoutClick();
+};
+
+window.filterCasinoCategory = function(cat, btn) {
+  if (window.app && window.app.filterCasinoCategory) return window.app.filterCasinoCategory(cat, btn);
+};
+window.scrollCasinoCarousel = function(trackId, dir) {
+  if (window.app && window.app.scrollCarousel) return window.app.scrollCarousel(trackId, dir);
+};
+window.openBetSlip = function(tab) {
+  if (window.app && window.app.openBetSlipPanel) return window.app.openBetSlipPanel(tab);
+};
+window.closeBetSlip = function() {
+  if (window.app && window.app.closeBetSlipPanel) return window.app.closeBetSlipPanel();
 };

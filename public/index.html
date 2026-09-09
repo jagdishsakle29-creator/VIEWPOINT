@@ -602,6 +602,12 @@
           <span>Refer & Earn</span>
         </button>
 
+        <!-- Promo Video & Redeem Code Button (Admin Toggleable) -->
+        <button id="btnOpenPromoVideoNav" class="btn-refer-nav" style="display: none; background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2)); border: 1px solid rgba(239,68,68,0.5); color: #ff6b6b;" onclick="window.app && window.app.openPromoVideoModal()" title="Promo Video & Redeem Code">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <span>Promo Video</span>
+        </button>
+
         <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
         <div id="authLoggedOutBox" class="auth-buttons-group">
           <button id="btnOpenLogin" class="btn-auth-login" onclick="window.openAuthModal ? window.openAuthModal('login') : (window.app && window.app.openAuthModal('login'))">
@@ -627,6 +633,12 @@
         <!-- Provably Fair Verifier Icon -->
         <button id="btnProvablyFair" class="btn-icon-nav" title="Provably Fair Verifier">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </button>
+
+        <!-- Header Notifications Button -->
+        <button id="btnHeaderNotifications" class="btn-icon-nav" title="Notifications" onclick="window.app && window.app.showToast ? window.app.showToast('🔔 No new notifications', 'info') : null" style="position: relative;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span style="position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: #00e701; box-shadow: 0 0 6px #00e701;"></span>
         </button>
       </div>
 
@@ -662,143 +674,313 @@
   <!-- Page 1: Classic Casino Lobby (Mines & Chicken) -->
   <main id="mainPage1" class="main-layout page-section active">
     
-    <!-- 3-Page Responsive Pagination Bar (Android / iOS Clean Swipe/Tap) -->
-    <div class="game-pages-nav-bar" id="gamePagesNavBar">
-      <button type="button" id="btnGamePage1" class="btn-game-page-pill active" onclick="window.switchGamePage ? window.switchGamePage(1) : (window.app && window.app.switchGamePage(1))">
-        <span>⚡ PAGE 1</span>
-        <small style="display:block; font-size:10px; opacity:0.8;">Mines & Dragon Tiger</small>
+    <!-- Casino Title, Subtitle & Search Box -->
+    <div class="casino-title-row">
+      <div class="casino-title-content">
+        <h1 class="casino-main-title">
+          <span>Casino</span>
+          <span class="casino-live-badge">VIEW POINT</span>
+        </h1>
+        <p class="casino-subtitle">Play your favorite games, win big!</p>
+      </div>
+      <div class="casino-search-box">
+        <span class="casino-search-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <input type="text" id="inputCasinoSearch" class="casino-search-input" placeholder="Search games..." oninput="window.app && window.app.searchCasinoGames ? window.app.searchCasinoGames(this.value) : null">
+      </div>
+    </div>
+
+    <!-- Horizontally Swipeable Category Navigation Tabs -->
+    <div class="casino-category-nav" id="casinoCategoryNav">
+      <button type="button" class="casino-cat-btn active" data-cat="all" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('all', this) : null">
+        <span>🔥 All Games</span>
       </button>
-      <button type="button" id="btnGamePage2" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))">
-        <span>🚀 PAGE 2</span>
-        <small style="display:block; font-size:10px; opacity:0.8;">Chicken & Crash</small>
+      <button type="button" class="casino-cat-btn" data-cat="originals" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('originals', this) : null">
+        <span>🎲 Originals</span>
       </button>
-      <button type="button" id="btnGamePage3" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(3) : (window.app && window.app.switchGamePage(3))">
-        <span>📈 PAGE 3</span>
-        <small style="display:block; font-size:10px; opacity:0.8;">Dice & Win Go</small>
+      <button type="button" class="casino-cat-btn" data-cat="slots" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('slots', this) : null">
+        <span>🎰 Slots</span>
       </button>
-      <button type="button" id="btnGamePage4" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(4) : (window.app && window.app.switchGamePage(4))">
-        <span>✈️ PAGE 4</span>
-        <small style="display:block; font-size:10px; opacity:0.8;">Aviator & Cards</small>
+      <button type="button" class="casino-cat-btn" data-cat="live" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('live', this) : null">
+        <span>👑 Live Casino</span>
+      </button>
+      <button type="button" class="casino-cat-btn" data-cat="table" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('table', this) : null">
+        <span>🎯 Table Games</span>
+      </button>
+      <button type="button" class="casino-cat-btn" data-cat="crash" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('crash', this) : null">
+        <span>💥 Crash</span>
+      </button>
+      <button type="button" class="casino-cat-btn" data-cat="providers" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('providers', this) : null">
+        <span>⚡ Providers</span>
       </button>
     </div>
 
-    <!-- Game Tabs Container Organized by Pages (4 Games Per Page) -->
-    <div class="game-tabs-wrapper">
-      <!-- Page 1 Group (Games 1-4) -->
-      <div id="gamePageGroup1" class="game-page-group" style="display: flex;">
-        <!-- 1. Mines -->
-        <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" style="position:relative;">
-          <svg class="game-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="13" r="7" fill="#ff3b30"/><path d="M12 2v4M12 20v2M2 13h4M18 13h4M5.5 6.5l2.8 2.8M15.7 16.7l2.8 2.8M18.5 6.5l-2.8 2.8M8.3 16.7l-2.8 2.8" stroke="#ff4d4d" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="11" r="2" fill="#fff" opacity="0.6"/></svg>
-          <span style="font-weight: 900;">Mines</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 7.6k</span>
-        </button>
+    <!-- Hidden Legacy Elements for 100% Backward Compatibility with existing tests/scripts -->
+    <div class="game-pages-nav-bar" id="gamePagesNavBar" style="display: none !important;">
+      <button type="button" id="btnGamePage1" class="btn-game-page-pill active" onclick="window.switchGamePage ? window.switchGamePage(1) : (window.app && window.app.switchGamePage(1))"><span>⚡ PAGE 1</span></button>
+      <button type="button" id="btnGamePage2" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))"><span>🚀 PAGE 2</span></button>
+      <button type="button" id="btnGamePage3" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(3) : (window.app && window.app.switchGamePage(3))"><span>📈 PAGE 3</span></button>
+      <button type="button" id="btnGamePage4" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(4) : (window.app && window.app.switchGamePage(4))"><span>✈️ PAGE 4</span></button>
+    </div>
+    <div class="game-tabs-wrapper" id="gameTabsWrapper" style="display: none !important;">
+      <div id="gamePageGroup1" class="game-page-group"><button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))"><span>Mines</span></button><button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))"><span>Dragon Tiger</span></button><button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))"><span>Limbo</span></button><button id="tabPump" class="tab-btn" data-game="pump" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))"><span>Pump</span></button></div>
+      <div id="gamePageGroup2" class="game-page-group"><button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))"><span>Chicken</span></button><button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))"><span>Plinko</span></button><button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))"><span>Crash</span></button><button id="tabMoles" class="tab-btn" data-game="moles" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))"><span>Moles</span></button></div>
+      <div id="gamePageGroup3" class="game-page-group"><button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))"><span>Dice</span></button><button id="tabTower" class="tab-btn" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))"><span>Tower</span></button><button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))"><span>Win Go</span></button><button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))"><span>Stock BTC</span></button></div>
+      <div id="gamePageGroup4" class="game-page-group"><button id="tabAviator" class="tab-btn" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))"><span>Aviator</span></button><button id="tabAndarBahar" class="tab-btn" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))"><span>Andar Bahar</span></button><button id="tabLuckySpin" class="tab-btn" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);"><span>Spin & Win</span></button></div>
+    </div>
 
-        <!-- 2. Dragon Tiger -->
-        <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🐉🐯</span>
-          <span style="font-weight: 900;">Dragon Tiger</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 5.1k</span>
-        </button>
-
-        <!-- 3. Limbo Turbo -->
-        <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🎯⚡</span>
-          <span style="font-weight: 900;">Limbo</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 3.0k</span>
-        </button>
-
-        <!-- 4. Stake Pump (Page 1) -->
-        <button id="tabPump" class="tab-btn" data-game="pump" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🎈💨</span>
-          <span style="font-weight: 900;">Pump</span>
-          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 8.5px; font-weight: 800;">🔥 2.1k</span>
-        </button>
+    <!-- Featured Horizontal Swipeable Hero Game Carousel -->
+    <div class="casino-carousel-section" id="featuredCarouselSection">
+      <div class="carousel-header-row">
+        <h2 class="carousel-section-title">
+          <span style="font-size: 18px;">🔥</span>
+          <span>Featured Games</span>
+        </h2>
+        <div class="carousel-controls">
+          <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('featuredCarouselTrack', -1) : null" title="Previous Games">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('featuredCarouselTrack', 1) : null" title="Next Games">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Page 2 Group (Games 5-8) -->
-      <div id="gamePageGroup2" class="game-page-group" style="display: none;">
-        <!-- 5. Chicken Road -->
-        <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🍗🚗</span>
-          <span style="font-weight: 900;">Chicken</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 5.9k</span>
-        </button>
+      <div class="carousel-track" id="featuredCarouselTrack">
+        <!-- 1. Mines Poster Card -->
+        <div class="game-poster-card active" data-game="mines" data-category="originals popular" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
+            <span class="game-poster-badge hot">🔥 HOT</span>
+            <span class="game-poster-players">⚡ 7.6k</span>
+            <svg viewBox="0 0 100 100" style="padding: 12px; filter: drop-shadow(0 6px 12px rgba(239, 68, 68, 0.4));">
+              <circle cx="50" cy="54" r="28" fill="#ef4444"/>
+              <circle cx="42" cy="46" r="8" fill="#fca5a5" opacity="0.6"/>
+              <rect x="46" y="16" width="8" height="14" rx="2" fill="#64748b"/>
+              <path d="M50 16 Q58 6 68 12" stroke="#f59e0b" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="68" cy="12" r="4" fill="#fbbf24"/>
+            </svg>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Mines</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
 
-        <!-- 6. Plinko -->
-        <button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🔴🔺</span>
-          <span style="font-weight: 900;">Plinko</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 4.7k</span>
-        </button>
+        <!-- 2. Aviator Poster Card -->
+        <div class="game-poster-card" data-game="aviator" data-category="crash popular" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #450a0a 0%, #090d16 100%);">
+            <span class="game-poster-badge hot">🔥 HOT</span>
+            <span class="game-poster-players">⚡ 8.9k</span>
+            <div style="font-size: 46px; filter: drop-shadow(0 6px 16px rgba(239, 68, 68, 0.6));">✈️</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Aviator</div>
+            <div class="game-poster-provider">Spribe / View Point</div>
+          </div>
+        </div>
 
-        <!-- 7. Crash Rocket -->
-        <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🚀✨</span>
-          <span style="font-weight: 900;">Crash</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 6.8k</span>
-        </button>
+        <!-- 3. Dragon Tiger Poster Card -->
+        <div class="game-poster-card" data-game="dragontiger" data-category="live table popular" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #311042 0%, #090d16 100%);">
+            <span class="game-poster-badge live">🔴 LIVE</span>
+            <span class="game-poster-players">⚡ 5.1k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.5));">🐉🐯</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Dragon Tiger</div>
+            <div class="game-poster-provider">View Point Live</div>
+          </div>
+        </div>
 
-        <!-- 8. Stake Moles (Page 2) -->
-        <button id="tabMoles" class="tab-btn" data-game="moles" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🐹🔨</span>
-          <span style="font-weight: 900;">Moles</span>
-          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 8.5px; font-weight: 800;">🔥 1.7k</span>
-        </button>
+        <!-- 4. Crash Poster Card -->
+        <div class="game-poster-card" data-game="crash" data-category="crash originals popular" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #0f2e3d 0%, #090d16 100%);">
+            <span class="game-poster-badge top">⭐ TOP</span>
+            <span class="game-poster-players">⚡ 6.8k</span>
+            <div style="font-size: 44px; filter: drop-shadow(0 6px 16px rgba(56, 189, 248, 0.5));">🚀</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Crash</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 5. Chicken Road Poster Card -->
+        <div class="game-poster-card" data-game="chicken" data-category="originals popular" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3d2207 0%, #090d16 100%);">
+            <span class="game-poster-badge top">⭐ TOP</span>
+            <span class="game-poster-players">⚡ 5.9k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(245, 158, 11, 0.5));">🍗🚗</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Chicken Road</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 6. Plinko Poster Card -->
+        <div class="game-poster-card" data-game="plinko" data-category="originals" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 4.7k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(139, 92, 246, 0.5));">🔴🔺</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Plinko</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 7. Limbo Turbo Poster Card -->
+        <div class="game-poster-card" data-game="limbo" data-category="originals crash" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #142825 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 3.0k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.5));">🎯⚡</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Limbo Turbo</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 8. Andar Bahar Poster Card -->
+        <div class="game-poster-card" data-game="andarbahar" data-category="live table popular" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #331520 0%, #090d16 100%);">
+            <span class="game-poster-badge live">🔴 LIVE</span>
+            <span class="game-poster-players">⚡ 6.2k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(244, 63, 94, 0.5));">🃏👑</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Andar Bahar</div>
+            <div class="game-poster-provider">View Point Live</div>
+          </div>
+        </div>
+
+        <!-- 9. Win Go 30s Poster Card -->
+        <div class="game-poster-card" data-game="colortrading" data-category="live slots" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #201a38 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 2.5k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.5));">🎨💎</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Win Go 30s</div>
+            <div class="game-poster-provider">View Point Live</div>
+          </div>
+        </div>
+
+        <!-- 10. Classic Dice Poster Card -->
+        <div class="game-poster-card" data-game="dice" data-category="originals table" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #172554 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 850</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(59, 130, 246, 0.5));">🎲✨</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Classic Dice</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 11. Tower Legend Poster Card -->
+        <div class="game-poster-card" data-game="tower" data-category="originals" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3b1d11 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 1.3k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(249, 115, 22, 0.5));">🏰💎</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Tower Legend</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 12. Crypto Pump Poster Card -->
+        <div class="game-poster-card" data-game="pump" data-category="slots originals" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #291a05 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 2.1k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(234, 179, 8, 0.5));">🎈💨</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Crypto Pump</div>
+            <div class="game-poster-provider">View Point Arcade</div>
+          </div>
+        </div>
+
+        <!-- 13. Moles Burrow Poster Card -->
+        <div class="game-poster-card" data-game="moles" data-category="slots originals" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1e24 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 1.7k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(161, 161, 170, 0.5));">🐹🔨</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Moles Burrow</div>
+            <div class="game-poster-provider">View Point Arcade</div>
+          </div>
+        </div>
+
+        <!-- 14. Stock BTC Poster Card -->
+        <div class="game-poster-card" data-game="stock" data-category="crash live" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #092e20 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 850</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(34, 197, 94, 0.5));">📈₿</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Stock BTC</div>
+            <div class="game-poster-provider">View Point Fast</div>
+          </div>
+        </div>
       </div>
 
-      <!-- Page 3 Group (Games 9-12: Dice, Tower, Win Go, Stock BTC) -->
-      <div id="gamePageGroup3" class="game-page-group" style="display: none;">
-        <!-- 9. Classic Dice (Page 3 - 1st) -->
-        <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🎲</span>
-          <span style="font-weight: 900;">Dice</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 850</span>
-        </button>
-
-        <!-- 10. Tower Legend (Page 3 - 2nd) -->
-        <button id="tabTower" class="tab-btn" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🏰💎</span>
-          <span style="font-weight: 900;">Tower</span>
-          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.18); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 8.5px; font-weight: 800;">🔥 1.3k</span>
-        </button>
-
-        <!-- 11. Win Go 30s (Page 3 - 3rd) -->
-        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🎨</span>
-          <span style="font-weight: 800;">Win Go</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 2.5k</span>
-        </button>
-
-        <!-- 12. Stock BTC (Page 3 - 4th) -->
-        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">📈</span>
-          <span style="font-weight: 800;">Stock BTC</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); font-size: 8.5px; font-weight: 800;">⚡ 850</span>
-        </button>
+      <!-- Navigation Dots and Swipe Hint -->
+      <div class="carousel-dots-row" id="featuredCarouselDots">
+        <span class="carousel-dot active" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 0) : null"></span>
+        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 1) : null"></span>
+        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 2) : null"></span>
+        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 3) : null"></span>
       </div>
-
-      <!-- Page 4 Group (Games 13-14: Aviator & Andar Bahar) -->
-      <div id="gamePageGroup4" class="game-page-group" style="display: none;">
-        <!-- 13. Aviator Rocket Flight -->
-        <button id="tabAviator" class="tab-btn" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">✈️🚀</span>
-          <span style="font-weight: 900;">Aviator</span>
-          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); font-size: 8.5px; font-weight: 900;">🔥 HOT</span>
-        </button>
-
-        <!-- 14. Andar Bahar Royal Cards -->
-        <button id="tabAndarBahar" class="tab-btn" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🃏👑</span>
-          <span style="font-weight: 900;">Andar Bahar</span>
-          <span class="tab-badge" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4); font-size: 8.5px; font-weight: 900;">⚡ 6.2k</span>
-        </button>
-
-        <!-- 15. Daily Lucky Spin & Win -->
-        <button id="tabLuckySpin" class="tab-btn" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" style="position:relative;">
-          <span style="font-size: 16px; line-height: 1;">🎡💰</span>
-          <span style="font-weight: 900;">Spin &amp; Win</span>
-          <span class="tab-badge" style="background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.45); font-size: 8.5px; font-weight: 900;">🎁 FREE</span>
-        </button>
+      <div class="carousel-swipe-hint">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4"/></svg>
+        <span>Swipe to explore more games</span>
       </div>
     </div>
 
@@ -1938,7 +2120,7 @@
             <!-- Pump How to Play -->
             <div class="game-how-to-play" style="margin-top: 8px;">
               <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-                <span>📖 Stake Pump Rules & How to Play</span>
+                <span>📖 View Point Pump Rules & How to Play</span>
                 <span>▼</span>
               </div>
               <div class="how-to-play-body" style="display: none;">
@@ -2296,7 +2478,338 @@
 
     </div>
 
-    <!-- VIP Rewards Hub Dock (Spin & Win + Daily Bonus - Moved to Bottom of Page) -->
+    <!-- Curated Horizontal Swipe Sections -->
+    <div class="casino-curated-sections" id="casinoCuratedSections">
+
+      <!-- 1. Popular Games Section -->
+      <section class="casino-carousel-section" id="popularSection">
+        <div class="carousel-header-row">
+          <h2 class="carousel-section-title">
+            <span style="font-size: 18px;">🔥</span>
+            <span>Popular Games</span>
+          </h2>
+          <div class="carousel-controls">
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('popularCarouselTrack', -1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('popularCarouselTrack', 1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="carousel-track" id="popularCarouselTrack">
+          <!-- Mines -->
+          <div class="game-poster-card" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
+              <span class="game-poster-badge hot">🔥 HOT</span>
+              <span class="game-poster-players">⚡ 7.6k</span>
+              <div style="font-size: 40px;">💣💎</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info">
+              <div class="game-poster-name">Mines</div>
+              <div class="game-poster-provider">View Point Originals</div>
+            </div>
+          </div>
+          <!-- Aviator -->
+          <div class="game-poster-card" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #450a0a 0%, #090d16 100%);">
+              <span class="game-poster-badge hot">🔥 HOT</span>
+              <span class="game-poster-players">⚡ 8.9k</span>
+              <div style="font-size: 40px;">✈️🚀</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info">
+              <div class="game-poster-name">Aviator</div>
+              <div class="game-poster-provider">Spribe / View Point</div>
+            </div>
+          </div>
+          <!-- Dragon Tiger -->
+          <div class="game-poster-card" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #311042 0%, #090d16 100%);">
+              <span class="game-poster-badge live">🔴 LIVE</span>
+              <span class="game-poster-players">⚡ 5.1k</span>
+              <div style="font-size: 40px;">🐉🐯</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info">
+              <div class="game-poster-name">Dragon Tiger</div>
+              <div class="game-poster-provider">View Point Live</div>
+            </div>
+          </div>
+          <!-- Crash -->
+          <div class="game-poster-card" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #0f2e3d 0%, #090d16 100%);">
+              <span class="game-poster-badge top">⭐ TOP</span>
+              <span class="game-poster-players">⚡ 6.8k</span>
+              <div style="font-size: 40px;">🚀✨</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info">
+              <div class="game-poster-name">Crash</div>
+              <div class="game-poster-provider">View Point Originals</div>
+            </div>
+          </div>
+          <!-- Chicken -->
+          <div class="game-poster-card" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3d2207 0%, #090d16 100%);">
+              <span class="game-poster-badge top">⭐ TOP</span>
+              <span class="game-poster-players">⚡ 5.9k</span>
+              <div style="font-size: 40px;">🍗🚗</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info">
+              <div class="game-poster-name">Chicken Road</div>
+              <div class="game-poster-provider">View Point Originals</div>
+            </div>
+          </div>
+          <!-- Andar Bahar -->
+          <div class="game-poster-card" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #331520 0%, #090d16 100%);">
+              <span class="game-poster-badge live">🔴 LIVE</span>
+              <span class="game-poster-players">⚡ 6.2k</span>
+              <div style="font-size: 40px;">🃏👑</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info">
+              <div class="game-poster-name">Andar Bahar</div>
+              <div class="game-poster-provider">View Point Live</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. View Point Originals Section -->
+      <section class="casino-carousel-section" id="originalsSection">
+        <div class="carousel-header-row">
+          <h2 class="carousel-section-title">
+            <span style="font-size: 18px;">🎲</span>
+            <span>View Point Originals</span>
+          </h2>
+          <div class="carousel-controls">
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('originalsCarouselTrack', -1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('originalsCarouselTrack', 1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="carousel-track" id="originalsCarouselTrack">
+          <!-- Mines -->
+          <div class="game-poster-card" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
+              <span class="game-poster-badge hot">🔥 HOT</span>
+              <span class="game-poster-players">⚡ 7.6k</span>
+              <div style="font-size: 40px;">💣💎</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Mines</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+          <!-- Plinko -->
+          <div class="game-poster-card" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 4.7k</span>
+              <div style="font-size: 40px;">🔴🔺</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Plinko</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+          <!-- Limbo -->
+          <div class="game-poster-card" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #142825 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 3.0k</span>
+              <div style="font-size: 40px;">🎯⚡</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Limbo Turbo</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+          <!-- Classic Dice -->
+          <div class="game-poster-card" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #172554 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 850</span>
+              <div style="font-size: 40px;">🎲✨</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Classic Dice</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+          <!-- Tower -->
+          <div class="game-poster-card" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3b1d11 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 1.3k</span>
+              <div style="font-size: 40px;">🏰💎</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Tower Legend</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Crash Games Section -->
+      <section class="casino-carousel-section" id="crashSection">
+        <div class="carousel-header-row">
+          <h2 class="carousel-section-title">
+            <span style="font-size: 18px;">💥</span>
+            <span>Crash & Instant Games</span>
+          </h2>
+          <div class="carousel-controls">
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('crashCarouselTrack', -1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('crashCarouselTrack', 1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="carousel-track" id="crashCarouselTrack">
+          <!-- Aviator -->
+          <div class="game-poster-card" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #450a0a 0%, #090d16 100%);">
+              <span class="game-poster-badge hot">🔥 HOT</span>
+              <span class="game-poster-players">⚡ 8.9k</span>
+              <div style="font-size: 40px;">✈️🚀</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Aviator</div><div class="game-poster-provider">Spribe / View Point</div></div>
+          </div>
+          <!-- Crash -->
+          <div class="game-poster-card" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #0f2e3d 0%, #090d16 100%);">
+              <span class="game-poster-badge top">⭐ TOP</span>
+              <span class="game-poster-players">⚡ 6.8k</span>
+              <div style="font-size: 40px;">🚀✨</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Crash</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+          <!-- Limbo -->
+          <div class="game-poster-card" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #142825 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 3.0k</span>
+              <div style="font-size: 40px;">🎯⚡</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Limbo Turbo</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+          <!-- Stock BTC -->
+          <div class="game-poster-card" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #092e20 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 850</span>
+              <div style="font-size: 40px;">📈₿</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Stock BTC</div><div class="game-poster-provider">View Point Fast</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Table & Live Casino Section -->
+      <section class="casino-carousel-section" id="tableSection">
+        <div class="carousel-header-row">
+          <h2 class="carousel-section-title">
+            <span style="font-size: 18px;">🎯</span>
+            <span>Table & Live Casino</span>
+          </h2>
+          <div class="carousel-controls">
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('tableCarouselTrack', -1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('tableCarouselTrack', 1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="carousel-track" id="tableCarouselTrack">
+          <!-- Dragon Tiger -->
+          <div class="game-poster-card" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #311042 0%, #090d16 100%);">
+              <span class="game-poster-badge live">🔴 LIVE</span>
+              <span class="game-poster-players">⚡ 5.1k</span>
+              <div style="font-size: 40px;">🐉🐯</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Dragon Tiger</div><div class="game-poster-provider">View Point Live</div></div>
+          </div>
+          <!-- Andar Bahar -->
+          <div class="game-poster-card" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #331520 0%, #090d16 100%);">
+              <span class="game-poster-badge live">🔴 LIVE</span>
+              <span class="game-poster-players">⚡ 6.2k</span>
+              <div style="font-size: 40px;">🃏👑</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Andar Bahar</div><div class="game-poster-provider">View Point Live</div></div>
+          </div>
+          <!-- Win Go 30s -->
+          <div class="game-poster-card" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #201a38 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 2.5k</span>
+              <div style="font-size: 40px;">🎨💎</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Win Go 30s</div><div class="game-poster-provider">View Point Live</div></div>
+          </div>
+          <!-- Classic Dice -->
+          <div class="game-poster-card" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #172554 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 850</span>
+              <div style="font-size: 40px;">🎲✨</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Classic Dice</div><div class="game-poster-provider">View Point Originals</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Slots & Arcade Section -->
+      <section class="casino-carousel-section" id="slotsSection">
+        <div class="carousel-header-row">
+          <h2 class="carousel-section-title">
+            <span style="font-size: 18px;">🎰</span>
+            <span>Slots & Arcade</span>
+          </h2>
+          <div class="carousel-controls">
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('slotsCarouselTrack', -1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('slotsCarouselTrack', 1) : null">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="carousel-track" id="slotsCarouselTrack">
+          <!-- Crypto Pump -->
+          <div class="game-poster-card" data-game="pump" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #291a05 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 2.1k</span>
+              <div style="font-size: 40px;">🎈💨</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Crypto Pump</div><div class="game-poster-provider">View Point Arcade</div></div>
+          </div>
+          <!-- Moles Burrow -->
+          <div class="game-poster-card" data-game="moles" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1e24 0%, #090d16 100%);">
+              <span class="game-poster-players">⚡ 1.7k</span>
+              <div style="font-size: 40px;">🐹🔨</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Moles Burrow</div><div class="game-poster-provider">View Point Arcade</div></div>
+          </div>
+          <!-- Spin & Win -->
+          <div class="game-poster-card" data-game="luckyspin" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null)">
+            <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #2d1805 0%, #090d16 100%);">
+              <span class="game-poster-badge live">🎁 FREE</span>
+              <span class="game-poster-players">⚡ 10k+</span>
+              <div style="font-size: 40px;">🎡💰</div>
+              <div class="game-poster-hover-play"><div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            </div>
+            <div class="game-poster-info"><div class="game-poster-name">Daily Spin & Win</div><div class="game-poster-provider">View Point Rewards</div></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
     <div id="bottomRewardsHub" class="bottom-rewards-hub">
       <button id="btnNavLuckySpin" class="btn-bottom-vip-reward spin-reward" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);" title="Daily Lucky Spin Wheel">
         <span class="vip-reward-icon">🎡</span>
@@ -2643,8 +3156,15 @@
         </p>
       </div>
 
+      <!-- Video Player Embed Container (Admin Configurable) -->
+      <div id="promoVideoPlayerContainer" style="margin-top: 12px; display: none; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #000;">
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+          <iframe id="promoVideoIframe" style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
       <!-- Redeem Promo Code Box -->
-      <div style="margin-top: 14px;">
+      <div id="promoCodeSection" style="margin-top: 14px;">
         <label class="control-label">Redeem Secret Promo Code:</label>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="inputPromoCode" class="custom-select" placeholder="Enter code (e.g. VP100)" style="text-transform: uppercase;">
@@ -2655,7 +3175,7 @@
       </div>
 
       <!-- Submit Gameplay Video Link -->
-      <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+      <div id="promoSubmitLinkSection" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color);">
         <label class="control-label">Submit YouTube / Reel Link (Win ₹100-₹500):</label>
         <input type="url" id="inputPromoVideoLink" class="custom-select" placeholder="https://youtube.com/shorts/... or instagram.com/reel/..." style="margin-bottom: 8px;">
         <button id="btnSubmitPromoVideo" class="btn-action-withdraw" style="width: 100%; height: 42px;" onclick="window.app && window.app.submitPromoVideoLink()">
@@ -3444,6 +3964,7 @@
         </button>
         <button id="tabAdminVideo" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('video') : (window.app && window.app.switchAdminTab('video'))">
           <span>🎬 Promo Video</span>
+          <span id="adminPromoNavBadge" class="admin-badge-count" style="background:#ef4444; font-size:10px; padding:2px 6px;">OFF</span>
         </button>
       </div>
 
@@ -3613,7 +4134,96 @@
       </div>
 
       <!-- View 7: Promo Video & Creator Demo Studio -->
-      <div id="viewAdminVideo" class="admin-tab-view" style="display: none;">
+      <div id="viewAdminVideo" class="admin-tab-view">
+        
+        <!-- Promo Video Feature Master ON/OFF Switch -->
+        <div style="background: rgba(15, 23, 42, 0.9); border: 1.5px solid rgba(239, 68, 68, 0.4); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px; font-weight: 800; color: #fff;">🎬 Master Promo Video Status:</span>
+              <span id="badgePromoStatus" style="font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444;">🔴 OFF</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+              Toggle the entire Promo Video &amp; Codes system ON or OFF across the platform.
+            </div>
+          </div>
+          <button type="button" id="btnTogglePromoVideo" class="btn-action-primary" style="height: 40px; padding: 0 20px; font-size: 13px; font-weight: 800; border-radius: 8px; white-space: nowrap; background: rgba(0, 231, 1, 0.2); border: 1px solid #00e701; color: #00e701;" onclick="window.app && window.app.togglePromoVideoMaster()">
+            <span>🟢 Turn ON</span>
+          </button>
+        </div>
+
+        <!-- Detailed ON/OFF Options for Promo Video -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <strong style="color: #60a5fa; font-size: 14px; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+            <span>⚙️</span> Promo Video Feature Options &amp; Toggles
+          </strong>
+
+          <!-- Option 1: Top Navbar Button ON/OFF -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #fff;">Header Navbar Button</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Show &quot;Promo Video&quot; quick button in top navbar for players</div>
+            </div>
+            <label class="switch-toggle" style="margin: 0;">
+              <input type="checkbox" id="chkPromoNavBtn" onchange="window.app && window.app.togglePromoOption('showNavButton', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Option 2: Embedded Video Player in Modal ON/OFF -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #fff;">In-Modal Video Player</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Embed promotional video player directly inside the Promo modal</div>
+            </div>
+            <label class="switch-toggle" style="margin: 0;">
+              <input type="checkbox" id="chkPromoVideoPlayer" onchange="window.app && window.app.togglePromoOption('showVideoPlayer', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Video URL Input -->
+          <div style="padding: 12px 0 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+            <label class="control-label" style="font-size: 12px; margin-bottom: 6px;">Promo Video Embed URL (YouTube or Direct Video):</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="inputPromoVideoUrl" class="custom-select" placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ" style="font-size: 12px; font-family: monospace;">
+              <button type="button" id="btnPreviewPromoVideo" class="btn-action-primary" style="white-space: nowrap; padding: 0 14px; font-size: 12px; height: 40px; background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; color: #60a5fa;" onclick="window.app && window.app.previewPromoVideo()">
+                <span>👁️ Preview</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Option 3: Secret Promo Code Redemption ON/OFF -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #fff;">Secret Promo Codes Redemption</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Allow players to redeem promo vouchers (e.g. VP100) for instant cash</div>
+            </div>
+            <label class="switch-toggle" style="margin: 0;">
+              <input type="checkbox" id="chkPromoRedeemCodes" onchange="window.app && window.app.togglePromoOption('allowPromoCodes', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Option 4: Gameplay Video Submission Rewards ON/OFF -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #fff;">Player Video Link Submissions</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Allow players to submit YouTube Shorts/Reels gameplay links for cash bonus</div>
+            </div>
+            <label class="switch-toggle" style="margin: 0;">
+              <input type="checkbox" id="chkPromoVideoSubmission" onchange="window.app && window.app.togglePromoOption('allowVideoSubmission', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div style="margin-top: 14px; display: flex; gap: 8px;">
+            <button type="button" id="btnSavePromoSettings" class="btn-action-primary" style="flex: 1; height: 40px; font-size: 13px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; border-radius: 8px; color: #fff;" onclick="window.app && window.app.savePromoOptionsFromForm()">
+              <span>💾 Save All Promo Video Settings</span>
+            </button>
+          </div>
+        </div>
+
         <div class="refer-hero-banner" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(239, 68, 68, 0.3); margin-bottom: 14px;">
           <strong style="color: #ff4757; font-size: 14px; display:block;">🎬 Promo Video & Creator Studio Options</strong>
           <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
@@ -3698,37 +4308,41 @@
     </div>
   </div>
 
-  <!-- Fixed Mobile Bottom Navigation Bar (Ultra Classy VIP App Experience) -->
-  <nav class="mobile-bottom-nav" id="mobileBottomNav">
-    <button class="mobile-nav-item active" id="mNavOriginals" onclick="window.switchMainPage ? window.switchMainPage(1) : (window.app && window.app.switchMainPage(1)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">💣</span>
-      <span class="m-nav-label">Originals</span>
-    </button>
-    <button class="mobile-nav-item" id="mNavCrash" onclick="window.switchMainPage ? window.switchMainPage(2) : (window.app && window.app.switchMainPage(2)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">🚀</span>
-      <span class="m-nav-label">Crash</span>
-    </button>
-    <button class="mobile-nav-item highlight-deposit" id="mNavDeposit" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
-      <div class="m-nav-deposit-bubble">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+  <!-- Dedicated Slide-Over / Expandable Bet Slip + History Panel -->
+  <div class="bet-slip-panel" id="panelBetSlip">
+    <div class="bet-slip-header">
+      <div class="bet-slip-tabs">
+        <button type="button" class="bet-slip-tab-btn active" id="tabBetSlipBets" onclick="window.app && window.app.switchBetSlipTab ? window.app.switchBetSlipTab('slip') : null">Bet Slip</button>
+        <button type="button" class="bet-slip-tab-btn" id="tabBetSlipHistory" onclick="window.app && window.app.switchBetSlipTab ? window.app.switchBetSlipTab('history') : null">My Bets</button>
       </div>
-      <span class="m-nav-label" style="color: #00f59b; font-weight: 900;">Deposit</span>
+      <button type="button" class="bet-slip-close-btn" onclick="window.app && window.app.closeBetSlipPanel ? window.app.closeBetSlipPanel() : null" title="Close Panel">✕</button>
+    </div>
+    <div class="bet-slip-body" id="betSlipPanelBody">
+      <!-- Dynamic Bet Slip or Real User History from window.wallet.history -->
+    </div>
+  </div>
+
+  <!-- Fixed Mobile Bottom Navigation Bar (VIEW POINT VIP App Experience) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <button class="mobile-nav-item" id="mNavBrowse" onclick="window.app && window.app.handleBottomNav ? window.app.handleBottomNav('browse') : null">
+      <span class="m-nav-icon">🧭</span>
+      <span class="m-nav-label">Browse</span>
     </button>
-    <button class="mobile-nav-item" id="mNavCasino" onclick="window.switchMainPage ? window.switchMainPage(3) : (window.app && window.app.switchMainPage(3)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">🐉</span>
+    <button class="mobile-nav-item active" id="mNavCasino" onclick="window.app && window.app.handleBottomNav ? window.app.handleBottomNav('casino') : null">
+      <span class="m-nav-icon">🎰</span>
       <span class="m-nav-label">Casino</span>
     </button>
-    <button class="mobile-nav-item" id="mNavLiveBet" onclick="window.switchMainPage ? window.switchMainPage(4) : (window.app && window.app.switchMainPage(4)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">📊</span>
-      <span class="m-nav-label">Live Bet</span>
+    <button class="mobile-nav-item" id="mNavBetSlip" onclick="window.app && window.app.handleBottomNav ? window.app.handleBottomNav('betslip') : null">
+      <span class="m-nav-icon">🎫</span>
+      <span class="m-nav-label">Bet Slip</span>
     </button>
-    <button class="mobile-nav-item" id="mNavHistory" onclick="window.openTxHistoryModal ? window.openTxHistoryModal() : (window.app && window.app.openTxHistoryModal())">
-      <span class="m-nav-icon">📜</span>
-      <span class="m-nav-label">History</span>
+    <button class="mobile-nav-item" id="mNavSports" onclick="window.app && window.app.handleBottomNav ? window.app.handleBottomNav('sports') : null">
+      <span class="m-nav-icon">⚽</span>
+      <span class="m-nav-label">Sports</span>
     </button>
-    <button class="mobile-nav-item" id="mNavSupport" onclick="window.openSupportModal ? window.openSupportModal() : (window.app && window.app.openSupportModal())">
+    <button class="mobile-nav-item" id="mNavChat" onclick="window.app && window.app.handleBottomNav ? window.app.handleBottomNav('chat') : null">
       <span class="m-nav-icon">💬</span>
-      <span class="m-nav-label">Support</span>
+      <span class="m-nav-label">Chat</span>
     </button>
   </nav>
 
