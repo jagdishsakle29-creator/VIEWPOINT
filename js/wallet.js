@@ -12,8 +12,8 @@ class CasinoWallet {
     this.activeUserId = this.detectUserId();
     this.activeTelegramId = this.detectTelegramId();
     this.balance = this.loadLocalBalance();
-    if (!this.balance || this.balance <= 0) {
-      this.balance = 500.00;
+    if (typeof this.balance !== 'number' || isNaN(this.balance) || this.balance < 0) {
+      this.balance = 0.00;
       this.saveLocalBalance();
     }
     this.history = this.loadHistory();
@@ -209,10 +209,10 @@ class CasinoWallet {
       }
     }
 
-    const initialDemoBalance = 500.00;
-    localStorage.setItem(key, initialDemoBalance.toFixed(2));
-    localStorage.setItem(sigKey, this.generateIntegritySig(initialDemoBalance));
-    return initialDemoBalance;
+    const initialBalance = 0.00;
+    localStorage.setItem(key, initialBalance.toFixed(2));
+    localStorage.setItem(sigKey, this.generateIntegritySig(initialBalance));
+    return initialBalance;
   }
 
   saveLocalBalance() {
@@ -464,7 +464,7 @@ class CasinoWallet {
     if (!deposit) {
       deposit = {
         id: depositId,
-        amount: amountOverride || 500,
+        amount: amountOverride !== null ? parseFloat(amountOverride) : 0,
         utr: 'N/A',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         date: new Date().toLocaleDateString()
@@ -573,8 +573,8 @@ class CasinoWallet {
     if (!wth) {
       wth = {
         id: withdrawId,
-        amount: 500,
-        netPayout: 460,
+        amount: 0,
+        netPayout: 0,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
     }
@@ -619,7 +619,7 @@ class CasinoWallet {
     if (!wth) {
       wth = {
         id: withdrawId,
-        amount: 500,
+        amount: 0,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
     }

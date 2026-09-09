@@ -66,7 +66,7 @@ function getWallet(userId) {
   if (!store.wallets[uid]) {
     store.wallets[uid] = {
       userId: uid,
-      balance: 200.00,
+      balance: 0.00,
       totalDeposited: 0.00,
       totalWithdrawn: 0.00,
       currency: '₹',

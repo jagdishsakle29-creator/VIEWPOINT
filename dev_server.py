@@ -171,26 +171,59 @@ class DevServerHandler(SimpleHTTPRequestHandler):
                     "balance": wallet['balance']
                 })
 
-            # Simulate deposit / wallet / sync
-            if 'deposit' in parsed.path or action == 'deposit':
-                amount = float(body.get('amount') or 100)
-                utr = body.get('utr') or 'DEMO_UTR_12345'
+            # Real casino deposit handling: PENDING upon submission, balance ONLY added when approved by admin
+            if action in ['submit_deposit', 'create_deposit']:
+                amount = float(body.get('amount') or 0)
+                utr = body.get('utr') or ''
+                upi_val = body.get('upiId') or 'adrenox1@axl'
+                dep_id = body.get('id') or f"DEP-{os.urandom(4).hex().upper()}"
                 dep_obj = {
-                    "id": f"DEP-{os.urandom(4).hex()}",
+                    "id": dep_id,
                     "amount": amount,
                     "utr": utr,
-                    "status": "APPROVED",
+                    "upiId": upi_val,
+                    "status": "PENDING",
                     "userId": uid
                 }
-                wallet['balance'] = round(wallet.get('balance', 0) + amount, 2)
                 state.setdefault("deposits", []).append(dep_obj)
                 save_dev_state(state)
                 return self._send_json({
                     "success": True,
-                    "message": "Deposit recorded and approved",
+                    "message": "Deposit submitted for admin approval",
                     "deposit": dep_obj,
                     "balance": wallet['balance']
                 })
+            elif action in ['approve_dep', 'admin_approve_deposit', 'approve_deposit']:
+                dep_id = body.get('id') or body.get('deposit_id')
+                amt_override = body.get('amount') or body.get('amt')
+                dep_found = None
+                for d in state.get("deposits", []):
+                    if d.get("id") == dep_id:
+                        dep_found = d
+                        break
+                dep_amount = float(amt_override if amt_override is not None else (dep_found.get('amount', 0) if dep_found else 0))
+                if dep_found:
+                    dep_found['status'] = 'APPROVED'
+                    dep_found['amount'] = dep_amount
+                target_uid = (dep_found.get('userId') if dep_found else None) or body.get('userId') or uid
+                if target_uid not in state["wallets"]:
+                    state["wallets"][target_uid] = {"userId": target_uid, "balance": 0.0, "currency": "₹"}
+                target_wallet = state["wallets"][target_uid]
+                target_wallet['balance'] = round(target_wallet.get('balance', 0) + dep_amount, 2)
+                save_dev_state(state)
+                return self._send_json({
+                    "success": True,
+                    "message": "Deposit approved and credited",
+                    "balance": target_wallet['balance']
+                })
+            elif action in ['reject_dep', 'admin_reject_deposit', 'reject_deposit']:
+                dep_id = body.get('id') or body.get('deposit_id')
+                for d in state.get("deposits", []):
+                    if d.get("id") == dep_id:
+                        d['status'] = 'REJECTED'
+                        break
+                save_dev_state(state)
+                return self._send_json({"success": True, "message": "Deposit rejected"})
             elif 'withdraw' in parsed.path or action == 'withdraw':
                 amount = float(body.get('amount') or 200)
                 if wallet.get('balance', 0) >= amount:
