@@ -10,8 +10,8 @@ class ChickenGame {
     this.ui = uiCallbacks || {};
     this.totalLanes = 25; // 25 highway lanes
     this.difficulty = 'medium'; // 'easy', 'medium', 'hard', 'daredevil'
-    this.hazardRate = 0.25;
-    this.hazardCount = 3;
+    this.hazardRate = 0.34;
+    this.hazardCount = 6;
     this.betAmount = 10.0;
     this.isPlaying = false;
     this.currentStep = 0;
@@ -31,10 +31,10 @@ class ChickenGame {
   setDifficulty(diff) {
     if (this.isPlaying) return;
     this.difficulty = diff;
-    if (diff === 'easy') { this.hazardRate = 0.15; this.hazardCount = 2; }
-    else if (diff === 'medium') { this.hazardRate = 0.25; this.hazardCount = 4; }
-    else if (diff === 'hard') { this.hazardRate = 0.35; this.hazardCount = 7; }
-    else if (diff === 'daredevil') { this.hazardRate = 0.50; this.hazardCount = 10; }
+    if (diff === 'easy') { this.hazardRate = 0.22; this.hazardCount = 3; }
+    else if (diff === 'medium') { this.hazardRate = 0.34; this.hazardCount = 6; }
+    else if (diff === 'hard') { this.hazardRate = 0.46; this.hazardCount = 9; }
+    else if (diff === 'daredevil') { this.hazardRate = 0.60; this.hazardCount = 14; }
     
     this.generateMultiplierTable();
     this.updateNextMultiplierPreview();
@@ -238,8 +238,8 @@ class ChickenGame {
 
     await new Promise(r => setTimeout(r, 220));
 
-    const depthFactor = (nextStep / this.totalLanes) * 0.22;
-    const effectiveHazardRate = Math.min(0.85, this.hazardRate + depthFactor);
+    const depthFactor = (nextStep / this.totalLanes) * 0.30;
+    const effectiveHazardRate = Math.min(0.88, this.hazardRate + depthFactor);
     let isHazard = Math.random() < effectiveHazardRate;
 
     try {

@@ -4961,12 +4961,32 @@ class AppController {
   }
 
   switchGame(gameType) {
-    window.soundEngine.playClick();
-    if (this.isAutoPlaying) {
-      this.stopAutoPlay("Game switched.");
+    if (this._switchingGame) return;
+    if (this.currentGame === gameType && this.activeInstance) {
+      return;
     }
-    this.currentGame = gameType;
-    this.hideToast();
+    this._switchingGame = true;
+    try {
+      window.soundEngine.playClick();
+      if (this.isAutoPlaying) {
+        this.stopAutoPlay("Game switched.");
+      }
+
+      // Stop lingering background canvas animation loops from previous games to eliminate mobile lag & freezing
+      if (this.plinko && gameType !== 'plinko' && this.plinko.destroy) {
+        this.plinko.destroy();
+      }
+      if (this.crash && gameType !== 'crash' && this.crash.animFrameId) {
+        cancelAnimationFrame(this.crash.animFrameId);
+        this.crash.animFrameId = null;
+      }
+      if (window.aviatorGame && gameType !== 'aviator' && window.aviatorGame.animationFrameId) {
+        cancelAnimationFrame(window.aviatorGame.animationFrameId);
+        window.aviatorGame.animationFrameId = null;
+      }
+
+      this.currentGame = gameType;
+      this.hideToast();
 
     // Auto switch page group based on game
     let targetPage = 1;
@@ -5075,7 +5095,7 @@ class AppController {
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Full-Width Casino Games (Dragon Tiger, Win Go, Stock, Pump, Moles, Tower, Dice, Aviator, Andar Bahar) hide master controls panel and take 100% width
+    // Full-Width Casino Games hide master controls panel and take 100% width
     const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
@@ -5097,14 +5117,23 @@ class AppController {
     }
 
     // Auto Play Toggle & Master Difficulty Controller under Bet Tab
-    if (isFullWidthGame) {
+    if (isFullWidthGame || gameType === 'plinko') {
       if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = 'none';
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
       if (this.dom.difficultyControlGroup) this.dom.difficultyControlGroup.style.display = 'none';
       this.betMode = 'manual';
     } else {
-      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = (gameType === 'moles' || gameType === 'plinko') ? 'none' : 'flex';
-      if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
+      if (this.dom.betModeToggleRow) this.dom.betModeToggleRow.style.display = (gameType === 'moles') ? 'none' : 'flex';
+      
+      // In Crash, always default to manual mode so Number of Bets is strictly hidden unless Auto Play is selected
+      if (gameType === 'crash') {
+        this.betMode = 'manual';
+        if (this.dom.btnModeManual) this.dom.btnModeManual.classList.add('active');
+        if (this.dom.btnModeAuto) this.dom.btnModeAuto.classList.remove('active');
+        if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
+      } else {
+        if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
+      }
     }
       
     // Master difficultyControlGroup under bet tab (Strictly shown for Chicken, Dice; Dedicated selector on Mines)
@@ -5420,6 +5449,9 @@ class AppController {
     if (this.activeInstance && this.activeInstance.setBetAmount) {
       this.activeInstance.setBetAmount(betVal);
       if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
+    }
+    } finally {
+      this._switchingGame = false;
     }
   }
 
@@ -6869,6 +6901,11 @@ class AppController {
 
   // ================= AUTO PLAY ENGINE (Mines, Chicken, Crash) =================
   setBetMode(mode) {
+    if (this.currentGame === 'plinko') {
+      this.betMode = 'manual';
+      if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = 'none';
+      return;
+    }
     if (this.currentGame === 'moles' && mode === 'auto') {
       this.showNotification("ℹ️ Stake Moles is exclusively manual burrow digging.", "info");
       return;

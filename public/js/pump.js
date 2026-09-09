@@ -149,26 +149,27 @@ class CasinoPump {
     const r = Math.random();
 
     if (diff === 'easy') {
-      if (r < 0.03) this.targetPopPump = 2;
-      else if (r < 0.20) this.targetPopPump = 3 + Math.floor(Math.random() * 2);
-      else if (r < 0.65) this.targetPopPump = 5 + Math.floor(Math.random() * 2);
-      else this.targetPopPump = 7 + Math.floor(Math.random() * 3);
+      if (r < 0.12) this.targetPopPump = 1;
+      else if (r < 0.38) this.targetPopPump = 2;
+      else if (r < 0.68) this.targetPopPump = 3;
+      else if (r < 0.88) this.targetPopPump = 4;
+      else this.targetPopPump = 5 + Math.floor(Math.random() * 2);
     } else if (diff === 'hard') {
-      if (r < 0.15) this.targetPopPump = 1;
-      else if (r < 0.50) this.targetPopPump = 2 + Math.floor(Math.random() * 2);
-      else if (r < 0.85) this.targetPopPump = 4 + Math.floor(Math.random() * 2);
-      else this.targetPopPump = 6 + Math.floor(Math.random() * 2);
-    } else if (diff === 'daredevil') {
       if (r < 0.35) this.targetPopPump = 1;
       else if (r < 0.70) this.targetPopPump = 2;
-      else if (r < 0.90) this.targetPopPump = 3 + Math.floor(Math.random() * 2);
-      else this.targetPopPump = 5 + Math.floor(Math.random() * 2);
+      else if (r < 0.90) this.targetPopPump = 3;
+      else this.targetPopPump = 4 + Math.floor(Math.random() * 2);
+    } else if (diff === 'daredevil') {
+      if (r < 0.50) this.targetPopPump = 1;
+      else if (r < 0.82) this.targetPopPump = 2;
+      else this.targetPopPump = 3;
     } else {
-      // Medium
-      if (r < 0.05) this.targetPopPump = 1;
-      else if (r < 0.25) this.targetPopPump = 2 + Math.floor(Math.random() * 2);
-      else if (r < 0.70) this.targetPopPump = 4 + Math.floor(Math.random() * 2);
-      else this.targetPopPump = 6 + Math.floor(Math.random() * 3);
+      // Medium - Balanced Casino House Edge
+      if (r < 0.20) this.targetPopPump = 1;
+      else if (r < 0.52) this.targetPopPump = 2;
+      else if (r < 0.78) this.targetPopPump = 3;
+      else if (r < 0.92) this.targetPopPump = 4;
+      else this.targetPopPump = 5 + Math.floor(Math.random() * 2);
     }
 
     this.resetBalloonVisuals();
