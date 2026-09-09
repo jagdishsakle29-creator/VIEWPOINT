@@ -4021,59 +4021,94 @@ body {
   }
 
   .bet-mode-toggle-row {
-    height: 24px !important;
-    padding: 1px !important;
-    gap: 2px !important;
-    margin-bottom: 2px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 3px !important;
+    gap: 4px !important;
+    margin-bottom: 6px !important;
+    touch-action: manipulation !important;
   }
 
   .btn-mode-tab {
-    padding: 1.5px 5px !important;
-    font-size: 9.5px !important;
-    border-radius: 3px !important;
-    gap: 3px !important;
+    flex: 1 !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    border-radius: 6px !important;
+    gap: 5px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: pointer !important;
+  }
+
+  .btn-mode-tab * {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  .btn-mode-tab:active {
+    transform: scale(0.96) !important;
   }
 
   .btn-mode-tab svg {
-    width: 11px !important;
-    height: 11px !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .chip-btn, .btn-chip, .ab-chip-btn, .aviator-chip-btn {
-    height: 22px !important;
-    padding: 1px 5px !important;
-    font-size: 9.5px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 2px 8px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
   }
 
   .input-with-actions {
-    height: 30px !important;
+    height: 36px !important;
   }
 
   .bet-input-field {
-    height: 28px !important;
+    height: 34px !important;
   }
 
   .btn-quick-bet {
-    height: 22px !important;
-    padding: 1px 4px !important;
-    font-size: 9.5px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 2px 7px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
   }
   
   /* Vibrant Action Bet & Cashout Buttons for Thumbs - Compact Zero-Scroll */
   .btn-action-primary, .btn-action-cashout, .btn-stake-primary, .btn-bet, .btn-cashout {
-    height: 38px !important;
-    font-size: 13.5px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    font-size: 14px !important;
     letter-spacing: 0.5px;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     box-shadow: 0 4px 14px rgba(0, 245, 155, 0.35) !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
   }
 
-  /* Smooth Zero-Overlap Mobile Tabs */
+  /* Smooth Zero-Overlap Mobile Tabs with Generous Touch Targets */
   .game-tabs-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
     scrollbar-width: none;
-    margin-bottom: 4px !important;
+    margin-bottom: 6px !important;
+    padding: 2px 0;
   }
   .game-tabs-wrapper::-webkit-scrollbar {
     display: none;
@@ -4082,31 +4117,88 @@ body {
   .game-tabs {
     display: flex !important;
     flex-wrap: nowrap !important;
-    gap: 4px !important;
+    gap: 6px !important;
     min-width: max-content;
   }
 
   .tab-btn {
     flex-shrink: 0 !important;
     white-space: nowrap !important;
-    height: 30px !important;
-    font-size: 11px !important;
-    padding: 0 8px !important;
-    border-radius: 8px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    padding: 6px 12px !important;
+    border-radius: 10px !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+
+  .tab-btn * {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  .tab-btn:active {
+    transform: scale(0.95) !important;
+    opacity: 0.9 !important;
   }
 
   .game-pages-nav-bar {
-    margin: 2px auto 4px auto !important;
-    gap: 4px !important;
+    margin: 3px auto 6px auto !important;
+    gap: 5px !important;
+    touch-action: pan-y !important;
   }
 
   .btn-game-page-pill {
-    padding: 3px 2px !important;
-    font-size: 10px !important;
-    border-radius: 7px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 5px 6px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    border-radius: 9px !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: pointer !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .btn-game-page-pill * {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+  .btn-game-page-pill:active {
+    transform: scale(0.95) !important;
   }
   .btn-game-page-pill small {
-    display: none !important;
+    display: block !important;
+    font-size: 9px !important;
+    opacity: 0.75 !important;
+  }
+
+  .btn-crash-color {
+    min-height: 46px !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: pointer !important;
+  }
+  .btn-crash-color * {
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+  .btn-crash-color:active {
+    transform: scale(0.95) !important;
+    filter: brightness(1.2) !important;
   }
 
   .page-nav-bar {
@@ -4130,10 +4222,17 @@ body {
 
 /* ================= ULTRA FAST TOUCH & MOBILE AUTO-ZOOM FIX ================= */
 html, body, button, a, input, select, textarea, [role="button"],
-.nav-item, .nav-btn, .game-tab, .game-card, .btn-action, .chip-btn, .btn, .tab-btn, .btn-page-pill {
+.nav-item, .nav-btn, .game-tab, .game-card, .btn-action, .chip-btn, .btn, .tab-btn, .btn-page-pill,
+.btn-mode-tab, .btn-game-page-pill, .btn-crash-color, .mobile-nav-item, .game-page-group button {
   touch-action: manipulation !important;
   -webkit-tap-highlight-color: transparent !important;
   -webkit-touch-callout: none !important;
+}
+
+.tab-btn *, .btn-mode-tab *, .btn-game-page-pill *, .btn-crash-color *, .mobile-nav-item * {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 @media screen and (max-width: 768px) {

@@ -87,7 +87,7 @@ class CrashGame {
   }
 
   setColorPrediction(color) {
-    this.colorPrediction = (this.colorPrediction === color) ? null : color;
+    this.colorPrediction = color;
     return this.colorPrediction;
   }
 
@@ -240,11 +240,12 @@ class CrashGame {
     this.history.unshift(this.crashPoint);
     if (this.history.length > 15) this.history.pop();
 
-    if (!this.hasCashedOut) {
-      let colorWon = false;
-      let colorPayout = 0;
-      let colorMult = 0;
+    let colorWon = false;
+    let colorPayout = 0;
+    let colorMult = 0;
+    const playedColor = this.colorPrediction;
 
+    if (!this.hasCashedOut) {
       if (this.colorPrediction === 'red' && this.crashPoint < 2.00) {
         colorWon = true;
         colorMult = 1.95;
@@ -274,7 +275,7 @@ class CrashGame {
         });
       } else {
         window.wallet.recordBet({
-          game: 'Crash',
+          game: this.colorPrediction ? `Crash Color (${this.colorPrediction.toUpperCase()})` : 'Crash',
           bet: this.betAmount,
           multiplier: 0,
           payout: 0,
@@ -287,9 +288,15 @@ class CrashGame {
       this.ui.onCrash({
         crashPoint: this.crashPoint,
         hasCashedOut: this.hasCashedOut,
-        history: this.history
+        history: this.history,
+        colorWon: colorWon,
+        colorPayout: colorPayout,
+        colorMult: colorMult,
+        colorPrediction: playedColor
       });
     }
+
+    this.colorPrediction = null; // Reset for next round
 
     this.updateAiSignalHint();
     this.renderCrashAnimation();

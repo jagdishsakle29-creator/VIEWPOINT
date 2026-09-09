@@ -690,15 +690,33 @@ class AppController {
           if (!this.isAutoPlaying) this.dom.betAmountInput.disabled = false;
           this.dom.crashMultiplierText.classList.add('crashed');
           this.dom.crashMultiplierText.innerText = `${res.crashPoint.toFixed(2)}x`;
-          this.dom.crashStatusTag.innerText = "CRASHED!";
           this.renderCrashHistory();
-          if (!res.hasCashedOut) {
+
+          if (res.colorWon) {
+            const colName = (res.colorPrediction || 'COLOR').toUpperCase();
+            this.dom.crashStatusTag.innerText = `🎉 ${colName} WON (${res.colorMult}x)!`;
+            this.dom.crashStatusTag.style.color = '#00e701';
+            this.showToast({ won: true, payout: res.colorPayout, multiplier: res.colorMult });
+          } else if (res.hasCashedOut) {
+            // Already toasted upon manual cashout
+          } else {
+            this.dom.crashStatusTag.innerText = "CRASHED!";
+            this.dom.crashStatusTag.style.color = '#fe2c55';
             this.showToast({ won: false, payout: 0, multiplier: 0 });
           }
           this.renderHistoryTable();
 
+          const tag = document.getElementById('crashSelectedColorTag');
+          if (tag) { tag.innerText = 'Tap color to bet'; tag.style.color = 'var(--text-muted)'; }
+          const btnRed = document.getElementById('btnCrashColorRed');
+          const btnGreen = document.getElementById('btnCrashColorGreen');
+          const btnBlue = document.getElementById('btnCrashColorBlue');
+          [btnRed, btnGreen, btnBlue].forEach(b => b && (b.style.boxShadow = 'none'));
+
+          const didWin = res.hasCashedOut || res.colorWon;
+          const payoutAmt = res.hasCashedOut ? res.payout : (res.colorWon ? res.colorPayout : 0);
           if (this.isAutoPlaying) {
-            this.handleAutoRoundCompleted({ won: res.hasCashedOut, payout: res.hasCashedOut ? res.payout : 0, multiplier: res.crashPoint });
+            this.handleAutoRoundCompleted({ won: didWin, payout: payoutAmt, multiplier: res.colorWon ? res.colorMult : res.crashPoint });
           }
         },
         onError: (msg) => this.showNotification(msg, 'error')
@@ -4963,6 +4981,7 @@ class AppController {
   switchGame(gameType) {
     if (this._switchingGame) return;
     if (this.currentGame === gameType && this.activeInstance) {
+      window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
       return;
     }
     this._switchingGame = true;
