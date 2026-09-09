@@ -8631,3 +8631,11 @@ window.setMolesTrapCount = function(count) {
 window.setPlinkoRows = function(rows) {
   if (window.app && window.app.setPlinkoRows) return window.app.setPlinkoRows(rows);
 };
+window.handleBetClick = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.handleBetClick) return window.app.handleBetClick();
+};
+window.handleCashoutClick = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.handleCashoutClick) return window.app.handleCashoutClick();
+};

@@ -457,6 +457,12 @@
       var targetTab = document.getElementById(activeTabId);
       if (targetTab) targetTab.classList.add('active');
 
+      if (g === 'aviator' && !window.aviatorGame && window.AviatorGame) {
+        window.aviatorGame = new window.AviatorGame();
+      }
+      if (g === 'andarbahar' && !window.andarBaharGame && window.AndarBaharGame) {
+        window.andarBaharGame = new window.AndarBaharGame();
+      }
       if (g === 'aviator' && window.aviatorGame && window.aviatorGame.resizeCanvas) {
         setTimeout(function(){ window.aviatorGame.resizeCanvas(); }, 50);
       }

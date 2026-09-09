@@ -101,15 +101,24 @@ class DevServerHandler(SimpleHTTPRequestHandler):
             action = body.get('action', '')
             uid = body.get('userId') or body.get('telegram_id') or self.headers.get('X-User-Id') or 'guest_default'
             state = load_dev_state()
+            init_bal = 0.00
+            try:
+                if body.get('balance') is not None:
+                    init_bal = float(body.get('balance'))
+            except (ValueError, TypeError):
+                init_bal = 0.00
             if uid not in state["wallets"]:
-                state["wallets"][uid] = {"userId": uid, "balance": float(body.get('balance', 0.00)), "currency": "₹"}
+                state["wallets"][uid] = {"userId": uid, "balance": init_bal, "currency": "₹"}
 
             wallet = state["wallets"][uid]
 
             if action in ['update_balance', 'sync_balance', 'set_balance']:
-                if 'balance' in body:
-                    wallet['balance'] = round(float(body['balance']), 2)
-                    save_dev_state(state)
+                if 'balance' in body and body['balance'] is not None:
+                    try:
+                        wallet['balance'] = round(float(body['balance']), 2)
+                        save_dev_state(state)
+                    except (ValueError, TypeError):
+                        pass
                 return self._send_json({"success": True, "balance": wallet['balance']})
 
             if 'dragontiger' in parsed.path or action in ['dragontiger_play', 'dt_play']:
