@@ -232,8 +232,11 @@
     },
 
     handleTickerClick: function(e) {
-      // If clicked outside close button, scroll to feed table
-      this.scrollToFeed();
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      this.hideFloatingWin();
     },
 
     startFeedStream: function() {

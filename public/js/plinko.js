@@ -174,6 +174,9 @@ class CasinoPlinko {
   }
 
   dropBall(betAmount = 10) {
+    if (!this.animId) {
+      this.startRenderLoop();
+    }
     if (this.balls.length >= 14) {
       return false; // Prevent CPU choking from too many simultaneous physics bodies
     }
@@ -510,6 +513,8 @@ class CasinoPlinko {
   }
 
   startRenderLoop() {
+    if (this.animId) cancelAnimationFrame(this.animId);
+    this.lastTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     const loop = (now) => {
       const dt = (now - this.lastTime) / 1000;
       this.lastTime = now;
@@ -525,7 +530,10 @@ class CasinoPlinko {
   }
 
   destroy() {
-    if (this.animId) cancelAnimationFrame(this.animId);
+    if (this.animId) {
+      cancelAnimationFrame(this.animId);
+      this.animId = null;
+    }
   }
 }
 

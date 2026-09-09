@@ -5191,7 +5191,11 @@ class AppController {
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'none';
       if (this.dom.btnActionCashout) this.dom.btnActionCashout.style.display = 'none';
       if (this.dom.betAmountInput) this.dom.betAmountInput.disabled = false;
-      if (this.plinko && this.plinko.initCanvas) this.plinko.initCanvas();
+      if (this.plinko) {
+        if (this.plinko.initCanvas) this.plinko.initCanvas();
+        if (this.plinko.buildPegsAndBuckets) this.plinko.buildPegsAndBuckets();
+        if (this.plinko.startRenderLoop) this.plinko.startRenderLoop();
+      }
     } else if (gameType === 'dice') {
       const tab = this.dom.tabDice || document.getElementById('tabDice');
       if (tab) tab.classList.add('active');
@@ -5469,6 +5473,14 @@ class AppController {
       this.activeInstance.setBetAmount(betVal);
       if (this.activeInstance.updateNextMultiplierPreview) this.activeInstance.updateNextMultiplierPreview();
     }
+
+    // Update active game How-to-Play guide (Positioned at the bottom)
+    try {
+      const allHtps = document.querySelectorAll('.how-to-play-item');
+      allHtps.forEach(el => { el.style.display = 'none'; });
+      const targetHtp = document.getElementById('howToPlay_' + gameType) || document.getElementById('howToPlay' + gameType.charAt(0).toUpperCase() + gameType.slice(1));
+      if (targetHtp) targetHtp.style.display = 'block';
+    } catch(e) {}
     } finally {
       this._switchingGame = false;
     }
