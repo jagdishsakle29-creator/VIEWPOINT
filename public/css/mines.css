@@ -148,10 +148,10 @@
   40%, 80% { transform: translate(5px, 3px) rotate(4deg); }
 }
 
-/* Dimmed auto-revealed remaining tiles */
+/* Auto-revealed remaining mine tiles on round completion */
 .mine-tile.auto-revealed {
-  opacity: 0.4;
-  filter: grayscale(0.4);
+  opacity: 0.65;
+  filter: grayscale(0.2);
 }
 
 /* ================= 25 CLOCHE DISH CHICKEN MINES LUXURY STYLING & ANIMATIONS ================= */

@@ -5107,9 +5107,9 @@ class AppController {
       if (this.dom.autoPlaySettingsPanel) this.dom.autoPlaySettingsPanel.style.display = this.betMode === 'auto' ? 'block' : 'none';
     }
       
-    // Master difficultyControlGroup under bet tab (Strictly shown for Chicken, Mines, Dice; Removed from Plinko, Crash, Moles, Limbo, Pump, Tower)
+    // Master difficultyControlGroup under bet tab (Strictly shown for Chicken, Dice; Dedicated selector on Mines)
     if (this.dom.difficultyControlGroup) {
-      this.dom.difficultyControlGroup.style.display = ['chicken', 'mines', 'dice'].includes(gameType) ? 'flex' : 'none';
+      this.dom.difficultyControlGroup.style.display = ['chicken', 'dice'].includes(gameType) ? 'flex' : 'none';
     }
 
     // Crash Auto Cashout Group: only on Crash
@@ -6790,12 +6790,13 @@ class AppController {
   }
 
   renderMultiplierLadder() {
+    if (!this.dom.multProgressBadges) return;
     this.dom.multProgressBadges.innerHTML = '';
     const totalSafe = this.activeInstance.totalTiles - (this.currentGame === 'mines' ? this.activeInstance.mineCount : (this.activeInstance.boneCount || 5));
     const count = this.activeInstance.revealedCount || this.activeInstance.currentStep || 0;
 
     const startIdx = Math.max(1, count - 1);
-    const endIdx = Math.min(totalSafe || 25, startIdx + 5);
+    const endIdx = Math.min(totalSafe || 25, startIdx + 3);
 
     for (let i = startIdx; i <= endIdx; i++) {
       const mult = this.activeInstance.calculateMultiplier ? this.activeInstance.calculateMultiplier(i) : this.activeInstance.getMultiplierForStep(i);
@@ -6826,15 +6827,23 @@ class AppController {
     const tile = this.dom.minesGrid.querySelector(`[data-index="${index}"]`);
     if (!tile || tile.classList.contains('revealed')) return;
 
-    tile.classList.add('revealed', 'auto-revealed');
     if (type === 'mine') {
+      tile.classList.add('revealed', 'auto-revealed', 'bomb-revealed');
       tile.innerHTML = `<div class="bomb-icon-wrapper">${ASSETS.bomb}</div>`;
-    } else {
-      tile.innerHTML = `<div class="gem-icon-wrapper">${ASSETS.gem}</div>`;
     }
   }
 
   onGameOverResult(result) {
+    if (this.currentGame === 'mines' || this.currentGame === 'chicken') {
+      if (result.won) {
+        if (this.dom.multCurrentVal) this.dom.multCurrentVal.innerText = `${(result.multiplier || 1).toFixed(2)}x`;
+        if (this.dom.multNextVal) this.dom.multNextVal.innerText = "CASHED OUT";
+      } else {
+        if (this.dom.multCurrentVal) this.dom.multCurrentVal.innerText = "0.00x";
+        if (this.dom.multNextVal) this.dom.multNextVal.innerText = "EXPLODED";
+      }
+    }
+
     if (this.betMode === 'auto') {
       if (this.dom.btnActionAutoStart) this.dom.btnActionAutoStart.style.display = 'flex';
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
@@ -6846,8 +6855,8 @@ class AppController {
 
     if (!this.isAutoPlaying) {
       this.dom.betAmountInput.disabled = false;
-      this.dom.minesCountSelect.disabled = false;
-      this.dom.bonesCountSelect.disabled = false;
+      if (this.dom.minesCountSelect) this.dom.minesCountSelect.disabled = false;
+      if (this.dom.bonesCountSelect) this.dom.bonesCountSelect.disabled = false;
     }
 
     this.showToast(result);
