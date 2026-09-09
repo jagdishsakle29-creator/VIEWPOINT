@@ -1387,36 +1387,14 @@ class AppController {
     this.switchGamePage(1);
     this.switchGame(initialGame);
 
-    if (hashGame === '7400' || hashGame === 'creator') {
-      setTimeout(() => this.openCreatorStudioModal(), 300);
-    } else if (hashGame === 'admin') {
-      setTimeout(() => this.openAdminModal(), 300);
-    }
-
     window.addEventListener('hashchange', () => {
       const newHash = (window.location.hash || '').replace('#', '');
-      if (newHash === '7400' || newHash === 'creator') {
-        this.openCreatorStudioModal();
-        return;
-      }
-      if (newHash === 'admin') {
-        this.openAdminModal();
-        return;
-      }
       if (validGames.includes(newHash) && newHash !== this.currentGame) {
         this.switchGame(newHash);
       }
     });
 
     this.initPromoSecretListener();
-
-    const adminQuery = getQueryParam('admin') || getQueryParam('secret') || '';
-    if (hashGame === '6263' || hashGame === 'admin6263' || adminQuery === '6263' || hashGame === '7400' || hashGame === 'admin7400' || adminQuery === '7400') {
-      this.openAdminModal(true);
-      this.switchAdminTab('video');
-    } else if (hashGame === 'admin') {
-      this.openAdminModal();
-    }
 
     // Detect referral tracking link (?ref=... or ?r=...)
     try {
@@ -4060,24 +4038,7 @@ class AppController {
   }
 
   initPromoSecretListener() {
-    const checkAndUnlock = () => {
-      try {
-        const btn = document.getElementById('btnOpenPromoVideoNav');
-        const isUnlocked = this.hasPromoSecretKey();
-        if (btn && btn.style) {
-          btn.style.display = isUnlocked ? 'flex' : 'none';
-          if (typeof btn.style.setProperty === 'function') {
-            try { btn.style.setProperty('display', isUnlocked ? 'flex' : 'none', 'important'); } catch(e) {}
-          }
-        }
-        if (isUnlocked && (window.location.hash.includes('promo') || (window.location.search && window.location.search.includes('promo')) || window.location.href.includes('7489'))) {
-          this.openPromoVideoModal(true);
-        }
-      } catch(e) {}
-    };
-    checkAndUnlock();
-    window.addEventListener('hashchange', checkAndUnlock);
-    window.addEventListener('popstate', checkAndUnlock);
+    // Promo video is exclusively inside Admin Panel now
   }
 
   closePromoVideoModal() {
@@ -5564,11 +5525,12 @@ class AppController {
     }
     this.betAmount = Math.max(1, betAmount);
     
-    // Safety check: ensure wallet balance is ready and positive
-    if (window.wallet && (window.wallet.balance <= 0 || !window.wallet.hasFunds(this.betAmount))) {
-      window.wallet.balance = Math.max(500.00, this.betAmount * 10);
-      window.wallet.saveLocalBalance();
-      window.wallet.notify();
+    // Strict funds check: block bet if insufficient funds
+    if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {
+      const balStr = window.wallet ? `${window.wallet.currency}${window.wallet.balance.toFixed(2)}` : '₹0.00';
+      this.showNotification(`❌ Insufficient balance (${balStr})! Please deposit to bet ₹${this.betAmount.toFixed(2)}.`, "error");
+      if (this.openDepositModal) this.openDepositModal();
+      return;
     }
 
     if (this.currentGame === 'plinko') {
@@ -5722,8 +5684,8 @@ class AppController {
     if (e && e.preventDefault) e.preventDefault();
     this.logoClickCount = (this.logoClickCount || 0) + 1;
     clearTimeout(this.logoClickTimer);
-    this.logoClickTimer = setTimeout(() => { this.logoClickCount = 0; }, 1500);
-    if (this.logoClickCount >= 3) {
+    this.logoClickTimer = setTimeout(() => { this.logoClickCount = 0; }, 3000);
+    if (this.logoClickCount >= 7) {
       this.logoClickCount = 0;
       const pinModal = document.getElementById('modalAdminPinGate');
       if (pinModal) {

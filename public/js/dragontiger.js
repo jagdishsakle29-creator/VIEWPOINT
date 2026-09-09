@@ -147,11 +147,6 @@ class DragonTigerGame {
     }
 
     const amount = this.selectedChip || 10;
-    if (window.wallet && (window.wallet.balance <= 0 || !window.wallet.hasFunds(amount))) {
-      window.wallet.balance = Math.max(500.00, amount * 10);
-      window.wallet.saveLocalBalance();
-      window.wallet.notify();
-    }
     if (!window.wallet || !window.wallet.hasFunds(amount)) {
       return { success: false, msg: "Insufficient wallet balance!" };
     }

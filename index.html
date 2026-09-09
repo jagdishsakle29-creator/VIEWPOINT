@@ -114,47 +114,7 @@
   <link rel="stylesheet" href="css/admin.css?v=105.0">
   <link rel="stylesheet" href="css/livebets.css?v=105.0">
 
-  <!-- Secret Admin & Support Guard: Only unlocked via ?secret=6263 or ?admin=6263 -->
-  <script>
-    (function() {
-      function checkAdminGuard() {
-        var params = new URLSearchParams(window.location.search);
-        var hash = window.location.hash;
-        var isSecret = params.get("secret") === "6263" ||
-                       params.get("admin") === "6263" ||
-                       hash === "#admin6263" ||
-                       sessionStorage.getItem("vp_admin_secret") === "6263";
 
-        var adminBtn = document.getElementById("btnNavAdminPanel");
-        var supportBar = document.getElementById("floatingSupportBar");
-
-        if (isSecret) {
-          sessionStorage.setItem("vp_admin_secret", "6263");
-          if (adminBtn) adminBtn.style.setProperty("display", "flex", "important");
-          if (supportBar) supportBar.style.setProperty("display", "flex", "important");
-
-          if (params.get("secret") === "6263" || params.get("admin") === "6263") {
-            var pinModal = document.getElementById("modalAdminPinGate");
-            if (pinModal) {
-              pinModal.classList.add("open");
-              pinModal.style.display = "flex";
-              var inp = document.getElementById("inputAdminPin");
-              if (inp) { inp.value = ""; setTimeout(function(){ inp.focus(); }, 300); }
-            }
-          }
-        } else {
-          if (adminBtn) adminBtn.style.setProperty("display", "none", "important");
-          if (supportBar) supportBar.style.setProperty("display", "none", "important");
-        }
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", checkAdminGuard);
-      } else {
-        checkAdminGuard();
-      }
-    })();
-  </script>
 
 </head>
 <body role="application" translate="no" data-reader-ignore="true">
@@ -532,8 +492,8 @@
       if (e && e.preventDefault) e.preventDefault();
       window._logoClickCount = (window._logoClickCount || 0) + 1;
       clearTimeout(window._logoClickTimer);
-      window._logoClickTimer = setTimeout(function() { window._logoClickCount = 0; }, 1500);
-      if (window._logoClickCount >= 3) {
+      window._logoClickTimer = setTimeout(function() { window._logoClickCount = 0; }, 3000);
+      if (window._logoClickCount >= 7) {
         window._logoClickCount = 0;
         var pinModal = document.getElementById('modalAdminPinGate');
         if (pinModal) {
@@ -636,21 +596,10 @@
           <div class="brand-name" style="font-family: var(--font-display); font-weight: 900; font-size: 19px; letter-spacing: -0.5px;">VIEW<span style="color: #fcd34d; text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">POINT</span></div>
         </div>
 
-        <!-- Promo Video & Redeem Code Button (Secret link 7489 only) -->
-        <button id="btnOpenPromoVideoNav" class="btn-refer-nav" style="display: none !important; background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2)); border: 1px solid rgba(239,68,68,0.5); color: #ff6b6b;" onclick="window.app && window.app.openPromoVideoModal()" title="Promo Video & Redeem Code">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-          <span>Promo Code</span>
-        </button>
-
         <!-- Refer & Earn Button -->
         <button id="btnOpenRefer" class="btn-refer-nav" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
           <span>Refer & Earn</span>
-        </button>
-
-        <!-- Admin Button (Hidden by default, only shown via ?secret=6263 private link) -->
-        <button id="btnNavAdminPanel" class="btn-refer-nav" style="display: none !important; background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.4); color: #c084fc;" onclick="window.adminDashboard && window.adminDashboard.openAdmin();" title="Admin Control Dashboard">
-          <span>⚙️ Admin</span>
         </button>
 
         <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
@@ -3494,6 +3443,9 @@
         <button id="tabAdminSms" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('sms') : (window.app && window.app.switchAdminTab('sms'))">
           <span>📲 SMS & Email API</span>
         </button>
+        <button id="tabAdminVideo" class="admin-tab-btn" onclick="window.switchAdminTab ? window.switchAdminTab('video') : (window.app && window.app.switchAdminTab('video'))">
+          <span>🎬 Promo Video</span>
+        </button>
       </div>
 
       <!-- View 1: Pending Deposits Live Approval Queue -->
@@ -3658,6 +3610,43 @@
         </div>
         <div id="adminUsersListContainer" style="max-height: 380px; overflow-y: auto;">
           <!-- Dynamically populated member accounts and FB logins -->
+        </div>
+      </div>
+
+      <!-- View 7: Promo Video & Creator Demo Studio -->
+      <div id="viewAdminVideo" class="admin-tab-view" style="display: none;">
+        <div class="refer-hero-banner" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(239, 68, 68, 0.3); margin-bottom: 14px;">
+          <strong style="color: #ff4757; font-size: 14px; display:block;">🎬 Promo Video & Creator Studio Options</strong>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+            Load high demo recording balances for recording high-multiplier gameplay highlights for YouTube/Reels, or manage player promo rewards.
+          </p>
+        </div>
+
+        <label class="control-label">Load Video Demo Recording Balance:</label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;">
+          <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(0, 231, 1, 0.2); border: 1px solid #00e701; color: #00e701;" onclick="window.app && window.app.setVideoDemoBalance(10000)">+₹10,000</button>
+          <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(0, 229, 255, 0.2); border: 1px solid #00e5ff; color: #00e5ff;" onclick="window.app && window.app.setVideoDemoBalance(50000)">+₹50,000</button>
+          <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #f59e0b;" onclick="window.app && window.app.setVideoDemoBalance(100000)">+₹1,00,000</button>
+          <button type="button" class="btn-action-primary" style="height: 38px; font-size: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444;" onclick="window.app && window.app.setVideoDemoBalance(500000)">+₹5,00,000</button>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label class="control-label">Custom Video Recording Balance:</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="number" id="inputAdminVideoBal" class="custom-select" placeholder="Enter amount (e.g. 25000)">
+            <button type="button" class="btn-action-primary" style="white-space: nowrap; padding: 0 16px;" onclick="const a = parseFloat(document.getElementById('inputAdminVideoBal').value); if(a>0 && window.app) window.app.setVideoDemoBalance(a);">
+              <span>⚡ Set Balance</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; display: flex; gap: 10px;">
+          <button type="button" class="btn-action-primary" style="flex: 1; height: 42px; background: linear-gradient(135deg, #ef4444, #f59e0b); color: #fff; font-weight: 800; border-radius: 8px;" onclick="window.app && window.app.openCreatorStudioModal()">
+            <span>📹 Open Creator Studio Modal</span>
+          </button>
+          <button type="button" class="btn-action-primary" style="flex: 1; height: 42px; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #c084fc; font-weight: 800; border-radius: 8px;" onclick="window.app && window.app.openPromoVideoModal()">
+            <span>🎁 Open Promo Codes Modal</span>
+          </button>
         </div>
       </div>
 
