@@ -1397,6 +1397,7 @@ class AppController {
     });
 
     this.initPromoSecretListener();
+    this.initCasinoCategoryEvents();
 
     // Detect referral tracking link (?ref=... or ?r=...)
     try {
@@ -8873,21 +8874,100 @@ class AppController {
     }
   }
 
+  initCasinoCategoryEvents() {
+    const catBtns = document.querySelectorAll('.casino-cat-btn, .casino-category-btn');
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const cat = btn.getAttribute('data-cat') || btn.getAttribute('data-category') || btn.textContent || 'all';
+        this.filterCasinoCategory(cat, btn);
+      });
+    });
+
+    const searchInput = document.getElementById('inputCasinoSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.searchCasinoGames(e.target.value);
+      });
+    }
+  }
+
   // Modern VIP Casino Category Filter & Live Search
   filterCasinoCategory(category, activeBtn) {
-    const navButtons = document.querySelectorAll('.casino-cat-btn, .casino-category-btn');
-    navButtons.forEach(btn => btn.classList.remove('active'));
-    if (activeBtn) activeBtn.classList.add('active');
+    category = String(category || 'all').toLowerCase().trim();
+    if (category.includes('all')) category = 'all';
+    else if (category.includes('orig')) category = 'originals';
+    else if (category.includes('live')) category = 'live';
+    else if (category.includes('crash')) category = 'crash';
+    else if (category.includes('table') || category.includes('card')) category = 'table';
+    else if (category.includes('slot')) category = 'slots';
+    else if (category.includes('arc')) category = 'arcade';
+    else if (category.includes('prov')) category = 'providers';
 
+    if (window.soundEngine && window.soundEngine.playClick) {
+      try { window.soundEngine.playClick(); } catch(e) {}
+    }
+
+    // Toggle active class on all category buttons
+    const navButtons = document.querySelectorAll('.casino-cat-btn, .casino-category-btn');
+    navButtons.forEach(btn => {
+      const btnCat = (btn.getAttribute('data-cat') || btn.getAttribute('data-category') || btn.textContent || '').toLowerCase();
+      const isMatch = (category === 'all' && btnCat.includes('all')) ||
+                      (category !== 'all' && btnCat.includes(category));
+      btn.classList.toggle('active', btn === activeBtn || isMatch);
+    });
+
+    // Games belonging to each category
+    const categoryGameMap = {
+      'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles'],
+      'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles'],
+      'live': ['roulette', 'andarbahar', 'dragontiger', 'colortrading'],
+      'crash': ['crash', 'aviator', 'chicken', 'limbo', 'pump'],
+      'table': ['roulette', 'andarbahar', 'dragontiger', 'dice'],
+      'slots': ['colortrading', 'stock', 'pump', 'moles'],
+      'arcade': ['colortrading', 'stock', 'moles', 'pump'],
+      'providers': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles']
+    };
+
+    const allowedGames = categoryGameMap[category] || categoryGameMap['all'];
+
+    // 1. Filter Carousel Cards
     const cards = document.querySelectorAll('.game-poster-card');
     cards.forEach(card => {
-      const cardCategory = card.getAttribute('data-category') || '';
-      if (category === 'all' || cardCategory.includes(category)) {
-        card.style.display = 'flex';
-      } else {
-        card.style.display = 'none';
-      }
+      const g = (card.getAttribute('data-game') || '').toLowerCase();
+      const c = (card.getAttribute('data-category') || '').toLowerCase();
+      const match = (category === 'all') || allowedGames.includes(g) || c.includes(category);
+      card.style.display = match ? 'flex' : 'none';
     });
+
+    // Scroll carousel back to start
+    const track = document.getElementById('featuredCarouselTrack');
+    if (track) {
+      track.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+
+    // Reset pagination dots
+    const dots = document.querySelectorAll('#featuredCarouselDots .carousel-dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === 0));
+
+    // 2. Filter Tab Buttons if present
+    const tabBtns = document.querySelectorAll('.tab-btn[data-game]');
+    tabBtns.forEach(tab => {
+      const g = (tab.getAttribute('data-game') || '').toLowerCase();
+      tab.style.display = (category === 'all' || allowedGames.includes(g)) ? 'inline-flex' : 'none';
+    });
+
+    // 3. If currently loaded game does NOT belong to the category, auto switch to first game of that category
+    if (category !== 'all' && !allowedGames.includes(this.currentGame)) {
+      const targetGame = allowedGames[0];
+      if (targetGame) {
+        this.switchGame(targetGame);
+      }
+    } else {
+      // Highlight matching active card
+      cards.forEach(card => {
+        card.classList.toggle('active', card.getAttribute('data-game') === this.currentGame);
+      });
+    }
   }
 
   searchCasinoGames(query) {
@@ -8902,6 +8982,16 @@ class AppController {
       } else {
         card.style.display = 'none';
       }
+    });
+
+    const track = document.getElementById('featuredCarouselTrack');
+    if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
+
+    const tabBtns = document.querySelectorAll('.tab-btn[data-game]');
+    tabBtns.forEach(tab => {
+      const g = (tab.getAttribute('data-game') || '').toLowerCase();
+      const text = (tab.textContent || '').toLowerCase();
+      tab.style.display = (!q || g.includes(q) || text.includes(q)) ? 'inline-flex' : 'none';
     });
   }
 

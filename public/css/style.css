@@ -4077,7 +4077,8 @@ body {
   display: none;
 }
 
-.casino-cat-btn {
+.casino-cat-btn,
+.casino-category-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -4096,13 +4097,15 @@ body {
   user-select: none;
 }
 
-.casino-cat-btn:hover {
+.casino-cat-btn:hover,
+.casino-category-btn:hover {
   color: #fff;
   background: rgba(30, 41, 69, 0.8);
   border-color: rgba(99, 102, 241, 0.3);
 }
 
-.casino-cat-btn.active {
+.casino-cat-btn.active,
+.casino-category-btn.active {
   color: #fff;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.35) 0%, rgba(139, 92, 246, 0.25) 100%);
   border: 1.5px solid #6366f1;

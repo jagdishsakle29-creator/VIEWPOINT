@@ -446,6 +446,76 @@
       }
     };
 
+    window.filterCasinoCategory = function(category, activeBtn) {
+      if (window.app && window.app.filterCasinoCategory) return window.app.filterCasinoCategory(category, activeBtn);
+      category = String(category || 'all').toLowerCase().trim();
+      if (category.includes('all')) category = 'all';
+      else if (category.includes('orig')) category = 'originals';
+      else if (category.includes('live')) category = 'live';
+      else if (category.includes('crash')) category = 'crash';
+      else if (category.includes('table') || category.includes('card')) category = 'table';
+      else if (category.includes('slot')) category = 'slots';
+      else if (category.includes('arc')) category = 'arcade';
+      else if (category.includes('prov')) category = 'providers';
+
+      var navButtons = document.querySelectorAll('.casino-cat-btn, .casino-category-btn');
+      navButtons.forEach(function(btn) {
+        var btnCat = (btn.getAttribute('data-cat') || btn.getAttribute('data-category') || btn.textContent || '').toLowerCase();
+        var isMatch = (category === 'all' && btnCat.includes('all')) || (category !== 'all' && btnCat.includes(category));
+        btn.classList.toggle('active', btn === activeBtn || isMatch);
+      });
+
+      var categoryGameMap = {
+        'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles'],
+        'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles'],
+        'live': ['roulette', 'andarbahar', 'dragontiger', 'colortrading'],
+        'crash': ['crash', 'aviator', 'chicken', 'limbo', 'pump'],
+        'table': ['roulette', 'andarbahar', 'dragontiger', 'dice'],
+        'slots': ['colortrading', 'stock', 'pump', 'moles'],
+        'arcade': ['colortrading', 'stock', 'moles', 'pump'],
+        'providers': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles']
+      };
+
+      var allowedGames = categoryGameMap[category] || categoryGameMap['all'];
+      var cards = document.querySelectorAll('.game-poster-card');
+      cards.forEach(function(card) {
+        var g = (card.getAttribute('data-game') || '').toLowerCase();
+        var c = (card.getAttribute('data-category') || '').toLowerCase();
+        var match = (category === 'all') || allowedGames.indexOf(g) !== -1 || c.indexOf(category) !== -1;
+        card.style.display = match ? 'flex' : 'none';
+      });
+
+      var track = document.getElementById('featuredCarouselTrack');
+      if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
+
+      var dots = document.querySelectorAll('#featuredCarouselDots .carousel-dot');
+      dots.forEach(function(d, i) { d.classList.toggle('active', i === 0); });
+
+      var tabBtns = document.querySelectorAll('.tab-btn[data-game]');
+      tabBtns.forEach(function(tab) {
+        var g = (tab.getAttribute('data-game') || '').toLowerCase();
+        tab.style.display = (category === 'all' || allowedGames.indexOf(g) !== -1) ? 'inline-flex' : 'none';
+      });
+
+      if (category !== 'all' && allowedGames.length > 0 && window.switchGame) {
+        window.switchGame(allowedGames[0]);
+      }
+    };
+
+    window.searchCasinoGames = function(query) {
+      if (window.app && window.app.searchCasinoGames) return window.app.searchCasinoGames(query);
+      var q = String(query || '').toLowerCase().trim();
+      var cards = document.querySelectorAll('.game-poster-card');
+      cards.forEach(function(card) {
+        var title = ((card.querySelector('.game-poster-name') || {}).textContent || '').toLowerCase();
+        var cat = ((card.querySelector('.game-poster-provider') || {}).textContent || '').toLowerCase();
+        var gameAttr = (card.getAttribute('data-game') || '').toLowerCase();
+        card.style.display = (!q || title.indexOf(q) !== -1 || cat.indexOf(q) !== -1 || gameAttr.indexOf(q) !== -1) ? 'flex' : 'none';
+      });
+      var track = document.getElementById('featuredCarouselTrack');
+      if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
+    };
+
     window.placeColorBet = function(type, choice, amt) {
       if (window.app && window.app.placeColorBet) return window.app.placeColorBet(type, choice, amt);
     };
@@ -692,25 +762,25 @@
 
     <!-- Horizontally Swipeable Category Navigation Tabs -->
     <div class="casino-category-nav" id="casinoCategoryNav">
-      <button type="button" class="casino-cat-btn active" data-cat="all" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('all', this) : (window.filterCasinoCategory && window.filterCasinoCategory('all', this))">
+      <button type="button" class="casino-cat-btn active" data-cat="all" onclick="window.filterCasinoCategory('all', this)">
         <span>🔥 All Games</span>
       </button>
-      <button type="button" class="casino-cat-btn" data-cat="originals" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('originals', this) : (window.filterCasinoCategory && window.filterCasinoCategory('originals', this))">
+      <button type="button" class="casino-cat-btn" data-cat="originals" onclick="window.filterCasinoCategory('originals', this)">
         <span>🎲 Originals</span>
       </button>
-      <button type="button" class="casino-cat-btn" data-cat="slots" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('slots', this) : (window.filterCasinoCategory && window.filterCasinoCategory('slots', this))">
+      <button type="button" class="casino-cat-btn" data-cat="slots" onclick="window.filterCasinoCategory('slots', this)">
         <span>🎰 Slots</span>
       </button>
-      <button type="button" class="casino-cat-btn" data-cat="live" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('live', this) : (window.filterCasinoCategory && window.filterCasinoCategory('live', this))">
+      <button type="button" class="casino-cat-btn" data-cat="live" onclick="window.filterCasinoCategory('live', this)">
         <span>👑 Live Casino</span>
       </button>
-      <button type="button" class="casino-cat-btn" data-cat="table" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('table', this) : (window.filterCasinoCategory && window.filterCasinoCategory('table', this))">
+      <button type="button" class="casino-cat-btn" data-cat="table" onclick="window.filterCasinoCategory('table', this)">
         <span>🎯 Table Games</span>
       </button>
-      <button type="button" class="casino-cat-btn" data-cat="crash" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('crash', this) : (window.filterCasinoCategory && window.filterCasinoCategory('crash', this))">
+      <button type="button" class="casino-cat-btn" data-cat="crash" onclick="window.filterCasinoCategory('crash', this)">
         <span>💥 Crash</span>
       </button>
-      <button type="button" class="casino-cat-btn" data-cat="providers" onclick="window.app && window.app.filterCasinoCategory ? window.app.filterCasinoCategory('providers', this) : (window.filterCasinoCategory && window.filterCasinoCategory('providers', this))">
+      <button type="button" class="casino-cat-btn" data-cat="providers" onclick="window.filterCasinoCategory('providers', this)">
         <span>⚡ Providers</span>
       </button>
     </div>
