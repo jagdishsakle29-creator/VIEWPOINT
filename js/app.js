@@ -1383,7 +1383,7 @@ class AppController {
     };
     const queryGame = getQueryParam('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette'];
+    const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette', 'blackjack', 'baccarat', 'teenpatti', 'sicbo', 'megawheel', 'sevenup'];
     const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'mines';
     
     this.switchGamePage(1);
@@ -5265,7 +5265,13 @@ class AppController {
       this.dom.towerView || document.getElementById('towerView'),
       document.getElementById('aviatorView'),
       document.getElementById('andarbaharView'),
-      document.getElementById('rouletteView')
+      document.getElementById('rouletteView'),
+      document.getElementById('blackjackView'),
+      document.getElementById('baccaratView'),
+      document.getElementById('teenpattiView'),
+      document.getElementById('sicboView'),
+      document.getElementById('megawheelView'),
+      document.getElementById('sevenupView')
     ];
     viewsList.forEach(v => {
       if (v) {
@@ -5289,7 +5295,7 @@ class AppController {
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
     // Full-Width Casino Games hide master controls panel and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar' || gameType === 'roulette');
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar' || gameType === 'roulette' || gameType === 'blackjack' || gameType === 'baccarat' || gameType === 'teenpatti' || gameType === 'sicbo' || gameType === 'megawheel' || gameType === 'sevenup');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
@@ -5644,6 +5650,48 @@ class AppController {
       if (window.rouletteGame && window.rouletteGame.init) {
         window.rouletteGame.init();
       }
+    } else if (gameType === 'blackjack') {
+      const v = document.getElementById('blackjackView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.blackjackGame && window.BlackjackGame) {
+        window.blackjackGame = new window.BlackjackGame();
+      }
+      this.activeInstance = window.blackjackGame;
+    } else if (gameType === 'baccarat') {
+      const v = document.getElementById('baccaratView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.baccaratGame && window.BaccaratGame) {
+        window.baccaratGame = new window.BaccaratGame();
+      }
+      this.activeInstance = window.baccaratGame;
+    } else if (gameType === 'teenpatti') {
+      const v = document.getElementById('teenpattiView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.teenPattiGame && window.TeenPattiGame) {
+        window.teenPattiGame = new window.TeenPattiGame();
+      }
+      this.activeInstance = window.teenPattiGame;
+    } else if (gameType === 'sicbo') {
+      const v = document.getElementById('sicboView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.sicBoGame && window.SicBoGame) {
+        window.sicBoGame = new window.SicBoGame();
+      }
+      this.activeInstance = window.sicBoGame;
+    } else if (gameType === 'megawheel') {
+      const v = document.getElementById('megawheelView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.megaWheelGame && window.MegaWheelGame) {
+        window.megaWheelGame = new window.MegaWheelGame();
+      }
+      this.activeInstance = window.megaWheelGame;
+    } else if (gameType === 'sevenup') {
+      const v = document.getElementById('sevenupView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.sevenUpGame && window.SevenUpGame) {
+        window.sevenUpGame = new window.SevenUpGame();
+      }
+      this.activeInstance = window.sevenUpGame;
     }
 
     if (this.betMode === 'auto' && !isFullWidthGame) {
@@ -8916,17 +8964,30 @@ class AppController {
       btn.classList.toggle('active', btn === activeBtn || isMatch);
     });
 
-    // Games belonging to each category
+    // Games belonging to each category (Including 9 Live Table Bet Games)
     const categoryGameMap = {
-      'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles'],
+      'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles', 'blackjack', 'baccarat', 'teenpatti', 'sicbo', 'megawheel', 'sevenup'],
       'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles'],
-      'live': ['roulette', 'andarbahar', 'dragontiger', 'colortrading'],
+      'live': ['roulette', 'blackjack', 'baccarat', 'dragontiger', 'andarbahar', 'teenpatti', 'sicbo', 'megawheel', 'sevenup', 'colortrading'],
       'crash': ['crash', 'aviator', 'chicken', 'limbo', 'pump'],
-      'table': ['roulette', 'andarbahar', 'dragontiger', 'dice'],
+      'table': ['roulette', 'blackjack', 'baccarat', 'dragontiger', 'andarbahar', 'teenpatti', 'sicbo', 'sevenup', 'dice'],
       'slots': ['colortrading', 'stock', 'pump', 'moles'],
       'arcade': ['colortrading', 'stock', 'moles', 'pump'],
-      'providers': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles']
+      'providers': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles', 'blackjack', 'baccarat', 'teenpatti', 'sicbo', 'megawheel', 'sevenup']
     };
+
+    // Show or hide dedicated Live Casino Studio section based on category
+    const liveSec = document.getElementById('liveCasinoStudioSection');
+    if (liveSec) {
+      if (category === 'live') {
+        liveSec.style.display = 'block';
+        liveSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (category === 'all') {
+        liveSec.style.display = 'block';
+      } else {
+        liveSec.style.display = 'none';
+      }
+    }
 
     const allowedGames = categoryGameMap[category] || categoryGameMap['all'];
 

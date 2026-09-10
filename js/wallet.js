@@ -322,6 +322,10 @@ class CasinoWallet {
     return this.balance >= amount;
   }
 
+  hasSufficientBalance(amount) {
+    return this.hasFunds(amount);
+  }
+
   // Authoritative balance deduction (Strict - Never goes negative)
   deduct(amount) {
     if (isNaN(amount) || amount <= 0) return false;
@@ -333,6 +337,10 @@ class CasinoWallet {
     this.syncBalanceToServer(this.balance);
     this.notify();
     return true;
+  }
+
+  deductBalance(amount, reason = '') {
+    return this.deduct(amount);
   }
 
   // Optimistic credit when confirmed by authoritative server response

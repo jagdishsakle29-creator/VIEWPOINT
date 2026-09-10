@@ -111,6 +111,12 @@ files = [
     "js/aviator.js",
     "js/andarbahar.js",
     "js/roulette.js",
+    "js/blackjack.js",
+    "js/baccarat.js",
+    "js/teenpatti.js",
+    "js/sicbo.js",
+    "js/megawheel.js",
+    "js/sevenup.js",
     "js/rewards.js",
     "js/admin.js",
     "js/livebets.js",
@@ -126,7 +132,11 @@ window.app = new window.AppController();
 console.log("=== WALLET BALANCE ===");
 console.log("Balance: " + window.wallet.balance);
 
-var games = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette'];
+var games = [
+  'mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles',
+  'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette',
+  'blackjack', 'baccarat', 'teenpatti', 'sicbo', 'megawheel', 'sevenup'
+];
 
 games.forEach(function(g) {
   console.log("\\n>>> Testing game: " + g);
@@ -180,6 +190,56 @@ games.forEach(function(g) {
         console.log("Roulette after spinNow, isSpinning: " + rl.isSpinning);
       } else {
         console.log("Roulette is null!");
+      }
+    } else if (g === 'blackjack') {
+      var bj = window.blackjackGame;
+      if (bj) {
+        bj.startDeal();
+        console.log("Blackjack after startDeal: gameState=" + bj.gameState + ", playerHand=" + bj.playerHand.length + ", dealerHand=" + bj.dealerHand.length);
+        if (bj.gameState === 'player_turn') {
+          bj.stand();
+          console.log("Blackjack after stand: gameState=" + bj.gameState);
+        }
+      }
+    } else if (g === 'baccarat') {
+      var bac = window.baccaratGame;
+      if (bac) {
+        bac.placeBet('player');
+        console.log("Baccarat bets: " + JSON.stringify(bac.bets));
+        bac.startDeal();
+        console.log("Baccarat after startDeal: gameState=" + bac.gameState + ", playerHand=" + bac.playerHand.length);
+      }
+    } else if (g === 'teenpatti') {
+      var tp = window.teenPattiGame;
+      if (tp) {
+        tp.startDeal();
+        console.log("Teen Patti after startDeal: gameState=" + tp.gameState + ", playerHand=" + tp.playerHand.length);
+        tp.playHand();
+        console.log("Teen Patti after playHand: gameState=" + tp.gameState);
+      }
+    } else if (g === 'sicbo') {
+      var sb = window.sicBoGame;
+      if (sb) {
+        sb.placeBet('small');
+        console.log("Sic Bo bets: " + JSON.stringify(sb.bets));
+        sb.rollDice();
+        console.log("Sic Bo after rollDice: gameState=" + sb.gameState);
+      }
+    } else if (g === 'megawheel') {
+      var mw = window.megaWheelGame;
+      if (mw) {
+        mw.placeBet('1x');
+        console.log("Mega Wheel bets: " + JSON.stringify(mw.bets));
+        mw.spinWheel();
+        console.log("Mega Wheel after spinWheel: isSpinning=" + mw.isSpinning);
+      }
+    } else if (g === 'sevenup') {
+      var su = window.sevenUpGame;
+      if (su) {
+        su.placeBet('down');
+        console.log("7 Up 7 Down bets: " + JSON.stringify(su.bets));
+        su.rollDice();
+        console.log("7 Up 7 Down after rollDice: isRolling=" + su.isRolling);
       }
     } else {
       // General handleBetClick
