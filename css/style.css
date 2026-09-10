@@ -1261,7 +1261,8 @@ body {
 .game-stage:has(.moles-view.active),
 .game-stage:has(.pump-view.active),
 .game-stage:has(.aviator-view.active),
-.game-stage:has(.andarbahar-view.active) {
+.game-stage:has(.andarbahar-view.active),
+.game-stage:has(.roulette-view.active) {
   padding: 8px 4px !important;
   width: 100% !important;
   max-width: 100% !important;
@@ -1278,7 +1279,8 @@ body {
 .game-arena:has(.tower-view.active),
 .game-arena:has(.dice-view.active),
 .game-arena:has(.aviator-view.active),
-.game-arena:has(.andarbahar-view.active) {
+.game-arena:has(.andarbahar-view.active),
+.game-arena:has(.roulette-view.active) {
   display: block !important;
   grid-template-columns: 1fr !important;
   width: 100% !important;
@@ -1292,8 +1294,19 @@ body {
 .game-arena:has(.tower-view.active) .controls-panel,
 .game-arena:has(.dice-view.active) .controls-panel,
 .game-arena:has(.aviator-view.active) .controls-panel,
-.game-arena:has(.andarbahar-view.active) .controls-panel {
+.game-arena:has(.andarbahar-view.active) .controls-panel,
+.game-arena:has(.roulette-view.active) .controls-panel {
   display: none !important;
+}
+
+@keyframes arenaFocusPulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 231, 1, 0.7); }
+  50% { box-shadow: 0 0 30px 6px rgba(0, 231, 1, 0.45); }
+  100% { box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 30px rgba(109, 40, 217, 0.08); }
+}
+
+.arena-focus-pulse {
+  animation: arenaFocusPulse 0.9s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* ================= WIN / LOSS OVERLAY MODAL (Sleek & Compact) ================= */

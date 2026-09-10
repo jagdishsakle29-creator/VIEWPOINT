@@ -209,10 +209,22 @@ class CasinoWallet {
       }
     }
 
-    const initialBalance = 0.00;
+    const isLocalDev = (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
+    const initialBalance = isLocalDev ? 500.00 : 0.00;
     localStorage.setItem(key, initialBalance.toFixed(2));
     localStorage.setItem(sigKey, this.generateIntegritySig(initialBalance));
     return initialBalance;
+  }
+
+  claimDemoChips(amount = 500) {
+    const amt = parseFloat(amount) || 500;
+    this.balance = (this.balance || 0) + amt;
+    this.saveLocalBalance();
+    this.notify();
+    if (window.app && window.app.showNotification) {
+      window.app.showNotification(`🎉 Added ₹${amt.toFixed(2)} Demo Chips to your wallet!`, "success");
+    }
+    return this.balance;
   }
 
   saveLocalBalance() {
@@ -870,3 +882,6 @@ class CasinoWallet {
 }
 
 window.wallet = new CasinoWallet();
+window.claimDemoChips = function(amount) {
+  if (window.wallet && window.wallet.claimDemoChips) return window.wallet.claimDemoChips(amount);
+};

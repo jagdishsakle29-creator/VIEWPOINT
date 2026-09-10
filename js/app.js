@@ -5150,10 +5150,28 @@ class AppController {
     this.switchGame(targetGame);
   }
 
+  scrollToGameArena() {
+    try {
+      const arena = document.querySelector('.game-arena');
+      if (arena) {
+        const headerOffset = 70;
+        const arenaRect = arena.getBoundingClientRect();
+        if (arenaRect.top < 10 || arenaRect.top > 250) {
+          const targetY = arenaRect.top + (window.pageYOffset || document.documentElement.scrollTop || 0) - headerOffset;
+          window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+        }
+        arena.classList.remove('arena-focus-pulse');
+        void arena.offsetWidth; // trigger reflow
+        arena.classList.add('arena-focus-pulse');
+      }
+    } catch(e) {}
+  }
+
   switchGame(gameType) {
     if (this._switchingGame) return;
     if (this.currentGame === gameType && this.activeInstance) {
       window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
+      this.scrollToGameArena();
       return;
     }
     this._switchingGame = true;
@@ -5675,6 +5693,9 @@ class AppController {
         card.classList.toggle('active', matches);
       });
     } catch(e) {}
+
+    // Auto-scroll directly to game arena so the game immediately opens in view
+    this.scrollToGameArena();
     } finally {
       this._switchingGame = false;
     }
@@ -5762,7 +5783,7 @@ class AppController {
     // Strict funds check: block bet if insufficient funds
     if (!window.wallet || !window.wallet.hasFunds(this.betAmount)) {
       const balStr = window.wallet ? `${window.wallet.currency}${window.wallet.balance.toFixed(2)}` : '₹0.00';
-      this.showNotification(`❌ Insufficient balance (${balStr})! Please deposit to bet ₹${this.betAmount.toFixed(2)}.`, "error");
+      this.showNotification(`❌ Insufficient balance (${balStr})! <a href="javascript:void(0)" onclick="window.claimDemoChips && window.claimDemoChips(500)" style="color:#00e5ff;text-decoration:underline;font-weight:700;margin-left:6px;">⚡ Tap to Claim Free ₹500 Chips</a>`, "error");
       if (this.openDepositModal) this.openDepositModal();
       return;
     }
@@ -5832,6 +5853,15 @@ class AppController {
       if (window.andarBaharGame) {
         if (!window.andarBaharGame.selectedSide) window.andarBaharGame.selectSide('ANDAR');
         window.andarBaharGame.startDeal();
+      }
+    } else if (this.currentGame === 'roulette') {
+      if (window.rouletteGame) {
+        if (window.rouletteGame.getTotalBet && window.rouletteGame.getTotalBet() === 0) {
+          window.rouletteGame.placeBet('red');
+        }
+        if (window.rouletteGame.spinNow) {
+          window.rouletteGame.spinNow();
+        }
       }
     } else if (this.activeInstance && this.activeInstance.startGame) {
       if (this.activeInstance.setBetAmount) this.activeInstance.setBetAmount(this.betAmount);

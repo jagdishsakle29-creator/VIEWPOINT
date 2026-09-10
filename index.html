@@ -388,12 +388,12 @@
     window.switchGame = function(g) {
       if (window.app && window.app.switchGame) return window.app.switchGame(g);
       // Standalone Instant DOM Fallback
-      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView', 'towerView', 'molesView', 'pumpView', 'aviatorView', 'andarbaharView'];
+      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView', 'towerView', 'molesView', 'pumpView', 'aviatorView', 'andarbaharView', 'rouletteView'];
       views.forEach(function(vId) {
         var el = document.getElementById(vId);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
       });
-      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabPlinko', 'tabDice', 'tabLimbo', 'tabDragonTiger', 'tabColorTrading', 'tabStock', 'tabTower', 'tabMoles', 'tabPump', 'tabAviator', 'tabAndarBahar'];
+      var tabs = ['tabMines', 'tabChicken', 'tabChickenMines', 'tabCrash', 'tabPlinko', 'tabDice', 'tabLimbo', 'tabDragonTiger', 'tabColorTrading', 'tabStock', 'tabTower', 'tabMoles', 'tabPump', 'tabAviator', 'tabAndarBahar', 'tabRoulette'];
       tabs.forEach(function(tId) {
         var el = document.getElementById(tId);
         if (el) el.classList.remove('active');
@@ -405,6 +405,7 @@
       if (g === 'dragontiger') activeViewId = 'dragontigerView';
       if (g === 'andarbahar') activeViewId = 'andarbaharView';
       if (g === 'aviator') activeViewId = 'aviatorView';
+      if (g === 'roulette') activeViewId = 'rouletteView';
 
       var activeTabId = 'tab' + g.charAt(0).toUpperCase() + g.slice(1);
       if (g === 'colortrading') activeTabId = 'tabColorTrading';
@@ -412,8 +413,9 @@
       if (g === 'dragontiger') activeTabId = 'tabDragonTiger';
       if (g === 'andarbahar') activeTabId = 'tabAndarBahar';
       if (g === 'aviator') activeTabId = 'tabAviator';
+      if (g === 'roulette') activeTabId = 'tabRoulette';
 
-      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'tower' || g === 'moles' || g === 'pump' || g === 'dice' || g === 'aviator' || g === 'andarbahar');
+      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'tower' || g === 'moles' || g === 'pump' || g === 'dice' || g === 'aviator' || g === 'andarbahar' || g === 'roulette');
       var targetView = document.getElementById(activeViewId);
       if (targetView) {
         targetView.classList.add('active');
@@ -427,6 +429,9 @@
       }
       if (g === 'andarbahar' && !window.andarBaharGame && window.AndarBaharGame) {
         window.andarBaharGame = new window.AndarBaharGame();
+      }
+      if (g === 'roulette' && !window.rouletteGame && window.RouletteGame) {
+        window.rouletteGame = new window.RouletteGame();
       }
       if (g === 'aviator' && window.aviatorGame && window.aviatorGame.resizeCanvas) {
         setTimeout(function(){ window.aviatorGame.resizeCanvas(); }, 50);
@@ -443,7 +448,26 @@
           ga.style.display = window.innerWidth > 900 ? 'grid' : 'flex';
           ga.style.gridTemplateColumns = window.innerWidth > 900 ? '310px 1fr' : '1fr';
         }
+        try {
+          var headerOffset = 70;
+          var arenaRect = ga.getBoundingClientRect();
+          if (arenaRect.top < 10 || arenaRect.top > 250) {
+            var targetY = arenaRect.top + (window.pageYOffset || document.documentElement.scrollTop || 0) - headerOffset;
+            window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+          }
+          ga.classList.remove('arena-focus-pulse');
+          void ga.offsetWidth;
+          ga.classList.add('arena-focus-pulse');
+        } catch(e) {}
       }
+
+      // Sync active card highlight in carousel
+      try {
+        var cards = document.querySelectorAll('.game-poster-card');
+        cards.forEach(function(c) {
+          c.classList.toggle('active', c.getAttribute('data-game') === g);
+        });
+      } catch(e) {}
     };
 
     window.filterCasinoCategory = function(category, activeBtn) {
@@ -732,6 +756,11 @@
         <span>Deposit</span>
       </button>
 
+      <!-- Instant Demo Refill Button -->
+      <button id="btnClaimDemo" class="btn-demo-refill" title="Free Demo Balance (₹500)" onclick="window.claimDemoChips ? window.claimDemoChips(500) : (window.wallet && window.wallet.claimDemoChips(500))" style="background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.35); color: #00e5ff; border-radius: 8px; font-weight: 700; font-size: 11px; padding: 0 10px; height: 32px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s;">
+        <span>🎁 +₹500 Free</span>
+      </button>
+
       <!-- Withdrawal Button -->
       <button id="btnOpenWithdraw" class="btn-withdraw-nav" title="Withdraw Funds to UPI / Bank" onclick="window.openWithdrawModal ? window.openWithdrawModal() : (window.app && window.app.openWithdrawModal())">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -870,7 +899,7 @@
         </div>
 
         <!-- 3. Win Go 30s Poster Card -->
-        <div class="game-poster-card active" data-game="colortrading" data-category="live slots arcade all" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))">
+        <div class="game-poster-card" data-game="colortrading" data-category="live slots arcade all" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))">
           <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #201a38 0%, #090d16 100%);">
             <span class="game-poster-players">⚡ 2.5k</span>
             <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.5));">🎨💎</div>
@@ -946,7 +975,7 @@
         </div>
 
         <!-- 8. Mines Poster Card -->
-        <div class="game-poster-card" data-game="mines" data-category="originals popular all" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
+        <div class="game-poster-card active" data-game="mines" data-category="originals popular all" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
           <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
             <span class="game-poster-badge hot">🔥 HOT</span>
             <span class="game-poster-players">⚡ 7.6k</span>
