@@ -388,7 +388,7 @@
     window.switchGame = function(g) {
       if (window.app && window.app.switchGame) return window.app.switchGame(g);
       // Standalone Instant DOM Fallback
-      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView', 'towerView', 'molesView', 'pumpView', 'aviatorView', 'andarbaharView', 'rouletteView'];
+      var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView', 'towerView', 'molesView', 'pumpView', 'aviatorView', 'andarbaharView', 'rouletteView', 'sportsbookView'];
       views.forEach(function(vId) {
         var el = document.getElementById(vId);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
@@ -406,6 +406,7 @@
       if (g === 'andarbahar') activeViewId = 'andarbaharView';
       if (g === 'aviator') activeViewId = 'aviatorView';
       if (g === 'roulette') activeViewId = 'rouletteView';
+      if (g === 'sportsbook') activeViewId = 'sportsbookView';
 
       var activeTabId = 'tab' + g.charAt(0).toUpperCase() + g.slice(1);
       if (g === 'colortrading') activeTabId = 'tabColorTrading';
@@ -415,7 +416,7 @@
       if (g === 'aviator') activeTabId = 'tabAviator';
       if (g === 'roulette') activeTabId = 'tabRoulette';
 
-      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'tower' || g === 'moles' || g === 'pump' || g === 'dice' || g === 'aviator' || g === 'andarbahar' || g === 'roulette');
+      var isFullWidth = (g === 'dragontiger' || g === 'colortrading' || g === 'stock' || g === 'tower' || g === 'moles' || g === 'pump' || g === 'dice' || g === 'aviator' || g === 'andarbahar' || g === 'roulette' || g === 'sportsbook');
       var targetView = document.getElementById(activeViewId);
       if (targetView) {
         targetView.classList.add('active');
@@ -473,6 +474,9 @@
     window.filterCasinoCategory = function(category, activeBtn) {
       if (window.app && window.app.filterCasinoCategory) return window.app.filterCasinoCategory(category, activeBtn);
       category = String(category || 'all').toLowerCase().trim();
+      if (category.includes('sport') || category.includes('cric')) {
+        return window.switchGame('sportsbook');
+      }
       if (category.includes('all')) category = 'all';
       else if (category.includes('orig')) category = 'originals';
       else if (category.includes('live')) category = 'live';
@@ -678,8 +682,45 @@
     };
   </script>
 
-  <!-- Top Navigation Bar (2-Tier Sleek Header) -->
-  <header class="navbar">
+  <!-- Stake-Style App Shell Container with Left Navigation Rail -->
+  <div class="stake-app-container" id="stakeAppContainer">
+    <!-- Stake Left Vertical Icon Rail (Screenshot 1 Replication) -->
+    <aside class="stake-sidebar-rail" id="stakeSidebarRail">
+      <button type="button" class="sidebar-rail-btn active" id="railBtnCasino" title="Casino Lobby" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : null">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
+        <span class="rail-tooltip">Casino Lobby</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnSports" title="Sports & Cricket" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+        <span class="rail-tooltip">Sportsbook</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnLive" title="Live Casino Studio" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('live') : null">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span class="rail-tooltip">Live Studio</span>
+      </button>
+      <div class="sidebar-divider"></div>
+      <button type="button" class="sidebar-rail-btn" id="railBtnVip" title="VIP Club & Rewards" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="rail-tooltip">VIP Club</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnPromos" title="Promotions & Bonuses" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        <span class="rail-tooltip">Promotions</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnAffiliates" title="Affiliate Program" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="rail-tooltip">Affiliates</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnSupport" title="Live 24/7 Support" onclick="window.openSupportModal ? window.openSupportModal() : (window.app && window.app.openSupportModal())">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="rail-tooltip">Live Support</span>
+      </button>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="stake-main-content" id="stakeMainContent">
+      <!-- Top Navigation Bar (2-Tier Sleek Header) -->
+      <header class="navbar">
       <!-- Top Row: Logo & Brand + Auth / Profile + Refer Button -->
       <div class="nav-top-row">
         <div class="nav-brand" id="navBrandLogo" onclick="window.handleSecretLogoClick(event)" ontouchend="window.handleSecretLogoClick(event)" style="cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; gap: 8px;" title="VIEWPOINT">
@@ -776,10 +817,10 @@
     <div class="casino-title-row">
       <div class="casino-title-content">
         <h1 class="casino-main-title">
-          <span>Casino</span>
-          <span class="casino-live-badge">VIEW POINT</span>
+          <span class="viewpoint-brand-text">VIEWPOINT</span>
+          <span class="casino-live-badge">VIP</span>
         </h1>
-        <p class="casino-subtitle">Play your favorite games, win big!</p>
+        <p class="casino-subtitle">Play your favorite games & live sports, win big!</p>
       </div>
       <div class="casino-search-box">
         <span class="casino-search-icon">
@@ -793,6 +834,9 @@
     <div class="casino-category-nav" id="casinoCategoryNav">
       <button type="button" class="casino-cat-btn active" data-cat="all" onclick="window.filterCasinoCategory('all', this)">
         <span>🔥 All Games</span>
+      </button>
+      <button type="button" class="casino-cat-btn" data-cat="sports" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+        <span>🏏 Sports</span>
       </button>
       <button type="button" class="casino-cat-btn" data-cat="originals" onclick="window.filterCasinoCategory('originals', this)">
         <span>🎲 Originals</span>
@@ -1112,6 +1156,174 @@
         <span>Swipe to explore more games</span>
       </div>
     </div>
+
+    <!-- Stake.bz Style Trending Games Section (Screenshot 1 Replication) -->
+    <section class="trending-section" id="trendingGamesSection">
+      <div class="trending-header-row">
+        <div class="trending-title" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : null">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
+          <span>Trending Games</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+      <div class="trending-grid">
+        <!-- 1. Gates of Olympus (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Gates of Olympus">
+          <div class="stake-card-visual">
+            <img src="images/gates_of_olympus.jpg" alt="Gates of Olympus" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Pragmatic Play</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Gates of Olympus</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 8,421 playing</div>
+          </div>
+        </div>
+
+        <!-- 2. Odin's Vault (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Play Odin's Vault">
+          <div class="stake-card-visual">
+            <img src="images/odins_vault.jpg" alt="Odin's Vault" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Viewpoint Exclusive</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Odin's Vault</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 4,110 playing</div>
+          </div>
+        </div>
+
+        <!-- 3. Aviator Live Crash -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" title="Play Aviator">
+          <div class="stake-card-visual">
+            <img src="assets/banners/aviator.png" onerror="this.src='images/live_dealer_studio.jpg'" alt="Aviator" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Spribe</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Aviator</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 11,890 playing</div>
+          </div>
+        </div>
+
+        <!-- 4. Dragon Tiger Live Studio -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" title="Play Dragon Tiger">
+          <div class="stake-card-visual">
+            <img src="images/live_dealer_studio.jpg" alt="Dragon Tiger Live" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Evolution Live</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Dragon Tiger Live</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 6,750 playing</div>
+          </div>
+        </div>
+
+        <!-- 5. Limbo Turbo -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Limbo Turbo">
+          <div class="stake-card-visual">
+            <img src="assets/banners/mines.png" onerror="this.src='images/gates_of_olympus.jpg'" alt="Limbo Turbo" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Originals</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Limbo 10,000x</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 5,230 playing</div>
+          </div>
+        </div>
+
+        <!-- 6. Mines Grid -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Play Mines">
+          <div class="stake-card-visual">
+            <img src="assets/banners/mines.png" alt="Mines" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Originals</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Mines Diamond</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 9,140 playing</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stake.bz Style Trending Sports Section (Screenshot 1 Replication) -->
+    <section class="trending-section" id="trendingSportsSection">
+      <div class="trending-header-row">
+        <div class="trending-title" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <span>Trending Sports</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+      <div class="trending-grid">
+        <!-- 1. Cricket Live Sports (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Live Cricket">
+          <div class="stake-card-visual">
+            <img src="images/cricket_sports.jpg" alt="Live Cricket Betting" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);"><span class="pulse-red" style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> LIVE T20</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Cricket: IND vs AUS</div>
+            <div class="stake-card-meta sports-meta">🇮🇳 184/4 (17.3 ov) • Live Bet</div>
+          </div>
+        </div>
+
+        <!-- 2. Soccer Premier League (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Soccer">
+          <div class="stake-card-visual">
+            <img src="images/soccer_sports.jpg" alt="Soccer Premier League" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Premier League</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Man City vs Arsenal</div>
+            <div class="stake-card-meta sports-meta">Tomorrow • 84 Markets</div>
+          </div>
+        </div>
+
+        <!-- 3. Tennis Grand Slam -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Tennis">
+          <div class="stake-card-visual">
+            <img src="images/soccer_sports.jpg" alt="Tennis Grand Slam" class="stake-card-img" style="filter: hue-rotate(90deg);" loading="lazy">
+            <div class="stake-provider-pill">ATP Masters</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Alcaraz vs Sinner</div>
+            <div class="stake-card-meta sports-meta">Live in 2h • 32 Markets</div>
+          </div>
+        </div>
+
+        <!-- 4. Basketball NBA -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Basketball">
+          <div class="stake-card-visual">
+            <img src="images/cricket_sports.jpg" alt="Basketball NBA" class="stake-card-img" style="filter: hue-rotate(180deg);" loading="lazy">
+            <div class="stake-provider-pill">NBA Finals</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Lakers vs Celtics</div>
+            <div class="stake-card-meta sports-meta">Friday • 55 Markets</div>
+          </div>
+        </div>
+
+        <!-- 5. Baseball MLB -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Baseball">
+          <div class="stake-card-visual">
+            <img src="images/soccer_sports.jpg" alt="Baseball MLB" class="stake-card-img" style="filter: hue-rotate(240deg);" loading="lazy">
+            <div class="stake-provider-pill">MLB World Series</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Yankees vs Dodgers</div>
+            <div class="stake-card-meta sports-meta">Saturday • 28 Markets</div>
+          </div>
+        </div>
+
+        <!-- 6. American Football NFL -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on NFL">
+          <div class="stake-card-visual">
+            <img src="images/cricket_sports.jpg" alt="NFL Football" class="stake-card-img" style="filter: hue-rotate(300deg);" loading="lazy">
+            <div class="stake-provider-pill">NFL Super Bowl</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Chiefs vs 49ers</div>
+            <div class="stake-card-meta sports-meta">Sunday • 92 Markets</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Main Game Box -->
     <div class="game-arena">
@@ -1731,6 +1943,23 @@
         <!-- Game 8: Dragon Tiger Live VIP Arena -->
         <div id="dragontigerView" class="game-view dragontiger-view">
           <div class="dt-live-stage">
+            <!-- Live Female Dealer Studio Stream (User Request: Ladki card deal karke dikhati hai) -->
+            <div class="live-dealer-stream-wrapper">
+              <img src="images/live_dealer_studio.jpg" alt="Live Dealer Stream" class="live-stream-backdrop">
+              <div class="live-stream-overlay">
+                <div class="live-stream-header">
+                  <div class="dealer-tag-group">
+                    <span class="live-cam-badge"><span class="pulse-red" style="width: 6px; height: 6px; border-radius: 50%; background: #ffffff; display: inline-block;"></span> LIVE CAM 1</span>
+                    <span class="dealer-name-badge">👩 Dealer Sophia • Riga Live Studio</span>
+                  </div>
+                  <span style="font-size: 11px; font-weight: 800; color: #00e701; background: rgba(0,0,0,0.6); padding: 2px 7px; border-radius: 4px;">1080p 60FPS</span>
+                </div>
+                <div class="live-round-announcement" id="dtLiveAnnouncement">
+                  ✨ Sophia is dealing Dragon & Tiger cards • Place your bets!
+                </div>
+              </div>
+            </div>
+
             <div class="dt-header-bar">
               <div class="dt-status-pill">
                 <span class="dt-live-dot"></span>
@@ -2519,6 +2748,23 @@
         <!-- Game 14: Andar Bahar Royal Cards View -->
         <div id="andarbaharView" class="game-view andarbahar-view" style="display: none; width: 100%;">
           <div class="ab-container">
+            <!-- Live Female Dealer Studio Stream (User Request: Ladki live card deal karke dikhati hai) -->
+            <div class="live-dealer-stream-wrapper">
+              <img src="images/live_dealer_studio.jpg" alt="Live Dealer Stream" class="live-stream-backdrop">
+              <div class="live-stream-overlay">
+                <div class="live-stream-header">
+                  <div class="dealer-tag-group">
+                    <span class="live-cam-badge"><span class="pulse-red" style="width: 6px; height: 6px; border-radius: 50%; background: #ffffff; display: inline-block;"></span> LIVE CAM 2</span>
+                    <span class="dealer-name-badge">👩 Dealer Isabella • Mumbai Live VIP Table</span>
+                  </div>
+                  <span style="font-size: 11px; font-weight: 800; color: #00e701; background: rgba(0,0,0,0.6); padding: 2px 7px; border-radius: 4px;">1080p HD</span>
+                </div>
+                <div class="live-round-announcement">
+                  👑 Isabella is dealing the Trump Joker & Dealing Cards!
+                </div>
+              </div>
+            </div>
+
             <!-- Trend History Bar -->
             <div class="ab-history-bar" id="andarBaharHistoryList"></div>
 
@@ -2610,6 +2856,23 @@
           <div class="rl-live-stage">
             <div class="rl-live-ambient-glow"></div>
             
+            <!-- Live Female Dealer Studio Stream (User Request: Ladki live card deal karke dikhati hai) -->
+            <div class="live-dealer-stream-wrapper">
+              <img src="images/live_dealer_studio.jpg" alt="Live Dealer Stream" class="live-stream-backdrop">
+              <div class="live-stream-overlay">
+                <div class="live-stream-header">
+                  <div class="dealer-tag-group">
+                    <span class="live-cam-badge"><span class="pulse-red" style="width: 6px; height: 6px; border-radius: 50%; background: #ffffff; display: inline-block;"></span> LIVE WHEEL CAM</span>
+                    <span class="dealer-name-badge">👩 Dealer Sophia • European Roulette Live Studio</span>
+                  </div>
+                  <span style="font-size: 11px; font-weight: 800; color: #00e701; background: rgba(0,0,0,0.6); padding: 2px 7px; border-radius: 4px;">PROVABLY LIVE</span>
+                </div>
+                <div class="live-round-announcement">
+                  🎯 Sophia is spinning the European Wheel • No More Bets Soon!
+                </div>
+              </div>
+            </div>
+
             <div class="rl-stage-header">
               <div class="rl-dealer-badge">
                 <span class="rl-live-dot"></span>
@@ -2737,6 +3000,180 @@
                 <strong id="rlTotalBetVal">₹0.00</strong>
               </div>
             </div>
+          </div>
+
+        </div>
+
+        <!-- Game 16: Live Cricket Sportsbook & Real-Time Bet Engine (User Request: Cricket betting) -->
+        <div id="sportsbookView" class="game-view sportsbook-view" style="display: none; width: 100%;">
+          
+          <!-- Match Hero Banner with Live Scoreboard -->
+          <div class="sportsbook-hero-banner">
+            <div class="cric-match-header">
+              <span class="cric-badge-live">
+                <span class="pulse-red"></span>
+                <span>ICC T20 WORLD CUP • LIVE INNINGS 2</span>
+              </span>
+              <div style="font-size: 12px; color: #94a3b8; font-weight: 700;">Melbourne Cricket Ground • Over 18.0</div>
+            </div>
+
+            <!-- Scoreboard Grid -->
+            <div class="cric-score-grid">
+              <div class="team-score-block">
+                <span class="team-flag-icon">🇮🇳</span>
+                <div>
+                  <div class="team-name-big">India</div>
+                  <div class="team-runs-big" id="cricScoreIndia">184/4 <span style="font-size: 14px; color: #94a3b8;">(17.3 ov)</span></div>
+                  <div style="font-size: 11px; color: #10b981; font-weight: 700;">CRR: 10.51 • Projected: 215</div>
+                </div>
+              </div>
+
+              <div class="match-center-vs">
+                <span class="vs-circle">VS</span>
+                <span style="font-size: 10.5px; color: #f59e0b; font-weight: 800;">TARGET: 205</span>
+              </div>
+
+              <div class="team-score-block" style="justify-content: flex-end; text-align: right;">
+                <div>
+                  <div class="team-name-big">Australia</div>
+                  <div class="team-runs-big" style="color: #cbd5e1;">204/6 <span style="font-size: 14px; color: #64748b;">(20.0 ov)</span></div>
+                  <div style="font-size: 11px; color: #94a3b8;">IND need 21 runs in 15 balls</div>
+                </div>
+                <span class="team-flag-icon">🇦🇺</span>
+              </div>
+            </div>
+
+            <!-- Live Ball Tracker Strip -->
+            <div class="live-tracker-strip">
+              <div class="tracker-bowler-info">
+                <span>🎳 Bowler: <strong>Mitchell Starc</strong> (3.3-0-32-2)</span>
+                <span>🏏 Striker: <strong>Virat Kohli</strong> (72* off 41)</span>
+              </div>
+              <div class="over-balls-row" id="cricBallsStrip">
+                <span class="ball-pill">1</span>
+                <span class="ball-pill four">4</span>
+                <span class="ball-pill dot">0</span>
+                <span class="ball-pill six">6</span>
+                <span class="ball-pill current">Next</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sports Betting Markets Layout (Markets Left + Bet Slip Right) -->
+          <div class="sports-layout-row">
+            <div class="sports-markets-panel">
+              
+              <!-- Market 1: Match Winner -->
+              <div class="market-card">
+                <div class="market-card-title">🏆 Match Winner (Moneyline)</div>
+                <div class="market-odds-grid">
+                  <button type="button" class="market-odd-btn" id="oddBtn-winner-india" onclick="window.Sportsbook && window.Sportsbook.selectMarket('match_winner', 'India', 1.75)">
+                    <span class="odd-label">🇮🇳 India</span>
+                    <span class="odd-val">1.75</span>
+                  </button>
+                  <button type="button" class="market-odd-btn" id="oddBtn-winner-aus" onclick="window.Sportsbook && window.Sportsbook.selectMarket('match_winner', 'Australia', 2.15)">
+                    <span class="odd-label">🇦🇺 Australia</span>
+                    <span class="odd-val">2.15</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Market 2: Over Runs -->
+              <div class="market-card">
+                <div class="market-card-title">📊 18th Over Total Runs</div>
+                <div class="market-odds-grid">
+                  <button type="button" class="market-odd-btn" id="oddBtn-over-o12" onclick="window.Sportsbook && window.Sportsbook.selectMarket('over_runs', 'Over 12.5 Runs', 1.90)">
+                    <span class="odd-label">Over 12.5</span>
+                    <span class="odd-val">1.90</span>
+                  </button>
+                  <button type="button" class="market-odd-btn" id="oddBtn-over-u12" onclick="window.Sportsbook && window.Sportsbook.selectMarket('over_runs', 'Under 12.5 Runs', 1.85)">
+                    <span class="odd-label">Under 12.5</span>
+                    <span class="odd-val">1.85</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Market 3: Next Ball Outcome (Instant Ball Bet) -->
+              <div class="market-card">
+                <div class="market-card-title">⚡ Instant Next Ball Outcome</div>
+                <div class="market-odds-grid">
+                  <button type="button" class="market-odd-btn" id="oddBtn-next-dot" onclick="window.Sportsbook && window.Sportsbook.selectMarket('next_ball', 'Dot Ball (0)', 2.20)">
+                    <span class="odd-label">Dot Ball (0)</span>
+                    <span class="odd-val">2.20</span>
+                  </button>
+                  <button type="button" class="market-odd-btn" id="oddBtn-next-single" onclick="window.Sportsbook && window.Sportsbook.selectMarket('next_ball', '1 or 2 Runs', 1.55)">
+                    <span class="odd-label">1 or 2 Runs</span>
+                    <span class="odd-val">1.55</span>
+                  </button>
+                  <button type="button" class="market-odd-btn" id="oddBtn-next-four" onclick="window.Sportsbook && window.Sportsbook.selectMarket('next_ball', 'Four Boundary (4)', 4.50)">
+                    <span class="odd-label">Four (4)</span>
+                    <span class="odd-val">4.50</span>
+                  </button>
+                  <button type="button" class="market-odd-btn" id="oddBtn-next-six" onclick="window.Sportsbook && window.Sportsbook.selectMarket('next_ball', 'Six Maximum (6)', 6.00)">
+                    <span class="odd-label">Six (6)</span>
+                    <span class="odd-val">6.00</span>
+                  </button>
+                  <button type="button" class="market-odd-btn" id="oddBtn-next-wicket" onclick="window.Sportsbook && window.Sportsbook.selectMarket('next_ball', 'Wicket Fall (W)', 8.50)">
+                    <span class="odd-label">Wicket (W)</span>
+                    <span class="odd-val">8.50</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Bet Slip Panel -->
+            <div class="sports-bet-slip-panel">
+              <div class="slip-panel-title">
+                <span>🎫 Sports Bet Slip</span>
+                <span id="slipActiveCount" style="font-size: 11px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 7px; border-radius: 10px;">1 Selection</span>
+              </div>
+
+              <!-- Active Selection Box -->
+              <div id="betSlipContent">
+                <div class="bet-slip-empty" id="betSlipEmpty" style="display: none;">
+                  Click any market odds button to add to bet slip
+                </div>
+
+                <div class="bet-slip-selection" id="betSlipSelection">
+                  <div class="selection-header">
+                    <div>
+                      <div class="selection-market" id="slipMarketName">Match Winner: India</div>
+                      <div class="selection-match-title">India vs Australia • ICC T20 World Cup</div>
+                    </div>
+                    <div class="selection-odds" id="slipOddsDisplay">1.75</div>
+                  </div>
+
+                  <div class="selection-stake-row">
+                    <span class="selection-stake-label">Stake Amount (₹)</span>
+                    <input type="number" id="sportsStakeInput" class="sports-stake-input" value="100" min="10" max="50000" step="10" oninput="window.Sportsbook && window.Sportsbook.updateEstPayout()">
+                  </div>
+
+                  <div class="quick-stakes-row">
+                    <button type="button" class="quick-stake-btn" onclick="window.Sportsbook && window.Sportsbook.setQuickStake(50)">+50</button>
+                    <button type="button" class="quick-stake-btn" onclick="window.Sportsbook && window.Sportsbook.setQuickStake(100)">+100</button>
+                    <button type="button" class="quick-stake-btn" onclick="window.Sportsbook && window.Sportsbook.setQuickStake(500)">+500</button>
+                    <button type="button" class="quick-stake-btn" onclick="window.Sportsbook && window.Sportsbook.setQuickStake(1000)">+1000</button>
+                  </div>
+
+                  <div class="potential-payout-row">
+                    <span>Est. Payout:</span>
+                    <span class="payout-amount" id="slipEstPayout">₹175.00</span>
+                  </div>
+
+                  <button type="button" id="btnPlaceSportsBet" class="btn-place-sports-bet" onclick="window.Sportsbook && window.Sportsbook.placeBet()">
+                    ⚡ Place Bet Now
+                  </button>
+                </div>
+              </div>
+
+              <!-- Open Bets History Strip -->
+              <div class="open-bets-summary" id="openBetsContainer" style="margin-top: 14px;">
+                <div style="font-size: 12px; font-weight: 800; color: #94a3b8; margin-bottom: 8px;">Active Bets (<span id="openBetsCount">0</span>)</div>
+                <div id="openBetsList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+              </div>
+            </div>
+
           </div>
 
         </div>
@@ -4281,6 +4718,8 @@
     </div>
   </div>
   <div class="bet-slip-backdrop" id="backdropBetSlip" onclick="window.closeBetSlip ? window.closeBetSlip() : (window.app && window.app.closeBetSlipPanel())"></div>
+  </div><!-- /#stakeMainContent -->
+  </div><!-- /#stakeAppContainer -->
 
   <!-- Fixed Mobile Bottom Navigation Bar (Ultra Classy VIP App Experience) -->
   <nav class="mobile-bottom-nav" id="mobileBottomNav">
@@ -4340,6 +4779,7 @@
   <script src="js/rewards.js?v=108.0"></script>
   <script src="js/admin.js?v=108.0"></script>
   <script src="js/livebets.js?v=108.0"></script>
+  <script src="js/sportsbook.js?v=108.0"></script>
 
   <script src="js/app.js?v=108.0"></script>
 

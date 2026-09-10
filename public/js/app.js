@@ -5283,7 +5283,8 @@ class AppController {
       this.dom.towerView || document.getElementById('towerView'),
       document.getElementById('aviatorView'),
       document.getElementById('andarbaharView'),
-      document.getElementById('rouletteView')
+      document.getElementById('rouletteView'),
+      document.getElementById('sportsbookView')
     ];
     viewsList.forEach(v => {
       if (v) {
@@ -5306,8 +5307,8 @@ class AppController {
     if (this.dom.multStreakContainer) this.dom.multStreakContainer.style.display = 'none';
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
-    // Full-Width Casino Games hide master controls panel and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar' || gameType === 'roulette');
+    // Full-Width Casino & Sports Games hide master controls panel and take 100% width
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar' || gameType === 'roulette' || gameType === 'sportsbook');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
@@ -5662,7 +5663,20 @@ class AppController {
       if (window.rouletteGame && window.rouletteGame.init) {
         window.rouletteGame.init();
       }
+    } else if (gameType === 'sportsbook') {
+      const v = document.getElementById('sportsbookView');
+      if (v) { v.classList.add('active'); v.style.display = 'flex'; }
+      if (window.Sportsbook && window.Sportsbook.init) {
+        window.Sportsbook.init();
+      }
+      this.activeInstance = window.Sportsbook;
     }
+
+    // Sync Stake Left Sidebar Rail Active State
+    const railSports = document.getElementById('railBtnSports');
+    const railCasino = document.getElementById('railBtnCasino');
+    if (railSports) railSports.classList.toggle('active', gameType === 'sportsbook');
+    if (railCasino) railCasino.classList.toggle('active', gameType !== 'sportsbook');
 
     if (this.betMode === 'auto' && !isFullWidthGame) {
       if (this.dom.btnActionBet) this.dom.btnActionBet.style.display = 'none';
@@ -8244,6 +8258,7 @@ class AppController {
       letter-spacing: 0.3px;
     `;
     toast.innerHTML = `<span style="font-size: 20px; flex-shrink:0;">${icon}</span> <span>${msg}</span>`;
+    if (!document.body) return;
     document.body.appendChild(toast);
 
     setTimeout(() => {
@@ -8924,6 +8939,10 @@ class AppController {
   // Modern VIP Casino Category Filter & Live Search
   filterCasinoCategory(category, activeBtn) {
     category = String(category || 'all').toLowerCase().trim();
+    if (category.includes('sport') || category.includes('cric')) {
+      this.switchGame('sportsbook');
+      return;
+    }
     if (category.includes('all')) category = 'all';
     else if (category.includes('orig')) category = 'originals';
     else if (category.includes('live')) category = 'live';

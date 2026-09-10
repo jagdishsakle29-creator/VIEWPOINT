@@ -59,7 +59,8 @@ var document = {
     }; 
   },
   addEventListener: function() {},
-  hidden: false
+  hidden: false,
+  body: { appendChild: function(){}, removeChild: function(){} }
 };
 var localStorage = {
   store: { 'stake_game_balance': '5000' },
@@ -114,6 +115,7 @@ files = [
     "js/rewards.js",
     "js/admin.js",
     "js/livebets.js",
+    "js/sportsbook.js",
     "js/app.js"
 ]
 
@@ -126,7 +128,7 @@ window.app = new window.AppController();
 console.log("=== WALLET BALANCE ===");
 console.log("Balance: " + window.wallet.balance);
 
-var games = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette'];
+var games = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette', 'sportsbook'];
 
 games.forEach(function(g) {
   console.log("\\n>>> Testing game: " + g);
@@ -180,6 +182,16 @@ games.forEach(function(g) {
         console.log("Roulette after spinNow, isSpinning: " + rl.isSpinning);
       } else {
         console.log("Roulette is null!");
+      }
+    } else if (g === 'sportsbook') {
+      var sb = window.Sportsbook;
+      if (sb) {
+        console.log("Sportsbook active market: " + sb.selectedMarket.label + " (" + sb.selectedMarket.odds + ")");
+        var pRes = sb.placeBet();
+        console.log("Sportsbook placeBet result: " + JSON.stringify(pRes));
+        console.log("Sportsbook active bets count: " + sb.activeBets.length);
+      } else {
+        console.log("Sportsbook is null!");
       }
     } else {
       // General handleBetClick
