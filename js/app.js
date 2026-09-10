@@ -1367,6 +1367,8 @@ class AppController {
     if (tabAviator) tabAviator.addEventListener('click', () => this.switchGame('aviator'));
     const tabAndarBahar = document.getElementById('tabAndarBahar');
     if (tabAndarBahar) tabAndarBahar.addEventListener('click', () => this.switchGame('andarbahar'));
+    const tabRoulette = document.getElementById('tabRoulette');
+    if (tabRoulette) tabRoulette.addEventListener('click', () => this.switchGame('roulette'));
 
     // Restore active game from URL hash, query param, or localStorage
     const hashGame = window.location.hash ? window.location.hash.replace('#', '') : '';
@@ -1381,7 +1383,7 @@ class AppController {
     };
     const queryGame = getQueryParam('game');
     const savedGame = localStorage.getItem('stake_active_game');
-    const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar'];
+    const validGames = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette'];
     const initialGame = [hashGame, queryGame, savedGame].find(g => validGames.includes(g)) || 'mines';
     
     this.switchGamePage(1);
@@ -5141,7 +5143,7 @@ class AppController {
       1: ['mines', 'dragontiger', 'limbo', 'pump'],
       2: ['chicken', 'plinko', 'crash', 'moles'],
       3: ['dice', 'tower', 'colortrading', 'stock'],
-      4: ['aviator', 'andarbahar']
+      4: ['aviator', 'andarbahar', 'roulette']
     };
     const targetGame = (pageGames[p] && pageGames[p].includes(this.currentGame)) ? this.currentGame : ((pageGames[p] && pageGames[p][0]) || 'mines');
     this.switchGame(targetGame);
@@ -5181,7 +5183,7 @@ class AppController {
     if (['mines', 'dragontiger', 'limbo', 'pump'].includes(gameType)) targetPage = 1;
     else if (['chicken', 'plinko', 'crash', 'moles'].includes(gameType)) targetPage = 2;
     else if (['colortrading', 'stock', 'dice', 'tower'].includes(gameType)) targetPage = 3;
-    else if (['aviator', 'andarbahar'].includes(gameType)) targetPage = 4;
+    else if (['aviator', 'andarbahar', 'roulette'].includes(gameType)) targetPage = 4;
 
     const p1Btn = document.getElementById('btnGamePage1');
     const p2Btn = document.getElementById('btnGamePage2');
@@ -5242,7 +5244,8 @@ class AppController {
       this.dom.tabDice || document.getElementById('tabDice'),
       this.dom.tabTower || document.getElementById('tabTower'),
       document.getElementById('tabAviator'),
-      document.getElementById('tabAndarBahar')
+      document.getElementById('tabAndarBahar'),
+      document.getElementById('tabRoulette')
     ];
     allTabs.forEach(t => t && t.classList.remove('active'));
     
@@ -5260,7 +5263,8 @@ class AppController {
       this.dom.diceView || document.getElementById('diceView'),
       this.dom.towerView || document.getElementById('towerView'),
       document.getElementById('aviatorView'),
-      document.getElementById('andarbaharView')
+      document.getElementById('andarbaharView'),
+      document.getElementById('rouletteView')
     ];
     viewsList.forEach(v => {
       if (v) {
@@ -5284,7 +5288,7 @@ class AppController {
     if (this.dom.mainActionArea) this.dom.mainActionArea.style.display = 'flex';
 
     // Full-Width Casino Games hide master controls panel and take 100% width
-    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar');
+    const isFullWidthGame = (gameType === 'dragontiger' || gameType === 'colortrading' || gameType === 'stock' || gameType === 'pump' || gameType === 'moles' || gameType === 'tower' || gameType === 'dice' || gameType === 'aviator' || gameType === 'andarbahar' || gameType === 'roulette');
     const cp = document.querySelector('.controls-panel');
     const ga = document.querySelector('.game-arena');
     if (cp) cp.style.display = isFullWidthGame ? 'none' : 'flex';
@@ -5627,6 +5631,18 @@ class AppController {
         window.andarBaharGame = new window.AndarBaharGame();
       }
       this.activeInstance = window.andarBaharGame;
+    } else if (gameType === 'roulette') {
+      const tab = document.getElementById('tabRoulette');
+      if (tab) tab.classList.add('active');
+      const v = document.getElementById('rouletteView');
+      if (v) { v.classList.add('active'); v.style.display = 'block'; }
+      if (!window.rouletteGame && window.RouletteGame) {
+        window.rouletteGame = new window.RouletteGame();
+      }
+      this.activeInstance = window.rouletteGame;
+      if (window.rouletteGame && window.rouletteGame.init) {
+        window.rouletteGame.init();
+      }
     }
 
     if (this.betMode === 'auto' && !isFullWidthGame) {
@@ -5683,7 +5699,8 @@ class AppController {
       'moles': this.moles,
       'pump': this.pump,
       'aviator': window.aviatorGame,
-      'andarbahar': window.andarBaharGame
+      'andarbahar': window.andarBaharGame,
+      'roulette': window.rouletteGame
     };
     if (instanceMap[this.currentGame]) {
       this.activeInstance = instanceMap[this.currentGame];
@@ -8804,6 +8821,200 @@ class AppController {
     if (!tiles.length) return;
     tiles[Math.floor(Math.random() * tiles.length)].click();
   }
+
+  // Live European Roulette Bridge Methods
+  selectRouletteChip(amount) {
+    if (!window.rouletteGame && window.RouletteGame) {
+      window.rouletteGame = new window.RouletteGame();
+    }
+    if (window.rouletteGame && window.rouletteGame.selectChip) {
+      window.rouletteGame.selectChip(amount);
+    }
+  }
+
+  handleRouletteBet(spot) {
+    if (!window.rouletteGame && window.RouletteGame) {
+      window.rouletteGame = new window.RouletteGame();
+    }
+    if (window.rouletteGame && window.rouletteGame.placeBet) {
+      window.rouletteGame.placeBet(spot);
+    }
+  }
+
+  clearRouletteBets() {
+    if (window.rouletteGame && window.rouletteGame.clearBets) {
+      window.rouletteGame.clearBets();
+    }
+  }
+
+  doubleRouletteBets() {
+    if (window.rouletteGame && window.rouletteGame.doubleBets) {
+      window.rouletteGame.doubleBets();
+    }
+  }
+
+  rebetRoulette() {
+    if (window.rouletteGame && window.rouletteGame.rebet) {
+      window.rouletteGame.rebet();
+    }
+  }
+
+  dealRouletteNow() {
+    if (window.rouletteGame && window.rouletteGame.spinNow) {
+      window.rouletteGame.spinNow();
+    }
+  }
+
+  // Modern VIP Casino Category Filter & Live Search
+  filterCasinoCategory(category, activeBtn) {
+    const navButtons = document.querySelectorAll('.casino-category-btn');
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    if (activeBtn) activeBtn.classList.add('active');
+
+    const cards = document.querySelectorAll('#casinoGamesGrid .game-poster-card');
+    cards.forEach(card => {
+      const cardCategory = card.getAttribute('data-category') || '';
+      if (category === 'all' || cardCategory.includes(category)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  searchCasinoGames(query) {
+    const q = (query || '').toLowerCase().trim();
+    const cards = document.querySelectorAll('#casinoGamesGrid .game-poster-card');
+    cards.forEach(card => {
+      const title = (card.querySelector('.game-poster-title')?.textContent || '').toLowerCase();
+      const cat = (card.querySelector('.game-poster-cat')?.textContent || '').toLowerCase();
+      const gameAttr = (card.getAttribute('data-game') || '').toLowerCase();
+      if (!q || title.includes(q) || cat.includes(q) || gameAttr.includes(q)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // Bet Slip Slide-Over Drawer Methods
+  openBetSlipPanel() {
+    const panel = document.getElementById('panelBetSlip');
+    const backdrop = document.getElementById('backdropBetSlip');
+    if (panel) {
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden', 'false');
+    }
+    if (backdrop) backdrop.classList.add('open');
+    this.renderBetSlipContent();
+  }
+
+  closeBetSlipPanel() {
+    const panel = document.getElementById('panelBetSlip');
+    const backdrop = document.getElementById('backdropBetSlip');
+    if (panel) {
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden', 'true');
+    }
+    if (backdrop) backdrop.classList.remove('open');
+  }
+
+  switchBetSlipTab(tab) {
+    const tabActive = document.getElementById('tabBetSlipActive');
+    const tabHistory = document.getElementById('tabBetSlipHistory');
+    if (tabActive) tabActive.classList.toggle('active', tab === 'active');
+    if (tabHistory) tabHistory.classList.toggle('active', tab === 'history');
+    this.renderBetSlipContent(tab);
+  }
+
+  renderBetSlipContent(tab = 'active') {
+    const emptyState = document.getElementById('betSlipEmptyState');
+    const itemsContainer = document.getElementById('betSlipItems');
+    const counter = document.getElementById('betSlipCounter');
+    const totalWagerEl = document.getElementById('betSlipTotalWager');
+    const estWinEl = document.getElementById('betSlipEstWin');
+
+    if (tab === 'active') {
+      let activeBets = [];
+      let totalWager = 0;
+      let estWin = 0;
+
+      // Check roulette active bets
+      if (window.rouletteGame && window.rouletteGame.bets) {
+        const rBets = window.rouletteGame.bets;
+        Object.keys(rBets).forEach(spot => {
+          const amt = rBets[spot];
+          if (amt > 0) {
+            totalWager += amt;
+            const payout = (window.rouletteGame.PAYOUTS && window.rouletteGame.PAYOUTS[spot]) ? window.rouletteGame.PAYOUTS[spot] : 2;
+            estWin += amt * payout;
+            activeBets.push({
+              game: 'Live Roulette',
+              icon: '🎡',
+              label: spot.replace('num_', 'Number ').replace('col_', 'Column ').replace('dozen_', 'Dozen ').toUpperCase(),
+              amount: amt,
+              payoutMultiplier: payout
+            });
+          }
+        });
+      }
+
+      if (counter) counter.textContent = activeBets.length;
+      if (totalWagerEl) totalWagerEl.textContent = '₹' + totalWager.toFixed(2);
+      if (estWinEl) estWinEl.textContent = '₹' + estWin.toFixed(2);
+
+      if (activeBets.length === 0) {
+        if (emptyState) emptyState.style.display = 'block';
+        if (itemsContainer) itemsContainer.style.display = 'none';
+      } else {
+        if (emptyState) emptyState.style.display = 'none';
+        if (itemsContainer) {
+          itemsContainer.style.display = 'flex';
+          itemsContainer.innerHTML = activeBets.map(b => `
+            <div class="bet-slip-card">
+              <div class="bet-slip-card-header">
+                <span>${b.icon} ${b.game}</span>
+                <span class="bet-slip-chip-badge">₹${b.amount}</span>
+              </div>
+              <div class="bet-slip-card-details">
+                <span>Selection: <strong>${b.label}</strong></span>
+                <span>Odds: <strong>${b.payoutMultiplier}:1</strong></span>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    } else {
+      // History tab
+      const txs = (window.wallet && window.wallet.history) ? window.wallet.history.slice(0, 8) : [];
+      if (counter) counter.textContent = txs.length;
+      if (txs.length === 0) {
+        if (emptyState) {
+          emptyState.style.display = 'block';
+          const p = emptyState.querySelector('.empty-slip-desc');
+          if (p) p.textContent = 'No past bet history recorded yet.';
+        }
+        if (itemsContainer) itemsContainer.style.display = 'none';
+      } else {
+        if (emptyState) emptyState.style.display = 'none';
+        if (itemsContainer) {
+          itemsContainer.style.display = 'flex';
+          itemsContainer.innerHTML = txs.map(t => `
+            <div class="bet-slip-card ${t.type === 'win' ? 'win' : ''}">
+              <div class="bet-slip-card-header">
+                <span>${t.type === 'win' ? '🏆 WIN' : '⚡ BET'}</span>
+                <span style="color: ${t.type === 'win' ? '#00f59b' : '#ff4757'}">₹${Math.abs(t.amount || 0).toFixed(2)}</span>
+              </div>
+              <div class="bet-slip-card-details">
+                <span>${t.description || 'VIP Game Bet'}</span>
+                <span>${new Date(t.timestamp || Date.now()).toLocaleTimeString()}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+  }
 }
 
 window.pickRandomMineTile = function() {
@@ -8916,4 +9127,50 @@ window.handleBetClick = function() {
 window.handleCashoutClick = function() {
   if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
   if (window.app && window.app.handleCashoutClick) return window.app.handleCashoutClick();
+};
+
+// Global exports for Modern VIP Casino & Live Roulette
+window.filterCasinoCategory = function(cat, btn) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.filterCasinoCategory) window.app.filterCasinoCategory(cat, btn);
+};
+window.searchCasinoGames = function(q) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.searchCasinoGames) window.app.searchCasinoGames(q);
+};
+window.openBetSlip = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.openBetSlipPanel) window.app.openBetSlipPanel();
+};
+window.closeBetSlip = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.closeBetSlipPanel) window.app.closeBetSlipPanel();
+};
+window.switchBetSlipTab = function(tab) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.switchBetSlipTab) window.app.switchBetSlipTab(tab);
+};
+window.selectRouletteChip = function(amt) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.selectRouletteChip) window.app.selectRouletteChip(amt);
+};
+window.handleRouletteBet = function(spot) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.handleRouletteBet) window.app.handleRouletteBet(spot);
+};
+window.clearRouletteBets = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.clearRouletteBets) window.app.clearRouletteBets();
+};
+window.doubleRouletteBets = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.doubleRouletteBets) window.app.doubleRouletteBets();
+};
+window.rebetRoulette = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.rebetRoulette) window.app.rebetRoulette();
+};
+window.dealRouletteNow = function() {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.dealRouletteNow) window.app.dealRouletteNow();
 };

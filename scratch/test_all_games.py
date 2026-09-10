@@ -110,6 +110,7 @@ files = [
     "js/tower.js",
     "js/aviator.js",
     "js/andarbahar.js",
+    "js/roulette.js",
     "js/rewards.js",
     "js/admin.js",
     "js/livebets.js",
@@ -125,7 +126,7 @@ window.app = new window.AppController();
 console.log("=== WALLET BALANCE ===");
 console.log("Balance: " + window.wallet.balance);
 
-var games = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar'];
+var games = ['mines', 'dragontiger', 'limbo', 'pump', 'chicken', 'plinko', 'crash', 'moles', 'colortrading', 'stock', 'dice', 'tower', 'aviator', 'andarbahar', 'roulette'];
 
 games.forEach(function(g) {
   console.log("\\n>>> Testing game: " + g);
@@ -166,6 +167,20 @@ games.forEach(function(g) {
     } else if (g === 'andarbahar') {
       window.app.handleBetClick();
       console.log("Andar Bahar isPlaying: " + (window.andarBaharGame ? window.andarBaharGame.isPlaying : 'N/A'));
+    } else if (g === 'roulette') {
+      var rl = window.rouletteGame;
+      if (rl) {
+        console.log("Roulette roundId: " + rl.roundId + ", isSpinning: " + rl.isSpinning);
+        var bRes = rl.placeBet('red');
+        console.log("Roulette placeBet red result: " + JSON.stringify(bRes));
+        var bRes2 = rl.placeBet('num_7');
+        console.log("Roulette placeBet num_7 result: " + JSON.stringify(bRes2));
+        console.log("Roulette bets: " + JSON.stringify(rl.bets));
+        rl.spinNow();
+        console.log("Roulette after spinNow, isSpinning: " + rl.isSpinning);
+      } else {
+        console.log("Roulette is null!");
+      }
     } else {
       // General handleBetClick
       window.app.handleBetClick();
