@@ -4109,77 +4109,123 @@ body {
   box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-/* UNIFIED SINGLE-INSTANCE GAMES GRID (NO DUPLICATES) */
-.casino-games-section {
+/* Swipeable Game Carousel Section */
+.casino-carousel-section {
+  position: relative;
+  margin-bottom: 20px;
   width: 100%;
-  max-width: 1200px;
-  margin: 14px auto 30px auto;
-  padding: 0 12px;
-  box-sizing: border-box;
 }
 
-.casino-grid-header {
+.carousel-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+  padding: 0 4px;
 }
 
-.casino-grid-title {
+.carousel-section-title {
   font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 900;
-  color: #ffffff;
+  font-size: 16.5px;
+  font-weight: 800;
+  color: #fff;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0;
 }
 
-.casino-games-count {
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.carousel-arrow-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(18, 26, 48, 0.85);
+  border: 1px solid var(--vp-border-subtle);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.carousel-arrow-btn:hover {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.carousel-view-all {
   font-size: 12px;
   font-weight: 700;
-  color: #64748b;
-  background: rgba(15, 23, 42, 0.8);
-  padding: 4px 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #60a5fa;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.2s ease;
 }
 
-.casino-games-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 14px;
+.carousel-view-all:hover {
+  color: #93c5fd;
 }
 
-@media (min-width: 768px) {
-  .casino-games-grid {
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
-    gap: 16px;
-  }
+/* Swipeable Track */
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding: 6px 2px 14px 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
-@media (max-width: 480px) {
-  .casino-games-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
+.carousel-track::-webkit-scrollbar {
+  display: none;
 }
 
 /* Game Poster Card */
 .game-poster-card {
-  height: 225px;
+  flex: 0 0 155px;
+  height: 215px;
   border-radius: 14px;
   background: linear-gradient(180deg, #131b2e 0%, #0c1221 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   position: relative;
   cursor: pointer;
+  scroll-snap-align: start;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   user-select: none;
+}
+
+@media (min-width: 600px) {
+  .game-poster-card {
+    flex: 0 0 170px;
+    height: 230px;
+  }
+}
+
+@media (min-width: 992px) {
+  .game-poster-card {
+    flex: 0 0 185px;
+    height: 245px;
+  }
 }
 
 .game-poster-card:hover {
@@ -4312,6 +4358,48 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Carousel Dots & Indicator */
+.carousel-dots-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.carousel-dot.active {
+  width: 22px;
+  background: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+}
+
+.carousel-swipe-hint {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 4px;
+  margin-bottom: 14px;
+  letter-spacing: 0.3px;
+}
+
+.carousel-swipe-hint svg {
+  opacity: 0.7;
 }
 
 /* Bet Slip Slide-Over Panel */

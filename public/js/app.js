@@ -5666,6 +5666,14 @@ class AppController {
       const targetHtp = document.getElementById('howToPlay_' + gameType) || document.getElementById('howToPlay' + gameType.charAt(0).toUpperCase() + gameType.slice(1));
       if (targetHtp) targetHtp.style.display = 'block';
     } catch(e) {}
+
+    // Update active highlight on carousel game cards
+    try {
+      document.querySelectorAll('.game-poster-card').forEach(card => {
+        const matches = (card.getAttribute('data-game') === gameType);
+        card.classList.toggle('active', matches);
+      });
+    } catch(e) {}
     } finally {
       this._switchingGame = false;
     }
@@ -8867,11 +8875,11 @@ class AppController {
 
   // Modern VIP Casino Category Filter & Live Search
   filterCasinoCategory(category, activeBtn) {
-    const navButtons = document.querySelectorAll('.casino-category-btn');
+    const navButtons = document.querySelectorAll('.casino-cat-btn, .casino-category-btn');
     navButtons.forEach(btn => btn.classList.remove('active'));
     if (activeBtn) activeBtn.classList.add('active');
 
-    const cards = document.querySelectorAll('#casinoGamesGrid .game-poster-card');
+    const cards = document.querySelectorAll('.game-poster-card');
     cards.forEach(card => {
       const cardCategory = card.getAttribute('data-category') || '';
       if (category === 'all' || cardCategory.includes(category)) {
@@ -8884,10 +8892,10 @@ class AppController {
 
   searchCasinoGames(query) {
     const q = (query || '').toLowerCase().trim();
-    const cards = document.querySelectorAll('#casinoGamesGrid .game-poster-card');
+    const cards = document.querySelectorAll('.game-poster-card');
     cards.forEach(card => {
-      const title = (card.querySelector('.game-poster-title')?.textContent || '').toLowerCase();
-      const cat = (card.querySelector('.game-poster-cat')?.textContent || '').toLowerCase();
+      const title = (card.querySelector('.game-poster-name, .game-poster-title')?.textContent || '').toLowerCase();
+      const cat = (card.querySelector('.game-poster-provider, .game-poster-cat')?.textContent || '').toLowerCase();
       const gameAttr = (card.getAttribute('data-game') || '').toLowerCase();
       if (!q || title.includes(q) || cat.includes(q) || gameAttr.includes(q)) {
         card.style.display = 'flex';
@@ -8895,6 +8903,25 @@ class AppController {
         card.style.display = 'none';
       }
     });
+  }
+
+  scrollCarousel(trackId, dir) {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    const scrollAmount = track.clientWidth * 0.75 * dir;
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+
+  jumpCarousel(trackId, idx) {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+    const cards = Array.from(track.querySelectorAll('.game-poster-card')).filter(c => c.style.display !== 'none');
+    if (cards.length > 0) {
+      const targetIdx = Math.min(Math.max(0, idx * 4), cards.length - 1);
+      cards[targetIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    }
+    const dots = document.querySelectorAll('#featuredCarouselDots .carousel-dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
   }
 
   // Bet Slip Slide-Over Drawer Methods
@@ -9174,3 +9201,12 @@ window.dealRouletteNow = function() {
   if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
   if (window.app && window.app.dealRouletteNow) window.app.dealRouletteNow();
 };
+window.scrollCarousel = function(trackId, dir) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.scrollCarousel) window.app.scrollCarousel(trackId, dir);
+};
+window.jumpCarousel = function(trackId, idx) {
+  if (!window.app && typeof initViewpointApp === 'function') initViewpointApp();
+  if (window.app && window.app.jumpCarousel) window.app.jumpCarousel(trackId, idx);
+};
+
