@@ -24,8 +24,9 @@ class CasinoWallet {
     this.upiSettings = this.loadUpiSettings();
     this.subscribers = [];
 
-    // Sync authoritative server balance on init
+    // Sync authoritative server balance on init & launch real-time sync
     this.syncServerBalance();
+    this.startRealtimeSync();
 
     // SEC-08: Cross-tab sync without trusting client-side balance
     window.addEventListener('storage', (e) => {
@@ -71,12 +72,7 @@ class CasinoWallet {
     if (!uid) return;
 
     try {
-      // Sync local balance to server so server is always up-to-date with local game results
-      if (this.balance !== undefined && !isNaN(this.balance)) {
-        this.syncBalanceToServer(this.balance);
-      }
-
-      // Try /api/wallet first (serverless), fallback to /api/user (Python backend)
+      // Fetch authoritative balance & pending status from server
       let res = await fetch(`${this.apiBaseUrl}/api/wallet?userId=${encodeURIComponent(uid)}&action=get_balance`, {
         headers: { 'X-User-Id': uid }
       }).catch(() => null);
@@ -90,11 +86,46 @@ class CasinoWallet {
         if (data && data.success) {
           const remoteBal = parseFloat(data.balance !== undefined ? data.balance : (data.user && data.user.balance));
           if (!isNaN(remoteBal)) {
-            const hasLocal = localStorage.getItem(this.activeUserId ? ('stake_balance_' + this.activeUserId) : 'stake_game_balance');
-            if (hasLocal === null && remoteBal > 0) {
-              this.balance = remoteBal;
+            // Authoritative server balance: if remote balance changed (e.g. approved deposit), update immediately!
+            if (Math.abs(this.balance - remoteBal) >= 0.01) {
+              const prevBal = this.balance;
+              this.balance = Math.max(0, Math.round(remoteBal * 100) / 100);
               this.saveLocalBalance();
               this.notify();
+              this.broadcastBalanceChange(this.balance);
+              if (this.balance > prevBal && window.soundEngine && window.soundEngine.playDeposit) {
+                window.soundEngine.playDeposit();
+              }
+            }
+          }
+
+          // Check if any of our pending deposits were approved on server
+          if (Array.isArray(data.deposits) && this.pendingDeposits.length > 0) {
+            let updatedAny = false;
+            for (const serverDep of data.deposits) {
+              const pIdx = this.pendingDeposits.findIndex(p => p.id === serverDep.id);
+              if (pIdx !== -1 && (serverDep.status === 'SUCCESS' || serverDep.status === 'APPROVED')) {
+                const approvedDep = this.pendingDeposits.splice(pIdx, 1)[0];
+                approvedDep.status = 'SUCCESS';
+                const finalAmt = serverDep.approvedAmount || serverDep.amount || approvedDep.amount;
+                approvedDep.amount = finalAmt;
+                this.depositHistory.unshift(approvedDep);
+                updatedAny = true;
+
+                if (window.app && window.app.showNotification) {
+                  window.app.showNotification(`🎉 Payment Approved! +${this.currency}${finalAmt.toFixed(2)} added to balance.`, "success");
+                }
+              }
+            }
+            if (updatedAny) {
+              this.savePendingDeposits();
+              this.saveDepositHistory();
+              if (window.app && window.app.renderDepositHistoryTable) {
+                window.app.renderDepositHistoryTable();
+              }
+              if (window.app && window.app.renderAdminPendingDeposits) {
+                window.app.renderAdminPendingDeposits();
+              }
             }
           }
         }
@@ -102,6 +133,45 @@ class CasinoWallet {
     } catch (e) {
       // Offline fallback
     }
+  }
+
+  startRealtimeSync() {
+    if (this._realtimeSyncStarted) return;
+    this._realtimeSyncStarted = true;
+
+    // Cross-tab broadcast channel
+    try {
+      if (typeof window !== 'undefined' && window.BroadcastChannel) {
+        this._walletChannel = new BroadcastChannel('viewpoint_wallet_sync');
+        this._walletChannel.onmessage = (event) => {
+          if (event.data && typeof event.data.balance === 'number') {
+            if (Math.abs(this.balance - event.data.balance) >= 0.01) {
+              this.balance = event.data.balance;
+              this.saveLocalBalance();
+              this.notify();
+            }
+          }
+        };
+      }
+    } catch(e) {}
+
+    // Adaptive polling loop
+    const pollTick = async () => {
+      await this.syncServerBalance();
+      // Fast polling (3.5s) while pending deposits exist; slower (12s) when idle
+      const nextDelay = (this.pendingDeposits && this.pendingDeposits.length > 0) ? 3500 : 12000;
+      this._realtimeTimeout = setTimeout(pollTick, nextDelay);
+    };
+
+    this._realtimeTimeout = setTimeout(pollTick, 2500);
+  }
+
+  broadcastBalanceChange(bal) {
+    try {
+      if (this._walletChannel) {
+        this._walletChannel.postMessage({ balance: bal, userId: this.activeUserId, timestamp: Date.now() });
+      }
+    } catch(e) {}
   }
 
   async syncBalanceToServer(bal) {
@@ -463,7 +533,7 @@ class CasinoWallet {
   }
 
   // Admin / Server Approves Deposit and credits funds to wallet
-  approveDeposit(depositId, amountOverride = null, userId = null) {
+  approveDeposit(depositId, amountOverride = null, userId = null, isLocalUser = false) {
     let deposit = null;
     const pIdx = this.pendingDeposits.findIndex(d => d.id === depositId);
     if (pIdx !== -1) {
@@ -488,8 +558,12 @@ class CasinoWallet {
     deposit.approvedAt = new Date().toISOString();
     deposit.amount = credAmount;
 
-    // Credit player balance
-    this.addWin(credAmount);
+    // Credit player balance ONLY if this deposit belongs to the currently active user on this device
+    const targetUserId = userId || deposit.userId;
+    if (isLocalUser || (targetUserId && String(targetUserId) === String(this.activeUserId))) {
+      this.addWin(credAmount);
+      this.recordFinancialTransaction('deposit', credAmount);
+    }
 
     // Save to deposit history if not already present
     const hIdx = this.depositHistory.findIndex(d => d.id === depositId);
@@ -500,21 +574,19 @@ class CasinoWallet {
     }
     this.saveDepositHistory();
 
-    // Record to financial ledger
-    this.recordFinancialTransaction('deposit', credAmount);
-
-    // Sync approval to server in background
+    // Sync approval to server in background (authoritative source of truth)
     try {
+      const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
       fetch(`${this.apiBaseUrl}/api/admin/approve_deposit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ deposit_id: depositId, amount: credAmount, userId: userId || deposit.userId })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+        body: JSON.stringify({ deposit_id: depositId, amount: credAmount, userId: targetUserId, secret: adminToken })
       }).catch(() => {});
 
       fetch(`${this.apiBaseUrl}/api/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approve_dep', id: depositId, amt: credAmount, userId: userId || deposit.userId })
+        body: JSON.stringify({ action: 'approve_dep', id: depositId, amt: credAmount, userId: targetUserId, secret: adminToken, source: 'admin_panel' })
       }).catch(() => {});
     } catch(e) {}
 

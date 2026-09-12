@@ -4,6 +4,7 @@ Stores users, persistent balances, referrals, deposits, withdrawals, and bet log
 """
 import sqlite3
 import datetime
+import uuid
 from pathlib import Path
 from config import DB_PATH, DAILY_BONUS_AMOUNT, REFERRAL_BONUS_AMOUNT
 
@@ -89,6 +90,22 @@ class Database:
                     attempts INTEGER DEFAULT 0
                 )
             """)
+
+            # Immutable Financial Wallet Ledger for Approvals (Single Source of Truth)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS wallet_ledger (
+                    id TEXT PRIMARY KEY,
+                    payment_id TEXT UNIQUE,
+                    user_id TEXT,
+                    requested_amount REAL,
+                    approved_amount REAL,
+                    credited_amount REAL,
+                    approval_source TEXT,
+                    created_at TEXT,
+                    status TEXT
+                )
+            """)
+            cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_ledger_payment_id ON wallet_ledger(payment_id);")
 
             # Bet logs table
             cursor.execute("""
@@ -344,23 +361,84 @@ class Database:
             row = cursor.fetchone()
             return dict(row) if row else None
 
-    def approve_deposit(self, deposit_id):
+    def approve_deposit(self, deposit_id, amount_override=None, source='admin'):
+        """Centralized Atomic Deposit Approval: Exactly approved_amount credited, idempotent, zero duplicate credit"""
         now = datetime.datetime.utcnow().isoformat()
+        ledger_id = f"LEDGER-{uuid.uuid4().hex[:12].upper()}"
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM deposits WHERE id = ? AND status = 'PENDING'", (deposit_id,))
+
+            # 1. Check if already credited in immutable ledger
+            cursor.execute("SELECT * FROM wallet_ledger WHERE payment_id = ?", (deposit_id,))
+            existing_ledger = cursor.fetchone()
+            if existing_ledger:
+                return False, "ALREADY_PROCESSED: This payment was already credited and recorded in ledger."
+
+            # 2. Fetch pending deposit record
+            cursor.execute("SELECT * FROM deposits WHERE id = ?", (deposit_id,))
             dep = cursor.fetchone()
             if not dep:
-                return False, "Deposit request not found or already processed"
+                return False, "NOT_FOUND: Deposit request not found."
+            if dep['status'] != 'PENDING':
+                return False, f"ALREADY_PROCESSED: Deposit is already {dep['status']}."
 
-            cursor.execute("UPDATE deposits SET status = 'APPROVED', updated_at = ? WHERE id = ?", (now, deposit_id))
+            # 3. Determine single source of truth for approved amount (Integer/Cent Precision)
+            requested_amount = round(float(dep['amount'] or 0), 2)
+            if amount_override is not None:
+                try:
+                    approved_amount = round(float(amount_override), 2)
+                except (ValueError, TypeError):
+                    approved_amount = requested_amount
+            else:
+                approved_amount = requested_amount
+
+            # Strict guard: Must be positive real amount
+            if approved_amount <= 0:
+                return False, "INVALID_AMOUNT: Approved amount must be greater than 0."
+
+            credited_amount = approved_amount
+            user_id = str(dep['telegram_id'])
+
+            # 4. Atomic Database Execution
+            # Update deposit status & approved amount
+            cursor.execute(
+                "UPDATE deposits SET status = 'APPROVED', amount = ?, updated_at = ? WHERE id = ? AND status = 'PENDING'",
+                (approved_amount, now, deposit_id)
+            )
+            if cursor.rowcount == 0:
+                return False, "CONCURRENCY_ERROR: Deposit was modified concurrently by another admin/session."
+
+            # Credit user balance
             cursor.execute("""
                 UPDATE users 
-                SET balance = balance + ?, total_deposited = total_deposited + ? 
+                SET balance = ROUND(balance + ?, 2), total_deposited = ROUND(total_deposited + ?, 2) 
                 WHERE telegram_id = ?
-            """, (dep['amount'], dep['amount'], dep['telegram_id']))
+            """, (credited_amount, credited_amount, dep['telegram_id']))
+
+            # Record in immutable ledger
+            cursor.execute("""
+                INSERT INTO wallet_ledger (id, payment_id, user_id, requested_amount, approved_amount, credited_amount, approval_source, created_at, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'SUCCESS')
+            """, (ledger_id, deposit_id, user_id, requested_amount, approved_amount, credited_amount, source, now))
+
+            # Fetch authoritative updated balance
+            cursor.execute("SELECT balance FROM users WHERE telegram_id = ?", (dep['telegram_id'],))
+            user_row = cursor.fetchone()
+            new_balance = user_row['balance'] if user_row else 0.0
+
             conn.commit()
-            return True, dep
+            return True, {
+                "id": deposit_id,
+                "telegram_id": dep['telegram_id'],
+                "user_id": user_id,
+                "requested_amount": requested_amount,
+                "amount": approved_amount,
+                "approved_amount": approved_amount,
+                "credited_amount": credited_amount,
+                "new_balance": new_balance,
+                "ledger_id": ledger_id,
+                "source": source
+            }
 
     def reject_deposit(self, deposit_id):
         now = datetime.datetime.utcnow().isoformat()

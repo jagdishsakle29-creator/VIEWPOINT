@@ -610,7 +610,7 @@ async def callback_query_handler(update: Update, context: ContextTypes.DEFAULT_T
             await query.answer("❌ Unauthorized administrator access.", show_alert=True)
             return
         dep_id = data.replace("adm_app_DEP_", "").replace("appr_dep_", "")
-        success, dep = db.approve_deposit(dep_id)
+        success, dep = db.approve_deposit(dep_id, source="telegram_async")
         if success:
             await query.answer("✅ Deposit Approved & Credited!", show_alert=True)
             await query.edit_message_text(f"✅ Approved Deposit `{dep_id}`! Credited ₹{dep['amount']:.2f} to user `{dep['telegram_id']}`.", parse_mode="Markdown")

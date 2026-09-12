@@ -196,25 +196,73 @@ class DevServerHandler(SimpleHTTPRequestHandler):
             elif action in ['approve_dep', 'admin_approve_deposit', 'approve_deposit']:
                 dep_id = body.get('id') or body.get('deposit_id')
                 amt_override = body.get('amount') or body.get('amt')
+                state.setdefault("ledger", {})
+                if dep_id and dep_id in state["ledger"]:
+                    return self._send_json({
+                        "success": False,
+                        "alreadyProcessed": True,
+                        "error": "ALREADY_PROCESSED: This payment was already credited and recorded in ledger."
+                    })
+
                 dep_found = None
                 for d in state.get("deposits", []):
                     if d.get("id") == dep_id:
                         dep_found = d
                         break
-                dep_amount = float(amt_override if amt_override is not None else (dep_found.get('amount', 0) if dep_found else 0))
-                if dep_found:
-                    dep_found['status'] = 'APPROVED'
-                    dep_found['amount'] = dep_amount
+
+                if dep_found and dep_found.get('status') == 'APPROVED':
+                    return self._send_json({
+                        "success": False,
+                        "alreadyProcessed": True,
+                        "error": "ALREADY_PROCESSED: Deposit is already marked as APPROVED."
+                    })
+
+                req_amount = round(float(dep_found.get('amount', 0) if dep_found else 0), 2)
+                try:
+                    dep_amount = round(float(amt_override if amt_override is not None else req_amount), 2)
+                except (ValueError, TypeError):
+                    dep_amount = req_amount
+
+                if dep_amount <= 0:
+                    return self._send_json({
+                        "success": False,
+                        "error": "INVALID_AMOUNT: Approved amount must be greater than 0."
+                    })
+
                 target_uid = (dep_found.get('userId') if dep_found else None) or body.get('userId') or uid
                 if target_uid not in state["wallets"]:
                     state["wallets"][target_uid] = {"userId": target_uid, "balance": 0.0, "currency": "₹"}
                 target_wallet = state["wallets"][target_uid]
                 target_wallet['balance'] = round(target_wallet.get('balance', 0) + dep_amount, 2)
+
+                if dep_found:
+                    dep_found['status'] = 'APPROVED'
+                    dep_found['requestedAmount'] = req_amount
+                    dep_found['approvedAmount'] = dep_amount
+                    dep_found['creditedAmount'] = dep_amount
+                    dep_found['amount'] = dep_amount
+
+                ledger_rec = {
+                    "id": f"LEDGER-{os.urandom(6).hex().upper()}",
+                    "paymentId": dep_id,
+                    "userId": target_uid,
+                    "requestedAmount": req_amount,
+                    "approvedAmount": dep_amount,
+                    "creditedAmount": dep_amount,
+                    "source": body.get("source", "admin"),
+                    "createdAt": time.time(),
+                    "status": "SUCCESS"
+                }
+                if dep_id:
+                    state["ledger"][dep_id] = ledger_rec
                 save_dev_state(state)
                 return self._send_json({
                     "success": True,
                     "message": "Deposit approved and credited",
-                    "balance": target_wallet['balance']
+                    "approved_amount": dep_amount,
+                    "credited_amount": dep_amount,
+                    "balance": target_wallet['balance'],
+                    "ledger": ledger_rec
                 })
             elif action in ['reject_dep', 'admin_reject_deposit', 'reject_deposit']:
                 dep_id = body.get('id') or body.get('deposit_id')

@@ -1109,10 +1109,17 @@ class GameAPIHandler(BaseHTTPRequestHandler):
                 return
 
             if parsed.path == "/api/admin/approve_deposit":
-                deposit_id = body.get("deposit_id")
-                success, res = db.approve_deposit(deposit_id)
-                if success: self._json_response({"success": True, "message": "Deposit approved and user credited."})
-                else: self._error_response(str(res))
+                deposit_id = body.get("deposit_id") or body.get("id")
+                amount = body.get("amount") or body.get("amt")
+                success, res = db.approve_deposit(deposit_id, amount_override=amount, source="admin_panel")
+                if success:
+                    self._json_response({
+                        "success": True,
+                        "message": "Deposit approved and user credited.",
+                        "data": res
+                    })
+                else:
+                    self._error_response(str(res))
                 return
 
             elif parsed.path == "/api/admin/reject_deposit":

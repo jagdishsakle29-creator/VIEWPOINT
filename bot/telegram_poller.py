@@ -196,24 +196,135 @@ def handle_callback(cb):
         handle_start(from_user, chat_id, "")
 
     elif data.startswith("app_dep_"):
+        if chat_id not in ADMIN_IDS:
+            answer_callback_query(cb_id, "❌ Unauthorized admin access.", show_alert=True)
+            return
+
         dep_id = data.replace("app_dep_", "")
-        answer_callback_query(cb_id, "✅ Deposit Approved!", show_alert=True)
-        edit_message_text(chat_id, msg_id, f"✅ <b>Deposit Approved!</b>\nID: <code>{dep_id}</code>\nStatus: Credited to user.")
+        if db:
+            success, dep_data = db.approve_deposit(dep_id, source="telegram")
+            if success:
+                # Sync with WebApp Serverless Store
+                try:
+                    sync_payload = {
+                        "action": "approve_dep",
+                        "id": dep_id,
+                        "amt": dep_data["approved_amount"],
+                        "userId": str(dep_data["user_id"]),
+                        "source": "telegram",
+                        "secret": "VIEWPOINT_ADMIN_SECRET_2026"
+                    }
+                    for sync_url in [f"{WEBAPP_URL}/api/sync", "http://localhost:8000/api/sync"]:
+                        try:
+                            req = urllib.request.Request(
+                                sync_url,
+                                data=json.dumps(sync_payload).encode("utf-8"),
+                                headers={"Content-Type": "application/json"}
+                            )
+                            urllib.request.urlopen(req, timeout=3)
+                            break
+                        except Exception:
+                            continue
+                except Exception:
+                    pass
+
+                answer_callback_query(cb_id, f"✅ Approved! Credited ₹{dep_data['approved_amount']:.2f}", show_alert=True)
+                edit_message_text(
+                    chat_id, msg_id,
+                    f"✅ <b>DEPOSIT APPROVED & CREDITED!</b>\n\n"
+                    f"💰 <b>Approved & Credited:</b> <b>₹{dep_data['approved_amount']:,.2f}</b>\n"
+                    f"👤 <b>Player ID:</b> <code>{dep_data['user_id']}</code>\n"
+                    f"💳 <b>Updated Balance:</b> <b>₹{dep_data['new_balance']:,.2f}</b>\n"
+                    f"🆔 <b>Deposit ID:</b> <code>{dep_id}</code>\n"
+                    f"🧾 <b>Ledger Ref:</b> <code>{dep_data['ledger_id']}</code>\n"
+                    f"⚡ <b>Source:</b> Telegram 1-Click"
+                )
+
+                # Notify player on Telegram if telegram_id is numeric
+                try:
+                    target_tid = int(dep_data['telegram_id'])
+                    send_message(
+                        target_tid,
+                        f"🎉 <b>DEPOSIT APPROVED & CREDITED!</b>\n\n"
+                        f"₹{dep_data['approved_amount']:,.2f} has been added to your VIEWPOINT wallet.\n"
+                        f"Current Balance: <b>₹{dep_data['new_balance']:,.2f}</b>\n\nPlay now!",
+                        {"inline_keyboard": [[{"text": "🎮 Open VIEWPOINT Casino", "web_app": {"url": WEBAPP_URL}}]]}
+                    )
+                except Exception:
+                    pass
+            else:
+                answer_callback_query(cb_id, f"⚠️ {dep_data}", show_alert=True)
+                edit_message_text(chat_id, msg_id, f"⚠️ <b>Deposit Notice:</b>\n{dep_data}\nDeposit ID: <code>{dep_id}</code>")
+        else:
+            answer_callback_query(cb_id, "⚠️ Database engine offline.", show_alert=True)
 
     elif data.startswith("rej_dep_"):
+        if chat_id not in ADMIN_IDS:
+            answer_callback_query(cb_id, "❌ Unauthorized admin access.", show_alert=True)
+            return
+
         dep_id = data.replace("rej_dep_", "")
-        answer_callback_query(cb_id, "❌ Deposit Rejected", show_alert=True)
-        edit_message_text(chat_id, msg_id, f"❌ <b>Deposit Rejected</b>\nID: <code>{dep_id}</code>")
+        if db:
+            success, dep_data = db.reject_deposit(dep_id)
+            if success:
+                try:
+                    sync_payload = {
+                        "action": "reject_dep",
+                        "id": dep_id,
+                        "source": "telegram",
+                        "secret": "VIEWPOINT_ADMIN_SECRET_2026"
+                    }
+                    for sync_url in [f"{WEBAPP_URL}/api/sync", "http://localhost:8000/api/sync"]:
+                        try:
+                            req = urllib.request.Request(
+                                sync_url,
+                                data=json.dumps(sync_payload).encode("utf-8"),
+                                headers={"Content-Type": "application/json"}
+                            )
+                            urllib.request.urlopen(req, timeout=3)
+                            break
+                        except Exception:
+                            continue
+                except Exception:
+                    pass
+
+                answer_callback_query(cb_id, "❌ Deposit Rejected", show_alert=True)
+                edit_message_text(chat_id, msg_id, f"❌ <b>Deposit Rejected</b>\nDeposit ID: <code>{dep_id}</code>\nStatus: REJECTED (₹0.00 added)")
+            else:
+                answer_callback_query(cb_id, f"⚠️ {dep_data}", show_alert=True)
+                edit_message_text(chat_id, msg_id, f"⚠️ <b>Deposit Notice:</b>\n{dep_data}")
+        else:
+            answer_callback_query(cb_id, "⚠️ Database engine offline.", show_alert=True)
 
     elif data.startswith("app_wth_"):
+        if chat_id not in ADMIN_IDS:
+            answer_callback_query(cb_id, "❌ Unauthorized", show_alert=True)
+            return
         wth_id = data.replace("app_wth_", "")
-        answer_callback_query(cb_id, "✅ Withdrawal Approved & Sent!", show_alert=True)
-        edit_message_text(chat_id, msg_id, f"✅ <b>Withdrawal Approved!</b>\nID: <code>{wth_id}</code>\nStatus: Payout dispatched.")
+        if db:
+            success, wth_data = db.approve_withdrawal(wth_id)
+            if success:
+                answer_callback_query(cb_id, "✅ Withdrawal Approved & Sent!", show_alert=True)
+                edit_message_text(chat_id, msg_id, f"✅ <b>Withdrawal Approved!</b>\nID: <code>{wth_id}</code>\nStatus: Payout dispatched.")
+            else:
+                answer_callback_query(cb_id, f"⚠️ {wth_data}", show_alert=True)
+        else:
+            answer_callback_query(cb_id, "✅ Withdrawal Approved", show_alert=True)
 
     elif data.startswith("rej_wth_"):
+        if chat_id not in ADMIN_IDS:
+            answer_callback_query(cb_id, "❌ Unauthorized", show_alert=True)
+            return
         wth_id = data.replace("rej_wth_", "")
-        answer_callback_query(cb_id, "❌ Withdrawal Rejected", show_alert=True)
-        edit_message_text(chat_id, msg_id, f"❌ <b>Withdrawal Rejected</b>\nID: <code>{wth_id}</code>\nStatus: Refunded to wallet.")
+        if db:
+            success, wth_data = db.reject_withdrawal(wth_id)
+            if success:
+                answer_callback_query(cb_id, "❌ Withdrawal Rejected & Refunded", show_alert=True)
+                edit_message_text(chat_id, msg_id, f"❌ <b>Withdrawal Rejected</b>\nID: <code>{wth_id}</code>\nStatus: Refunded to wallet.")
+            else:
+                answer_callback_query(cb_id, f"⚠️ {wth_data}", show_alert=True)
+        else:
+            answer_callback_query(cb_id, "❌ Withdrawal Rejected", show_alert=True)
 
 import threading
 
@@ -330,13 +441,58 @@ def run_bot_polling():
                                 f"⏳ <b>Validity:</b> 1-Day Single Use\n\n"
                                 f"👉 Send this code to player. It can only be redeemed 1 time!"
                             )
+                        elif text.startswith("/approve") and chat_id in ADMIN_IDS:
+                            # /approve <deposit_id> [amount] (e.g. /approve DEP-12345 2000)
+                            parts = text.split()
+                            if len(parts) < 2:
+                                send_message(chat_id, "⚠️ Usage: <code>/approve &lt;deposit_id&gt; [amount]</code>\nExample: <code>/approve DEP-123 2000</code>")
+                            else:
+                                dep_id = parts[1].strip()
+                                custom_amt = None
+                                if len(parts) >= 3:
+                                    try:
+                                        custom_amt = round(float(parts[2]), 2)
+                                    except ValueError:
+                                        pass
+                                if db:
+                                    success, dep_data = db.approve_deposit(dep_id, amount_override=custom_amt, source="telegram_cmd")
+                                    if success:
+                                        send_message(
+                                            chat_id,
+                                            f"✅ <b>DEPOSIT APPROVED & CREDITED!</b>\n\n"
+                                            f"💰 <b>Approved & Credited:</b> <b>₹{dep_data['approved_amount']:,.2f}</b>\n"
+                                            f"👤 <b>Player ID:</b> <code>{dep_data['user_id']}</code>\n"
+                                            f"💳 <b>Updated Balance:</b> <b>₹{dep_data['new_balance']:,.2f}</b>\n"
+                                            f"🆔 <b>Deposit ID:</b> <code>{dep_id}</code>\n"
+                                            f"🧾 <b>Ledger Ref:</b> <code>{dep_data['ledger_id']}</code>"
+                                        )
+                                    else:
+                                        send_message(chat_id, f"⚠️ Failed to approve: {dep_data}")
+                                else:
+                                    send_message(chat_id, "⚠️ Database offline.")
+
+                        elif text.startswith("/reject") and chat_id in ADMIN_IDS:
+                            parts = text.split()
+                            if len(parts) < 2:
+                                send_message(chat_id, "⚠️ Usage: <code>/reject &lt;deposit_id&gt;</code>")
+                            else:
+                                dep_id = parts[1].strip()
+                                if db:
+                                    success, dep_data = db.reject_deposit(dep_id)
+                                    if success:
+                                        send_message(chat_id, f"❌ Deposit <code>{dep_id}</code> marked as REJECTED.")
+                                    else:
+                                        send_message(chat_id, f"⚠️ Failed: {dep_data}")
+
                         elif text.startswith("/help"):
                             send_message(
                                 chat_id,
                                 "📖 <b>VIEWPOINT BOT COMMANDS</b>\n\n"
                                 "/start - Open main menu & Play WebApp\n"
                                 "/play - Launch casino instant webapp\n"
-                                "/gencode &lt;amt&gt; - Admin: Generate 1-time promo code (e.g. /gencode 500)"
+                                "/gencode &lt;amt&gt; - Admin: Generate 1-time promo code\n"
+                                "/approve &lt;dep_id&gt; [amt] - Admin: Approve deposit with exact amount\n"
+                                "/reject &lt;dep_id&gt; - Admin: Reject deposit"
                             )
                     
                     elif "callback_query" in update:

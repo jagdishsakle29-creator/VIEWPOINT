@@ -1784,8 +1784,11 @@ class AppController {
           <span class="pending-dep-time">Time: ${item.time} • Order: ${item.id} • Player: ${item.userId || 'Player'}</span>
         </div>
         <div class="pending-dep-actions">
-          <button class="btn-approve-dep" onclick="window.app.handleAdminApprove('${item.id}')">
-            ✅ Approve
+          <button class="btn-approve-dep" onclick="window.app.handleAdminApprove('${item.id}', ${item.amount})">
+            ✅ Approve (+${window.wallet.currency}${item.amount.toFixed(0)})
+          </button>
+          <button class="btn-approve-dep" style="background: rgba(0,229,255,0.15); border: 1px solid #00e5ff; color: #00e5ff; padding: 0 10px;" onclick="window.app.handleAdminApproveCustom('${item.id}', ${item.amount})" title="Edit approved amount">
+            ✏️ Edit Amt
           </button>
           <button class="btn-reject-dep" onclick="window.app.handleAdminReject('${item.id}')">
             ❌ Reject
@@ -1842,28 +1845,52 @@ class AppController {
     }).join('');
   }
 
-  async handleAdminApprove(depositId) {
-    window.soundEngine.playDeposit();
-    const approved = window.wallet.approveDeposit(depositId);
+  async handleAdminApprove(depositId, amountOverride = null) {
+    const item = (window.wallet.pendingDeposits || []).find(d => d.id === depositId);
+    let finalAmt = amountOverride !== null ? parseFloat(amountOverride) : (item ? parseFloat(item.amount) : 0);
+    finalAmt = Math.max(0, Math.round(finalAmt * 100) / 100);
+    if (finalAmt <= 0) {
+      this.showNotification("❌ Approved amount must be greater than ₹0", "error");
+      return;
+    }
+
     const apiBase = window.wallet ? window.wallet.apiBaseUrl : window.location.origin;
     const adminToken = sessionStorage.getItem('viewpoint_admin_token') || localStorage.getItem('viewpoint_admin_token') || 'VIEWPOINT_ADMIN_SECRET_2026';
+    const targetUid = item ? item.userId : '';
 
-    // Dispatch to server backend
+    // Optimistically update wallet pending list (does NOT credit admin's balance if target is a different player)
+    const approved = window.wallet.approveDeposit(depositId, finalAmt, targetUid);
+
+    // Dispatch to centralized server backend
     try {
-      fetch(`${apiBase}/api/admin/approve_deposit`, {
+      await fetch(`${apiBase}/api/admin/approve_deposit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
-        body: JSON.stringify({ deposit_id: depositId, secret: adminToken })
+        body: JSON.stringify({ deposit_id: depositId, amount: finalAmt, userId: targetUid, secret: adminToken })
       }).catch(() => {});
-      fetch(`${apiBase}/api/sync?action=approve_dep&id=${encodeURIComponent(depositId)}&secret=${encodeURIComponent(adminToken)}`).catch(() => {});
+
+      await fetch(`${apiBase}/api/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve_dep', id: depositId, amt: finalAmt, userId: targetUid, secret: adminToken, source: 'admin_panel' })
+      }).catch(() => {});
     } catch(e) {}
 
-    if (approved) {
-      this.renderAdminPendingDeposits();
-      this.renderDepositHistoryTable();
-      this.renderHistoryTable();
-      this.showNotification(`🎉 Approved deposit of ${window.wallet.currency}${approved.amount.toFixed(2)} (UTR: ${approved.utr})! Added to player wallet.`, "success");
+    window.soundEngine && window.soundEngine.playDeposit && window.soundEngine.playDeposit();
+    this.renderAdminPendingDeposits();
+    this.renderDepositHistoryTable();
+    this.showNotification(`🎉 Approved deposit: Exactly ${window.wallet.currency}${finalAmt.toFixed(2)} credited to player!`, "success");
+  }
+
+  async handleAdminApproveCustom(depositId, currentAmt) {
+    const input = prompt(`Enter exact approved amount to credit for deposit ${depositId}:`, currentAmt);
+    if (input === null) return;
+    const num = parseFloat(input);
+    if (isNaN(num) || num <= 0) {
+      this.showNotification("❌ Invalid amount entered. Must be greater than 0.", "error");
+      return;
     }
+    await this.handleAdminApprove(depositId, num);
   }
 
   async handleAdminReject(depositId) {

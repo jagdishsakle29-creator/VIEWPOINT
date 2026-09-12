@@ -51,15 +51,41 @@ module.exports = async function handler(req, res) {
   // 1. GET BALANCE
   if ((req.method === 'GET' && !action) || action === 'get_balance') {
     const wallet = getWallet(userId);
+    const storeObj = store.loadStore ? store.loadStore() : {};
+    const userDeposits = Object.values(storeObj.deposits || {}).filter(d => String(d.userId) === String(userId));
     return res.status(200).json({
       success: true,
       userId: wallet.userId,
       balance: wallet.balance,
-      currency: wallet.currency
+      currency: wallet.currency,
+      deposits: userDeposits.slice(-10),
+      updatedAt: wallet.updatedAt || Date.now()
     });
   }
 
-  // 1.1 UPDATE / SYNC BALANCE
+  // 1.1 ADMIN APPROVE DEPOSIT
+  if (action === 'approve_deposit' || action === 'admin_approve_deposit') {
+    if (!isAdmin(req, params)) {
+      return res.status(403).json({ success: false, error: 'Unauthorized: Admin authorization required' });
+    }
+    const depId = params.deposit_id || params.id;
+    const amt = params.amount !== undefined ? params.amount : params.amt;
+    const targetUid = params.userId || params.user_id;
+    const result = store.approveDeposit(depId, amt, targetUid, 'admin_panel');
+    return res.status(200).json(result);
+  }
+
+  // 1.2 ADMIN REJECT DEPOSIT
+  if (action === 'reject_deposit' || action === 'admin_reject_deposit') {
+    if (!isAdmin(req, params)) {
+      return res.status(403).json({ success: false, error: 'Unauthorized: Admin authorization required' });
+    }
+    const depId = params.deposit_id || params.id;
+    const result = store.rejectDeposit(depId);
+    return res.status(200).json(result);
+  }
+
+  // 1.3 UPDATE / SYNC BALANCE (Server-side validation)
   if (action === 'update_balance' || action === 'sync_balance' || action === 'set_balance') {
     const bal = parseFloat(params.balance !== undefined ? params.balance : 0);
     const wallet = store.setWalletBalance(userId, bal);
