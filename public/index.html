@@ -914,570 +914,7 @@
       </button>
     </div>
 
-    <!-- Featured Gaming Showcase (Left Main Banners + Right Area Real Game Cards) -->
-    <section class="lobby-showcase-grid" id="lobbyShowcaseGrid">
-      <!-- Left / Main Area: Featured Banners -->
-      <div class="lobby-main-banners">
-        <!-- Cricket Bet Featured Hero Banner -->
-        <div class="cricket-hero-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Play Real Cricket Bet">
-          <div class="cricket-hero-badge">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block;"></span>
-            LIVE MATCHES
-          </div>
-          <div class="cricket-hero-title">CRICKET BET</div>
-          <div class="cricket-hero-sub">ICC T20 World Cup Final • India vs Australia • Live Ball Tracker & Instant Odds</div>
-          <button type="button" class="cricket-hero-btn" onclick="event.stopPropagation(); window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
-            ⚡ VIEW MATCHES / PLAY NOW
-          </button>
-        </div>
-
-        <!-- Secondary Hero Banners Row -->
-        <div class="secondary-hero-row">
-          <div class="secondary-hero-card olympus" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Gates of Olympus">
-            <div style="font-size: 10px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">PRAGMATIC PLAY</div>
-            <div class="secondary-hero-title">Gates of Olympus</div>
-            <div class="secondary-hero-sub">Multipliers up to 5,000x</div>
-          </div>
-          <div class="secondary-hero-card odins" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))" title="Play Odin's Vault">
-            <div style="font-size: 10px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">VALKYRIE EXCLUSIVE</div>
-            <div class="secondary-hero-title">Odin's Vault</div>
-            <div class="secondary-hero-sub">Tower Climb & Golden Chests</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right Area: Additional Real Game Cards -->
-      <div class="lobby-side-cards">
-        <!-- 1. Cricket Bet Card -->
-        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Cricket Bet">
-          <div class="side-game-left">
-            <div class="side-game-thumb" style="background-image: url('images/cricket_sports.jpg');"></div>
-            <div class="side-game-info">
-              <div class="side-game-title">Cricket Bet</div>
-              <div class="side-game-sub">IND 1.75 | AUS 2.15 • Live</div>
-            </div>
-          </div>
-          <button type="button" class="side-game-btn">BET NOW</button>
-        </div>
-
-        <!-- 2. Aviator Card -->
-        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" title="Aviator">
-          <div class="side-game-left">
-            <div class="side-game-thumb" style="background: radial-gradient(circle, #ef4444, #7f1d1d);">🚀</div>
-            <div class="side-game-info">
-              <div class="side-game-title">Aviator</div>
-              <div class="side-game-sub">Spribe • 100x Multiplier</div>
-            </div>
-          </div>
-          <button type="button" class="side-game-btn">FLY NOW</button>
-        </div>
-
-        <!-- 3. Dragon Tiger Card -->
-        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" title="Dragon Tiger">
-          <div class="side-game-left">
-            <div class="side-game-thumb" style="background: radial-gradient(circle, #f59e0b, #78350f);">🐉</div>
-            <div class="side-game-info">
-              <div class="side-game-title">Dragon Tiger</div>
-              <div class="side-game-sub">Live Studio Table • 2.0x</div>
-            </div>
-          </div>
-          <button type="button" class="side-game-btn">JOIN TABLE</button>
-        </div>
-
-        <!-- 4. Evolution Live Studio Card -->
-        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))" title="Evolution Live">
-          <div class="side-game-left">
-            <div class="side-game-thumb" style="background-image: url('images/live_dealer_studio.jpg');"></div>
-            <div class="side-game-info">
-              <div class="side-game-title">Evolution Live</div>
-              <div class="side-game-sub">VIP Live Roulette • 36x</div>
-            </div>
-          </div>
-          <button type="button" class="side-game-btn">PLAY LIVE</button>
-        </div>
-
-        <!-- 5. Viewpoint Originals Card -->
-        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Originals">
-          <div class="side-game-left">
-            <div class="side-game-thumb" style="background: radial-gradient(circle, #8b5cf6, #3b0764);">🎲</div>
-            <div class="side-game-info">
-              <div class="side-game-title">Originals</div>
-              <div class="side-game-sub">Mines & Limbo • 99% RTP</div>
-            </div>
-          </div>
-          <button type="button" class="side-game-btn">PLAY NOW</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Hidden Legacy Elements for 100% Backward Compatibility with test suite -->
-    <div class="game-pages-nav-bar" id="gamePagesNavBar" style="display: none !important;">
-      <button type="button" id="btnGamePage1" class="btn-game-page-pill active" onclick="window.switchGamePage ? window.switchGamePage(1) : (window.app && window.app.switchGamePage(1))"><span>⚡ PAGE 1</span></button>
-      <button type="button" id="btnGamePage2" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))"><span>🚀 PAGE 2</span></button>
-      <button type="button" id="btnGamePage3" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(3) : (window.app && window.app.switchGamePage(3))"><span>📈 PAGE 3</span></button>
-      <button type="button" id="btnGamePage4" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(4) : (window.app && window.app.switchGamePage(4))"><span>🔴 PAGE 4</span></button>
-    </div>
-
-    <div class="game-tabs-wrapper" style="display: none !important;">
-      <div id="gamePageGroup1" class="game-page-group" style="display: flex;">
-        <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))"><span>Mines</span></button>
-        <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))"><span>Dragon Tiger</span></button>
-        <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))"><span>Limbo</span></button>
-        <button id="tabPump" class="tab-btn" data-game="pump" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))"><span>Pump</span></button>
-      </div>
-      <div id="gamePageGroup2" class="game-page-group" style="display: none;">
-        <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))"><span>Chicken</span></button>
-        <button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))"><span>Plinko</span></button>
-        <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))"><span>Crash</span></button>
-        <button id="tabMoles" class="tab-btn" data-game="moles" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))"><span>Moles</span></button>
-      </div>
-      <div id="gamePageGroup3" class="game-page-group" style="display: none;">
-        <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))"><span>Dice</span></button>
-        <button id="tabTower" class="tab-btn" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))"><span>Tower</span></button>
-        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))"><span>Win Go</span></button>
-        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))"><span>Stock BTC</span></button>
-      </div>
-      <div id="gamePageGroup4" class="game-page-group" style="display: none;">
-        <button id="tabAviator" class="tab-btn" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))"><span>Aviator</span></button>
-        <button id="tabAndarBahar" class="tab-btn" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))"><span>Andar Bahar</span></button>
-        <button id="tabRoulette" class="tab-btn" data-game="roulette" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))"><span>Roulette</span></button>
-        <button id="tabLuckySpin" class="tab-btn" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);"><span>Spin & Win</span></button>
-      </div>
-    </div>
-
-    <!-- Featured Horizontal Swipeable Hero Game Carousel (All 15 Games Strictly ONCE) -->
-    <div class="casino-carousel-section" id="featuredCarouselSection">
-      <div class="carousel-header-row">
-        <h2 class="carousel-section-title">
-          <span style="font-size: 18px;">🔥</span>
-          <span>Featured Games</span>
-        </h2>
-        <div class="carousel-controls">
-          <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('featuredCarouselTrack', -1) : null" title="Previous Games">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-          <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('featuredCarouselTrack', 1) : null" title="Next Games">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="carousel-track" id="featuredCarouselTrack">
-        <!-- 1. Limbo Turbo Poster Card -->
-        <div class="game-poster-card" data-game="limbo" data-category="originals crash all" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #142825 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 3.0k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.5));">🎯⚡</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Limbo Turbo</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-
-        <!-- 2. Andar Bahar Poster Card -->
-        <div class="game-poster-card" data-game="andarbahar" data-category="live table popular all" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #331520 0%, #090d16 100%);">
-            <span class="game-poster-badge live">🔴 LIVE</span>
-            <span class="game-poster-players">⚡ 6.2k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(244, 63, 94, 0.5));">🃏👑</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Andar Bahar</div>
-            <div class="game-poster-provider">View Point Live</div>
-          </div>
-        </div>
-
-        <!-- 3. Win Go 30s Poster Card -->
-        <div class="game-poster-card" data-game="colortrading" data-category="live slots arcade all" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #201a38 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 2.5k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.5));">🎨💎</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Win Go 30s</div>
-            <div class="game-poster-provider">View Point Live</div>
-          </div>
-        </div>
-
-        <!-- 4. Classic Dice Poster Card -->
-        <div class="game-poster-card" data-game="dice" data-category="originals table all" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #172554 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 850</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(59, 130, 246, 0.5));">🎲✨</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Classic Dice</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-
-        <!-- 5. Tower Legend Poster Card -->
-        <div class="game-poster-card" data-game="tower" data-category="originals all" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3b1d11 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 1.3k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(249, 115, 22, 0.5));">🏰💎</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Tower Legend</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-
-        <!-- 6. Crypto Pump Poster Card -->
-        <div class="game-poster-card" data-game="pump" data-category="slots originals arcade all" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #291a05 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 2.1k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(234, 179, 8, 0.5));">🎈💨</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Crypto Pump</div>
-            <div class="game-poster-provider">View Point Arcade</div>
-          </div>
-        </div>
-
-        <!-- 7. Live European Roulette Poster Card -->
-        <div class="game-poster-card" data-game="roulette" data-category="live table popular all" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #064e3b 0%, #090d16 100%);">
-            <span class="game-poster-badge live">🔴 LIVE</span>
-            <span class="game-poster-players">⚡ 5.4k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.5));">🎡✨</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Live Roulette</div>
-            <div class="game-poster-provider">View Point Live</div>
-          </div>
-        </div>
-
-        <!-- 8. Mines Poster Card -->
-        <div class="game-poster-card active" data-game="mines" data-category="originals popular all" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
-            <span class="game-poster-badge hot">🔥 HOT</span>
-            <span class="game-poster-players">⚡ 7.6k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(239, 68, 68, 0.5));">💣🔥</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Mines</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-
-        <!-- 9. Aviator Poster Card -->
-        <div class="game-poster-card" data-game="aviator" data-category="crash popular all" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #450a0a 0%, #090d16 100%);">
-            <span class="game-poster-badge hot">🔥 HOT</span>
-            <span class="game-poster-players">⚡ 8.9k</span>
-            <div style="font-size: 46px; filter: drop-shadow(0 6px 16px rgba(239, 68, 68, 0.6));">✈️</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Aviator</div>
-            <div class="game-poster-provider">Spribe / View Point</div>
-          </div>
-        </div>
-
-        <!-- 10. Dragon Tiger Poster Card -->
-        <div class="game-poster-card" data-game="dragontiger" data-category="live table popular all" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #311042 0%, #090d16 100%);">
-            <span class="game-poster-badge live">🔴 LIVE</span>
-            <span class="game-poster-players">⚡ 5.1k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.5));">🐉🐯</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Dragon Tiger</div>
-            <div class="game-poster-provider">View Point Live</div>
-          </div>
-        </div>
-
-        <!-- 11. Crash Poster Card -->
-        <div class="game-poster-card" data-game="crash" data-category="crash originals popular all" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #0f2e3d 0%, #090d16 100%);">
-            <span class="game-poster-badge top">⭐ TOP</span>
-            <span class="game-poster-players">⚡ 6.8k</span>
-            <div style="font-size: 44px; filter: drop-shadow(0 6px 16px rgba(56, 189, 248, 0.5));">🚀</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Crash</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-
-        <!-- 12. Chicken Road Poster Card -->
-        <div class="game-poster-card" data-game="chicken" data-category="originals popular all" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3d2207 0%, #090d16 100%);">
-            <span class="game-poster-badge top">⭐ TOP</span>
-            <span class="game-poster-players">⚡ 5.9k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(245, 158, 11, 0.5));">🍗🚗</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Chicken Road</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-
-        <!-- 13. Plinko Poster Card -->
-        <div class="game-poster-card" data-game="plinko" data-category="originals all" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 4.7k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(139, 92, 246, 0.5));">🔴🔺</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Plinko</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-
-        <!-- 14. Stock Trading Poster Card -->
-        <div class="game-poster-card" data-game="stock" data-category="arcade table all" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #064e3b 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 3.2k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.5));">📈📊</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Stock Trading</div>
-            <div class="game-poster-provider">View Point Arcade</div>
-          </div>
-        </div>
-
-        <!-- 15. Moles Burrow Poster Card -->
-        <div class="game-poster-card" data-game="moles" data-category="slots originals all" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))">
-          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1e24 0%, #090d16 100%);">
-            <span class="game-poster-players">⚡ 1.7k</span>
-            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(161, 161, 170, 0.5));">🐹🔨</div>
-            <div class="game-poster-hover-play">
-              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
-            </div>
-          </div>
-          <div class="game-poster-info">
-            <div class="game-poster-name">Moles Burrow</div>
-            <div class="game-poster-provider">View Point Originals</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Navigation Dots and Swipe Hint -->
-      <div class="carousel-dots-row" id="featuredCarouselDots">
-        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 0) : null"></span>
-        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 1) : null"></span>
-        <span class="carousel-dot active" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 2) : null"></span>
-        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 3) : null"></span>
-      </div>
-      <div class="carousel-swipe-hint">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4"/></svg>
-        <span>Swipe to explore more games</span>
-      </div>
-    </div>
-
-    <!-- Stake.bz Style Trending Games Section (Screenshot 1 Replication) -->
-    <section class="trending-section" id="trendingGamesSection">
-      <div class="trending-header-row">
-        <div class="trending-title" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : null">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
-          <span>Trending Games</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-      </div>
-      <div class="trending-grid">
-        <!-- 1. Gates of Olympus (Generated High-Res Poster) -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Gates of Olympus">
-          <div class="stake-card-visual">
-            <img src="images/gates_of_olympus.jpg" alt="Gates of Olympus" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill">Pragmatic Play</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Gates of Olympus</div>
-            <div class="stake-card-meta"><span class="meta-dot"></span> 8,421 playing</div>
-          </div>
-        </div>
-
-        <!-- 2. Odin's Vault (Generated High-Res Poster) -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Play Odin's Vault">
-          <div class="stake-card-visual">
-            <img src="images/odins_vault.jpg" alt="Odin's Vault" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill">Viewpoint Exclusive</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Odin's Vault</div>
-            <div class="stake-card-meta"><span class="meta-dot"></span> 4,110 playing</div>
-          </div>
-        </div>
-
-        <!-- 3. Aviator Live Crash -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" title="Play Aviator">
-          <div class="stake-card-visual">
-            <img src="assets/banners/aviator.png" onerror="this.src='images/live_dealer_studio.jpg'" alt="Aviator" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill">Spribe</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Aviator</div>
-            <div class="stake-card-meta"><span class="meta-dot"></span> 11,890 playing</div>
-          </div>
-        </div>
-
-        <!-- 4. Dragon Tiger Live Studio -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" title="Play Dragon Tiger">
-          <div class="stake-card-visual">
-            <img src="images/live_dealer_studio.jpg" alt="Dragon Tiger Live" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill">Evolution Live</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Dragon Tiger Live</div>
-            <div class="stake-card-meta"><span class="meta-dot"></span> 6,750 playing</div>
-          </div>
-        </div>
-
-        <!-- 5. Limbo Turbo -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Limbo Turbo">
-          <div class="stake-card-visual">
-            <img src="assets/banners/mines.png" onerror="this.src='images/gates_of_olympus.jpg'" alt="Limbo Turbo" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill">Originals</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Limbo 10,000x</div>
-            <div class="stake-card-meta"><span class="meta-dot"></span> 5,230 playing</div>
-          </div>
-        </div>
-
-        <!-- 6. Mines Grid -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Play Mines">
-          <div class="stake-card-visual">
-            <img src="assets/banners/mines.png" alt="Mines" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill">Originals</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Mines Diamond</div>
-            <div class="stake-card-meta"><span class="meta-dot"></span> 9,140 playing</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Stake.bz Style Trending Sports Section (Screenshot 1 Replication) -->
-    <section class="trending-section" id="trendingSportsSection">
-      <div class="trending-header-row">
-        <div class="trending-title" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-          <span>Trending Sports</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-        </div>
-      </div>
-      <div class="trending-grid">
-        <!-- 1. Cricket Live Sports (Generated High-Res Poster) -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Live Cricket">
-          <div class="stake-card-visual">
-            <img src="images/cricket_sports.jpg" alt="Live Cricket Betting" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);"><span class="pulse-red" style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> LIVE T20</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Cricket: IND vs AUS</div>
-            <div class="stake-card-meta sports-meta">🇮🇳 184/4 (17.3 ov) • Live Bet</div>
-          </div>
-        </div>
-
-        <!-- 2. Soccer Premier League (Generated High-Res Poster) -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Soccer">
-          <div class="stake-card-visual">
-            <img src="images/soccer_sports.jpg" alt="Soccer Premier League" class="stake-card-img" loading="lazy">
-            <div class="stake-provider-pill">Premier League</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Man City vs Arsenal</div>
-            <div class="stake-card-meta sports-meta">Tomorrow • 84 Markets</div>
-          </div>
-        </div>
-
-        <!-- 3. Tennis Grand Slam -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Tennis">
-          <div class="stake-card-visual">
-            <img src="images/soccer_sports.jpg" alt="Tennis Grand Slam" class="stake-card-img" style="filter: hue-rotate(90deg);" loading="lazy">
-            <div class="stake-provider-pill">ATP Masters</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Alcaraz vs Sinner</div>
-            <div class="stake-card-meta sports-meta">Live in 2h • 32 Markets</div>
-          </div>
-        </div>
-
-        <!-- 4. Basketball NBA -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Basketball">
-          <div class="stake-card-visual">
-            <img src="images/cricket_sports.jpg" alt="Basketball NBA" class="stake-card-img" style="filter: hue-rotate(180deg);" loading="lazy">
-            <div class="stake-provider-pill">NBA Finals</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Lakers vs Celtics</div>
-            <div class="stake-card-meta sports-meta">Friday • 55 Markets</div>
-          </div>
-        </div>
-
-        <!-- 5. Baseball MLB -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Baseball">
-          <div class="stake-card-visual">
-            <img src="images/soccer_sports.jpg" alt="Baseball MLB" class="stake-card-img" style="filter: hue-rotate(240deg);" loading="lazy">
-            <div class="stake-provider-pill">MLB World Series</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Yankees vs Dodgers</div>
-            <div class="stake-card-meta sports-meta">Saturday • 28 Markets</div>
-          </div>
-        </div>
-
-        <!-- 6. American Football NFL -->
-        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on NFL">
-          <div class="stake-card-visual">
-            <img src="images/cricket_sports.jpg" alt="NFL Football" class="stake-card-img" style="filter: hue-rotate(300deg);" loading="lazy">
-            <div class="stake-provider-pill">NFL Super Bowl</div>
-          </div>
-          <div class="stake-card-info">
-            <div class="stake-card-title">Chiefs vs 49ers</div>
-            <div class="stake-card-meta sports-meta">Sunday • 92 Markets</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Main Game Box -->
+<!-- Main Game Box -->
     <div class="game-arena">
       
       <!-- Left Betting Controls Sidebar -->
@@ -3333,6 +2770,570 @@
       </section>
 
     </div>
+
+<!-- Featured Gaming Showcase (Left Main Banners + Right Area Real Game Cards) -->
+    <section class="lobby-showcase-grid" id="lobbyShowcaseGrid">
+      <!-- Left / Main Area: Featured Banners -->
+      <div class="lobby-main-banners">
+        <!-- Cricket Bet Featured Hero Banner -->
+        <div class="cricket-hero-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Play Real Cricket Bet">
+          <div class="cricket-hero-badge">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block;"></span>
+            LIVE MATCHES
+          </div>
+          <div class="cricket-hero-title">CRICKET BET</div>
+          <div class="cricket-hero-sub">ICC T20 World Cup Final • India vs Australia • Live Ball Tracker & Instant Odds</div>
+          <button type="button" class="cricket-hero-btn" onclick="event.stopPropagation(); window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+            ⚡ VIEW MATCHES / PLAY NOW
+          </button>
+        </div>
+
+        <!-- Secondary Hero Banners Row -->
+        <div class="secondary-hero-row">
+          <div class="secondary-hero-card olympus" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Gates of Olympus">
+            <div style="font-size: 10px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">PRAGMATIC PLAY</div>
+            <div class="secondary-hero-title">Gates of Olympus</div>
+            <div class="secondary-hero-sub">Multipliers up to 5,000x</div>
+          </div>
+          <div class="secondary-hero-card odins" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))" title="Play Odin's Vault">
+            <div style="font-size: 10px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">VALKYRIE EXCLUSIVE</div>
+            <div class="secondary-hero-title">Odin's Vault</div>
+            <div class="secondary-hero-sub">Tower Climb & Golden Chests</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Area: Additional Real Game Cards -->
+      <div class="lobby-side-cards">
+        <!-- 1. Cricket Bet Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Cricket Bet">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background-image: url('images/cricket_sports.jpg');"></div>
+            <div class="side-game-info">
+              <div class="side-game-title">Cricket Bet</div>
+              <div class="side-game-sub">IND 1.75 | AUS 2.15 • Live</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">BET NOW</button>
+        </div>
+
+        <!-- 2. Aviator Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" title="Aviator">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background: radial-gradient(circle, #ef4444, #7f1d1d);">🚀</div>
+            <div class="side-game-info">
+              <div class="side-game-title">Aviator</div>
+              <div class="side-game-sub">Spribe • 100x Multiplier</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">FLY NOW</button>
+        </div>
+
+        <!-- 3. Dragon Tiger Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" title="Dragon Tiger">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background: radial-gradient(circle, #f59e0b, #78350f);">🐉</div>
+            <div class="side-game-info">
+              <div class="side-game-title">Dragon Tiger</div>
+              <div class="side-game-sub">Live Studio Table • 2.0x</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">JOIN TABLE</button>
+        </div>
+
+        <!-- 4. Evolution Live Studio Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))" title="Evolution Live">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background-image: url('images/live_dealer_studio.jpg');"></div>
+            <div class="side-game-info">
+              <div class="side-game-title">Evolution Live</div>
+              <div class="side-game-sub">VIP Live Roulette • 36x</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">PLAY LIVE</button>
+        </div>
+
+        <!-- 5. Viewpoint Originals Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Originals">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background: radial-gradient(circle, #8b5cf6, #3b0764);">🎲</div>
+            <div class="side-game-info">
+              <div class="side-game-title">Originals</div>
+              <div class="side-game-sub">Mines & Limbo • 99% RTP</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">PLAY NOW</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hidden Legacy Elements for 100% Backward Compatibility with test suite -->
+    <div class="game-pages-nav-bar" id="gamePagesNavBar" style="display: none !important;">
+      <button type="button" id="btnGamePage1" class="btn-game-page-pill active" onclick="window.switchGamePage ? window.switchGamePage(1) : (window.app && window.app.switchGamePage(1))"><span>⚡ PAGE 1</span></button>
+      <button type="button" id="btnGamePage2" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(2) : (window.app && window.app.switchGamePage(2))"><span>🚀 PAGE 2</span></button>
+      <button type="button" id="btnGamePage3" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(3) : (window.app && window.app.switchGamePage(3))"><span>📈 PAGE 3</span></button>
+      <button type="button" id="btnGamePage4" class="btn-game-page-pill" onclick="window.switchGamePage ? window.switchGamePage(4) : (window.app && window.app.switchGamePage(4))"><span>🔴 PAGE 4</span></button>
+    </div>
+
+    <div class="game-tabs-wrapper" style="display: none !important;">
+      <div id="gamePageGroup1" class="game-page-group" style="display: flex;">
+        <button id="tabMines" class="tab-btn active" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))"><span>Mines</span></button>
+        <button id="tabDragonTiger" class="tab-btn" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))"><span>Dragon Tiger</span></button>
+        <button id="tabLimbo" class="tab-btn" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))"><span>Limbo</span></button>
+        <button id="tabPump" class="tab-btn" data-game="pump" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))"><span>Pump</span></button>
+      </div>
+      <div id="gamePageGroup2" class="game-page-group" style="display: none;">
+        <button id="tabChicken" class="tab-btn" data-game="chicken" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))"><span>Chicken</span></button>
+        <button id="tabPlinko" class="tab-btn" data-game="plinko" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))"><span>Plinko</span></button>
+        <button id="tabCrash" class="tab-btn" data-game="crash" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))"><span>Crash</span></button>
+        <button id="tabMoles" class="tab-btn" data-game="moles" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))"><span>Moles</span></button>
+      </div>
+      <div id="gamePageGroup3" class="game-page-group" style="display: none;">
+        <button id="tabDice" class="tab-btn" data-game="dice" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))"><span>Dice</span></button>
+        <button id="tabTower" class="tab-btn" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))"><span>Tower</span></button>
+        <button id="tabColorTrading" class="tab-btn" data-game="colortrading" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))"><span>Win Go</span></button>
+        <button id="tabStock" class="tab-btn" data-game="stock" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))"><span>Stock BTC</span></button>
+      </div>
+      <div id="gamePageGroup4" class="game-page-group" style="display: none;">
+        <button id="tabAviator" class="tab-btn" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))"><span>Aviator</span></button>
+        <button id="tabAndarBahar" class="tab-btn" data-game="andarbahar" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))"><span>Andar Bahar</span></button>
+        <button id="tabRoulette" class="tab-btn" data-game="roulette" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))"><span>Roulette</span></button>
+        <button id="tabLuckySpin" class="tab-btn" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null);"><span>Spin & Win</span></button>
+      </div>
+    </div>
+
+    <!-- Featured Horizontal Swipeable Hero Game Carousel (All 15 Games Strictly ONCE) -->
+    <div class="casino-carousel-section" id="featuredCarouselSection">
+      <div class="carousel-header-row">
+        <h2 class="carousel-section-title">
+          <span style="font-size: 18px;">🔥</span>
+          <span>Featured Games</span>
+        </h2>
+        <div class="carousel-controls">
+          <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('featuredCarouselTrack', -1) : null" title="Previous Games">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="carousel-arrow-btn" onclick="window.app && window.app.scrollCarousel ? window.app.scrollCarousel('featuredCarouselTrack', 1) : null" title="Next Games">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="carousel-track" id="featuredCarouselTrack">
+        <!-- 1. Limbo Turbo Poster Card -->
+        <div class="game-poster-card" data-game="limbo" data-category="originals crash all" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #142825 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 3.0k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.5));">🎯⚡</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Limbo Turbo</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 2. Andar Bahar Poster Card -->
+        <div class="game-poster-card" data-game="andarbahar" data-category="live table popular all" onclick="window.switchGame ? window.switchGame('andarbahar') : (window.app && window.app.switchGame('andarbahar'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #331520 0%, #090d16 100%);">
+            <span class="game-poster-badge live">🔴 LIVE</span>
+            <span class="game-poster-players">⚡ 6.2k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(244, 63, 94, 0.5));">🃏👑</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Andar Bahar</div>
+            <div class="game-poster-provider">View Point Live</div>
+          </div>
+        </div>
+
+        <!-- 3. Win Go 30s Poster Card -->
+        <div class="game-poster-card" data-game="colortrading" data-category="live slots arcade all" onclick="window.switchGame ? window.switchGame('colortrading') : (window.app && window.app.switchGame('colortrading'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #201a38 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 2.5k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.5));">🎨💎</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Win Go 30s</div>
+            <div class="game-poster-provider">View Point Live</div>
+          </div>
+        </div>
+
+        <!-- 4. Classic Dice Poster Card -->
+        <div class="game-poster-card" data-game="dice" data-category="originals table all" onclick="window.switchGame ? window.switchGame('dice') : (window.app && window.app.switchGame('dice'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #172554 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 850</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(59, 130, 246, 0.5));">🎲✨</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Classic Dice</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 5. Tower Legend Poster Card -->
+        <div class="game-poster-card" data-game="tower" data-category="originals all" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3b1d11 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 1.3k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(249, 115, 22, 0.5));">🏰💎</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Tower Legend</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 6. Crypto Pump Poster Card -->
+        <div class="game-poster-card" data-game="pump" data-category="slots originals arcade all" onclick="window.switchGame ? window.switchGame('pump') : (window.app && window.app.switchGame('pump'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #291a05 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 2.1k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(234, 179, 8, 0.5));">🎈💨</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Crypto Pump</div>
+            <div class="game-poster-provider">View Point Arcade</div>
+          </div>
+        </div>
+
+        <!-- 7. Live European Roulette Poster Card -->
+        <div class="game-poster-card" data-game="roulette" data-category="live table popular all" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #064e3b 0%, #090d16 100%);">
+            <span class="game-poster-badge live">🔴 LIVE</span>
+            <span class="game-poster-players">⚡ 5.4k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.5));">🎡✨</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Live Roulette</div>
+            <div class="game-poster-provider">View Point Live</div>
+          </div>
+        </div>
+
+        <!-- 8. Mines Poster Card -->
+        <div class="game-poster-card active" data-game="mines" data-category="originals popular all" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
+            <span class="game-poster-badge hot">🔥 HOT</span>
+            <span class="game-poster-players">⚡ 7.6k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(239, 68, 68, 0.5));">💣🔥</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Mines</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 9. Aviator Poster Card -->
+        <div class="game-poster-card" data-game="aviator" data-category="crash popular all" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #450a0a 0%, #090d16 100%);">
+            <span class="game-poster-badge hot">🔥 HOT</span>
+            <span class="game-poster-players">⚡ 8.9k</span>
+            <div style="font-size: 46px; filter: drop-shadow(0 6px 16px rgba(239, 68, 68, 0.6));">✈️</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Aviator</div>
+            <div class="game-poster-provider">Spribe / View Point</div>
+          </div>
+        </div>
+
+        <!-- 10. Dragon Tiger Poster Card -->
+        <div class="game-poster-card" data-game="dragontiger" data-category="live table popular all" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #311042 0%, #090d16 100%);">
+            <span class="game-poster-badge live">🔴 LIVE</span>
+            <span class="game-poster-players">⚡ 5.1k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(168, 85, 247, 0.5));">🐉🐯</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Dragon Tiger</div>
+            <div class="game-poster-provider">View Point Live</div>
+          </div>
+        </div>
+
+        <!-- 11. Crash Poster Card -->
+        <div class="game-poster-card" data-game="crash" data-category="crash originals popular all" onclick="window.switchGame ? window.switchGame('crash') : (window.app && window.app.switchGame('crash'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #0f2e3d 0%, #090d16 100%);">
+            <span class="game-poster-badge top">⭐ TOP</span>
+            <span class="game-poster-players">⚡ 6.8k</span>
+            <div style="font-size: 44px; filter: drop-shadow(0 6px 16px rgba(56, 189, 248, 0.5));">🚀</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Crash</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 12. Chicken Road Poster Card -->
+        <div class="game-poster-card" data-game="chicken" data-category="originals popular all" onclick="window.switchGame ? window.switchGame('chicken') : (window.app && window.app.switchGame('chicken'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #3d2207 0%, #090d16 100%);">
+            <span class="game-poster-badge top">⭐ TOP</span>
+            <span class="game-poster-players">⚡ 5.9k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(245, 158, 11, 0.5));">🍗🚗</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Chicken Road</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 13. Plinko Poster Card -->
+        <div class="game-poster-card" data-game="plinko" data-category="originals all" onclick="window.switchGame ? window.switchGame('plinko') : (window.app && window.app.switchGame('plinko'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 4.7k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(139, 92, 246, 0.5));">🔴🔺</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Plinko</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+
+        <!-- 14. Stock Trading Poster Card -->
+        <div class="game-poster-card" data-game="stock" data-category="arcade table all" onclick="window.switchGame ? window.switchGame('stock') : (window.app && window.app.switchGame('stock'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #064e3b 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 3.2k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(16, 185, 129, 0.5));">📈📊</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Stock Trading</div>
+            <div class="game-poster-provider">View Point Arcade</div>
+          </div>
+        </div>
+
+        <!-- 15. Moles Burrow Poster Card -->
+        <div class="game-poster-card" data-game="moles" data-category="slots originals all" onclick="window.switchGame ? window.switchGame('moles') : (window.app && window.app.switchGame('moles'))">
+          <div class="game-poster-visual" style="background: radial-gradient(circle at 50% 40%, #1e1e24 0%, #090d16 100%);">
+            <span class="game-poster-players">⚡ 1.7k</span>
+            <div style="font-size: 42px; filter: drop-shadow(0 6px 16px rgba(161, 161, 170, 0.5));">🐹🔨</div>
+            <div class="game-poster-hover-play">
+              <div class="play-circle-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            </div>
+          </div>
+          <div class="game-poster-info">
+            <div class="game-poster-name">Moles Burrow</div>
+            <div class="game-poster-provider">View Point Originals</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Dots and Swipe Hint -->
+      <div class="carousel-dots-row" id="featuredCarouselDots">
+        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 0) : null"></span>
+        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 1) : null"></span>
+        <span class="carousel-dot active" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 2) : null"></span>
+        <span class="carousel-dot" onclick="window.app && window.app.jumpCarousel ? window.app.jumpCarousel('featuredCarouselTrack', 3) : null"></span>
+      </div>
+      <div class="carousel-swipe-hint">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4"/></svg>
+        <span>Swipe to explore more games</span>
+      </div>
+    </div>
+
+    <!-- Stake.bz Style Trending Games Section (Screenshot 1 Replication) -->
+    <section class="trending-section" id="trendingGamesSection">
+      <div class="trending-header-row">
+        <div class="trending-title" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : null">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
+          <span>Trending Games</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+      <div class="trending-grid">
+        <!-- 1. Gates of Olympus (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Gates of Olympus">
+          <div class="stake-card-visual">
+            <img src="images/gates_of_olympus.jpg" alt="Gates of Olympus" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Pragmatic Play</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Gates of Olympus</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 8,421 playing</div>
+          </div>
+        </div>
+
+        <!-- 2. Odin's Vault (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Play Odin's Vault">
+          <div class="stake-card-visual">
+            <img src="images/odins_vault.jpg" alt="Odin's Vault" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Viewpoint Exclusive</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Odin's Vault</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 4,110 playing</div>
+          </div>
+        </div>
+
+        <!-- 3. Aviator Live Crash -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" title="Play Aviator">
+          <div class="stake-card-visual">
+            <img src="assets/banners/aviator.png" onerror="this.src='images/live_dealer_studio.jpg'" alt="Aviator" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Spribe</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Aviator</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 11,890 playing</div>
+          </div>
+        </div>
+
+        <!-- 4. Dragon Tiger Live Studio -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" title="Play Dragon Tiger">
+          <div class="stake-card-visual">
+            <img src="images/live_dealer_studio.jpg" alt="Dragon Tiger Live" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Evolution Live</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Dragon Tiger Live</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 6,750 playing</div>
+          </div>
+        </div>
+
+        <!-- 5. Limbo Turbo -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Limbo Turbo">
+          <div class="stake-card-visual">
+            <img src="assets/banners/mines.png" onerror="this.src='images/gates_of_olympus.jpg'" alt="Limbo Turbo" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Originals</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Limbo 10,000x</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 5,230 playing</div>
+          </div>
+        </div>
+
+        <!-- 6. Mines Grid -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Play Mines">
+          <div class="stake-card-visual">
+            <img src="assets/banners/mines.png" alt="Mines" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Originals</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Mines Diamond</div>
+            <div class="stake-card-meta"><span class="meta-dot"></span> 9,140 playing</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stake.bz Style Trending Sports Section (Screenshot 1 Replication) -->
+    <section class="trending-section" id="trendingSportsSection">
+      <div class="trending-header-row">
+        <div class="trending-title" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <span>Trending Sports</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+      <div class="trending-grid">
+        <!-- 1. Cricket Live Sports (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Live Cricket">
+          <div class="stake-card-visual">
+            <img src="images/cricket_sports.jpg" alt="Live Cricket Betting" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4);"><span class="pulse-red" style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; display: inline-block;"></span> LIVE T20</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Cricket: IND vs AUS</div>
+            <div class="stake-card-meta sports-meta">🇮🇳 184/4 (17.3 ov) • Live Bet</div>
+          </div>
+        </div>
+
+        <!-- 2. Soccer Premier League (Generated High-Res Poster) -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Soccer">
+          <div class="stake-card-visual">
+            <img src="images/soccer_sports.jpg" alt="Soccer Premier League" class="stake-card-img" loading="lazy">
+            <div class="stake-provider-pill">Premier League</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Man City vs Arsenal</div>
+            <div class="stake-card-meta sports-meta">Tomorrow • 84 Markets</div>
+          </div>
+        </div>
+
+        <!-- 3. Tennis Grand Slam -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Tennis">
+          <div class="stake-card-visual">
+            <img src="images/soccer_sports.jpg" alt="Tennis Grand Slam" class="stake-card-img" style="filter: hue-rotate(90deg);" loading="lazy">
+            <div class="stake-provider-pill">ATP Masters</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Alcaraz vs Sinner</div>
+            <div class="stake-card-meta sports-meta">Live in 2h • 32 Markets</div>
+          </div>
+        </div>
+
+        <!-- 4. Basketball NBA -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Basketball">
+          <div class="stake-card-visual">
+            <img src="images/cricket_sports.jpg" alt="Basketball NBA" class="stake-card-img" style="filter: hue-rotate(180deg);" loading="lazy">
+            <div class="stake-provider-pill">NBA Finals</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Lakers vs Celtics</div>
+            <div class="stake-card-meta sports-meta">Friday • 55 Markets</div>
+          </div>
+        </div>
+
+        <!-- 5. Baseball MLB -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on Baseball">
+          <div class="stake-card-visual">
+            <img src="images/soccer_sports.jpg" alt="Baseball MLB" class="stake-card-img" style="filter: hue-rotate(240deg);" loading="lazy">
+            <div class="stake-provider-pill">MLB World Series</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Yankees vs Dodgers</div>
+            <div class="stake-card-meta sports-meta">Saturday • 28 Markets</div>
+          </div>
+        </div>
+
+        <!-- 6. American Football NFL -->
+        <div class="stake-media-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Bet on NFL">
+          <div class="stake-card-visual">
+            <img src="images/cricket_sports.jpg" alt="NFL Football" class="stake-card-img" style="filter: hue-rotate(300deg);" loading="lazy">
+            <div class="stake-provider-pill">NFL Super Bowl</div>
+          </div>
+          <div class="stake-card-info">
+            <div class="stake-card-title">Chiefs vs 49ers</div>
+            <div class="stake-card-meta sports-meta">Sunday • 92 Markets</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
 
     <!-- VIP Rewards Hub Dock (Spin & Win + Daily Bonus - Moved to Bottom of Page) -->
     <div id="bottomRewardsHub" class="bottom-rewards-hub">

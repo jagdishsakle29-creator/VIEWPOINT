@@ -5188,15 +5188,10 @@ class AppController {
   }
 
   scrollToGameArena() {
+    // No annoying forced scrolling on game switch
     try {
       const arena = document.querySelector('.game-arena');
       if (arena) {
-        const headerOffset = 70;
-        const arenaRect = arena.getBoundingClientRect();
-        if (arenaRect.top < 10 || arenaRect.top > 250) {
-          const targetY = arenaRect.top + (window.pageYOffset || document.documentElement.scrollTop || 0) - headerOffset;
-          window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-        }
         arena.classList.remove('arena-focus-pulse');
         void arena.offsetWidth; // trigger reflow
         arena.classList.add('arena-focus-pulse');
