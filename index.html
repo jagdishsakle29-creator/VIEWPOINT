@@ -692,34 +692,42 @@
   <div class="stake-app-container" id="stakeAppContainer">
     <!-- Stake Left Vertical Icon Rail (Screenshot 1 Replication) -->
     <aside class="stake-sidebar-rail" id="stakeSidebarRail">
-      <button type="button" class="sidebar-rail-btn active" id="railBtnCasino" title="Casino Lobby" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : null">
+      <button type="button" class="sidebar-rail-btn active" id="railBtnCasino" title="Home / Casino" onclick="window.switchGame ? window.switchGame('mines') : (window.filterCasinoCategory && window.filterCasinoCategory('all'))">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="rail-tooltip">Home</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnAllGames" title="All Games" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : null">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg>
-        <span class="rail-tooltip">Casino Lobby</span>
+        <span class="rail-tooltip">All Games</span>
       </button>
-      <button type="button" class="sidebar-rail-btn" id="railBtnSports" title="Sports & Cricket" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+      <button type="button" class="sidebar-rail-btn" id="railBtnSports" title="Live Cricket Bet" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-        <span class="rail-tooltip">Sportsbook</span>
+        <span class="rail-tooltip">Cricket Bet</span>
       </button>
-      <button type="button" class="sidebar-rail-btn" id="railBtnLive" title="Live Casino Studio" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('live') : null">
+      <button type="button" class="sidebar-rail-btn" id="railBtnLive" title="Live Studio" onclick="window.switchGame ? window.switchGame('roulette') : (window.filterCasinoCategory && window.filterCasinoCategory('live'))">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-        <span class="rail-tooltip">Live Studio</span>
+        <span class="rail-tooltip">Live Bet</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnHistory" title="Transaction History" onclick="window.openTxHistoryModal ? window.openTxHistoryModal() : (window.app && window.app.openTxHistoryModal())">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+        <span class="rail-tooltip">History</span>
+      </button>
+      <button type="button" class="sidebar-rail-btn" id="railBtnWallet" title="Wallet & Deposit" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h0M2 10h20"/></svg>
+        <span class="rail-tooltip">Wallet</span>
       </button>
       <div class="sidebar-divider"></div>
-      <button type="button" class="sidebar-rail-btn" id="railBtnVip" title="VIP Club & Rewards" onclick="window.openLuckySpinModal ? window.openLuckySpinModal() : (window.Rewards && window.Rewards.openLuckySpinModal ? window.Rewards.openLuckySpinModal() : null)">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span class="rail-tooltip">VIP Club</span>
-      </button>
-      <button type="button" class="sidebar-rail-btn" id="railBtnPromos" title="Promotions & Bonuses" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
+      <button type="button" class="sidebar-rail-btn" id="railBtnPromos" title="Promotions & VIP" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
         <span class="rail-tooltip">Promotions</span>
       </button>
-      <button type="button" class="sidebar-rail-btn" id="railBtnAffiliates" title="Affiliate Program" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span class="rail-tooltip">Affiliates</span>
+      <button type="button" class="sidebar-rail-btn" id="railBtnTelegram" title="Telegram Channel" onclick="window.open('https://t.me/viewpointios', '_blank')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span class="rail-tooltip">Telegram</span>
       </button>
       <button type="button" class="sidebar-rail-btn" id="railBtnSupport" title="Live 24/7 Support" onclick="window.openSupportModal ? window.openSupportModal() : (window.app && window.app.openSupportModal())">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span class="rail-tooltip">Live Support</span>
+        <span class="rail-tooltip">Support</span>
       </button>
     </aside>
 
@@ -769,6 +777,12 @@
             <span>Logout</span>
           </button>
         </div>
+
+        <!-- Header Sound Toggle Button -->
+        <button id="btnToggleSound" class="btn-icon-nav sound-nav-btn" title="Sound ON/OFF" onclick="window.toggleMasterAudio ? window.toggleMasterAudio() : (window.soundEngine && window.soundEngine.toggleSound ? window.soundEngine.toggleSound() : null)">
+          <span id="soundToggleIcon" style="font-size: 16px;">🔊</span>
+          <span class="sound-nav-label" style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-left: 3px;">Sound</span>
+        </button>
 
         <!-- Provably Fair Verifier Icon -->
         <button id="btnProvablyFair" class="btn-icon-nav" title="Provably Fair Verifier">
@@ -863,6 +877,138 @@
         <span>⚡ Providers</span>
       </button>
     </div>
+
+    <!-- Compact Game Tabs Bar (Visual Style of Reference) -->
+    <div class="viewpoint-game-tabs-bar" id="viewpointGameTabsBar">
+      <button type="button" class="v-game-tab active" id="vTabOriginals" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
+        <span class="v-tab-icon">🎲</span>
+        <span class="v-tab-label">ORIGINALS</span>
+      </button>
+      <button type="button" class="v-game-tab" id="vTabOlympus" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))">
+        <span class="v-tab-thumb" style="background-image: url('images/gates_of_olympus.jpg');"></span>
+        <span class="v-tab-label">GATES OF OLYMPUS</span>
+      </button>
+      <button type="button" class="v-game-tab" id="vTabOdinsVault" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))">
+        <span class="v-tab-thumb" style="background-image: url('images/odins_vault.jpg');"></span>
+        <span class="v-tab-label">ODIN'S VAULT</span>
+      </button>
+      <button type="button" class="v-game-tab" id="vTabAviator" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))">
+        <span class="v-tab-icon">🚀</span>
+        <span class="v-tab-label">AVIATOR</span>
+      </button>
+      <button type="button" class="v-game-tab" id="vTabDragonTiger" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))">
+        <span class="v-tab-icon">🐉</span>
+        <span class="v-tab-label">DRAGON TIGER</span>
+      </button>
+      <button type="button" class="v-game-tab" id="vTabEvolutionLive" data-game="roulette" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))">
+        <span class="v-tab-thumb" style="background-image: url('images/live_dealer_studio.jpg');"></span>
+        <span class="v-tab-label">EVOLUTION LIVE</span>
+      </button>
+      <button type="button" class="v-game-tab" id="vTabCricketBet" data-game="sportsbook" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+        <span class="v-tab-thumb" style="background-image: url('images/cricket_sports.jpg');"></span>
+        <span class="v-tab-label">CRICKET BET</span>
+      </button>
+      <button type="button" class="v-game-tab" id="vTabMoreGames" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : (window.app && window.app.scrollToGameArena())">
+        <span class="v-tab-icon">🎮</span>
+        <span class="v-tab-label">MORE GAMES</span>
+      </button>
+    </div>
+
+    <!-- Featured Gaming Showcase (Left Main Banners + Right Area Real Game Cards) -->
+    <section class="lobby-showcase-grid" id="lobbyShowcaseGrid">
+      <!-- Left / Main Area: Featured Banners -->
+      <div class="lobby-main-banners">
+        <!-- Cricket Bet Featured Hero Banner -->
+        <div class="cricket-hero-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Play Real Cricket Bet">
+          <div class="cricket-hero-badge">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #fff; display: inline-block;"></span>
+            LIVE MATCHES
+          </div>
+          <div class="cricket-hero-title">CRICKET BET</div>
+          <div class="cricket-hero-sub">ICC T20 World Cup Final • India vs Australia • Live Ball Tracker & Instant Odds</div>
+          <button type="button" class="cricket-hero-btn" onclick="event.stopPropagation(); window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
+            ⚡ VIEW MATCHES / PLAY NOW
+          </button>
+        </div>
+
+        <!-- Secondary Hero Banners Row -->
+        <div class="secondary-hero-row">
+          <div class="secondary-hero-card olympus" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))" title="Play Gates of Olympus">
+            <div style="font-size: 10px; color: #fbbf24; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">PRAGMATIC PLAY</div>
+            <div class="secondary-hero-title">Gates of Olympus</div>
+            <div class="secondary-hero-sub">Multipliers up to 5,000x</div>
+          </div>
+          <div class="secondary-hero-card odins" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))" title="Play Odin's Vault">
+            <div style="font-size: 10px; color: #38bdf8; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;">VALKYRIE EXCLUSIVE</div>
+            <div class="secondary-hero-title">Odin's Vault</div>
+            <div class="secondary-hero-sub">Tower Climb & Golden Chests</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Area: Additional Real Game Cards -->
+      <div class="lobby-side-cards">
+        <!-- 1. Cricket Bet Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))" title="Cricket Bet">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background-image: url('images/cricket_sports.jpg');"></div>
+            <div class="side-game-info">
+              <div class="side-game-title">Cricket Bet</div>
+              <div class="side-game-sub">IND 1.75 | AUS 2.15 • Live</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">BET NOW</button>
+        </div>
+
+        <!-- 2. Aviator Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))" title="Aviator">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background: radial-gradient(circle, #ef4444, #7f1d1d);">🚀</div>
+            <div class="side-game-info">
+              <div class="side-game-title">Aviator</div>
+              <div class="side-game-sub">Spribe • 100x Multiplier</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">FLY NOW</button>
+        </div>
+
+        <!-- 3. Dragon Tiger Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))" title="Dragon Tiger">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background: radial-gradient(circle, #f59e0b, #78350f);">🐉</div>
+            <div class="side-game-info">
+              <div class="side-game-title">Dragon Tiger</div>
+              <div class="side-game-sub">Live Studio Table • 2.0x</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">JOIN TABLE</button>
+        </div>
+
+        <!-- 4. Evolution Live Studio Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))" title="Evolution Live">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background-image: url('images/live_dealer_studio.jpg');"></div>
+            <div class="side-game-info">
+              <div class="side-game-title">Evolution Live</div>
+              <div class="side-game-sub">VIP Live Roulette • 36x</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">PLAY LIVE</button>
+        </div>
+
+        <!-- 5. Viewpoint Originals Card -->
+        <div class="side-game-card" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))" title="Originals">
+          <div class="side-game-left">
+            <div class="side-game-thumb" style="background: radial-gradient(circle, #8b5cf6, #3b0764);">🎲</div>
+            <div class="side-game-info">
+              <div class="side-game-title">Originals</div>
+              <div class="side-game-sub">Mines & Limbo • 99% RTP</div>
+            </div>
+          </div>
+          <button type="button" class="side-game-btn">PLAY NOW</button>
+        </div>
+      </div>
+    </section>
 
     <!-- Hidden Legacy Elements for 100% Backward Compatibility with test suite -->
     <div class="game-pages-nav-bar" id="gamePagesNavBar" style="display: none !important;">
@@ -4729,13 +4875,9 @@
 
   <!-- Fixed Mobile Bottom Navigation Bar (Ultra Classy VIP App Experience) -->
   <nav class="mobile-bottom-nav" id="mobileBottomNav">
-    <button class="mobile-nav-item active" id="mNavOriginals" onclick="window.switchMainPage ? window.switchMainPage(1) : (window.app && window.app.switchMainPage(1)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">💣</span>
-      <span class="m-nav-label">Originals</span>
-    </button>
-    <button class="mobile-nav-item" id="mNavCrash" onclick="window.switchMainPage ? window.switchMainPage(2) : (window.app && window.app.switchMainPage(2)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">🚀</span>
-      <span class="m-nav-label">Crash</span>
+    <button class="mobile-nav-item active" id="mNavHome" onclick="window.switchGame ? window.switchGame('mines') : null; (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
+      <span class="m-nav-icon">🏠</span>
+      <span class="m-nav-label">Home</span>
     </button>
     <button class="mobile-nav-item highlight-deposit" id="mNavDeposit" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
       <div class="m-nav-deposit-bubble">
@@ -4743,12 +4885,12 @@
       </div>
       <span class="m-nav-label" style="color: #00f59b; font-weight: 900;">Deposit</span>
     </button>
-    <button class="mobile-nav-item" id="mNavCasino" onclick="window.switchMainPage ? window.switchMainPage(3) : (window.app && window.app.switchMainPage(3)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">🐉</span>
-      <span class="m-nav-label">Casino</span>
+    <button class="mobile-nav-item" id="mNavWithdraw" onclick="window.openWithdrawModal ? window.openWithdrawModal() : (window.app && window.app.openWithdrawModal())">
+      <span class="m-nav-icon">💸</span>
+      <span class="m-nav-label">Withdraw</span>
     </button>
-    <button class="mobile-nav-item" id="mNavLiveBet" onclick="window.switchMainPage ? window.switchMainPage(4) : (window.app && window.app.switchMainPage(4)); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
-      <span class="m-nav-icon">📊</span>
+    <button class="mobile-nav-item" id="mNavLiveBet" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook')); (window.app && window.app.setMobileNavActive && window.app.setMobileNavActive(this));">
+      <span class="m-nav-icon">🏏</span>
       <span class="m-nav-label">Live Bet</span>
     </button>
     <button class="mobile-nav-item" id="mNavHistory" onclick="window.openTxHistoryModal ? window.openTxHistoryModal() : (window.app && window.app.openTxHistoryModal())">

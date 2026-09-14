@@ -5281,6 +5281,28 @@ class AppController {
       localStorage.setItem('stake_active_game', gameType);
     } catch(e) {}
 
+    // Sync ViewPoint Compact Reference Game Tabs
+    try {
+      const vTabMap = {
+        'mines': 'vTabOriginals',
+        'chicken': 'vTabOriginals',
+        'plinko': 'vTabOriginals',
+        'limbo': 'vTabOlympus',
+        'tower': 'vTabOdinsVault',
+        'aviator': 'vTabAviator',
+        'dragontiger': 'vTabDragonTiger',
+        'roulette': 'vTabEvolutionLive',
+        'andarbahar': 'vTabEvolutionLive',
+        'sportsbook': 'vTabCricketBet'
+      };
+      document.querySelectorAll('.v-game-tab').forEach(t => t.classList.remove('active'));
+      const activeVTabId = vTabMap[gameType];
+      if (activeVTabId) {
+        const el = document.getElementById(activeVTabId);
+        if (el) el.classList.add('active');
+      }
+    } catch(e) {}
+
     // Ensure main game page container remains visible for all games
     if (this.dom.mainPage1) this.dom.mainPage1.style.display = 'block';
     if (this.dom.mainPage2) this.dom.mainPage2.style.display = 'none';
