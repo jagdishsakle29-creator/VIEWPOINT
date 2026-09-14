@@ -4366,10 +4366,20 @@ class AppController {
       this.switchGamePage(3);
       this.switchGame('dice');
     } else if (p === 4) {
-      this.switchGamePage(4);
-      this.switchGame('aviator');
+      const lbSection = document.getElementById('liveBetsSection');
+      if (lbSection) {
+        lbSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        lbSection.classList.remove('section-glow');
+        void lbSection.offsetWidth;
+        lbSection.classList.add('section-glow');
+      } else {
+        this.switchGamePage(4);
+        this.switchGame('roulette');
+      }
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (p !== 4) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   setMobileNavActive(el) {
@@ -5219,6 +5229,9 @@ class AppController {
       if (window.aviatorGame && gameType !== 'aviator' && window.aviatorGame.animationFrameId) {
         cancelAnimationFrame(window.aviatorGame.animationFrameId);
         window.aviatorGame.animationFrameId = null;
+      }
+      if (window.rouletteGame && gameType !== 'roulette' && typeof window.rouletteGame.pause === 'function') {
+        window.rouletteGame.pause();
       }
 
       this.currentGame = gameType;

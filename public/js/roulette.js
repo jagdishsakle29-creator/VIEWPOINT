@@ -42,10 +42,30 @@ class RouletteGame {
 
     this.timerInterval = null;
     this.animFrameId = null;
+    this.isPaused = false;
 
     this.initAudio();
     this.initDOM();
-    this.startRoundLoop();
+    if (this.isRouletteActive()) {
+      this.startRoundLoop();
+    }
+  }
+
+  isRouletteActive() {
+    if (typeof document === 'undefined') return false;
+    if (document.hidden || document.visibilityState === 'hidden') return false;
+    const view = document.getElementById('rouletteView');
+    if (!view) return false;
+    if (view.style.display === 'none') return false;
+    return view.classList.contains('active');
+  }
+
+  canPlayAudio() {
+    if (typeof document !== 'undefined' && (document.hidden || document.visibilityState === 'hidden')) return false;
+    if (window.soundEngine && typeof window.soundEngine.canPlay === 'function' && !window.soundEngine.canPlay()) return false;
+    if (window.soundEngine && window.soundEngine.enabled === false) return false;
+    if (!this.isRouletteActive()) return false;
+    return true;
   }
 
   generateRoundId() {
@@ -77,13 +97,36 @@ class RouletteGame {
       if (AudioCtx) {
         this.audioCtx = new AudioCtx();
       }
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const handleHidden = () => {
+          if (this.audioCtx && this.audioCtx.state === 'running') {
+            this.audioCtx.suspend().catch(() => {});
+          }
+        };
+        const handleVisible = () => {
+          if (this.canPlayAudio() && this.audioCtx && this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume().catch(() => {});
+          }
+        };
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden || document.visibilityState === 'hidden') handleHidden();
+          else handleVisible();
+        });
+        window.addEventListener('pagehide', handleHidden);
+        window.addEventListener('blur', () => {
+          if (document.hidden || document.visibilityState === 'hidden') handleHidden();
+        });
+        window.addEventListener('pageshow', handleVisible);
+        window.addEventListener('focus', handleVisible);
+      }
     } catch(e) {}
   }
 
   playBeep(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
+    if (!this.canPlayAudio()) return;
     if (!this.audioCtx) return;
     try {
-      if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+      if (this.audioCtx.state === 'suspended') this.audioCtx.resume().catch(() => {});
       const osc = this.audioCtx.createOscillator();
       const gain = this.audioCtx.createGain();
       osc.type = type;
@@ -98,24 +141,28 @@ class RouletteGame {
   }
 
   playPlaceBetsSound() {
+    if (!this.canPlayAudio()) return;
     this.playBeep(523.25, 'sine', 0.2, 0.12);
-    setTimeout(() => this.playBeep(659.25, 'sine', 0.25, 0.15), 120);
-    setTimeout(() => this.playBeep(783.99, 'sine', 0.4, 0.18), 240);
+    setTimeout(() => { if (this.canPlayAudio()) this.playBeep(659.25, 'sine', 0.25, 0.15); }, 120);
+    setTimeout(() => { if (this.canPlayAudio()) this.playBeep(783.99, 'sine', 0.4, 0.18); }, 240);
   }
 
   playNoMoreBetsSound() {
+    if (!this.canPlayAudio()) return;
     this.playBeep(440, 'triangle', 0.3, 0.15);
-    setTimeout(() => this.playBeep(330, 'triangle', 0.4, 0.15), 180);
+    setTimeout(() => { if (this.canPlayAudio()) this.playBeep(330, 'triangle', 0.4, 0.15); }, 180);
   }
 
   playBallClickSound() {
+    if (!this.canPlayAudio()) return;
     this.playBeep(1200 + Math.random() * 400, 'square', 0.03, 0.05);
   }
 
   playWinFanfare() {
+    if (!this.canPlayAudio()) return;
     const notes = [523.25, 659.25, 783.99, 1046.50];
     notes.forEach((freq, i) => {
-      setTimeout(() => this.playBeep(freq, 'triangle', 0.3, 0.2), i * 110);
+      setTimeout(() => { if (this.canPlayAudio()) this.playBeep(freq, 'triangle', 0.3, 0.2); }, i * 110);
     });
   }
 
@@ -128,9 +175,40 @@ class RouletteGame {
     this.updateHistoryRoadmap();
   }
 
+  init() {
+    this.isPaused = false;
+    this.initDOM();
+    if (!this.timerInterval && this.gameState !== 'spinning') {
+      this.startRoundLoop();
+    }
+    this.updateBetDisplays();
+  }
+
+  pause() {
+    this.isPaused = true;
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
+    if (this.audioCtx && this.audioCtx.state === 'running') {
+      this.audioCtx.suspend().catch(() => {});
+    }
+  }
+
+  resume() {
+    this.isPaused = false;
+    this.init();
+  }
+
   // ================= GAME ROUND LOOP =================
   startRoundLoop() {
-    clearInterval(this.timerInterval);
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    if (this.isPaused) return;
+
     this.roundId = this.generateRoundId();
     this.gameState = 'betting';
     this.timeLeft = this.roundDuration;
@@ -140,17 +218,23 @@ class RouletteGame {
     this.updateStatusBanner(`🟢 PLACE YOUR BETS (${this.timeLeft}s)`, 'betting');
     this.updateRoundIdDisplay();
     this.setBettingLocked(false);
-    this.playPlaceBetsSound();
+    if (this.isRouletteActive()) {
+      this.playPlaceBetsSound();
+    }
 
     this.timerInterval = setInterval(() => {
+      if (this.isPaused || !this.isRouletteActive()) {
+        return;
+      }
       this.timeLeft--;
       if (this.timeLeft > 0) {
         this.updateStatusBanner(`🟢 PLACE YOUR BETS (${this.timeLeft}s)`, 'betting');
-        if (this.timeLeft <= 3) {
+        if (this.timeLeft <= 3 && this.isRouletteActive()) {
           this.playBeep(600, 'sine', 0.1, 0.08);
         }
       } else {
         clearInterval(this.timerInterval);
+        this.timerInterval = null;
         this.startSpinPhase();
       }
     }, 1000);
@@ -159,7 +243,9 @@ class RouletteGame {
   startSpinPhase() {
     this.gameState = 'spinning';
     this.setBettingLocked(true);
-    this.playNoMoreBetsSound();
+    if (this.isRouletteActive()) {
+      this.playNoMoreBetsSound();
+    }
     this.updateStatusBanner('🔴 NO MORE BETS • WHEEL SPINNING', 'spinning');
 
     // Provably fair RNG draw
@@ -194,10 +280,12 @@ class RouletteGame {
     // Settle bets
     this.calculatePayouts();
 
-    // Next round after 4s
+    // Next round after 4.5s
     setTimeout(() => {
       this.clearRoundBetsForNext();
-      this.startRoundLoop();
+      if (!this.isPaused && this.isRouletteActive()) {
+        this.startRoundLoop();
+      }
     }, 4500);
   }
 
@@ -219,22 +307,33 @@ class RouletteGame {
     }
 
     const cost = this.selectedChip;
-    const curBal = (window.wallet && typeof window.wallet.balance === 'number') ? window.wallet.balance : 0;
+    let curBal = 0;
+    if (window.wallet) {
+      if (typeof window.wallet.getBalance === 'function') curBal = window.wallet.getBalance();
+      else if (typeof window.wallet.balance === 'number') curBal = window.wallet.balance;
+    }
 
-    if (curBal < cost) {
-      if (window.app && window.app.showToast) {
-        window.app.showToast('Insufficient balance for this bet!', 'error');
+    if (window.wallet && typeof window.wallet.hasFunds === 'function') {
+      if (!window.wallet.hasFunds(cost)) {
+        if (window.app && window.app.showToast) window.app.showToast('Insufficient balance for this bet!', 'error');
+        return false;
       }
+    } else if (curBal < cost) {
+      if (window.app && window.app.showToast) window.app.showToast('Insufficient balance for this bet!', 'error');
       return false;
     }
 
     // Deduct from wallet
-    if (window.wallet && window.wallet.deductBet) {
-      window.wallet.deductBet(cost);
+    if (window.wallet) {
+      if (typeof window.wallet.deduct === 'function') {
+        window.wallet.deduct(cost);
+      } else if (typeof window.wallet.deductBalance === 'function') {
+        window.wallet.deductBalance(cost, `Live Roulette Bet on ${spotId}`);
+      }
     }
 
     this.currentBets[spotId] = (this.currentBets[spotId] || 0) + cost;
-    this.playBeep(880, 'sine', 0.08, 0.1);
+    if (this.canPlayAudio()) this.playBeep(880, 'sine', 0.08, 0.1);
     this.updateBetDisplays();
     return true;
   }
@@ -242,8 +341,12 @@ class RouletteGame {
   clearBets() {
     if (this.gameState !== 'betting') return;
     const total = this.getTotalBet();
-    if (total > 0 && window.wallet && window.wallet.addBonus) {
-      window.wallet.addBonus(total, 'Roulette Bet Refund');
+    if (total > 0 && window.wallet) {
+      if (typeof window.wallet.add === 'function') {
+        window.wallet.add(total);
+      } else if (typeof window.wallet.addWin === 'function') {
+        window.wallet.addWin(total);
+      }
     }
     this.currentBets = {};
     this.updateBetDisplays();
@@ -254,14 +357,27 @@ class RouletteGame {
     if (this.gameState !== 'betting') return;
     const curTotal = this.getTotalBet();
     if (curTotal <= 0) return;
-    const curBal = (window.wallet && typeof window.wallet.balance === 'number') ? window.wallet.balance : 0;
-    if (curBal < curTotal) {
+    let curBal = 0;
+    if (window.wallet) {
+      if (typeof window.wallet.getBalance === 'function') curBal = window.wallet.getBalance();
+      else if (typeof window.wallet.balance === 'number') curBal = window.wallet.balance;
+    }
+    if (window.wallet && typeof window.wallet.hasFunds === 'function') {
+      if (!window.wallet.hasFunds(curTotal)) {
+        if (window.app && window.app.showToast) window.app.showToast('Insufficient balance to double!', 'error');
+        return;
+      }
+    } else if (curBal < curTotal) {
       if (window.app && window.app.showToast) window.app.showToast('Insufficient balance to double!', 'error');
       return;
     }
 
-    if (window.wallet && window.wallet.deductBet) {
-      window.wallet.deductBet(curTotal);
+    if (window.wallet) {
+      if (typeof window.wallet.deduct === 'function') {
+        window.wallet.deduct(curTotal);
+      } else if (typeof window.wallet.deductBalance === 'function') {
+        window.wallet.deductBalance(curTotal, 'Live Roulette Double Bet');
+      }
     }
 
     Object.keys(this.currentBets).forEach(spot => {
@@ -277,15 +393,28 @@ class RouletteGame {
     
     let needed = 0;
     Object.values(this.previousBets).forEach(v => needed += v);
-    const curBal = (window.wallet && typeof window.wallet.balance === 'number') ? window.wallet.balance : 0;
-    if (curBal < needed) {
+    let curBal = 0;
+    if (window.wallet) {
+      if (typeof window.wallet.getBalance === 'function') curBal = window.wallet.getBalance();
+      else if (typeof window.wallet.balance === 'number') curBal = window.wallet.balance;
+    }
+    if (window.wallet && typeof window.wallet.hasFunds === 'function') {
+      if (!window.wallet.hasFunds(needed)) {
+        if (window.app && window.app.showToast) window.app.showToast('Insufficient balance to rebet!', 'error');
+        return;
+      }
+    } else if (curBal < needed) {
       if (window.app && window.app.showToast) window.app.showToast('Insufficient balance to rebet!', 'error');
       return;
     }
 
     this.clearBets();
-    if (window.wallet && window.wallet.deductBet) {
-      window.wallet.deductBet(needed);
+    if (window.wallet) {
+      if (typeof window.wallet.deduct === 'function') {
+        window.wallet.deduct(needed);
+      } else if (typeof window.wallet.deductBalance === 'function') {
+        window.wallet.deductBalance(needed, 'Live Roulette Rebet');
+      }
     }
     this.currentBets = Object.assign({}, this.previousBets);
     this.updateBetDisplays();
@@ -307,7 +436,10 @@ class RouletteGame {
       if (window.app && window.app.showToast) window.app.showToast('Place at least one bet first!', 'warning');
       return;
     }
-    clearInterval(this.timerInterval);
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
     this.startSpinPhase();
   }
 
@@ -380,17 +512,41 @@ class RouletteGame {
     });
 
     if (totalWon > 0) {
-      this.playWinFanfare();
-      if (window.wallet && window.wallet.recordWin) {
-        const netProfit = totalWon - totalBet;
-        window.wallet.recordWin(totalWon, totalBet > 0 ? (totalWon / totalBet) : 1, 'roulette', {
-          profit: netProfit,
-          title: `Roulette Win (${n} ${color.toUpperCase()})`
-        });
+      if (this.canPlayAudio()) this.playWinFanfare();
+      if (window.wallet) {
+        if (typeof window.wallet.addWin === 'function') {
+          window.wallet.addWin(totalWon);
+        } else if (typeof window.wallet.add === 'function') {
+          window.wallet.add(totalWon);
+        }
+        if (typeof window.wallet.recordBet === 'function') {
+          const mult = totalBet > 0 ? parseFloat((totalWon / totalBet).toFixed(2)) : 36.0;
+          window.wallet.recordBet({
+            game: 'Live Roulette',
+            bet: totalBet,
+            multiplier: mult,
+            payout: totalWon,
+            won: true
+          });
+        }
+      }
+      if (window.LiveBets && typeof window.LiveBets.recordUserWin === 'function') {
+        const mult = totalBet > 0 ? parseFloat((totalWon / totalBet).toFixed(2)) : 36.0;
+        window.LiveBets.recordUserWin('Live Roulette', totalBet, mult, totalWon);
       }
       if (window.app && window.app.showRoundResultToast) {
         const mult = totalBet > 0 ? (totalWon / totalBet).toFixed(2) : '36.00';
         window.app.showRoundResultToast(mult, totalWon, `ROULETTE HIT #${n} ${color.toUpperCase()}! 🎡💰`);
+      }
+    } else if (totalBet > 0) {
+      if (window.wallet && typeof window.wallet.recordBet === 'function') {
+        window.wallet.recordBet({
+          game: 'Live Roulette',
+          bet: totalBet,
+          multiplier: 0,
+          payout: 0,
+          won: false
+        });
       }
     }
   }
@@ -657,7 +813,19 @@ class RouletteGame {
   }
 }
 
+// Payout lookup dictionary for UI and Active Bets Table
+const ROULETTE_PAYOUTS = {
+  'red': 2, 'black': 2, 'even': 2, 'odd': 2, 'low': 2, 'high': 2,
+  'dozen_1': 3, 'dozen_2': 3, 'dozen_3': 3,
+  'col_1': 3, 'col_2': 3, 'col_3': 3
+};
+for (let i = 0; i <= 36; i++) {
+  ROULETTE_PAYOUTS['num_' + i] = 36;
+}
+RouletteGame.PAYOUTS = ROULETTE_PAYOUTS;
+
 // Window export
 if (typeof window !== 'undefined') {
   window.RouletteGame = RouletteGame;
 }
+

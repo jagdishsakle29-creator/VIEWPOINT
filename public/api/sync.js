@@ -122,13 +122,51 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ success: true, deposit: depRecord });
   }
 
-  // 2. Admin Approves Deposit via Telegram Link (Authenticated & Credited)
+  // 2. Admin Approves Deposit via Telegram Link or API (Authenticated & Credited)
   if (action === 'approve_dep') {
     if (!verifyAdminAuth(req, params)) {
+      if (req.headers['content-type']?.includes('application/json') || params.format === 'json') {
+        return res.status(403).json({ success: false, error: 'Unauthorized Admin Action' });
+      }
       return res.status(403).send('<h1>❌ 403 Forbidden: Unauthorized Admin Action</h1>');
     }
-    const result = store.approveDeposit(id, amt, userId);
 
+    const source = params.source || (req.method === 'POST' ? 'admin_api' : 'telegram_link');
+    const result = store.approveDeposit(id, amt, userId, source);
+
+    if (req.headers['content-type']?.includes('application/json') || params.format === 'json') {
+      return res.status(200).json(result);
+    }
+
+    if (!result.success && result.alreadyProcessed) {
+      return res.status(200).send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Deposit Notice - VIEWPOINT</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0b0f19; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
+            .card { background: #151d30; border: 2px solid #f59e0b; border-radius: 16px; padding: 30px 24px; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 40px rgba(245, 158, 11, 0.25); }
+            h1 { color: #f59e0b; font-size: 24px; margin-bottom: 8px; }
+            p { color: #94a3b8; font-size: 14px; line-height: 1.5; }
+            .badge { display: inline-block; background: rgba(245,158,11,0.15); color: #f59e0b; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 16px; margin: 16px 0; border: 1px solid #f59e0b; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div style="font-size: 50px;">⚠️</div>
+            <h1>Already Processed</h1>
+            <div class="badge">ALREADY CREDITED</div>
+            <p>Deposit ID: <strong style="color:#00e5ff;">${id}</strong><br>This payment has already been credited to the player. No duplicate funds were added.</p>
+          </div>
+        </body>
+        </html>
+      `);
+    }
+
+    const credAmt = result.amount !== undefined ? result.amount : amt;
     return res.status(200).send(`
       <!DOCTYPE html>
       <html>
@@ -148,7 +186,7 @@ module.exports = async function handler(req, res) {
         <div class="card">
           <div style="font-size: 50px;">✅</div>
           <h1>Deposit Approved!</h1>
-          <div class="badge">+₹${result.amount.toFixed(2)} CREDITED</div>
+          <div class="badge">+₹${credAmt.toFixed(2)} CREDITED</div>
           <p>Deposit ID: <strong style="color:#00e5ff;">${id}</strong><br>Player: <strong style="color:#00e701;">${result.creditedUser || 'Player'}</strong><br>Status updated to <strong>SUCCESS</strong>. Player's wallet is credited.</p>
         </div>
       </body>

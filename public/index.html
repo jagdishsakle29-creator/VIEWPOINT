@@ -434,6 +434,12 @@
       if (g === 'roulette' && !window.rouletteGame && window.RouletteGame) {
         window.rouletteGame = new window.RouletteGame();
       }
+      if (g === 'roulette' && window.rouletteGame && window.rouletteGame.init) {
+        window.rouletteGame.init();
+      }
+      if (g !== 'roulette' && window.rouletteGame && window.rouletteGame.pause) {
+        window.rouletteGame.pause();
+      }
       if (g === 'aviator' && window.aviatorGame && window.aviatorGame.resizeCanvas) {
         setTimeout(function(){ window.aviatorGame.resizeCanvas(); }, 50);
       }

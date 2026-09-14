@@ -18,6 +18,7 @@ function loadStore() {
       if (!inMemoryCache.deposits) inMemoryCache.deposits = {};
       if (!inMemoryCache.withdrawals) inMemoryCache.withdrawals = {};
       if (!inMemoryCache.history) inMemoryCache.history = {};
+      if (!inMemoryCache.ledger) inMemoryCache.ledger = {};
       return inMemoryCache;
     }
   } catch (e) {}
@@ -27,7 +28,8 @@ function loadStore() {
     deposits: {},
     withdrawals: {},
     history: {},
-    referrals: {}
+    referrals: {},
+    ledger: {}
   };
   return inMemoryCache;
 }
@@ -100,34 +102,96 @@ function saveDeposit(depRecord) {
   saveStore();
 }
 
-function approveDeposit(depId, amountOverride, userIdOverride) {
+function approveDeposit(depId, amountOverride, userIdOverride, source = 'admin') {
   const store = loadStore();
-  let dep = store.deposits[depId];
-  const amt = parseFloat(amountOverride) || (dep ? dep.amount : 200.0);
-  const uid = String(userIdOverride || (dep ? dep.userId : '')).trim();
+  if (!store.ledger) store.ledger = {};
 
+  // 1. Duplicate Credit Protection via Immutable Ledger
+  if (store.ledger[depId]) {
+    return {
+      success: false,
+      alreadyProcessed: true,
+      error: 'ALREADY_PROCESSED: This payment was already credited in ledger',
+      ledger: store.ledger[depId]
+    };
+  }
+
+  let dep = store.deposits[depId];
+  if (dep && dep.status === 'SUCCESS') {
+    return {
+      success: false,
+      alreadyProcessed: true,
+      error: 'ALREADY_PROCESSED: Deposit is already marked as SUCCESS'
+    };
+  }
+
+  // 2. Single Source of Truth for Approved Amount (Exact 2-Decimal Precision)
+  const requestedAmount = dep ? Math.round(parseFloat(dep.amount || 0) * 100) / 100 : 0;
+  let approvedAmount = requestedAmount;
+  if (amountOverride !== undefined && amountOverride !== null && !isNaN(parseFloat(amountOverride))) {
+    approvedAmount = Math.round(parseFloat(amountOverride) * 100) / 100;
+  }
+  if (approvedAmount <= 0) {
+    return { success: false, error: 'INVALID_AMOUNT: Approved amount must be greater than 0' };
+  }
+
+  const creditedAmount = approvedAmount;
+  const uid = String(userIdOverride || (dep ? dep.userId : '') || 'guest_default').trim();
+
+  // 3. Update Deposit Record
+  const now = Date.now();
   if (!dep) {
     dep = {
       id: depId,
-      userId: uid || 'guest_default',
-      amount: amt,
+      userId: uid,
+      requestedAmount: requestedAmount || approvedAmount,
+      amount: approvedAmount,
+      approvedAmount: approvedAmount,
+      creditedAmount: creditedAmount,
       status: 'SUCCESS',
-      approvedAt: Date.now()
+      approvedAt: now,
+      source: source
     };
     store.deposits[depId] = dep;
   } else {
     dep.status = 'SUCCESS';
-    dep.approvedAt = Date.now();
-    if (amt) dep.amount = amt;
+    dep.approvedAt = now;
+    dep.requestedAmount = requestedAmount;
+    dep.amount = approvedAmount;
+    dep.approvedAmount = approvedAmount;
+    dep.creditedAmount = creditedAmount;
+    dep.source = source;
   }
 
-  // Credit user's wallet
-  if (uid) {
-    updateWalletBalance(uid, amt);
-  }
+  // 4. Record Immutable Ledger Entry
+  const ledgerRecord = {
+    id: 'LEDGER-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+    paymentId: depId,
+    userId: uid,
+    requestedAmount: requestedAmount,
+    approvedAmount: approvedAmount,
+    creditedAmount: creditedAmount,
+    source: source,
+    createdAt: now,
+    status: 'SUCCESS'
+  };
+  store.ledger[depId] = ledgerRecord;
 
+  // 5. Credit Authoritative Wallet Balance
+  const updatedWallet = updateWalletBalance(uid, creditedAmount);
   saveStore();
-  return { success: true, deposit: dep, creditedUser: uid, amount: amt };
+
+  return {
+    success: true,
+    deposit: dep,
+    ledger: ledgerRecord,
+    creditedUser: uid,
+    requestedAmount: requestedAmount,
+    amount: approvedAmount,
+    approvedAmount: approvedAmount,
+    creditedAmount: creditedAmount,
+    balance: updatedWallet.balance
+  };
 }
 
 function rejectDeposit(depId) {
