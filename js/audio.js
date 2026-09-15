@@ -440,6 +440,214 @@ class CasinoAudioEngine {
       osc.stop(this.ctx.currentTime + 0.12);
     } catch(e) {}
   }
+
+  // =========================================================================
+  // DYNAMIC GAME-SPECIFIC BACKGROUND MUSIC (ZERO OVERLAP BETWEEN GAMES)
+  // =========================================================================
+  stopGameBgm() {
+    if (this.bgmTimer) {
+      clearInterval(this.bgmTimer);
+      this.bgmTimer = null;
+    }
+    if (this.bgmNodes && this.bgmNodes.length > 0) {
+      this.bgmNodes.forEach(node => {
+        try {
+          if (node.gain && this.ctx) {
+            node.gain.setValueAtTime(node.gain.value, this.ctx.currentTime);
+            node.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.15);
+          }
+          if (node.stop && this.ctx) {
+            node.stop(this.ctx.currentTime + 0.16);
+          }
+          if (node.disconnect) {
+            setTimeout(() => { try { node.disconnect(); } catch(e) {} }, 200);
+          }
+        } catch(e) {}
+      });
+    }
+    this.bgmNodes = [];
+    this.currentGame = null;
+  }
+
+  setGameBgm(gameId) {
+    // 1. Always stop any previously playing background audio immediately
+    this.stopGameBgm();
+
+    gameId = String(gameId || '').toLowerCase().trim();
+    if (!gameId || !this.canPlay() || !this.enabled || !this.tabVisible) return;
+
+    this.init();
+    if (!this.ctx) return;
+
+    this.currentGame = gameId;
+    const now = this.ctx.currentTime;
+
+    try {
+      if (gameId === 'aviator' || gameId === 'crash') {
+        // Jet / Rocket high-altitude wind drone
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(65, now);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(180, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.025, now + 0.4);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+
+        this.bgmNodes.push(osc, gain, filter);
+      }
+      else if (gameId === 'mines') {
+        // Deep tension ambient drone (110Hz + 165Hz fifth)
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(110, now);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(165, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.03, now + 0.5);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc1.start();
+        osc2.start();
+
+        this.bgmNodes.push(osc1, osc2, gain);
+      }
+      else if (gameId === 'dragontiger') {
+        // Oriental Mystic Casino Drone + Periodic gong
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(146.83, now); // D3
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.028, now + 0.5);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        this.bgmNodes.push(osc, gain);
+
+        // Periodic soft temple bell note every 4.5s
+        this.bgmTimer = setInterval(() => {
+          if (!this.canPlay() || this.currentGame !== 'dragontiger') return;
+          try {
+            const bell = this.ctx.createOscillator();
+            const bellGain = this.ctx.createGain();
+            bell.type = 'triangle';
+            bell.frequency.setValueAtTime(587.33, this.ctx.currentTime); // D5
+            bellGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+            bellGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.2);
+            bell.connect(bellGain);
+            bellGain.connect(this.ctx.destination);
+            bell.start();
+            bell.stop(this.ctx.currentTime + 1.2);
+          } catch(e) {}
+        }, 4500);
+      }
+      else if (gameId === 'chicken') {
+        // Upbeat rhythmic arcade bass pulse
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(130.81, now); // C3
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.025, now + 0.3);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        this.bgmNodes.push(osc, gain);
+      }
+      else if (gameId === 'roulette') {
+        // VIP Casino wheel lounge ambient
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(174.61, now); // F3
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.028, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        this.bgmNodes.push(osc, gain);
+      }
+      else if (gameId === 'andarbahar') {
+        // Indian Casino Card Lounge Ambience
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(196.00, now); // G3
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.025, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        this.bgmNodes.push(osc, gain);
+      }
+      else if (gameId === 'sportsbook') {
+        // Stadium match crowd rumble
+        const bufferSize = Math.floor(this.ctx.sampleRate * 2);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.2;
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        noise.loop = true;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(120, now);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.035, now + 0.5);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start();
+
+        this.bgmNodes.push(noise, filter, gain);
+      }
+      else {
+        // Default futuristic electronic lounge for Limbo, Dice, Plinko, Slots
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(130, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.022, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        this.bgmNodes.push(osc, gain);
+      }
+    } catch(e) {}
+  }
 }
 
 window.soundEngine = new CasinoAudioEngine();

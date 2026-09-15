@@ -5232,6 +5232,11 @@ class AppController {
       this.currentGame = gameType;
       this.hideToast();
 
+      // Trigger isolated procedural background music for this specific active game
+      if (window.soundEngine && window.soundEngine.setGameBgm) {
+        window.soundEngine.setGameBgm(gameType);
+      }
+
     // Auto switch page group based on game
     let targetPage = 1;
     if (['mines', 'dragontiger', 'limbo', 'pump'].includes(gameType)) targetPage = 1;

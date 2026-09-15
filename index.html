@@ -238,8 +238,21 @@
         activeId = 'viewLobby';
         if (window.filterCasinoCategory) window.filterCasinoCategory('live');
       }
-      else if (viewName === 'game' || viewName === 'gamescreen' || viewName === 'play') activeId = 'viewGameScreen';
-      else if (viewName === 'wallet') {
+      else if (viewName === 'game' || viewName === 'gamescreen' || viewName === 'play') {
+        activeId = 'viewGameScreen';
+        var activeG = (window.app && window.app.activeGame) ? window.app.activeGame : 'mines';
+        if (window.soundEngine && window.soundEngine.setGameBgm) {
+          window.soundEngine.setGameBgm(activeG);
+        }
+      }
+      else {
+        // Stop any active game background music when navigating away to Lobby, Home, Wallet, Deposit, Withdraw, or Promos
+        if (window.soundEngine && window.soundEngine.stopGameBgm) {
+          window.soundEngine.stopGameBgm();
+        }
+      }
+
+      if (viewName === 'wallet') {
         activeId = 'viewWallet';
         var inrBal = (window.wallet && window.wallet.balance) ? window.wallet.balance : 5432.00;
         var inrEl = document.getElementById('walletPageInrBal');
@@ -726,6 +739,11 @@
           c.classList.toggle('active', c.getAttribute('data-game') === g);
         });
       } catch(e) {}
+
+      // Trigger isolated background sound for only this active game
+      if (window.soundEngine && window.soundEngine.setGameBgm) {
+        window.soundEngine.setGameBgm(g);
+      }
     };
 
     window.filterCasinoCategory = function(category, activeBtn) {
