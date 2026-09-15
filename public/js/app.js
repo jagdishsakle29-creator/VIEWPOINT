@@ -9024,20 +9024,22 @@ class AppController {
 
     // Games belonging to each category
     const categoryGameMap = {
-      'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles'],
-      'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles'],
+      'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles', 'sportsbook'],
+      'featured': ['mines', 'aviator', 'roulette', 'dragontiger', 'chicken', 'plinko'],
+      'popular': ['mines', 'aviator', 'crash', 'roulette', 'colortrading'],
+      'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles', 'chicken'],
       'live': ['roulette', 'andarbahar', 'dragontiger', 'colortrading'],
       'crash': ['crash', 'aviator', 'chicken', 'limbo', 'pump'],
       'table': ['roulette', 'andarbahar', 'dragontiger', 'dice'],
-      'slots': ['colortrading', 'stock', 'pump', 'moles'],
-      'arcade': ['colortrading', 'stock', 'moles', 'pump'],
-      'providers': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles']
+      'slots': ['colortrading', 'stock', 'pump', 'moles', 'tower'],
+      'arcade': ['colortrading', 'stock', 'moles', 'pump', 'tower'],
+      'providers': ['roulette', 'andarbahar', 'dragontiger', 'aviator', 'colortrading', 'mines', 'crash', 'limbo', 'plinko', 'stock', 'dice', 'tower']
     };
 
     const allowedGames = categoryGameMap[category] || categoryGameMap['all'];
 
-    // 1. Filter Carousel Cards
-    const cards = document.querySelectorAll('.game-poster-card');
+    // 1. Filter Lobby Cards (Both Carousel & Compact Grid)
+    const cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
     cards.forEach(card => {
       const g = (card.getAttribute('data-game') || '').toLowerCase();
       const c = (card.getAttribute('data-category') || '').toLowerCase();
@@ -9078,10 +9080,10 @@ class AppController {
 
   searchCasinoGames(query) {
     const q = (query || '').toLowerCase().trim();
-    const cards = document.querySelectorAll('.game-poster-card');
+    const cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
     cards.forEach(card => {
-      const title = (card.querySelector('.game-poster-name, .game-poster-title')?.textContent || '').toLowerCase();
-      const cat = (card.querySelector('.game-poster-provider, .game-poster-cat')?.textContent || '').toLowerCase();
+      const title = (card.querySelector('.game-poster-name, .game-poster-title, .card-game-title')?.textContent || '').toLowerCase();
+      const cat = (card.querySelector('.game-poster-provider, .game-poster-cat, .card-cat-label')?.textContent || '').toLowerCase();
       const gameAttr = (card.getAttribute('data-game') || '').toLowerCase();
       if (!q || title.includes(q) || cat.includes(q) || gameAttr.includes(q)) {
         card.style.display = 'flex';

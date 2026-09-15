@@ -192,27 +192,283 @@
       var m = document.getElementById('modalDepositUpi');
       if (m) { m.classList.remove('open'); m.style.display = 'none'; }
     };
+    window.openWalletModal = function() {
+      if (window.app && window.app.openWalletModal) return window.app.openWalletModal();
+      var m = document.getElementById('modalWallet');
+      if (m) {
+        var inrBal = (window.wallet && window.wallet.balance) ? window.wallet.balance : 200.00;
+        var usdtBal = (inrBal / 90.0).toFixed(2);
+        var inrEl = document.getElementById('dashInrBalance');
+        var inrWEl = document.getElementById('dashInrWithdrawable');
+        var usdtEl = document.getElementById('dashUsdtBalance');
+        if (inrEl) inrEl.innerText = inrBal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (inrWEl) inrWEl.innerText = '₹' + inrBal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (usdtEl) usdtEl.innerText = usdtBal;
+        m.classList.add('open');
+        m.style.display = 'flex';
+      }
+    };
+    window.closeWalletModal = function() {
+      var m = document.getElementById('modalWallet');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+    window.openPromotionsModal = function() {
+      if (window.switchAppView) return window.switchAppView('promotions');
+      var m = document.getElementById('modalPromotions');
+      if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+    };
+    window.closePromotionsModal = function() {
+      var m = document.getElementById('modalPromotions');
+      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
+    };
+
+    // Master 8-Screen View Switcher (Exact Reference Design Matching)
+    window.switchAppView = function(viewName) {
+      viewName = String(viewName || 'home').toLowerCase().trim();
+      var viewIds = ['viewHome', 'viewLobby', 'viewGameScreen', 'viewWallet', 'viewDeposit', 'viewWithdraw', 'viewPromotions'];
+      viewIds.forEach(function(vId) {
+        var el = document.getElementById(vId);
+        if (el) el.style.display = 'none';
+      });
+
+      var activeId = 'viewHome';
+      if (viewName === 'home') activeId = 'viewHome';
+      else if (viewName === 'lobby' || viewName === 'games') activeId = 'viewLobby';
+      else if (viewName === 'live' || viewName === 'livegames') {
+        activeId = 'viewLobby';
+        if (window.filterCasinoCategory) window.filterCasinoCategory('live');
+      }
+      else if (viewName === 'game' || viewName === 'gamescreen' || viewName === 'play') activeId = 'viewGameScreen';
+      else if (viewName === 'wallet') {
+        activeId = 'viewWallet';
+        var inrBal = (window.wallet && window.wallet.balance) ? window.wallet.balance : 5432.00;
+        var inrEl = document.getElementById('walletPageInrBal');
+        if (inrEl) inrEl.innerText = inrBal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      else if (viewName === 'deposit') activeId = 'viewDeposit';
+      else if (viewName === 'withdraw') activeId = 'viewWithdraw';
+      else if (viewName === 'promotions' || viewName === 'promos') activeId = 'viewPromotions';
+      else if (viewName === 'transactions') {
+        activeId = 'viewWallet';
+        var tTab = document.getElementById('tabWalletTxHistory');
+        if (tTab) tTab.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      var targetEl = document.getElementById(activeId);
+      if (targetEl) {
+        targetEl.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // Sync active state in top header nav
+      var navButtons = document.querySelectorAll('.nav-link-btn');
+      navButtons.forEach(function(btn) {
+        var txt = (btn.textContent || '').toLowerCase().trim();
+        var match = (viewName === 'home' && txt === 'home') ||
+                    ((viewName === 'lobby' || viewName === 'games') && txt === 'games') ||
+                    ((viewName === 'live' || viewName === 'livegames') && txt.includes('live')) ||
+                    (viewName === 'promotions' && txt.includes('promo')) ||
+                    (viewName === 'wallet' && txt === 'wallet') ||
+                    (viewName === 'transactions' && txt.includes('trans'));
+        btn.classList.toggle('active', match);
+      });
+
+      // Sync mobile bottom nav
+      var mHome = document.getElementById('mNavHome');
+      var mGames = document.getElementById('mNavGames');
+      var mWallet = document.getElementById('mNavWallet');
+      var mProfile = document.getElementById('mNavProfile');
+      if (mHome) mHome.classList.toggle('active', viewName === 'home');
+      if (mGames) mGames.classList.toggle('active', viewName === 'lobby' || viewName === 'game');
+      if (mWallet) mWallet.classList.toggle('active', viewName === 'wallet' || viewName === 'deposit' || viewName === 'withdraw');
+    };
+
+    window.switchHeroSlide = function(index) {
+      index = parseInt(index, 10) || 0;
+      var slides = document.querySelectorAll('#compactHeroCarousel .compact-hero-slide');
+      var dots = document.querySelectorAll('.hero-dots-container .hero-dot');
+      if (!slides.length) return;
+      window._currentHeroIndex = index % slides.length;
+      slides.forEach(function(s, i) {
+        s.classList.toggle('active', i === window._currentHeroIndex);
+      });
+      dots.forEach(function(d, i) {
+        d.classList.toggle('active', i === window._currentHeroIndex);
+      });
+    };
+    // Helper functions for Screens 4, 5, 6, 7
+    window.switchWalletTabCurrency = function(curr) {
+      var isUsdt = (curr === 'USDT');
+      var bInr = document.getElementById('btnWTabInr');
+      var bUsdt = document.getElementById('btnWTabUsdt');
+      if (bInr) bInr.classList.toggle('active', !isUsdt);
+      if (bUsdt) bUsdt.classList.toggle('active', isUsdt);
+    };
+
+    window.selectDepositPageAmount = function(amt, btn) {
+      var chips = document.querySelectorAll('.dep-amount-chips-grid .dep-chip-btn');
+      chips.forEach(function(c) { c.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      var qrAmt = document.getElementById('depPageQrAmt');
+      if (qrAmt) {
+        if (amt === 'custom') {
+          var userAmt = prompt('Enter deposit amount (Min ₹200):', '1500');
+          if (userAmt) qrAmt.innerText = '₹ ' + parseInt(userAmt, 10).toLocaleString('en-IN');
+        } else {
+          qrAmt.innerText = '₹ ' + parseInt(amt, 10).toLocaleString('en-IN');
+        }
+      }
+    };
+
+    window.selectDepositPageMethod = function(method, btn) {
+      var btns = document.querySelectorAll('.dep-payment-methods-grid .dep-method-btn');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+    };
+
+    window.setWithdrawPagePct = function(pct, btn) {
+      var chips = document.querySelectorAll('.wth-pct-chips-row .wth-pct-chip');
+      chips.forEach(function(c) { c.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+      var balEl = document.getElementById('wthPageAvailBal');
+      var avail = balEl ? parseFloat(balEl.innerText.replace(/,/g, '')) || 5432 : 5432;
+      var amt = Math.max(200, Math.floor(avail * (pct / 100)));
+      var inp = document.getElementById('wthPageAmountInput');
+      if (inp) {
+        inp.value = amt;
+        window.updateWithdrawPageCalc();
+      }
+    };
+
+    window.updateWithdrawPageCalc = function() {
+      var inp = document.getElementById('wthPageAmountInput');
+      var amt = inp ? parseFloat(inp.value) || 0 : 0;
+      var feeEl = document.getElementById('wthPageFee');
+      var recEl = document.getElementById('wthPageReceive');
+      var fee = 10;
+      var receive = Math.max(0, amt - fee);
+      if (feeEl) feeEl.innerText = '₹ ' + fee;
+      if (recEl) recEl.innerText = '₹ ' + receive.toLocaleString('en-IN');
+    };
+
+    window.submitWithdrawPageRequest = function() {
+      var inp = document.getElementById('wthPageAmountInput');
+      var upiInp = document.getElementById('wthPageUpiInput');
+      var amt = inp ? inp.value : '1000';
+      var upi = upiInp ? upiInp.value : 'viewpoint@okaxis';
+      if (!upi || upi.length < 4) {
+        alert('Please enter a valid UPI ID');
+        return;
+      }
+      alert('Withdrawal request of ₹' + amt + ' to ' + upi + ' submitted successfully! Payout will arrive in 5-30 minutes.');
+    };
+
+    window.filterPromoCards = function(cat, btn) {
+      var pills = document.querySelectorAll('.promo-filter-pills-row .promo-pill-btn');
+      pills.forEach(function(p) { p.classList.remove('active'); });
+      if (btn) btn.classList.add('active');
+
+      var cards = document.querySelectorAll('.promo-3cards-row .promo-feature-card');
+      cards.forEach(function(card) {
+        var cardCat = (card.getAttribute('data-cat') || '').toLowerCase();
+        if (cat === 'all' || cardCat.includes(cat.toLowerCase())) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    };
+
+    // Auto-advance hero banner every 5 seconds
+    if (typeof window !== 'undefined' && !window._heroIntervalSet) {
+      window._heroIntervalSet = true;
+      window._currentHeroIndex = 0;
+      setInterval(function() {
+        var slides = document.querySelectorAll('#compactHeroCarousel .compact-hero-slide');
+        if (slides.length > 1) {
+          window.switchHeroSlide(((window._currentHeroIndex || 0) + 1) % slides.length);
+        }
+      }, 5000);
+    }
+    window.switchDepositCurrency = function(curr) {
+      curr = (curr || 'INR').toUpperCase();
+      var tabInr = document.getElementById('tabDepCurrInr');
+      var tabUsdt = document.getElementById('tabDepCurrUsdt');
+      var viewInr = document.getElementById('viewDepCurrInr');
+      var viewUsdt = document.getElementById('viewDepCurrUsdt');
+      var isInr = (curr === 'INR');
+      if (tabInr) tabInr.classList.toggle('active', isInr);
+      if (tabUsdt) tabUsdt.classList.toggle('active', !isInr);
+      if (viewInr) viewInr.style.display = isInr ? 'block' : 'none';
+      if (viewUsdt) viewUsdt.style.display = !isInr ? 'block' : 'none';
+
+      // Page view 5 sync
+      var pTabInr = document.getElementById('pageDepTabInr');
+      var pTabUsdt = document.getElementById('pageDepTabUsdt');
+      var pViewInr = document.getElementById('pageDepViewInr');
+      var pViewUsdt = document.getElementById('pageDepViewUsdt');
+      if (pTabInr) pTabInr.classList.toggle('active', isInr);
+      if (pTabUsdt) pTabUsdt.classList.toggle('active', !isInr);
+      if (pViewInr) pViewInr.style.display = isInr ? 'block' : 'none';
+      if (pViewUsdt) pViewUsdt.style.display = !isInr ? 'none' : 'block';
+    };
+    window.switchWithdrawCurrency = function(curr) {
+      curr = (curr || 'INR').toUpperCase();
+      var tabInr = document.getElementById('tabWdCurrInr');
+      var tabUsdt = document.getElementById('tabWdCurrUsdt');
+      var isInr = (curr === 'INR');
+      if (tabInr) tabInr.classList.toggle('active', isInr);
+      if (tabUsdt) tabUsdt.classList.toggle('active', !isInr);
+
+      var pTabInr = document.getElementById('pageWthTabInr');
+      var pTabUsdt = document.getElementById('pageWthTabUsdt');
+      if (pTabInr) pTabInr.classList.toggle('active', isInr);
+      if (pTabUsdt) pTabUsdt.classList.toggle('active', !isInr);
+
+      if (isInr) {
+        window.selectWithdrawMethod('UPI');
+      } else {
+        window.selectWithdrawMethod('CRYPTO');
+      }
+    };
+    window.setWithdrawPercent = function(pct) {
+      pct = parseInt(pct, 10) || 100;
+      var availBal = (window.wallet && typeof window.wallet.balance === 'number') ? window.wallet.balance : 0;
+      var amt = Math.max(0, Math.floor(availBal * (pct / 100)));
+      var inp = document.getElementById('withdrawAmountInput');
+      if (inp) {
+        inp.value = amt;
+      }
+      var chips = document.querySelectorAll('.withdraw-pct-chips .pct-chip-btn');
+      chips.forEach(function(c) {
+        c.classList.toggle('active', c.getAttribute('data-pct') === String(pct));
+      });
+      if (window.app && window.app.updateWithdrawCalculations) {
+        window.app.updateWithdrawCalculations();
+      }
+    };
     window.openWithdrawModal = function() {
       if (window.app && window.app.openWithdrawModal) return window.app.openWithdrawModal();
-      var m = document.getElementById('modalWithdrawUpi');
+      var m = document.getElementById('modalWithdraw');
       if (m) { m.classList.add('open'); m.style.display = 'flex'; }
     };
     window.closeWithdrawModal = function() {
       if (window.app && window.app.closeWithdrawModal) return window.app.closeWithdrawModal();
-      var m = document.getElementById('modalWithdrawUpi');
+      var m = document.getElementById('modalWithdraw');
       if (m) { m.classList.remove('open'); m.style.display = 'none'; }
     };
     window.switchDepositTab = function(t) {
       if (window.app && window.app.switchDepositTab) return window.app.switchDepositTab(t);
-      var tabs = [form, history, utr, crypto];
-      tabs.forEach(function(tab) {
-        var btn = document.getElementById(tabDeposit + (tab === form ? Form : (tab === history ? History : (tab === utr ? Utr : Crypto))));
-        var view = document.getElementById(viewDeposit + (tab === form ? Form : (tab === history ? History : (tab === utr ? Utr : Crypto))));
-        var active = (tab === t);
-        if (btn) btn.classList.toggle(active, active);
-        if (view) { view.classList.toggle(active, active); view.style.display = active ? block : none; }
-      });
-      if (t === history && window.app && window.app.renderDepositHistoryTable) window.app.renderDepositHistoryTable();
+      var isForm = (t === 'form');
+      var btnF = document.getElementById('tabDepositForm');
+      var btnH = document.getElementById('tabDepositHistory');
+      var viewF = document.getElementById('viewDepositForm');
+      var viewH = document.getElementById('viewDepositHistory');
+      if (btnF) btnF.classList.toggle('active', isForm);
+      if (btnH) btnH.classList.toggle('active', !isForm);
+      if (viewF) viewF.style.display = isForm ? 'block' : 'none';
+      if (viewH) viewH.style.display = !isForm ? 'block' : 'none';
+      if (!isForm && window.app && window.app.renderDepositHistoryTable) window.app.renderDepositHistoryTable();
     };
     window.setDepositAmount = function(amt) {
       var inp = document.getElementById('depositAmountInput');
@@ -231,11 +487,6 @@
     };
     window.submitWithdrawRequest = function() {
       if (window.app && window.app.submitWithdrawRequest) return window.app.submitWithdrawRequest();
-    };
-    window.closeWithdrawModal = function() {
-      if (window.app && window.app.closeWithdrawModal) return window.app.closeWithdrawModal();
-      var m = document.getElementById('modalWithdraw');
-      if (m) { m.classList.remove('open'); m.style.display = 'none'; }
     };
     window.switchWithdrawTab = function(t) {
       if (window.app && window.app.switchWithdrawTab) return window.app.switchWithdrawTab(t);
@@ -468,9 +719,9 @@
         } catch(e) {}
       }
 
-      // Sync active card highlight in carousel
+      // Sync active card highlight in lobby and carousel
       try {
-        var cards = document.querySelectorAll('.game-poster-card');
+        var cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
         cards.forEach(function(c) {
           c.classList.toggle('active', c.getAttribute('data-game') === g);
         });
@@ -500,18 +751,20 @@
       });
 
       var categoryGameMap = {
-        'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles'],
-        'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles'],
+        'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles', 'sportsbook'],
+        'featured': ['mines', 'aviator', 'roulette', 'dragontiger', 'chicken', 'plinko'],
+        'popular': ['mines', 'aviator', 'crash', 'roulette', 'colortrading'],
+        'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles', 'chicken'],
         'live': ['roulette', 'andarbahar', 'dragontiger', 'colortrading'],
         'crash': ['crash', 'aviator', 'chicken', 'limbo', 'pump'],
         'table': ['roulette', 'andarbahar', 'dragontiger', 'dice'],
-        'slots': ['colortrading', 'stock', 'pump', 'moles'],
-        'arcade': ['colortrading', 'stock', 'moles', 'pump'],
-        'providers': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles']
+        'slots': ['colortrading', 'stock', 'pump', 'moles', 'tower'],
+        'arcade': ['colortrading', 'stock', 'moles', 'pump', 'tower'],
+        'providers': ['roulette', 'andarbahar', 'dragontiger', 'aviator', 'colortrading', 'mines', 'crash', 'limbo', 'plinko', 'stock', 'dice', 'tower']
       };
 
       var allowedGames = categoryGameMap[category] || categoryGameMap['all'];
-      var cards = document.querySelectorAll('.game-poster-card');
+      var cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
       cards.forEach(function(card) {
         var g = (card.getAttribute('data-game') || '').toLowerCase();
         var c = (card.getAttribute('data-category') || '').toLowerCase();
@@ -539,10 +792,10 @@
     window.searchCasinoGames = function(query) {
       if (window.app && window.app.searchCasinoGames) return window.app.searchCasinoGames(query);
       var q = String(query || '').toLowerCase().trim();
-      var cards = document.querySelectorAll('.game-poster-card');
+      var cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
       cards.forEach(function(card) {
-        var title = ((card.querySelector('.game-poster-name') || {}).textContent || '').toLowerCase();
-        var cat = ((card.querySelector('.game-poster-provider') || {}).textContent || '').toLowerCase();
+        var title = ((card.querySelector('.game-poster-name, .card-game-title') || {}).textContent || '').toLowerCase();
+        var cat = ((card.querySelector('.game-poster-provider, .card-cat-label') || {}).textContent || '').toLowerCase();
         var gameAttr = (card.getAttribute('data-game') || '').toLowerCase();
         card.style.display = (!q || title.indexOf(q) !== -1 || cat.indexOf(q) !== -1 || gameAttr.indexOf(q) !== -1) ? 'flex' : 'none';
       });
@@ -731,547 +984,564 @@
       </button>
     </aside>
 
-    <!-- Main Content Area -->
-    <div class="stake-main-content" id="stakeMainContent">
-      <!-- Top Navigation Bar (2-Tier Sleek Header) -->
-      <header class="navbar">
-      <!-- Top Row: Logo & Brand + Auth / Profile + Refer Button -->
-      <div class="nav-top-row">
-        <div class="nav-brand" id="navBrandLogo" onclick="window.handleSecretLogoClick(event)" ontouchend="window.handleSecretLogoClick(event)" style="cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; gap: 8px;" title="VIEWPOINT">
-          <div class="brand-logo-icon" style="width: 36px; height: 36px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: transparent;">
-            <img src="assets/viewpoint_logo.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
-          </div>
-          <div class="brand-name" style="font-family: var(--font-display); font-weight: 900; font-size: 19px; letter-spacing: -0.5px;">VIEW<span style="color: #fcd34d; text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">POINT</span></div>
-        </div>
-
-        <!-- Refer & Earn Button -->
-        <button id="btnOpenRefer" class="btn-refer-nav" onclick="window.openReferModal ? window.openReferModal() : (window.app && window.app.openReferModal())">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-          <span>Refer & Earn</span>
-        </button>
-
-        <!-- Promo Video & Redeem Code Button (Admin Toggleable) -->
-        <button id="btnOpenPromoVideoNav" class="btn-refer-nav" style="display: none; background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2)); border: 1px solid rgba(239,68,68,0.5); color: #ff6b6b;" onclick="window.app && window.app.openPromoVideoModal()" title="Promo Video & Redeem Code">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-          <span>Promo Video</span>
-        </button>
-
-        <!-- Auth Status Box: Login & Signup OR Logged In Profile -->
-        <div id="authLoggedOutBox" class="auth-buttons-group">
-          <button id="btnOpenLogin" class="btn-auth-login" onclick="window.openAuthModal ? window.openAuthModal('login') : (window.app && window.app.openAuthModal('login'))">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            <span>Login</span>
-          </button>
-          <button id="btnOpenSignup" class="btn-auth-signup" onclick="window.openAuthModal ? window.openAuthModal('signup') : (window.app && window.app.openAuthModal('signup'))">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-            <span>Sign Up</span>
-          </button>
-        </div>
-
-        <div id="authLoggedInBox" class="user-profile-badge" style="display: none;">
-          <span class="user-avatar-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </span>
-          <span id="displayUsername" class="display-username">VIP Player</span>
-          <button id="btnLogout" class="btn-logout-mini" title="Logout" onclick="window.app && window.app.logoutUser()">
-            <span>Logout</span>
-          </button>
-        </div>
-
-        <!-- Header Sound Toggle Button -->
-        <button id="btnToggleSound" class="btn-icon-nav sound-nav-btn" title="Sound ON/OFF" onclick="window.toggleMasterAudio ? window.toggleMasterAudio() : (window.soundEngine && window.soundEngine.toggleSound ? window.soundEngine.toggleSound() : null)">
-          <span id="soundToggleIcon" style="font-size: 16px;">🔊</span>
-          <span class="sound-nav-label" style="font-size: 11px; font-weight: 700; color: #94a3b8; margin-left: 3px;">Sound</span>
-        </button>
-
-        <!-- Provably Fair Verifier Icon -->
-        <button id="btnProvablyFair" class="btn-icon-nav" title="Provably Fair Verifier">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-        </button>
-
-        <!-- Header Notifications Button -->
-        <button id="btnHeaderNotifications" class="btn-icon-nav" title="Notifications" onclick="window.app && window.app.showToast ? window.app.showToast('🔔 No new notifications', 'info') : null" style="position: relative;">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-          <span style="position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: #00e701; box-shadow: 0 0 6px #00e701;"></span>
-        </button>
-      </div>
-
-    <!-- Bottom Row: Balance + Deposit + Withdraw + Support -->
-    <div class="nav-bottom-row">
-      <!-- Balance Display -->
-      <div class="wallet-badge" title="Wallet Balance">
-        <div class="wallet-info">
-          <div style="display: flex; align-items: center; gap: 5px;">
-            <span class="wallet-label">Balance</span>
-          </div>
-          <div class="wallet-amount">
-            <span class="currency-symbol" id="currencySymbol">₹</span>
-            <span id="walletBalance">200.00</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Deposit Button -->
-      <button id="btnOpenDeposit" class="btn-deposit-upi" title="Add Money via UPI / QR Code" onclick="window.openDepositModal ? window.openDepositModal() : (window.app && window.app.openDepositModal())">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-        <span>Deposit</span>
-      </button>
-
-      <!-- Instant Demo Refill Button -->
-      <button id="btnClaimDemo" class="btn-demo-refill" title="Free Demo Balance (₹500)" onclick="window.claimDemoChips ? window.claimDemoChips(500) : (window.wallet && window.wallet.claimDemoChips(500))" style="background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.35); color: #00e5ff; border-radius: 8px; font-weight: 700; font-size: 11px; padding: 0 10px; height: 32px; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s;">
-        <span>🎁 +₹500 Free</span>
-      </button>
-
-      <!-- Withdrawal Button -->
-      <button id="btnOpenWithdraw" class="btn-withdraw-nav" title="Withdraw Funds to UPI / Bank" onclick="window.openWithdrawModal ? window.openWithdrawModal() : (window.app && window.app.openWithdrawModal())">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-        <span>Withdraw</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Page 1: Classic Casino Lobby (Mines & Chicken) -->
-  <main id="mainPage1" class="main-layout page-section active">
-    
-    <!-- Casino Title, Subtitle & Search Box -->
-    <div class="casino-title-row">
-      <div class="casino-title-content">
-        <h1 class="casino-main-title">
-          <span class="viewpoint-brand-text">VIEWPOINT</span>
-          <span class="casino-live-badge">VIP</span>
-        </h1>
-        <p class="casino-subtitle">Play your favorite games & live sports, win big!</p>
-      </div>
-      <div class="casino-search-box">
-        <span class="casino-search-icon">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        </span>
-        <input type="text" id="inputCasinoSearch" class="casino-search-input" placeholder="Search games..." oninput="window.app && window.app.searchCasinoGames ? window.app.searchCasinoGames(this.value) : (window.searchCasinoGames && window.searchCasinoGames(this.value))">
-      </div>
-    </div>
-
-    <!-- Horizontally Swipeable Category Navigation Tabs -->
-    <div class="casino-category-nav" id="casinoCategoryNav">
-      <button type="button" class="casino-cat-btn active" data-cat="all" onclick="window.filterCasinoCategory('all', this)">
-        <span>🔥 All Games</span>
-      </button>
-      <button type="button" class="casino-cat-btn" data-cat="sports" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
-        <span>🏏 Sports</span>
-      </button>
-      <button type="button" class="casino-cat-btn" data-cat="originals" onclick="window.filterCasinoCategory('originals', this)">
-        <span>🎲 Originals</span>
-      </button>
-      <button type="button" class="casino-cat-btn" data-cat="slots" onclick="window.filterCasinoCategory('slots', this)">
-        <span>🎰 Slots</span>
-      </button>
-      <button type="button" class="casino-cat-btn" data-cat="live" onclick="window.filterCasinoCategory('live', this)">
-        <span>👑 Live Casino</span>
-      </button>
-      <button type="button" class="casino-cat-btn" data-cat="table" onclick="window.filterCasinoCategory('table', this)">
-        <span>🎯 Table Games</span>
-      </button>
-      <button type="button" class="casino-cat-btn" data-cat="crash" onclick="window.filterCasinoCategory('crash', this)">
-        <span>💥 Crash</span>
-      </button>
-      <button type="button" class="casino-cat-btn" data-cat="providers" onclick="window.filterCasinoCategory('providers', this)">
-        <span>⚡ Providers</span>
-      </button>
-    </div>
-
-    <!-- Compact Game Tabs Bar (Visual Style of Reference) -->
-    <div class="viewpoint-game-tabs-bar" id="viewpointGameTabsBar">
-      <button type="button" class="v-game-tab active" id="vTabOriginals" data-game="mines" onclick="window.switchGame ? window.switchGame('mines') : (window.app && window.app.switchGame('mines'))">
-        <span class="v-tab-icon">🎲</span>
-        <span class="v-tab-label">ORIGINALS</span>
-      </button>
-      <button type="button" class="v-game-tab" id="vTabOlympus" data-game="limbo" onclick="window.switchGame ? window.switchGame('limbo') : (window.app && window.app.switchGame('limbo'))">
-        <span class="v-tab-thumb" style="background-image: url('images/gates_of_olympus.jpg');"></span>
-        <span class="v-tab-label">GATES OF OLYMPUS</span>
-      </button>
-      <button type="button" class="v-game-tab" id="vTabOdinsVault" data-game="tower" onclick="window.switchGame ? window.switchGame('tower') : (window.app && window.app.switchGame('tower'))">
-        <span class="v-tab-thumb" style="background-image: url('images/odins_vault.jpg');"></span>
-        <span class="v-tab-label">ODIN'S VAULT</span>
-      </button>
-      <button type="button" class="v-game-tab" id="vTabAviator" data-game="aviator" onclick="window.switchGame ? window.switchGame('aviator') : (window.app && window.app.switchGame('aviator'))">
-        <span class="v-tab-icon">🚀</span>
-        <span class="v-tab-label">AVIATOR</span>
-      </button>
-      <button type="button" class="v-game-tab" id="vTabDragonTiger" data-game="dragontiger" onclick="window.switchGame ? window.switchGame('dragontiger') : (window.app && window.app.switchGame('dragontiger'))">
-        <span class="v-tab-icon">🐉</span>
-        <span class="v-tab-label">DRAGON TIGER</span>
-      </button>
-      <button type="button" class="v-game-tab" id="vTabEvolutionLive" data-game="roulette" onclick="window.switchGame ? window.switchGame('roulette') : (window.app && window.app.switchGame('roulette'))">
-        <span class="v-tab-thumb" style="background-image: url('images/live_dealer_studio.jpg');"></span>
-        <span class="v-tab-label">EVOLUTION LIVE</span>
-      </button>
-      <button type="button" class="v-game-tab" id="vTabCricketBet" data-game="sportsbook" onclick="window.switchGame ? window.switchGame('sportsbook') : (window.app && window.app.switchGame('sportsbook'))">
-        <span class="v-tab-thumb" style="background-image: url('images/cricket_sports.jpg');"></span>
-        <span class="v-tab-label">CRICKET BET</span>
-      </button>
-      <button type="button" class="v-game-tab" id="vTabMoreGames" onclick="window.filterCasinoCategory ? window.filterCasinoCategory('all') : (window.app && window.app.scrollToGameArena())">
-        <span class="v-tab-icon">🎮</span>
-        <span class="v-tab-label">MORE GAMES</span>
-      </button>
-    </div>
-
-<!-- Main Game Box -->
-    <div class="game-arena">
-      
-      <!-- Left Betting Controls Sidebar -->
-      <section class="controls-panel">
-        
-        <!-- Mode Switcher: Manual vs Auto Play (Mines, Chicken, Crash) -->
-        <div class="bet-mode-toggle-row" id="betModeToggleRow">
-          <button id="btnModeManual" class="btn-mode-tab active" onclick="window.setBetMode ? window.setBetMode('manual') : (window.app && window.app.setBetMode('manual'))">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-            <span>Manual</span>
-          </button>
-          <button id="btnModeAuto" class="btn-mode-tab" onclick="window.setBetMode ? window.setBetMode('auto') : (window.app && window.app.setBetMode('auto'))">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/></svg>
-            <span>Auto Play</span>
-          </button>
-        </div>
-
-        <!-- Auto Play Settings Panel (Visible in Auto Mode) -->
-        <div id="autoPlaySettingsPanel" class="auto-play-settings-panel" style="display: none;">
-          <!-- Number of Bets -->
-          <div class="auto-field-group">
-            <div class="control-header">
-              <label class="control-label">Number of Bets</label>
-              <span class="control-helper" id="autoBetCountHelper">10 Rounds</span>
+          <!-- Main Top Navigation Bar (Fixed 62px Height) -->
+      <header class="navbar compact-navbar" id="viewpointHeader">
+        <div class="nav-compact-container">
+          <!-- Left: Golden Winged Logo & 7-Tap Secret Trigger -->
+          <div class="nav-brand" id="navBrandLogo" onclick="window.handleSecretLogoClick(event)" ontouchend="window.handleSecretLogoClick(event)" style="cursor: pointer; display: flex; align-items: center; gap: 8px;" title="VIEWPOINT">
+            <div class="brand-logo-icon" style="display: flex; align-items: center; justify-content: center;">
+              <svg width="32" height="26" viewBox="0 0 40 32" fill="none">
+                <path d="M4 4L20 28L36 4H28L20 18L12 4H4Z" fill="url(#goldLogoGrad)" />
+                <path d="M12 4L20 17L28 4H23L20 9L17 4H12Z" fill="#fff" opacity="0.6"/>
+                <defs>
+                  <linearGradient id="goldLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fef08a"/>
+                    <stop offset="50%" stop-color="#f59e0b"/>
+                    <stop offset="100%" stop-color="#b45309"/>
+                  </linearGradient>
+                </defs>
+              </svg>
             </div>
-            <div class="input-with-actions">
-              <input type="number" id="autoBetCountInput" class="bet-input-field" value="10" min="0" max="1000" step="1" oninput="window.app && window.app.updateAutoBetHelper ? window.app.updateAutoBetHelper() : (document.getElementById('autoBetCountHelper').innerText = this.value + ' Rounds')">
-              <div class="bet-quick-actions">
-                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(0) : (window.app && window.app.setAutoBetRounds(0))">∞</button>
-                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(10) : (window.app && window.app.setAutoBetRounds(10))">10</button>
-                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(25) : (window.app && window.app.setAutoBetRounds(25))">25</button>
-                <button class="btn-quick-bet" onclick="window.setAutoBetRounds ? window.setAutoBetRounds(50) : (window.app && window.app.setAutoBetRounds(50))">50</button>
+            <div class="brand-name" style="font-family: var(--font-display); font-weight: 900; font-size: 19px; letter-spacing: 0.5px; color: #f59e0b;">VIEW<span style="color: #fcd34d; text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">POINT</span></div>
+          </div>
+
+          <!-- Center: 6 Main Desktop Nav Links -->
+          <nav class="nav-center-links" id="navCenterLinks">
+            <button type="button" class="nav-link-btn active" onclick="window.switchAppView('home')">
+              <span>Home</span>
+            </button>
+            <button type="button" class="nav-link-btn" onclick="window.switchAppView('lobby')">
+              <span>Games</span>
+            </button>
+            <button type="button" class="nav-link-btn" onclick="window.switchAppView('live')">
+              <span>Live Games</span>
+            </button>
+            <button type="button" class="nav-link-btn" onclick="window.switchAppView('promotions')">
+              <span>Promotions</span>
+            </button>
+            <button type="button" class="nav-link-btn" onclick="window.switchAppView('wallet')">
+              <span>Wallet</span>
+            </button>
+            <button type="button" class="nav-link-btn" onclick="window.switchAppView('transactions')">
+              <span>Transactions</span>
+            </button>
+          </nav>
+
+          <!-- Right: Balance, Deposit, Sound, Notifications, Auth -->
+          <div class="nav-right-actions">
+            <!-- Balance Pill -->
+            <div class="wallet-badge compact-wallet-badge" onclick="window.switchAppView('wallet')" title="Click to view Wallet" style="cursor: pointer;">
+              <div class="wallet-info">
+                <span class="wallet-label">Balance:</span>
+                <div class="wallet-amount">
+                  <span class="currency-symbol" id="currencySymbol">₹</span>
+                  <span id="walletBalance">5,432.00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instant Deposit Button (Neon Green Highlight) -->
+            <button id="btnOpenDeposit" class="btn-deposit-upi compact-btn-deposit" title="Add Money via UPI / QR Code" onclick="window.switchAppView('deposit')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Deposit</span>
+            </button>
+
+            <!-- Notifications -->
+            <button id="btnHeaderNotifications" class="btn-icon-nav" title="Notifications" onclick="window.app && window.app.showToast ? window.app.showToast('🔔 No new notifications', 'info') : null" style="position: relative;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+              <span style="position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: #00e701; box-shadow: 0 0 6px #00e701;"></span>
+            </button>
+
+            <!-- User Profile Avatar -->
+            <button class="btn-icon-nav" title="My Profile" onclick="window.openAuthModal ? window.openAuthModal('login') : null">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+
+            <!-- Hamburger Menu for Mobile -->
+            <button class="btn-icon-nav mobile-menu-trigger" title="Menu" onclick="window.switchAppView('lobby')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Master Layout Container -->
+      <main id="mainPage1" class="main-layout page-section active" style="padding-top: 10px;">
+
+        <!-- ================================================================
+             SCREEN 1: HOME / LANDING PAGE (#viewHome)
+             ================================================================ -->
+        <div id="viewHome" class="app-view-screen" style="display: block;">
+          <!-- 1. Hero Banner Matching Image #1 -->
+          <div class="home-hero-banner">
+            <div class="home-hero-left">
+              <div class="home-hero-badge">
+                <svg width="18" height="14" viewBox="0 0 40 32" fill="none"><path d="M4 4L20 28L36 4H28L20 18L12 4H4Z" fill="#fcd34d"/></svg>
+                <span>VIEWPOINT • PLAY • WIN • GROW</span>
+              </div>
+              <h1 class="home-hero-title">Your Ultimate Gaming Destination</h1>
+              <p class="home-hero-sub">Big Games • Real Rewards • Non Stop Thrill</p>
+              <div class="home-hero-actions">
+                <button type="button" class="btn-join-now" onclick="window.switchAppView('lobby')">
+                  <span>Join Now</span>
+                </button>
+                <button type="button" class="btn-explore-games" onclick="window.switchAppView('lobby')">
+                  <span>Explore Games</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="home-hero-right">
+              <img src="images/odins_vault.jpg" alt="VIEWPOINT 3D Casino" class="hero-3d-visual" loading="eager">
+            </div>
+
+            <!-- Carousel Pagination Dots -->
+            <div class="hero-dots-container">
+              <span class="hero-dot active"></span>
+              <span class="hero-dot"></span>
+              <span class="hero-dot"></span>
+            </div>
+          </div>
+
+          <!-- 2. Value Propositions Bar (4 Items) -->
+          <div class="value-props-bar">
+            <div class="value-prop-card">
+              <span class="prop-icon">🛡️</span>
+              <div class="prop-text">
+                <strong>100% Secure</strong>
+                <span>&amp; Fair Play</span>
+              </div>
+            </div>
+            <div class="value-prop-card">
+              <span class="prop-icon">🏦</span>
+              <div class="prop-text">
+                <strong>Fast Deposits</strong>
+                <span>&amp; Withdrawals</span>
+              </div>
+            </div>
+            <div class="value-prop-card">
+              <span class="prop-icon">🎧</span>
+              <div class="prop-text">
+                <strong>24/7</strong>
+                <span>Support</span>
+              </div>
+            </div>
+            <div class="value-prop-card">
+              <span class="prop-icon">🎁</span>
+              <div class="prop-text">
+                <strong>Exciting</strong>
+                <span>Promotions</span>
               </div>
             </div>
           </div>
 
-          <!-- Auto Picks per Round (For Mines & Chicken) -->
-          <div id="autoPicksGroup" class="auto-field-group">
-            <div class="control-header">
-              <label class="control-label" id="autoPicksLabel">Auto Picks per Round</label>
-              <span class="control-helper">Safe Picks</span>
+          <!-- 3. Featured Games Section (Matching Image #1) -->
+          <div class="featured-games-row-wrap">
+            <div class="section-header-row">
+              <h2 class="section-title">Featured Games</h2>
+              <span class="section-view-all" onclick="window.switchAppView('lobby')">View All →</span>
             </div>
-            <div class="input-with-actions">
-              <input type="number" id="autoPicksCountInput" class="bet-input-field" value="3" min="1" max="10" step="1">
-              <div class="bet-quick-actions">
-                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='1'">1</button>
-                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='2'">2</button>
-                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='3'">3</button>
-                <button class="btn-quick-bet" onclick="document.getElementById('autoPicksCountInput').value='5'">5</button>
+
+            <div class="featured-cards-grid">
+              <!-- Crash -->
+              <div class="compact-game-card" data-game="crash" onclick="window.switchGame('crash')">
+                <div class="card-thumb-wrap">
+                  <span class="card-fav-icon">♥</span>
+                  <div class="card-thumb-emoji" style="background: radial-gradient(circle, #0f2e3d, #090d16);">🚀</div>
+                  <button type="button" class="card-quick-play-btn">Play</button>
+                </div>
+                <div class="card-meta-info">
+                  <div class="card-game-title">Crash</div>
+                  <div class="card-cat-label" style="color:#00e701;">Popular</div>
+                </div>
+              </div>
+
+              <!-- Aviator -->
+              <div class="compact-game-card" data-game="aviator" onclick="window.switchGame('aviator')">
+                <div class="card-thumb-wrap">
+                  <span class="card-badge hot">🔥 HOT</span>
+                  <span class="card-fav-icon">♥</span>
+                  <div class="card-thumb-emoji" style="background: radial-gradient(circle, #450a0a, #090d16);">✈️</div>
+                  <button type="button" class="card-quick-play-btn">Play</button>
+                </div>
+                <div class="card-meta-info">
+                  <div class="card-game-title">Aviator</div>
+                  <div class="card-cat-label" style="color:#ef4444;">Popular</div>
+                </div>
+              </div>
+
+              <!-- Dragon Tiger -->
+              <div class="compact-game-card" data-game="dragontiger" onclick="window.switchGame('dragontiger')">
+                <div class="card-thumb-wrap">
+                  <span class="card-badge live">🔴 LIVE</span>
+                  <span class="card-fav-icon">♥</span>
+                  <div class="card-thumb-emoji" style="background: radial-gradient(circle, #311042, #090d16);">🐉</div>
+                  <button type="button" class="card-quick-play-btn">Play</button>
+                </div>
+                <div class="card-meta-info">
+                  <div class="card-game-title">Dragon Tiger</div>
+                  <div class="card-cat-label" style="color:#c084fc;">Live</div>
+                </div>
+              </div>
+
+              <!-- Teen Patti / Andar Bahar -->
+              <div class="compact-game-card" data-game="andarbahar" onclick="window.switchGame('andarbahar')">
+                <div class="card-thumb-wrap">
+                  <span class="card-fav-icon">♥</span>
+                  <div class="card-thumb-emoji" style="background: radial-gradient(circle, #331520, #090d16);">🃏</div>
+                  <button type="button" class="card-quick-play-btn">Play</button>
+                </div>
+                <div class="card-meta-info">
+                  <div class="card-game-title">Teen Patti</div>
+                  <div class="card-cat-label">Card Game</div>
+                </div>
+              </div>
+
+              <!-- Roulette -->
+              <div class="compact-game-card" data-game="roulette" onclick="window.switchGame('roulette')">
+                <div class="card-thumb-wrap">
+                  <span class="card-badge live">🔴 LIVE</span>
+                  <span class="card-fav-icon">♥</span>
+                  <div class="card-thumb-emoji" style="background: radial-gradient(circle, #064e3b, #090d16);">🎡</div>
+                  <button type="button" class="card-quick-play-btn">Play</button>
+                </div>
+                <div class="card-meta-info">
+                  <div class="card-game-title">Roulette</div>
+                  <div class="card-cat-label" style="color:#00e701;">Live</div>
+                </div>
+              </div>
+
+              <!-- Slots 777 -->
+              <div class="compact-game-card" data-game="colortrading" onclick="window.switchGame('colortrading')">
+                <div class="card-thumb-wrap">
+                  <span class="card-fav-icon">♥</span>
+                  <div class="card-thumb-emoji" style="background: radial-gradient(circle, #291a05, #090d16);">🎰</div>
+                  <button type="button" class="card-quick-play-btn">Play</button>
+                </div>
+                <div class="card-meta-info">
+                  <div class="card-game-title">Slots</div>
+                  <div class="card-cat-label" style="color:#f59e0b;">Popular</div>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- Live Auto Stats Badge -->
-          <div id="autoPlayLiveStats" class="auto-live-stats" style="display: none;">
-            <span>Rounds: <strong id="autoLiveRoundsText" style="color: #00e5ff;">0 / 10</strong></span>
-            <span>Profit: <strong id="autoLiveProfitText" style="color: #00e701;">+₹0.00</strong></span>
-          </div>
         </div>
 
-        <!-- Bet Amount Input Group (Top Ergonomic Placement) -->
-        <div class="control-group">
-          <div class="control-header">
-            <label class="control-label">Bet Amount</label>
-            <span class="control-helper">INR (₹)</span>
-          </div>
-          <div class="input-with-actions">
-            <span class="input-currency-prefix" id="inputCurrencyPrefix">₹</span>
-            <input type="number" id="betAmountInput" class="bet-input-field" value="10.00" min="0.10" step="1.00">
-            <div class="bet-quick-actions">
-              <button id="btnHalfBet" class="btn-quick-bet">½</button>
-              <button id="btnDoubleBet" class="btn-quick-bet">2X</button>
-              <button id="btnMaxBet" class="btn-quick-bet">MAX</button>
+        <!-- ================================================================
+             SCREEN 2: GAME LOBBY PAGE (#viewLobby)
+             ================================================================ -->
+        <div id="viewLobby" class="app-view-screen" style="display: none;">
+          <div class="lobby-layout-wrap">
+            <!-- Left Sidebar Navigation with Badges (Matching Image #2) -->
+            <aside class="lobby-sidebar">
+              <input type="text" class="lobby-search-input" placeholder="🔍 Search games..." oninput="window.searchCasinoGames(this.value)">
+
+              <div class="lobby-categories-list">
+                <div class="lobby-cat-item active" data-cat="all" onclick="window.filterCasinoCategory('all', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>🟢</span> <span>All Games</span></div>
+                  <span class="lobby-cat-badge">120</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="crash" onclick="window.filterCasinoCategory('crash', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>🚀</span> <span>Crash</span></div>
+                  <span class="lobby-cat-badge">18</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="slots" onclick="window.filterCasinoCategory('slots', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>🎰</span> <span>Slots</span></div>
+                  <span class="lobby-cat-badge">32</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="live" onclick="window.filterCasinoCategory('live', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>🔴</span> <span>Live Casino</span></div>
+                  <span class="lobby-cat-badge">24</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="table" onclick="window.filterCasinoCategory('table', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>🃏</span> <span>Card Games</span></div>
+                  <span class="lobby-cat-badge">16</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="table" onclick="window.filterCasinoCategory('table', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>🎲</span> <span>Table Games</span></div>
+                  <span class="lobby-cat-badge">12</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="sports" onclick="window.filterCasinoCategory('sports', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>⚽</span> <span>Sports</span></div>
+                  <span class="lobby-cat-badge">8</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="arcade" onclick="window.filterCasinoCategory('arcade', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>🎣</span> <span>Fishing</span></div>
+                  <span class="lobby-cat-badge">6</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="featured" onclick="window.filterCasinoCategory('featured', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>⭐</span> <span>New Games</span></div>
+                  <span class="lobby-cat-badge">4</span>
+                </div>
+                <div class="lobby-cat-item" data-cat="popular" onclick="window.filterCasinoCategory('popular', this)">
+                  <div style="display:flex; align-items:center; gap:8px;"><span>👑</span> <span>Popular</span></div>
+                  <span class="lobby-cat-badge">10</span>
+                </div>
+              </div>
+            </aside>
+
+            <!-- Right Main Area: Filter Pills & 4-Column Dense Grid (Matching Image #2) -->
+            <div class="lobby-main-grid-area">
+              <div class="lobby-top-bar">
+                <h2 class="section-title">All Games</h2>
+                <div class="lobby-filter-pills">
+                  <button type="button" class="lobby-pill-btn active" onclick="window.filterCasinoCategory('featured', this)">Featured</button>
+                  <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('popular', this)">Popular</button>
+                  <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('originals', this)">New</button>
+                  <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('live', this)">Live</button>
+                  <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('all', this)">All Games</button>
+                </div>
+              </div>
+
+              <!-- 4-Column Game Grid -->
+              <div class="lobby-cards-4col-grid" id="lobbyCards4ColGrid">
+                <!-- 1. Aviator -->
+                <div class="lobby-poster-card" data-game="aviator" data-category="crash popular all" onclick="window.switchGame('aviator')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #581c87, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">✈️</div>
+                    <div class="poster-title-overlay">Aviator</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Popular</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 2. Crash -->
+                <div class="lobby-poster-card" data-game="crash" data-category="crash originals all" onclick="window.switchGame('crash')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #0e7490, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🚀</div>
+                    <div class="poster-title-overlay">Crash</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Popular</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 3. Dragon Tiger -->
+                <div class="lobby-poster-card" data-game="dragontiger" data-category="live table popular all" onclick="window.switchGame('dragontiger')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #831843, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🐉</div>
+                    <div class="poster-title-overlay">Dragon Tiger</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge" style="color:#00e701;">Live</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 4. Teen Patti -->
+                <div class="lobby-poster-card" data-game="andarbahar" data-category="table live all" onclick="window.switchGame('andarbahar')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #1e3a8a, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🃏</div>
+                    <div class="poster-title-overlay">Teen Patti</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Card Game</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 5. Roulette -->
+                <div class="lobby-poster-card" data-game="roulette" data-category="live table all" onclick="window.switchGame('roulette')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #14532d, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🎡</div>
+                    <div class="poster-title-overlay">Roulette</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge" style="color:#00e701;">Live</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 6. Blackjack / Dice -->
+                <div class="lobby-poster-card" data-game="dice" data-category="table originals all" onclick="window.switchGame('dice')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #334155, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🎲</div>
+                    <div class="poster-title-overlay">Blackjack</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Card Game</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 7. Slots 777 -->
+                <div class="lobby-poster-card" data-game="colortrading" data-category="slots arcade all" onclick="window.switchGame('colortrading')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #78350f, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🎰</div>
+                    <div class="poster-title-overlay">Slots 777</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Popular</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 8. Baccarat / Limbo -->
+                <div class="lobby-poster-card" data-game="limbo" data-category="table originals all" onclick="window.switchGame('limbo')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #1e293b, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🎯</div>
+                    <div class="poster-title-overlay">Baccarat</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Card Game</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Game Difficulty Mode Selector -->
-        <div class="control-group" id="difficultyControlGroup">
-          <div class="control-header">
-            <label class="control-label">Difficulty Mode</label>
-            <span class="control-helper" id="difficultyLabelHelper">🟡 Medium (Balanced Mode)</span>
-          </div>
-          <div class="difficulty-modes-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-            <button type="button" id="btnDiffEasy" class="btn-diff-mode" data-diff="easy" onclick="window.setDifficulty ? window.setDifficulty('easy') : (window.app && window.app.setDifficulty('easy'))" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-              <span style="pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                <span style="width: 6px; height: 6px; border-radius: 50%; background: #00e701; box-shadow: 0 0 6px #00e701;"></span>
-                <span>Easy</span>
-              </span>
-              <small style="pointer-events: none;">Low Risk</small>
+        <!-- ================================================================
+             SCREEN 3: 3-COLUMN GAME ARENA SCREEN (#viewGameScreen)
+             ================================================================ -->
+        <div id="viewGameScreen" class="app-view-screen" style="display: none;">
+          <!-- Compact Game Arena Title Header & Quick Tabs -->
+          <div class="viewpoint-game-tabs-bar" id="viewpointGameTabsBar">
+            <button type="button" class="v-game-tab active" id="vTabOriginals" data-game="mines" onclick="window.switchGame('mines')">
+              <span class="v-tab-icon">🎲</span>
+              <span class="v-tab-label">MINES</span>
             </button>
-            <button type="button" id="btnDiffMed" class="btn-diff-mode active" data-diff="medium" onclick="window.setDifficulty ? window.setDifficulty('medium') : (window.app && window.app.setDifficulty('medium'))" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-              <span style="pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span>
-                <span>Med</span>
-              </span>
-              <small style="pointer-events: none;">Balanced</small>
+            <button type="button" class="v-game-tab" id="vTabAviator" data-game="aviator" onclick="window.switchGame('aviator')">
+              <span class="v-tab-icon">🚀</span>
+              <span class="v-tab-label">AVIATOR</span>
             </button>
-            <button type="button" id="btnDiffHard" class="btn-diff-mode" data-diff="hard" onclick="window.setDifficulty ? window.setDifficulty('hard') : (window.app && window.app.setDifficulty('hard'))" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
-              <span style="pointer-events: none; display: flex; align-items: center; justify-content: center; gap: 4px;">
-                <span style="width: 6px; height: 6px; border-radius: 50%; background: #fe2c55; box-shadow: 0 0 6px #fe2c55;"></span>
-                <span>Hard</span>
-              </span>
-              <small style="pointer-events: none;">High Risk</small>
+            <button type="button" class="v-game-tab" id="vTabDragonTiger" data-game="dragontiger" onclick="window.switchGame('dragontiger')">
+              <span class="v-tab-icon">🐉</span>
+              <span class="v-tab-label">DRAGON TIGER</span>
+            </button>
+            <button type="button" class="v-game-tab" id="vTabOlympus" data-game="limbo" onclick="window.switchGame('limbo')">
+              <span class="v-tab-icon">🎯</span>
+              <span class="v-tab-label">LIMBO</span>
+            </button>
+            <button type="button" class="v-game-tab" id="vTabEvolutionLive" data-game="roulette" onclick="window.switchGame('roulette')">
+              <span class="v-tab-icon">🎡</span>
+              <span class="v-tab-label">ROULETTE</span>
+            </button>
+            <button type="button" class="v-game-tab" id="vTabCricketBet" data-game="sportsbook" onclick="window.switchGame('sportsbook')">
+              <span class="v-tab-icon">🏏</span>
+              <span class="v-tab-label">CRICKET BET</span>
             </button>
           </div>
-        </div>
 
-        <!-- Mines Difficulty Selector (Visible on Mines Tab) -->
-        <div id="minesSelectGroup" class="control-group" style="display: none;">
-          <div class="control-header">
-            <label class="control-label">Mines Count</label>
-            <span class="control-helper">1 - 24 Mines</span>
-          </div>
-          <div class="custom-select-wrapper">
-            <select id="minesCountSelect" class="custom-select">
-              <option value="1">1 Mine (Safe: 24)</option>
-              <option value="2">2 Mines (Safe: 23)</option>
-              <option value="3" selected>3 Mines (Safe: 22)</option>
-              <option value="4">4 Mines (Safe: 21)</option>
-              <option value="5">5 Mines (Safe: 20)</option>
-              <option value="7">7 Mines (Safe: 18)</option>
-              <option value="10">10 Mines (Safe: 15)</option>
-              <option value="15">15 Mines (Safe: 10)</option>
-              <option value="20">20 Mines (Safe: 5)</option>
-              <option value="24">24 Mines (Safe: 1)</option>
-            </select>
-            <span class="select-arrow">▼</span>
-          </div>
-        </div>
+          <!-- Main Game Box (3-Column Desktop Layout: Left History, Center Stage, Right Controls) -->
+          <div class="game-arena" id="mainGameArena">
+            
+            <!-- Left Column: Compact History / Live Rounds Panel (Matching Image #3) -->
+            <aside class="game-history-sidebar" id="gameHistorySidebar">
+              <div class="history-sidebar-header">
+                <span class="history-header-title">Game History</span>
+                <span class="history-live-dot"></span>
+              </div>
+              <div class="history-rounds-list" id="sidebarHistoryList">
+                <div class="history-item win"><span class="hist-game">🎯</span> <span class="hist-mult">2.15x</span></div>
+                <div class="history-item win"><span class="hist-game">🚀</span> <span class="hist-mult">1.42x</span></div>
+                <div class="history-item win"><span class="hist-game">🎰</span> <span class="hist-mult">3.67x</span></div>
+                <div class="history-item loss"><span class="hist-game">🎲</span> <span class="hist-mult">1.08x</span></div>
+                <div class="history-item win"><span class="hist-game">🐉</span> <span class="hist-mult">4.32x</span></div>
+                <div class="history-item loss"><span class="hist-game">✈️</span> <span class="hist-mult">1.25x</span></div>
+                <div class="history-item win"><span class="hist-game">🎡</span> <span class="hist-mult">2.78x</span></div>
+                <div class="history-item loss"><span class="hist-game">🍗</span> <span class="hist-mult">1.56x</span></div>
+                <div class="history-item win"><span class="hist-game">💣</span> <span class="hist-mult">5.21x</span></div>
+                <div class="history-item loss"><span class="hist-game">🏏</span> <span class="hist-mult">1.34x</span></div>
+              </div>
+            </aside>
 
-        <!-- Plinko Pyramid Rows Selector (Visible on Plinko Tab) -->
-        <div id="plinkoSelectGroup" class="control-group" style="display: none;">
-          <div class="control-header">
-            <label class="control-label">Pyramid Rows</label>
-            <span class="control-helper" id="plinkoRowsLabelHelper">12 Rows (Balanced)</span>
-          </div>
-          <div class="custom-select-wrapper">
-            <select id="plinkoRowsSelectSidebar" class="custom-select" onchange="window.app && window.app.setPlinkoRows(this.value)">
-              <option value="8">8 Rows (Fast)</option>
-              <option value="10">10 Rows (Standard)</option>
-              <option value="12" selected>12 Rows (Balanced)</option>
-              <option value="14">14 Rows (High Win)</option>
-              <option value="16">16 Rows (Max 1000x)</option>
-            </select>
-            <span class="select-arrow">▼</span>
-          </div>
-        </div>
+            <!-- Right Column: Compact Betting Controls Panel (Matching Image #3) -->
+            <section class="controls-panel">
+              <div class="control-header" style="margin-bottom: 2px;">
+                <span style="font-family: var(--font-display); font-size: 13px; font-weight: 800; color: #fff;">Bet Controls</span>
+              </div>
 
+              <!-- Mode Switcher: Manual vs Auto Play -->
+              <div class="bet-mode-toggle-row" id="betModeToggleRow">
+                <button id="btnModeManual" class="btn-mode-tab active" onclick="window.setBetMode ? window.setBetMode('manual') : null">
+                  <span>Manual</span>
+                </button>
+                <button id="btnModeAuto" class="btn-mode-tab" onclick="window.setBetMode ? window.setBetMode('auto') : null">
+                  <span>Auto</span>
+                </button>
+              </div>
 
-        <!-- Highway Difficulty Selector (Visible on Chicken Tab) -->
-        <div id="chickenSelectGroup" class="control-group" style="display: flex;">
-          <div class="control-header">
-            <label class="control-label">Highway Difficulty</label>
-            <span class="control-helper">Traffic Density</span>
-          </div>
-          <div class="custom-select-wrapper">
-            <select id="bonesCountSelect" class="custom-select" onchange="window.app && window.app.handleChickenDifficultyChange(this.value)">
-              <option value="easy">🟢 Easy (15% Traffic - Safe 85%)</option>
-              <option value="medium" selected>🟡 Medium (25% Traffic - Safe 75%)</option>
-              <option value="hard">🟠 Hard (35% Rush Hour - Safe 65%)</option>
-              <option value="daredevil">🔴 Daredevil (50% Nitro Traffic - Max Multipliers)</option>
-            </select>
-            <span class="select-arrow">▼</span>
-          </div>
-        </div>
+              <!-- Auto Play Settings Panel (Visible in Auto Mode) -->
+              <div id="autoPlaySettingsPanel" class="auto-play-settings-panel" style="display: none;">
+                <div class="auto-field-group">
+                  <div class="control-header">
+                    <label class="control-label">Number of Bets</label>
+                    <span class="control-helper" id="autoBetCountHelper">10 Rounds</span>
+                  </div>
+                  <div class="input-with-actions">
+                    <input type="number" id="autoBetCountInput" class="bet-input-field" value="10" min="0" max="1000" step="1">
+                    <div class="bet-quick-actions">
+                      <button class="btn-quick-bet" onclick="window.setAutoBetRounds(0)">∞</button>
+                      <button class="btn-quick-bet" onclick="window.setAutoBetRounds(10)">10</button>
+                      <button class="btn-quick-bet" onclick="window.setAutoBetRounds(25)">25</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-        <!-- Crash Auto Cashout Selector (Visible on Crash Tab) -->
-        <div id="crashSelectGroup" class="control-group" style="display: none;">
-          <div class="control-header">
-            <label class="control-label">Auto Cashout</label>
-            <span class="control-helper">Target Multiplier</span>
-          </div>
-          <div class="input-with-actions">
-            <input type="number" id="crashAutoCashoutInput" class="bet-input-field" value="2.00" min="1.01" step="0.10" style="padding-left: 14px;">
-            <div class="bet-quick-actions">
-              <button type="button" class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='1.50'">1.5x</button>
-              <button type="button" class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='2.00'">2x</button>
-              <button type="button" class="btn-quick-bet" onclick="document.getElementById('crashAutoCashoutInput').value='5.00'">5x</button>
-            </div>
-          </div>
-        </div>
+              <!-- Bet Amount Input Group with − and + -->
+              <div class="control-group">
+                <div class="control-header">
+                  <label class="control-label">Bet Amount</label>
+                  <span class="control-helper">INR (₹)</span>
+                </div>
+                <div class="input-with-actions">
+                  <span class="input-currency-prefix" id="inputCurrencyPrefix">₹</span>
+                  <input type="number" id="betAmountInput" class="bet-input-field" value="100.00" min="0.10" step="1.00">
+                  <div class="bet-quick-actions">
+                    <button class="btn-quick-bet" onclick="var el=document.getElementById('betAmountInput'); el.value = Math.max(1, Math.floor(parseFloat(el.value||0)-10));">−</button>
+                    <button class="btn-quick-bet" onclick="var el=document.getElementById('betAmountInput'); el.value = Math.floor(parseFloat(el.value||0)+10);">+</button>
+                  </div>
+                </div>
+              </div>
 
-        <!-- Limbo Target Multiplier Selector (Visible on Limbo Tab) -->
-        <div id="limboSelectGroup" class="control-group" style="display: none;">
-          <div class="control-header">
-            <label class="control-label">Target Multiplier</label>
-            <span class="control-helper" id="limboWinChanceSidebar">Win: 49.50%</span>
-          </div>
-          <div class="input-with-actions">
-            <input type="number" id="limboTargetInputSidebar" class="bet-input-field" value="2.00" min="1.01" step="0.10" style="padding-left: 14px;" oninput="window.app && window.app.setLimboTarget(this.value)">
-            <div class="bet-quick-actions">
-              <button type="button" class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(1.50)">1.5x</button>
-              <button type="button" class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(2.00)">2x</button>
-              <button type="button" class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(5.00)">5x</button>
-              <button type="button" class="btn-quick-bet" onclick="window.app && window.app.setLimboTarget(10.00)">10x</button>
-            </div>
-          </div>
-        </div>
+              <!-- Preset Amount Chips (Matching Image #3) -->
+              <div class="deposit-quick-chips" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 4px 0;">
+                <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='10'">₹ 10</button>
+                <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='50'">₹ 50</button>
+                <button type="button" class="chip-btn active" onclick="document.getElementById('betAmountInput').value='100'">₹ 100</button>
+                <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='500'">₹ 500</button>
+                <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='1000'">₹ 1,000</button>
+                <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='5000'">₹ 5,000</button>
+              </div>
 
-        <!-- Color Trading Contract Chips (Visible on Color Trading Tab) -->
-        <div id="colorTradingSelectGroup" class="control-group" style="display: none;">
-          <div class="control-header">
-            <label class="control-label">Quick Bet Amount</label>
-            <span class="control-helper">Tiranga Win Go</span>
-          </div>
-          <div class="deposit-quick-chips">
-            <button type="button" class="chip-btn active" onclick="document.getElementById('betAmountInput').value='10'">₹10</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='50'">₹50</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='100'">₹100</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='500'">₹500</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='1000'">₹1000</button>
-            <button type="button" class="chip-btn" onclick="document.getElementById('betAmountInput').value='5000'">₹5000</button>
-          </div>
-        </div>
+              <!-- Main Action Buttons -->
+              <div class="action-button-area" id="mainActionArea" style="margin-top: 6px;">
+                <button type="button" id="btnActionBet" class="btn-stake-primary btn-bet" style="background: linear-gradient(135deg, #00e701 0%, #00b801 100%); color: #07080d; font-family: var(--font-display); font-size: 14px; font-weight: 900; height: 44px; border-radius: 8px; width: 100%; cursor: pointer;" onclick="window.handleBetClick ? window.handleBetClick() : (window.app && window.app.handleBetClick())">
+                  <span>Place Bet</span>
+                </button>
 
-        <!-- Multiplier Preview Card (For Mines & Chicken) -->
-        <div id="multiplierPreviewCard" class="multiplier-preview-card">
-          <div class="preview-row">
-            <span id="previewStepLabel" class="preview-title">Next Diamond Multiplier</span>
-            <span id="previewMultiplier" class="preview-val-multiplier">1.13x</span>
-          </div>
-          <div class="preview-row">
-            <span class="preview-title">Potential Profit</span>
-            <span id="previewProfit" class="preview-val-profit">+₹11.30</span>
-          </div>
-        </div>
+                <button type="button" id="btnActionAutoStart" class="btn-stake-primary btn-auto-start" style="display: none;" onclick="window.toggleAutoPlay ? window.toggleAutoPlay() : (window.app && window.app.toggleAutoPlay())">
+                  <span id="btnAutoStartText">⚡ START AUTO PLAY</span>
+                </button>
+                
+                <button type="button" id="btnActionCashout" class="btn-stake-primary btn-cashout" style="display: none;" onclick="window.handleCashoutClick ? window.handleCashoutClick() : (window.app && window.app.handleCashoutClick())">
+                  <span>CASHOUT</span>
+                  <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
+                </button>
+              </div>
+            </section>
 
-        <!-- Main Action Buttons (Placed Right Below all Bet Options at the Bottom of Betting Controls) -->
-        <div class="action-button-area" id="mainActionArea" style="margin-top: 4px; margin-bottom: 2px;">
-          <button type="button" id="btnActionBet" class="btn-stake-primary btn-bet" onclick="window.handleBetClick ? window.handleBetClick() : (window.app && window.app.handleBetClick())">
-            <span>BET</span>
-          </button>
-
-          <button type="button" id="btnActionAutoStart" class="btn-stake-primary btn-auto-start" style="display: none;" onclick="window.toggleAutoPlay ? window.toggleAutoPlay() : (window.app && window.app.toggleAutoPlay())">
-            <span id="btnAutoStartText">⚡ START AUTO PLAY</span>
-          </button>
-          
-          <button type="button" id="btnActionCashout" class="btn-stake-primary btn-cashout" style="display: none;" onclick="window.handleCashoutClick ? window.handleCashoutClick() : (window.app && window.app.handleCashoutClick())">
-            <span>CASHOUT</span>
-            <span class="cashout-subtext"><span id="cashoutAmountDisplay">₹0.00</span> (<span id="cashoutMultiplierDisplay">0.00x</span>)</span>
-          </button>
-        </div>
-
-        <!-- Game How to Play Guides (Always at the very bottom, below all bet actions) -->
-        <div class="how-to-play-container" id="howToPlayContainer" style="margin-top: 8px; width: 100%;">
-          <!-- Mines How to Play -->
-          <div id="howToPlay_mines" class="game-how-to-play how-to-play-item">
-            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-              <span>📖 Mines Rules & How to Play</span>
-              <span>▼</span>
-            </div>
-            <div class="how-to-play-body" style="display: none;">
-              <ul>
-                <li>Set your bet amount and select the number of hidden bombs (1 to 24).</li>
-                <li>Click any tile to reveal 💎 Gems. Each gem increases your cashout multiplier!</li>
-                <li>Avoid the 💣 Bombs. Click <b>CASHOUT</b> anytime to lock in your winnings.</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Chicken How to Play -->
-          <div id="howToPlay_chicken" class="game-how-to-play how-to-play-item" style="display: none;">
-            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-              <span>📖 Chicken Road Rules & How to Play</span>
-              <span>▼</span>
-            </div>
-            <div class="how-to-play-body" style="display: none;">
-              <ul>
-                <li>Choose highway difficulty mode (Easy, Medium, Hard, Daredevil).</li>
-                <li>Click <b>JUMP NEXT LANE</b> to guide the chicken across traffic.</li>
-                <li>Every lane crossed increases your payout. Cash out anytime before getting hit!</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Chicken Mines How to Play -->
-          <div id="howToPlay_chickenmines" class="game-how-to-play how-to-play-item" style="display: none;">
-            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-              <span>📖 Roast Cloche Rules & How to Play</span>
-              <span>▼</span>
-            </div>
-            <div class="how-to-play-body" style="display: none;">
-              <ul>
-                <li>Uncover golden fried chickens under silver cloches.</li>
-                <li>Avoid the bone cloches. Each chicken adds to your multiplier!</li>
-                <li>Cash out whenever you want before hitting a bone.</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Crash How to Play -->
-          <div id="howToPlay_crash" class="game-how-to-play how-to-play-item" style="display: none;">
-            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-              <span>📖 Crash Rocket Rules & How to Play</span>
-              <span>▼</span>
-            </div>
-            <div class="how-to-play-body" style="display: none;">
-              <ul>
-                <li>Place your bet and watch the rocket take off into the sky.</li>
-                <li>The multiplier grows higher every second (up to 1,000x+).</li>
-                <li><b>Color Bet:</b> 🔴 Red pays 1.95x on &lt;2x crash, 🟢 Green pays 2.00x on &ge;2x, 🔵 Blue pays 10.00x on &ge;10x!</li>
-                <li>Or click <b>CASHOUT</b> before the rocket crashes to take your multiplier profit!</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Plinko How to Play -->
-          <div id="howToPlay_plinko" class="game-how-to-play how-to-play-item" style="display: none;">
-            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-              <span>📖 Plinko Rules & How to Play</span>
-              <span>▼</span>
-            </div>
-            <div class="how-to-play-body" style="display: none;">
-              <ul>
-                <li>Select Pyramid Rows from the panel below the bet tab.</li>
-                <li>Click <b>DROP BALL</b> to let balls cascade down through the pegs into multiplier buckets!</li>
-                <li>Outer edge buckets contain huge jackpots (up to 1,000x)!</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Dice How to Play -->
-          <div id="howToPlay_dice" class="game-how-to-play how-to-play-item" style="display: none;">
-            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-              <span>📖 Classic Dice Rules & How to Play</span>
-              <span>▼</span>
-            </div>
-            <div class="how-to-play-body" style="display: none;">
-              <ul>
-                <li>Drag the slider to choose your Target Number (between 2 and 98).</li>
-                <li>Select <b>Roll Over</b> or <b>Roll Under</b> to set your win condition.</li>
-                <li>Click <b>ROLL DICE</b>. If the rolled number satisfies the condition, you win up to 9900x!</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Limbo How to Play -->
-          <div id="howToPlay_limbo" class="game-how-to-play how-to-play-item" style="display: none;">
-            <div class="how-to-play-header" onclick="const b = this.nextElementSibling; b.style.display = b.style.display === 'none' ? 'block' : 'none';">
-              <span>📖 Limbo Turbo Rules & How to Play</span>
-              <span>▼</span>
-            </div>
-            <div class="how-to-play-body" style="display: none;">
-              <ul>
-                <li>Enter your Target Multiplier under the Bet panel (from 1.01x up to 1,000,000x).</li>
-                <li>Click <b>BET</b> to launch the Limbo generator.</li>
-                <li>If the generated multiplier is equal or greater than your target, you instantly win!</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- Right Main Game Board -->
-      <section class="game-stage">
+            <!-- Center Column: Main Game Stage -->
+            <section class="game-stage">
+              <!-- Live Multiplier Strip Header (Matching Image #3) -->
+              <div class="game-stage-live-bar" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: rgba(14, 18, 28, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; margin-bottom: 8px;">
+                <div style="font-size: 12px; color: #94a3b8;">Next round in <strong style="color: #f59e0b;">8.5s</strong></div>
+                <div style="font-size: 12px; color: #00e701; font-weight: 800;">● Provably Fair Live</div>
+              </div>
         
         <!-- Multiplier Streak Step Bar (Mines/Chicken) -->
         <div id="multStreakContainer" class="multiplier-bar-container">
@@ -3333,7 +3603,432 @@
         </div>
       </div>
     </section>
+        </div><!-- End of viewGameScreen (SCREEN 3) -->
 
+        <!-- ================================================================
+             SCREEN 4: WALLET PAGE (#viewWallet)
+             ================================================================ -->
+        <div id="viewWallet" class="app-view-screen" style="display: none;">
+          <div class="wallet-page-wrap">
+            <!-- Header: Title + Currency Toggle Pills -->
+            <div class="wallet-page-header">
+              <h2 class="section-title" style="margin: 0;">Wallet</h2>
+              <div class="wallet-curr-pill-toggle">
+                <button type="button" class="w-pill-btn active" id="btnWTabInr" onclick="window.switchWalletTabCurrency && window.switchWalletTabCurrency('INR')">Wallet</button>
+                <button type="button" class="w-pill-btn" id="btnWTabUsdt" onclick="window.switchWalletTabCurrency && window.switchWalletTabCurrency('USDT')">USDT</button>
+              </div>
+            </div>
+
+            <!-- Two Balance Cards in 2 Columns (Matching Image #4) -->
+            <div class="wallet-cards-2col">
+              <!-- Card 1: INR Balance -->
+              <div class="wallet-balance-box inr-box">
+                <div class="w-box-icon-row">
+                  <div class="w-curr-badge inr">
+                    <span class="w-badge-icon">🇮🇳</span>
+                    <span class="w-badge-code">INR</span>
+                  </div>
+                </div>
+                <div class="w-box-label">INR Balance</div>
+                <div class="w-box-bal-row">
+                  <span class="w-curr-symbol">₹</span>
+                  <span class="w-curr-amount" id="walletPageInrBal">5,432.00</span>
+                </div>
+                <div class="w-box-btn-row">
+                  <button type="button" class="w-bal-btn primary" onclick="window.switchAppView('deposit'); window.switchDepositCurrency('INR');">Deposit</button>
+                  <button type="button" class="w-bal-btn dark" onclick="window.switchAppView('withdraw'); window.switchWithdrawCurrency('INR');">Withdraw</button>
+                </div>
+              </div>
+
+              <!-- Card 2: USDT Balance -->
+              <div class="wallet-balance-box usdt-box">
+                <div class="w-box-icon-row">
+                  <div class="w-curr-badge usdt">
+                    <span class="w-badge-icon">₮</span>
+                    <span class="w-badge-code">USDT</span>
+                  </div>
+                </div>
+                <div class="w-box-label">USDT Balance</div>
+                <div class="w-box-bal-row">
+                  <span class="w-curr-amount" id="walletPageUsdtBal">0.00</span>
+                </div>
+                <div class="w-box-btn-row">
+                  <button type="button" class="w-bal-btn primary" onclick="window.switchAppView('deposit'); window.switchDepositCurrency('USDT');">Deposit</button>
+                  <button type="button" class="w-bal-btn dark" onclick="window.switchAppView('withdraw'); window.switchWithdrawCurrency('USDT');">Withdraw</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Transaction History Section (Matching Image #4) -->
+            <div class="wallet-tx-history-section" id="tabWalletTxHistory">
+              <div class="wallet-tx-header-row">
+                <h3 class="section-title" style="font-size: 15px; margin: 0;">Transaction History</h3>
+                <div class="tx-history-pills">
+                  <button type="button" class="tx-pill-btn active" id="txPillInr">INR</button>
+                  <button type="button" class="tx-pill-btn" id="txPillUsdt">USDT</button>
+                </div>
+              </div>
+
+              <div class="wallet-tx-table-wrap">
+                <table class="wallet-tx-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Date &amp; Time</th>
+                      <th>TXN ID</th>
+                    </tr>
+                  </thead>
+                  <tbody id="walletTxTableBody">
+                    <tr>
+                      <td class="tx-type-cell">Deposit</td>
+                      <td class="tx-amount-cell inr">₹ 2,000</td>
+                      <td><span class="tx-status-badge success">Success</span></td>
+                      <td class="tx-date-cell">12 Sep 2026 14:32</td>
+                      <td class="tx-id-cell">#TXN12456</td>
+                    </tr>
+                    <tr>
+                      <td class="tx-type-cell">Withdrawal</td>
+                      <td class="tx-amount-cell">₹ 1,000</td>
+                      <td><span class="tx-status-badge pending">Pending</span></td>
+                      <td class="tx-date-cell">12 Sep 2026 11:20</td>
+                      <td class="tx-id-cell">#TXN12455</td>
+                    </tr>
+                    <tr>
+                      <td class="tx-type-cell">Game Win</td>
+                      <td class="tx-amount-cell win">₹ 500</td>
+                      <td><span class="tx-status-badge success">Success</span></td>
+                      <td class="tx-date-cell">11 Sep 2026 22:18</td>
+                      <td class="tx-id-cell">#TXN12454</td>
+                    </tr>
+                    <tr>
+                      <td class="tx-type-cell">Deposit</td>
+                      <td class="tx-amount-cell inr">₹ 3,000</td>
+                      <td><span class="tx-status-badge success">Success</span></td>
+                      <td class="tx-date-cell">11 Sep 2026 18:07</td>
+                      <td class="tx-id-cell">#TXN12453</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             SCREEN 5: DEPOSIT PAGE (#viewDeposit)
+             ================================================================ -->
+        <div id="viewDeposit" class="app-view-screen" style="display: none;">
+          <div class="deposit-page-wrap">
+            <!-- Currency Switcher Tabs (Matching Image #5) -->
+            <div class="deposit-currency-tabs-bar">
+              <button type="button" class="dep-nav-tab active" id="pageDepTabInr" onclick="window.switchDepositCurrency('INR')">INR Deposit</button>
+              <button type="button" class="dep-nav-tab" id="pageDepTabUsdt" onclick="window.switchDepositCurrency('USDT')">USDT Deposit</button>
+            </div>
+
+            <!-- INR Deposit View Layout: Left Form + QR, Right History (Matching Image #5) -->
+            <div class="deposit-2col-layout" id="pageDepViewInr">
+              <div class="dep-col-main">
+                <!-- 1. Select Amount -->
+                <div class="dep-form-section">
+                  <div class="dep-section-label">1. Select Amount</div>
+                  <div class="dep-amount-chips-grid">
+                    <button type="button" class="dep-chip-btn" data-amt="500" onclick="window.selectDepositPageAmount(500, this)">₹ 500</button>
+                    <button type="button" class="dep-chip-btn active" data-amt="1000" onclick="window.selectDepositPageAmount(1000, this)">₹ 1,000</button>
+                    <button type="button" class="dep-chip-btn" data-amt="2000" onclick="window.selectDepositPageAmount(2000, this)">₹ 2,000</button>
+                    <button type="button" class="dep-chip-btn" data-amt="5000" onclick="window.selectDepositPageAmount(5000, this)">₹ 5,000</button>
+                    <button type="button" class="dep-chip-btn" data-amt="10000" onclick="window.selectDepositPageAmount(10000, this)">₹ 10,000</button>
+                    <button type="button" class="dep-chip-btn" data-amt="custom" onclick="window.selectDepositPageAmount('custom', this)">Custom</button>
+                  </div>
+                </div>
+
+                <!-- 2. Payment Method -->
+                <div class="dep-form-section">
+                  <div class="dep-section-label">2. Payment Method</div>
+                  <div class="dep-payment-methods-grid">
+                    <button type="button" class="dep-method-btn active" onclick="window.selectDepositPageMethod('phonepe', this)">
+                      <span class="dep-method-dot"></span>
+                      <span class="dep-method-icon">🟣</span>
+                      <span class="dep-method-name">PhonePe</span>
+                    </button>
+                    <button type="button" class="dep-method-btn" onclick="window.selectDepositPageMethod('paytm', this)">
+                      <span class="dep-method-dot"></span>
+                      <span class="dep-method-icon">🔵</span>
+                      <span class="dep-method-name">Paytm</span>
+                    </button>
+                    <button type="button" class="dep-method-btn" onclick="window.selectDepositPageMethod('gpay', this)">
+                      <span class="dep-method-dot"></span>
+                      <span class="dep-method-icon">🔴</span>
+                      <span class="dep-method-name">GPay</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Scan QR & Pay Card (Matching Image #5) -->
+                <div class="dep-qr-scan-card">
+                  <div class="dep-qr-left">
+                    <div class="dep-qr-img-wrap">
+                      <div class="mock-qr-code-box">
+                        <div class="qr-matrix-pattern"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dep-qr-right">
+                    <h4 class="dep-qr-title">Scan QR &amp; Pay</h4>
+                    <div class="dep-qr-row">
+                      <span class="dep-qr-lbl">Amount</span>
+                      <span class="dep-qr-val" id="depPageQrAmt">₹ 1,000</span>
+                    </div>
+                    <div class="dep-qr-row">
+                      <span class="dep-qr-lbl">UPI ID</span>
+                      <span class="dep-qr-val upi-copy" onclick="navigator.clipboard.writeText('viewpoint@okaxis'); alert('UPI ID copied: viewpoint@okaxis');">viewpoint@okaxis 📋</span>
+                    </div>
+                    <div class="dep-qr-row">
+                      <span class="dep-qr-lbl">Note</span>
+                      <input type="text" class="dep-note-input" id="depPageUtrInput" placeholder="Enter 12-digit UTR ID">
+                    </div>
+                    <button type="button" class="btn-upload-screenshot" onclick="window.submitDepositUtr ? window.submitDepositUtr() : alert('Deposit request submitted! Admin will verify in 2 minutes.')">
+                      <span>Upload Screenshot / Submit</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Deposit History List (Matching Image #5) -->
+              <div class="dep-col-history">
+                <div class="dep-history-header">Deposit History</div>
+                <div class="dep-history-list" id="depPageHistoryList">
+                  <div class="dep-history-card">
+                    <span class="dep-hist-amt">₹ 1,000</span>
+                    <span class="tx-status-badge success">Success</span>
+                    <span class="dep-hist-date">12 Sep 14:32</span>
+                  </div>
+                  <div class="dep-history-card">
+                    <span class="dep-hist-amt">₹ 2,000</span>
+                    <span class="tx-status-badge pending">Pending</span>
+                    <span class="dep-hist-date">11 Sep 16:20</span>
+                  </div>
+                  <div class="dep-history-card">
+                    <span class="dep-hist-amt">₹ 500</span>
+                    <span class="tx-status-badge pending">Pending</span>
+                    <span class="dep-hist-date">11 Sep 12:05</span>
+                  </div>
+                  <div class="dep-history-card">
+                    <span class="dep-hist-amt">₹ 3,000</span>
+                    <span class="tx-status-badge success">Success</span>
+                    <span class="dep-hist-date">10 Sep 21:10</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- USDT Deposit View -->
+            <div class="deposit-2col-layout" id="pageDepViewUsdt" style="display: none;">
+              <div class="dep-col-main" style="grid-column: 1 / -1;">
+                <div class="dep-qr-scan-card" style="max-width: 600px; margin: 0 auto;">
+                  <div class="dep-qr-left">
+                    <div class="dep-qr-img-wrap">
+                      <div class="mock-qr-code-box">
+                        <div class="qr-matrix-pattern"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dep-qr-right">
+                    <h4 class="dep-qr-title">USDT (TRC-20 / BEP-20)</h4>
+                    <div class="dep-qr-row">
+                      <span class="dep-qr-lbl">Network</span>
+                      <span class="dep-qr-val" style="color:#00e701;">TRON (TRC20)</span>
+                    </div>
+                    <div class="dep-qr-row">
+                      <span class="dep-qr-lbl">Wallet Address</span>
+                      <span class="dep-qr-val upi-copy" onclick="navigator.clipboard.writeText('TYkR8j9...viewpointUSDT'); alert('Address copied!');">TYkR8j9...viewpoint 📋</span>
+                    </div>
+                    <div class="dep-qr-row">
+                      <span class="dep-qr-lbl">Tx Hash</span>
+                      <input type="text" class="dep-note-input" placeholder="Paste Transaction Hash (TxID)">
+                    </div>
+                    <button type="button" class="btn-upload-screenshot" onclick="alert('USDT Deposit verification submitted!')">
+                      <span>Confirm USDT Deposit</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             SCREEN 6: WITHDRAWAL PAGE (#viewWithdraw)
+             ================================================================ -->
+        <div id="viewWithdraw" class="app-view-screen" style="display: none;">
+          <div class="withdraw-page-wrap">
+            <!-- Currency Switcher Tabs (Matching Image #6) -->
+            <div class="withdraw-currency-tabs-bar">
+              <button type="button" class="wth-nav-tab active" id="pageWthTabInr" onclick="window.switchWithdrawCurrency('INR')">INR Withdrawal</button>
+              <button type="button" class="wth-nav-tab" id="pageWthTabUsdt" onclick="window.switchWithdrawCurrency('USDT')">USDT Withdrawal</button>
+            </div>
+
+            <!-- 3-Column Layout (Matching Image #6: Left Balance/Input, Center Details/CTA, Right History) -->
+            <div class="withdraw-3col-layout">
+              <!-- Column 1: Balance & Amount Input -->
+              <div class="wth-col-card wth-col-balance">
+                <div class="wth-field-group">
+                  <div class="wth-label-sm">Available Balance</div>
+                  <div class="wth-avail-bal-val">₹ <span id="wthPageAvailBal">5,432.00</span></div>
+                </div>
+
+                <div class="wth-field-group">
+                  <div class="wth-label-sm">Amount</div>
+                  <div class="wth-input-wrap">
+                    <span class="wth-prefix">₹</span>
+                    <input type="number" class="wth-input-field" id="wthPageAmountInput" value="1000" min="200" oninput="window.updateWithdrawPageCalc()">
+                  </div>
+                </div>
+
+                <!-- Percentage Chips: 25%, 50%, 75%, MAX -->
+                <div class="wth-pct-chips-row">
+                  <button type="button" class="wth-pct-chip" onclick="window.setWithdrawPagePct(25, this)">25%</button>
+                  <button type="button" class="wth-pct-chip" onclick="window.setWithdrawPagePct(50, this)">50%</button>
+                  <button type="button" class="wth-pct-chip" onclick="window.setWithdrawPagePct(75, this)">75%</button>
+                  <button type="button" class="wth-pct-chip active" onclick="window.setWithdrawPagePct(100, this)">MAX</button>
+                </div>
+
+                <!-- Destination Account -->
+                <div class="wth-field-group" style="margin-top: 14px;">
+                  <div class="wth-label-sm">Destination Account</div>
+                  <div class="wth-dest-input-wrap">
+                    <span class="wth-dest-icon">🆔</span>
+                    <input type="text" class="wth-dest-input" id="wthPageUpiInput" value="viewpoint@okaxis" placeholder="Enter UPI ID (e.g. name@okaxis)">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Column 2: Withdrawal Details & Request CTA -->
+              <div class="wth-col-card wth-col-details">
+                <div class="wth-details-header">Withdrawal Details</div>
+
+                <div class="wth-detail-row">
+                  <span class="wth-dtl-lbl">Processing Fee</span>
+                  <span class="wth-dtl-val" id="wthPageFee">₹ 10</span>
+                </div>
+                <div class="wth-detail-row">
+                  <span class="wth-dtl-lbl">You Receive</span>
+                  <span class="wth-dtl-val highlight" id="wthPageReceive">₹ 990</span>
+                </div>
+                <div class="wth-detail-row">
+                  <span class="wth-dtl-lbl">Processing Time</span>
+                  <span class="wth-dtl-val" style="color: #94a3b8;">5 - 30 mins</span>
+                </div>
+
+                <button type="button" class="btn-request-withdrawal" onclick="window.submitWithdrawPageRequest()">
+                  <span>Request Withdrawal</span>
+                </button>
+              </div>
+
+              <!-- Column 3: Withdrawal History List -->
+              <div class="wth-col-card wth-col-history">
+                <div class="wth-history-header">Withdrawal History</div>
+                <div class="wth-history-list" id="wthPageHistoryList">
+                  <div class="wth-history-item">
+                    <div class="wth-h-amt">₹ 1,000</div>
+                    <span class="tx-status-badge success">Success</span>
+                    <div class="wth-h-date">12 Sep 14:20</div>
+                  </div>
+                  <div class="wth-history-item">
+                    <div class="wth-h-amt">₹ 2,000</div>
+                    <span class="tx-status-badge pending">Pending</span>
+                    <div class="wth-h-date">11 Sep 16:45</div>
+                  </div>
+                  <div class="wth-history-item">
+                    <div class="wth-h-amt">₹ 500</div>
+                    <span class="tx-status-badge success">Success</span>
+                    <div class="wth-h-date">10 Sep 12:30</div>
+                  </div>
+                  <div class="wth-history-item">
+                    <div class="wth-h-amt">₹ 3,000</div>
+                    <span class="tx-status-badge success">Success</span>
+                    <div class="wth-h-date">09 Sep 20:10</div>
+                  </div>
+                  <div class="wth-history-item">
+                    <div class="wth-h-amt">₹ 1,500</div>
+                    <span class="tx-status-badge failed">Failed</span>
+                    <div class="wth-h-date">08 Sep 18:22</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             SCREEN 7: PROMOTIONS PAGE (#viewPromotions)
+             ================================================================ -->
+        <div id="viewPromotions" class="app-view-screen" style="display: none;">
+          <div class="promotions-page-wrap">
+            <h2 class="section-title" style="margin-bottom: 8px;">Promotions</h2>
+
+            <!-- Category Filter Pills (Matching Image #7) -->
+            <div class="promo-filter-pills-row">
+              <button type="button" class="promo-pill-btn active" onclick="window.filterPromoCards('all', this)">All</button>
+              <button type="button" class="promo-pill-btn" onclick="window.filterPromoCards('welcome', this)">Welcome Offer</button>
+              <button type="button" class="promo-pill-btn" onclick="window.filterPromoCards('deposit', this)">Deposit Bonus</button>
+              <button type="button" class="promo-pill-btn" onclick="window.filterPromoCards('game', this)">Game Offers</button>
+              <button type="button" class="promo-pill-btn" onclick="window.filterPromoCards('referral', this)">Referral</button>
+            </div>
+
+            <!-- Hero Promo Card: 100% Welcome Bonus + Treasure Chest (Matching Image #7) -->
+            <div class="promo-hero-card">
+              <div class="promo-hero-left">
+                <div class="promo-hero-badge">EXCLUSIVE BONUS</div>
+                <h3 class="promo-hero-title">WELCOME BONUS<br><span class="promo-gold-grad">UP TO 100%</span></h3>
+                <button type="button" class="btn-promo-get-started" onclick="window.switchAppView('deposit')">
+                  <span>Get Started Now</span>
+                </button>
+              </div>
+              <div class="promo-hero-right">
+                <div class="promo-chest-visual">
+                  <div class="promo-chest-emoji">🎁✨</div>
+                </div>
+              </div>
+              <div class="hero-dots-container" style="bottom: 8px;">
+                <span class="hero-dot active"></span>
+                <span class="hero-dot"></span>
+                <span class="hero-dot"></span>
+              </div>
+            </div>
+
+            <!-- 3 Feature Promo Cards Row (Matching Image #7) -->
+            <div class="promo-3cards-row">
+              <!-- Card 1: Deposit Bonus -->
+              <div class="promo-feature-card" data-cat="deposit all">
+                <div class="promo-f-icon-box" style="background: radial-gradient(circle, #f59e0b33, #090d16);">🪙</div>
+                <h4 class="promo-f-title">Deposit Bonus</h4>
+                <div class="promo-f-highlight">Up to 50%</div>
+                <p class="promo-f-desc">More Play, More Win</p>
+                <button type="button" class="promo-f-btn" onclick="window.switchAppView('deposit')">Learn More</button>
+              </div>
+
+              <!-- Card 2: Game Rewards -->
+              <div class="promo-feature-card" data-cat="game all">
+                <div class="promo-f-icon-box" style="background: radial-gradient(circle, #ec489933, #090d16);">🎁</div>
+                <h4 class="promo-f-title">Game Rewards</h4>
+                <div class="promo-f-highlight" style="color: #f43f5e;">Special Offers</div>
+                <p class="promo-f-desc">For Top Games</p>
+                <button type="button" class="promo-f-btn" onclick="window.switchAppView('lobby')">Learn More</button>
+              </div>
+
+              <!-- Card 3: Referral Program -->
+              <div class="promo-feature-card" data-cat="referral all">
+                <div class="promo-f-icon-box" style="background: radial-gradient(circle, #3b82f633, #090d16);">👥</div>
+                <h4 class="promo-f-title">Referral Program</h4>
+                <div class="promo-f-highlight" style="color: #60a5fa;">Invite Friends</div>
+                <p class="promo-f-desc">Earn Together</p>
+                <button type="button" class="promo-f-btn" onclick="window.openReferModal ? window.openReferModal() : alert('Invite Link copied: https://www.viewpoint.diy/?ref=VIP100')">Learn More</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
     <!-- VIP Rewards Hub Dock (Spin & Win + Daily Bonus - Moved to Bottom of Page) -->
     <div id="bottomRewardsHub" class="bottom-rewards-hub">
@@ -3926,108 +4621,269 @@
     </div>
   </div>
 
-  <!-- UPI Deposit Modal -->
+  <!-- Dedicated Compact Wallet Dashboard Modal -->
+  <div id="modalWallet" class="modal-backdrop">
+    <div class="modal-card modal-wallet-card" style="max-width: 480px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: linear-gradient(135deg, #f59e0b, #b45309);">💳</div>
+          <h3 class="modal-title">VIEWPOINT Wallet</h3>
+        </div>
+        <button id="btnCloseWalletModal" class="modal-close-btn" onclick="window.closeWalletModal()">&times;</button>
+      </div>
+
+      <div class="wallet-dash-content">
+        <!-- Top Row: INR & USDT Balances (Separated) -->
+        <div class="wallet-currency-cards-grid">
+          <!-- INR Card -->
+          <div class="currency-card inr-card">
+            <div class="curr-card-top">
+              <div class="curr-badge">🇮🇳 INR WALLET</div>
+              <span class="curr-status-dot"></span>
+            </div>
+            <div class="curr-val-row">
+              <span class="curr-symbol">₹</span>
+              <span class="curr-val" id="dashInrBalance">200.00</span>
+            </div>
+            <div class="curr-meta-row">
+              <span>Main Withdrawable: <strong style="color: #00e701;" id="dashInrWithdrawable">₹200.00</strong></span>
+            </div>
+          </div>
+
+          <!-- USDT Card -->
+          <div class="currency-card usdt-card">
+            <div class="curr-card-top">
+              <div class="curr-badge">🌐 USDT (TRC20)</div>
+              <span class="curr-rate-tag">1 USDT ≈ ₹90.00</span>
+            </div>
+            <div class="curr-val-row">
+              <span class="curr-symbol">$</span>
+              <span class="curr-val" id="dashUsdtBalance">2.22</span>
+            </div>
+            <div class="curr-meta-row">
+              <span>Crypto Wallet Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet Quick Action Row -->
+        <div class="wallet-action-pills-row">
+          <button type="button" class="w-action-btn primary" onclick="window.closeWalletModal(); window.openDepositModal();">
+            <span>⚡ Deposit</span>
+          </button>
+          <button type="button" class="w-action-btn secondary" onclick="window.closeWalletModal(); window.openWithdrawModal();">
+            <span>💸 Withdraw</span>
+          </button>
+          <button type="button" class="w-action-btn tertiary" onclick="window.closeWalletModal(); window.openTxHistoryModal();">
+            <span>📜 History</span>
+          </button>
+        </div>
+
+        <!-- Wallet Security & Guarantee Strip -->
+        <div class="wallet-security-strip">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00e701" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span style="font-size:11px; color:#cbd5e1;">100% Encrypted & Instant 24/7 Automated Processing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dedicated Compact Promotions & VIP Offers Modal -->
+  <div id="modalPromotions" class="modal-backdrop">
+    <div class="modal-card modal-promotions-card" style="max-width: 520px;">
+      <div class="modal-title-row">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="deposit-icon-badge" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">🎁</div>
+          <h3 class="modal-title">Promotions & VIP Rewards</h3>
+        </div>
+        <button id="btnClosePromotionsModal" class="modal-close-btn" onclick="window.closePromotionsModal()">&times;</button>
+      </div>
+
+      <div class="promotions-grid">
+        <!-- 1. Welcome Bonus -->
+        <div class="promo-item-card">
+          <div class="promo-card-badge gold">100% BONUS</div>
+          <div class="promo-card-icon">👑</div>
+          <div class="promo-card-body">
+            <h4>First Deposit Match</h4>
+            <p>Get up to ₹10,000 instant bonus on your first recharge.</p>
+          </div>
+          <button type="button" class="promo-claim-btn" onclick="window.closePromotionsModal(); window.openDepositModal();">Deposit Now</button>
+        </div>
+
+        <!-- 2. Daily Reload -->
+        <div class="promo-item-card">
+          <div class="promo-card-badge green">DAILY 20%</div>
+          <div class="promo-card-icon">⚡</div>
+          <div class="promo-card-body">
+            <h4>Daily Reload Bonus</h4>
+            <p>Extra 20% extra chips on every top-up between 6 PM - 10 PM.</p>
+          </div>
+          <button type="button" class="promo-claim-btn" onclick="window.closePromotionsModal(); window.openDepositModal();">Recharge</button>
+        </div>
+
+        <!-- 3. VIP Cashback -->
+        <div class="promo-item-card">
+          <div class="promo-card-badge purple">10% CASHBACK</div>
+          <div class="promo-card-icon">🛡️</div>
+          <div class="promo-card-body">
+            <h4>Weekly Loss Cashback</h4>
+            <p>Automated weekly cashback credited directly to your wallet every Monday.</p>
+          </div>
+          <button type="button" class="promo-claim-btn" onclick="window.closePromotionsModal(); window.switchGame('mines');">Play Games</button>
+        </div>
+
+        <!-- 4. Refer & Earn -->
+        <div class="promo-item-card">
+          <div class="promo-card-badge cyan">₹100 / FRIEND</div>
+          <div class="promo-card-icon">👥</div>
+          <div class="promo-card-body">
+            <h4>Referral Program</h4>
+            <p>Invite friends and earn ₹100 cash plus 1% lifetime betting commission.</p>
+          </div>
+          <button type="button" class="promo-claim-btn" onclick="window.closePromotionsModal(); window.openReferModal();">Invite Friends</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compact Deposit Modal (INR & USDT Tabs) -->
   <div id="modalDepositUpi" class="modal-backdrop">
-    <div class="modal-card modal-deposit-card">
+    <div class="modal-card modal-deposit-card" style="max-width: 480px;">
       <div class="modal-title-row">
         <div style="display: flex; align-items: center; gap: 8px;">
           <div class="deposit-icon-badge">⚡</div>
-          <h3 class="modal-title">Add Funds via UPI / QR Code</h3>
+          <h3 class="modal-title">Deposit Funds</h3>
         </div>
         <button id="btnCloseDepositModal" class="modal-close-btn" onclick="window.closeDepositModal ? window.closeDepositModal() : (document.getElementById('modalDepositUpi').classList.remove('open'), document.getElementById('modalDepositUpi').style.display='none')">&times;</button>
       </div>
 
-      <div class="deposit-nav-tabs">
+      <!-- Currency Switcher Tabs: INR DEPOSIT vs USDT DEPOSIT -->
+      <div class="deposit-currency-tabs-row" style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <button type="button" id="tabDepCurrInr" class="dep-curr-tab-btn active" onclick="window.switchDepositCurrency('INR')">
+          <span>🇮🇳 INR DEPOSIT</span>
+        </button>
+        <button type="button" id="tabDepCurrUsdt" class="dep-curr-tab-btn" onclick="window.switchDepositCurrency('USDT')">
+          <span>🌐 USDT DEPOSIT</span>
+        </button>
+      </div>
+
+      <div class="deposit-nav-tabs" style="display: flex; gap: 6px; margin-bottom: 12px;">
         <button id="tabDepositForm" class="dep-tab-btn active" onclick="window.switchDepositTab ? window.switchDepositTab('form') : (window.app && window.app.switchDepositTab('form'))">💸 Deposit Online</button>
         <button id="tabDepositHistory" class="dep-tab-btn" onclick="window.switchDepositTab ? window.switchDepositTab('history') : (window.app && window.app.switchDepositTab('history'))">📜 Deposit History</button>
       </div>
 
-      <!-- Deposit Online View -->
+      <!-- Deposit Online View: INR -->
       <div id="viewDepositForm" class="deposit-tab-view active">
-        <!-- Step 1: Quick Amount Selector (Odd Amounts for Instant UTR Matching) -->
-        <div class="deposit-section">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label class="control-label">1. Select Deposit Amount:</label>
-            <span style="font-size:11px; font-weight:700; color:var(--accent-green);">Instant Auto Match Enabled ⚡</span>
-          </div>
-          <div class="deposit-quick-chips">
-            <button type="button" class="chip-btn active" data-amount="199" onclick="window.setDepositAmount ? window.setDepositAmount(199) : (document.getElementById('depositAmountInput').value='199', window.app && window.app.updateUpiQr())">₹199</button>
-            <button type="button" class="chip-btn" data-amount="499" onclick="window.setDepositAmount ? window.setDepositAmount(499) : (document.getElementById('depositAmountInput').value='499', window.app && window.app.updateUpiQr())">₹499</button>
-            <button type="button" class="chip-btn" data-amount="999" onclick="window.setDepositAmount ? window.setDepositAmount(999) : (document.getElementById('depositAmountInput').value='999', window.app && window.app.updateUpiQr())">₹999</button>
-            <button type="button" class="chip-btn" data-amount="1999" onclick="window.setDepositAmount ? window.setDepositAmount(1999) : (document.getElementById('depositAmountInput').value='1999', window.app && window.app.updateUpiQr())">₹1,999</button>
-            <button type="button" class="chip-btn" data-amount="4999" onclick="window.setDepositAmount ? window.setDepositAmount(4999) : (document.getElementById('depositAmountInput').value='4999', window.app && window.app.updateUpiQr())">₹4,999</button>
-            <button type="button" class="chip-btn" data-amount="9999" onclick="window.setDepositAmount ? window.setDepositAmount(9999) : (document.getElementById('depositAmountInput').value='9999', window.app && window.app.updateUpiQr())">₹9,999</button>
-            <button type="button" class="chip-btn" data-amount="14999" onclick="window.setDepositAmount ? window.setDepositAmount(14999) : (document.getElementById('depositAmountInput').value='14999', window.app && window.app.updateUpiQr())">₹14,999</button>
-            <button type="button" class="chip-btn" data-amount="29999" onclick="window.setDepositAmount ? window.setDepositAmount(29999) : (document.getElementById('depositAmountInput').value='29999', window.app && window.app.updateUpiQr())">₹29,999</button>
-            <button type="button" class="chip-btn" data-amount="35999" onclick="window.setDepositAmount ? window.setDepositAmount(35999) : (document.getElementById('depositAmountInput').value='35999', window.app && window.app.updateUpiQr())">₹35,999</button>
-          </div>
-          <div class="custom-amount-row">
-            <span class="curr-prefix" id="depCurrPrefix">₹</span>
-            <input type="number" id="depositAmountInput" class="custom-select dep-input" value="199" min="10" max="50000" step="10" oninput="window.app && window.app.updateUpiQr()">
-          </div>
-        </div>
-
-        <!-- Step 2: UPI Details & Dynamic QR Code -->
-        <div class="deposit-section qr-payment-box">
-          <div class="qr-code-wrapper">
-            <img id="upiQrCodeImg" class="upi-qr-image" src="" alt="Scan UPI QR Code">
-            <div class="qr-overlay-brand">
-              <span id="qrAmountTag">₹199</span>
+        <!-- INR Form View -->
+        <div id="viewDepCurrInr">
+          <!-- Step 1: Preset Amount Chips (₹500 | ₹1,000 | ₹2,000 | ₹5,000 | Custom) -->
+          <div class="deposit-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+              <label class="control-label" style="font-weight: 700;">1. Select Deposit Amount:</label>
+              <span style="font-size:11px; font-weight:700; color:#00e701;">⚡ Instant UPI Auto-Match</span>
+            </div>
+            <div class="deposit-quick-chips" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px;">
+              <button type="button" class="chip-btn active" data-amount="500" onclick="window.setDepositAmount ? window.setDepositAmount(500) : (document.getElementById('depositAmountInput').value='500', window.app && window.app.updateUpiQr())">₹500</button>
+              <button type="button" class="chip-btn" data-amount="1000" onclick="window.setDepositAmount ? window.setDepositAmount(1000) : (document.getElementById('depositAmountInput').value='1000', window.app && window.app.updateUpiQr())">₹1,000</button>
+              <button type="button" class="chip-btn" data-amount="2000" onclick="window.setDepositAmount ? window.setDepositAmount(2000) : (document.getElementById('depositAmountInput').value='2000', window.app && window.app.updateUpiQr())">₹2,000</button>
+              <button type="button" class="chip-btn" data-amount="5000" onclick="window.setDepositAmount ? window.setDepositAmount(5000) : (document.getElementById('depositAmountInput').value='5000', window.app && window.app.updateUpiQr())">₹5,000</button>
+            </div>
+            <div class="custom-amount-row" style="display: flex; align-items: center; gap: 6px;">
+              <span class="curr-prefix" id="depCurrPrefix">₹</span>
+              <input type="number" id="depositAmountInput" class="custom-select dep-input" value="500" min="100" max="50000" step="50" oninput="window.app && window.app.updateUpiQr()" placeholder="Custom Amount">
             </div>
           </div>
 
-          <div class="qr-instructions">
-            <div class="merchant-info-row">
-              <span class="merchant-label">Merchant / Payee:</span>
-              <strong id="displayPayeeName" class="merchant-val">VIEWPOINT Official</strong>
-            </div>
-
-            <div class="merchant-info-row">
-              <span class="merchant-label">UPI ID:</span>
-              <div class="upi-id-copy-row" onclick="window.app && window.app.copyUpiId()" title="Click to copy UPI ID" style="cursor: pointer;">
-                <code id="displayUpiId" class="upi-id-code">adrenox1@axl</code>
-                <button type="button" id="btnCopyUpiId" class="btn-copy-upi" title="Copy UPI ID" onclick="event.stopPropagation(); window.app && window.app.copyUpiId()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                  <span id="copyBtnText">Copy</span>
-                </button>
+          <!-- Step 2: UPI Apps & Dynamic QR Code -->
+          <div class="deposit-section qr-payment-box">
+            <div class="qr-code-wrapper">
+              <img id="upiQrCodeImg" class="upi-qr-image" src="" alt="Scan UPI QR Code">
+              <div class="qr-overlay-brand">
+                <span id="qrAmountTag">₹500</span>
               </div>
             </div>
 
-            <!-- UPI App Fast Links for Mobile -->
-            <div class="upi-apps-row">
-              <button type="button" id="linkPhonePe" class="upi-app-btn phonepe" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('phonepe') : (window.app && window.app.openDirectUpiApp('phonepe'))">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 2H4.5C3.12 2 2 3.12 2 4.5v15C2 20.88 3.12 22 4.5 22h15c1.38 0 2.5-1.12 2.5-2.5v-15C22 3.12 20.88 2 19.5 2zm-5.2 13.7c-.5.4-1.2.6-2 .6h-1.6v2.4H9.2V5.3h3.1c1.5 0 2.7.4 3.5 1.2.8.8 1.2 1.9 1.2 3.3 0 1.6-.6 2.8-1.7 3.6zm-1.8-4.2c.4-.3.6-.8.6-1.5 0-.6-.2-1.1-.6-1.4-.4-.3-1-.5-1.8-.5h-1.2v3.8h1.2c.8 0 1.4-.1 1.8-.4z"/></svg>
-                <span>PhonePe</span>
-              </button>
-              <button type="button" id="linkGPay" class="upi-app-btn gpay" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('gpay') : (window.app && window.app.openDirectUpiApp('gpay'))">
-                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.7 12.3c0-.8-.1-1.5-.2-2.2H12v4.5h6.6c-.3 1.5-1.1 2.8-2.4 3.7v3.1h3.9c2.3-2.1 3.6-5.2 3.6-9.1z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 7.9-2.9l-3.9-3.1c-1.1.7-2.5 1.2-4 1.2-3.1 0-5.8-2.1-6.7-4.9H1.3v3.1C3.3 21.4 7.3 24 12 24z"/><path fill="#FBBC05" d="M5.3 14.3c-.2-.7-.4-1.5-.4-2.3s.1-1.6.4-2.3V6.6H1.3C.5 8.2 0 10 0 12s.5 3.8 1.3 5.4l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.3 0 3.3 2.6 1.3 6.6l4 3.1c1-2.8 3.6-4.9 6.7-4.9z"/></svg>
-                <span>GPay</span>
-              </button>
-              <button type="button" id="linkPaytm" class="upi-app-btn paytm" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('paytm') : (window.app && window.app.openDirectUpiApp('paytm'))">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="#002970"/><path fill="#00b9f1" d="M7 8h4v8H7zm6 0h4v8h-4z"/></svg>
-                <span>Paytm</span>
-              </button>
-              <button type="button" id="linkAnyUpi" class="upi-app-btn other-upi" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('upi') : (window.app && window.app.openDirectUpiApp('upi'))">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                <span>Other UPI</span>
-              </button>
+            <div class="qr-instructions">
+              <div class="merchant-info-row">
+                <span class="merchant-label">Merchant:</span>
+                <strong id="displayPayeeName" class="merchant-val">VIEWPOINT Official</strong>
+              </div>
+
+              <div class="merchant-info-row">
+                <span class="merchant-label">UPI ID:</span>
+                <div class="upi-id-copy-row" onclick="window.app && window.app.copyUpiId()" title="Click to copy UPI ID" style="cursor: pointer;">
+                  <code id="displayUpiId" class="upi-id-code">adrenox1@axl</code>
+                  <button type="button" id="btnCopyUpiId" class="btn-copy-upi" title="Copy UPI ID" onclick="event.stopPropagation(); window.app && window.app.copyUpiId()">
+                    <span id="copyBtnText">Copy</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- UPI App Fast Links for Mobile -->
+              <div class="upi-apps-row" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px;">
+                <button type="button" id="linkPhonePe" class="upi-app-btn phonepe" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('phonepe') : (window.app && window.app.openDirectUpiApp('phonepe'))">
+                  <span>PhonePe</span>
+                </button>
+                <button type="button" id="linkGPay" class="upi-app-btn gpay" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('gpay') : (window.app && window.app.openDirectUpiApp('gpay'))">
+                  <span>GPay</span>
+                </button>
+                <button type="button" id="linkPaytm" class="upi-app-btn paytm" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('paytm') : (window.app && window.app.openDirectUpiApp('paytm'))">
+                  <span>Paytm</span>
+                </button>
+                <button type="button" id="linkAnyUpi" class="upi-app-btn other-upi" onclick="window.openDirectUpiApp ? window.openDirectUpiApp('upi') : (window.app && window.app.openDirectUpiApp('upi'))">
+                  <span>Other UPI</span>
+                </button>
+              </div>
             </div>
+          </div>
+
+          <!-- Step 3: Enter 12-Digit UTR -->
+          <div class="deposit-section">
+            <label class="control-label" style="display: flex; align-items: center; justify-content: space-between;">
+              <span>2. Enter 12-Digit UTR / Ref Number:</span>
+              <span style="font-size: 11px; color: #00e5ff; font-weight: 800;">● Auto Verify</span>
+            </label>
+            <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423456789012" maxlength="16" style="font-family: monospace; font-size: 15px; letter-spacing: 1.5px; text-align: center; font-weight: 800; background: rgba(0, 0, 0, 0.5); border: 1.5px solid rgba(245, 158, 11, 0.45); color: #fcd34d;">
+            
+            <button id="btnSubmitDeposit" class="btn-action-primary" style="margin-top: 10px; height: 46px; font-size: 14px; font-weight: 900; letter-spacing: 0.5px; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer;">
+              <span style="font-size: 16px;">⚡</span>
+              <span>SUBMIT DEPOSIT REQUEST</span>
+            </button>
           </div>
         </div>
 
-        <!-- Step 3: Enter 12-Digit UTR -->
-        <div class="deposit-section">
-          <label class="control-label" style="display: flex; align-items: center; justify-content: space-between;">
-            <span>2. Enter 12-Digit UTR / Transaction ID:</span>
-            <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 800;">● Instant Verification</span>
-          </label>
-          <input type="text" id="depositUtrInput" class="custom-select dep-input" placeholder="e.g. 423456789012" maxlength="16" style="font-family: monospace; font-size: 16px; letter-spacing: 1.5px; text-align: center; font-weight: 800; background: rgba(0, 0, 0, 0.5); border: 1.5px solid rgba(139, 92, 246, 0.45); color: #fcd34d;">
-          <p class="utr-hint" style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">📌 Payment app (GPay/PhonePe/Paytm) ki "Transaction History" me se 12-digit UTR number copy karke yahan paste karein.</p>
-          
-          <button id="btnSubmitDeposit" class="btn-action-primary" style="margin-top: 10px; height: 50px; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; box-shadow: 0 6px 24px rgba(124, 58, 237, 0.45); border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; cursor: pointer;">
-            <span style="font-size: 18px;">⚡</span>
-            <span>SUBMIT DEPOSIT REQUEST</span>
-          </button>
+        <!-- USDT Form View (Hidden by default) -->
+        <div id="viewDepCurrUsdt" style="display: none;">
+          <div class="deposit-section qr-payment-box">
+            <div class="qr-code-wrapper">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TXyzUSDTTRC20OfficialViewpointDepositAddress789" class="upi-qr-image" alt="USDT TRC20 QR Code">
+              <div class="qr-overlay-brand"><span style="color:#26a17b;">USDT</span></div>
+            </div>
+            <div class="qr-instructions">
+              <div class="merchant-info-row">
+                <span class="merchant-label">Network:</span>
+                <strong class="merchant-val" style="color: #00e5ff;">TRON (TRC-20)</strong>
+              </div>
+              <div class="merchant-info-row">
+                <span class="merchant-label">Address:</span>
+                <div class="upi-id-copy-row" onclick="navigator.clipboard.writeText('TPyZ8kR4wG9Lq2X7MvP5KjE1B3nC6HdF8Q'); window.app && window.app.showNotification('📋 USDT Address Copied!', 'success');" style="cursor: pointer;">
+                  <code class="upi-id-code" style="font-size: 11px;">TPyZ8kR4wG9Lq2X7MvP5...</code>
+                  <button type="button" class="btn-copy-upi">Copy</button>
+                </div>
+              </div>
+              <p style="font-size: 11px; color: #f59e0b; margin-top: 6px;">⚠️ Send only USDT via TRC-20 network. Minimum deposit: 10 USDT.</p>
+            </div>
+          </div>
+          <div class="deposit-section">
+            <label class="control-label">Transaction Hash (TXID):</label>
+            <input type="text" id="usdtDepositTxidInput" class="custom-select dep-input" placeholder="Paste TRC20 TXID hash here..." style="font-family: monospace; font-size: 13px;">
+            <button type="button" class="btn-action-primary" style="margin-top: 10px; height: 46px; background: linear-gradient(135deg, #26a17b, #10b981);" onclick="window.app && window.app.submitDepositUtr ? window.app.submitDepositUtr() : null">
+              <span>⚡ SUBMIT USDT DEPOSIT</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -4052,9 +4908,9 @@
     </div>
   </div>
 
-  <!-- Withdrawal Modal -->
+  <!-- Compact Withdrawal Modal (INR & USDT Tabs + 25%, 50%, 75%, MAX Percentages) -->
   <div id="modalWithdraw" class="modal-backdrop">
-    <div class="modal-card modal-deposit-card">
+    <div class="modal-card modal-deposit-card" style="max-width: 480px;">
       <div class="modal-title-row">
         <div style="display: flex; align-items: center; gap: 8px;">
           <div class="deposit-icon-badge" style="background: linear-gradient(135deg, #00e5ff, #0077ff); color: #fff;">💸</div>
@@ -4063,96 +4919,102 @@
         <button id="btnCloseWithdrawModal" class="modal-close-btn" onclick="window.closeWithdrawModal ? window.closeWithdrawModal() : (document.getElementById('modalWithdraw').classList.remove('open'), document.getElementById('modalWithdraw').style.display='none')">&times;</button>
       </div>
 
-      <div class="deposit-tabs-row">
+      <!-- Currency Switcher Tabs: INR WITHDRAWAL vs USDT WITHDRAWAL -->
+      <div class="deposit-currency-tabs-row" style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <button type="button" id="tabWdCurrInr" class="dep-curr-tab-btn active" onclick="window.switchWithdrawCurrency('INR')">
+          <span>🇮🇳 INR WITHDRAWAL</span>
+        </button>
+        <button type="button" id="tabWdCurrUsdt" class="dep-curr-tab-btn" onclick="window.switchWithdrawCurrency('USDT')">
+          <span>🌐 USDT WITHDRAWAL</span>
+        </button>
+      </div>
+
+      <div class="deposit-tabs-row" style="display: flex; gap: 6px; margin-bottom: 12px;">
         <button id="tabWithdrawForm" class="dep-tab-btn active" onclick="window.switchWithdrawTab ? window.switchWithdrawTab('form') : (window.app && window.app.switchWithdrawTab('form'))">⚡ Request Payout</button>
-        <button id="tabWithdrawHistory" class="dep-tab-btn" onclick="window.switchWithdrawTab ? window.switchWithdrawTab('history') : (window.app && window.app.switchWithdrawTab('history'))">📜 Payout History & Receipts</button>
+        <button id="tabWithdrawHistory" class="dep-tab-btn" onclick="window.switchWithdrawTab ? window.switchWithdrawTab('history') : (window.app && window.app.switchWithdrawTab('history'))">📜 History & Receipts</button>
       </div>
 
       <!-- Tab 1: Withdrawal Form -->
       <div id="viewWithdrawForm" class="deposit-tab-view active">
         
-        <!-- Balance & Daily Limit Status Bar -->
-        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-md); padding: 12px 14px; margin-bottom: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span style="font-size: 12px; color: var(--text-secondary);">Withdrawable Main Balance:</span>
-            <strong id="withdrawAvailableBal" style="font-size: 17px; color: #00e701; font-family: var(--font-display);">₹0.00</strong>
+        <!-- Balance & Available Limit Bar -->
+        <div style="background: rgba(11, 14, 23, 0.85); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 12px; color: var(--text-secondary);">Available Balance:</span>
+            <strong id="withdrawAvailableBal" style="font-size: 17px; color: #00e701; font-family: var(--font-display);">₹200.00</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">
-            <span>Daily Limit Remaining:</span>
-            <span id="withdrawDailyRemainingText" style="color: #00e5ff; font-weight: 700;">₹1,00,000.00 / ₹1,00,000.00</span>
-          </div>
-          <div style="width: 100%; height: 5px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
-            <div id="withdrawLimitProgressBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #8b5cf6, #fcd34d);"></div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+            <span>Daily Remaining:</span>
+            <span id="withdrawDailyRemainingText" style="color: #00e5ff; font-weight: 700;">₹1,00,000.00</span>
           </div>
         </div>
 
-        <!-- Payout Method Selector -->
-        <label class="control-label">1. Choose Payout Channel:</label>
-        <div class="withdraw-methods-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+        <!-- Payout Channel Grid -->
+        <label class="control-label">1. Choose Payout Method:</label>
+        <div class="withdraw-methods-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px;">
           <button type="button" class="withdraw-method-btn active" id="btnMethodUpi" data-method="UPI" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('UPI') : (window.app && window.app.selectWithdrawMethod('UPI'))">
-            <span style="font-size: 18px;">⚡</span>
+            <span style="font-size: 16px;">⚡</span>
             <div style="text-align: left;">
-              <strong style="display:block; font-size:12px;">Instant UPI</strong>
-              <span style="font-size:10px; color:#00e701;">5-15 Mins</span>
+              <strong style="display:block; font-size:11px;">Instant UPI</strong>
+              <span style="font-size:9.5px; color:#00e701;">5-15 Mins</span>
             </div>
           </button>
           <button type="button" class="withdraw-method-btn" id="btnMethodBank" data-method="BANK" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('BANK') : (window.app && window.app.selectWithdrawMethod('BANK'))">
-            <span style="font-size: 18px;">🏦</span>
+            <span style="font-size: 16px;">🏦</span>
             <div style="text-align: left;">
-              <strong style="display:block; font-size:12px;">Bank IMPS</strong>
-              <span style="font-size:10px; color:#00e5ff;">15-30 Mins</span>
+              <strong style="display:block; font-size:11px;">Bank IMPS</strong>
+              <span style="font-size:9.5px; color:#00e5ff;">15-30 Mins</span>
             </div>
           </button>
           <button type="button" class="withdraw-method-btn" id="btnMethodCrypto" data-method="CRYPTO" onclick="window.selectWithdrawMethod ? window.selectWithdrawMethod('CRYPTO') : (window.app && window.app.selectWithdrawMethod('CRYPTO'))">
-            <span style="font-size: 18px;">🪙</span>
+            <span style="font-size: 16px;">🪙</span>
             <div style="text-align: left;">
-              <strong style="display:block; font-size:12px;">USDT TRC20</strong>
-              <span style="font-size:10px; color:#f59e0b;">Automated</span>
+              <strong style="display:block; font-size:11px;">USDT TRC20</strong>
+              <span style="font-size:9.5px; color:#f59e0b;">Auto Fast</span>
             </div>
           </button>
         </div>
 
-        <!-- Amount Input -->
-        <label class="control-label">2. Enter Withdrawal Amount (Min ₹300 to ₹50,000):</label>
-        <div class="deposit-amount-row" style="margin-bottom: 8px;">
+        <!-- Amount Input & Quick Percentage Buttons (25% | 50% | 75% | MAX) -->
+        <label class="control-label">2. Enter Amount (Min ₹300):</label>
+        <div class="deposit-amount-row" style="margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
           <span class="currency-prefix">₹</span>
           <input type="number" id="withdrawAmountInput" class="custom-select dep-input" value="500" min="300" max="50000" step="50">
         </div>
 
-        <!-- Quick Amount Selection Chips -->
-        <div class="deposit-quick-chips" style="margin-bottom: 14px;">
-          <button type="button" class="chip-btn" data-amount="500">₹500</button>
-          <button type="button" class="chip-btn" data-amount="1000">₹1,000</button>
-          <button type="button" class="chip-btn" data-amount="2500">₹2,500</button>
-          <button type="button" class="chip-btn" data-amount="5000">₹5,000</button>
-          <button type="button" class="chip-btn" id="btnWithdrawMax">Max All</button>
+        <!-- Quick Percentage Chips (Auto-Calculates and populates Amount) -->
+        <div class="withdraw-pct-chips" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;">
+          <button type="button" class="pct-chip-btn" data-pct="25" onclick="window.setWithdrawPercent(25)">25%</button>
+          <button type="button" class="pct-chip-btn" data-pct="50" onclick="window.setWithdrawPercent(50)">50%</button>
+          <button type="button" class="pct-chip-btn" data-pct="75" onclick="window.setWithdrawPercent(75)">75%</button>
+          <button type="button" class="pct-chip-btn active" data-pct="100" id="btnWithdrawMax" onclick="window.setWithdrawPercent(100)">MAX</button>
         </div>
 
         <!-- Channel Specific Inputs: 1. UPI Mode -->
         <div id="channelUpiFields">
-          <label class="control-label">3. Receiver UPI ID (GPay / PhonePe / Paytm / BHIM):</label>
-          <input type="text" id="withdrawUpiInput" class="custom-select dep-input" placeholder="e.g. yourname@okhdfcbank, 9876543210@paytm" style="font-family: monospace; font-size: 14px; margin-bottom: 8px;">
+          <label class="control-label">3. Receiver UPI ID:</label>
+          <input type="text" id="withdrawUpiInput" class="custom-select dep-input" placeholder="e.g. yourname@okhdfcbank" style="font-family: monospace; font-size: 13px; margin-bottom: 6px;">
           
           <label class="control-label">4. Account Holder Name:</label>
-          <input type="text" id="withdrawNameInput" class="custom-select dep-input" placeholder="e.g. Rahul Sharma" style="margin-bottom: 10px;">
+          <input type="text" id="withdrawNameInput" class="custom-select dep-input" placeholder="e.g. Rahul Sharma" style="margin-bottom: 8px;">
         </div>
 
         <!-- Channel Specific Inputs: 2. Bank IMPS Mode -->
         <div id="channelBankFields" style="display: none;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px;">
             <div>
               <label class="control-label">Bank Account Number:</label>
-              <input type="text" id="withdrawBankAccInput" class="custom-select dep-input" placeholder="e.g. 50100234567890" style="font-family: monospace;">
+              <input type="text" id="withdrawBankAccInput" class="custom-select dep-input" placeholder="Account Number" style="font-family: monospace;">
             </div>
             <div>
-              <label class="control-label">IFSC Code (11 Digits):</label>
-              <input type="text" id="withdrawBankIfscInput" class="custom-select dep-input" placeholder="e.g. HDFC0000123" style="text-transform: uppercase; font-family: monospace;">
+              <label class="control-label">IFSC Code:</label>
+              <input type="text" id="withdrawBankIfscInput" class="custom-select dep-input" placeholder="IFSC Code" style="text-transform: uppercase; font-family: monospace;">
             </div>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
             <div>
               <label class="control-label">Bank Name:</label>
-              <input type="text" id="withdrawBankNameInput" class="custom-select dep-input" placeholder="e.g. HDFC Bank, SBI">
+              <input type="text" id="withdrawBankNameInput" class="custom-select dep-input" placeholder="e.g. HDFC Bank">
             </div>
             <div>
               <label class="control-label">Account Holder Name:</label>
@@ -4164,73 +5026,51 @@
         <!-- Channel Specific Inputs: 3. Crypto USDT Mode -->
         <div id="channelCryptoFields" style="display: none;">
           <label class="control-label">3. Receiver USDT TRC-20 Wallet Address:</label>
-          <input type="text" id="withdrawCryptoAddress" class="custom-select dep-input" placeholder="e.g. TXyz... (Tron TRC-20 network)" style="font-family: monospace; font-size: 13px; margin-bottom: 8px;">
-          <div style="font-size: 11px; color: #f59e0b; margin-bottom: 10px;">
-            ⚠️ Only TRC-20 USDT is supported. Sending to wrong address cannot be reversed.
+          <input type="text" id="withdrawCryptoAddress" class="custom-select dep-input" placeholder="e.g. TXyz... (Tron TRC-20 network)" style="font-family: monospace; font-size: 12px; margin-bottom: 6px;">
+          <div style="font-size: 10.5px; color: #f59e0b; margin-bottom: 8px;">
+            ⚠️ Only TRC-20 USDT is supported.
           </div>
         </div>
 
-        <!-- Live Payout & Fee Calculation Breakdown Card -->
-        <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 12px; font-size: 12px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-secondary);">
-            <span>Gross Withdrawal Amount:</span>
+        <!-- Live Payout Calculation Breakdown Card -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; font-size: 11.5px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 3px; color: var(--text-secondary);">
+            <span>Gross Amount:</span>
             <span id="calcGrossAmount" style="color: #fff; font-weight:700;">₹500.00</span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-secondary);">
-            <span>Platform Service Fee (8%):</span>
-            <span id="calcPlatformFee" style="color: #f59e0b; font-weight:700;">-₹40.00 (8%)</span>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 3px; color: var(--text-secondary);">
+            <span>Service Fee (8%):</span>
+            <span id="calcPlatformFee" style="color: #f59e0b; font-weight:700;">-₹40.00</span>
           </div>
-          <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong style="color: #fff; font-size: 13px; display:block;">Net Payout To Receive:</strong>
-              <span style="font-size: 10px; color: var(--text-muted);">Amount credited directly to your UPI/Bank</span>
-            </div>
-            <strong id="calcNetAmount" style="color: #00e701; font-size: 17px; font-family: var(--font-display);">₹460.00</strong>
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px; display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: #fff; font-size: 12px;">Net Payout To Receive:</strong>
+            <strong id="calcNetAmount" style="color: #00e701; font-size: 16px; font-family: var(--font-display);">₹460.00</strong>
           </div>
         </div>
 
         <!-- Strict Non-Refundable Account Warning Notice -->
-        <div style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid #ef4444; border-radius: var(--border-radius-md); padding: 10px 12px; margin-bottom: 12px;">
-          <div style="display: flex; align-items: flex-start; gap: 8px;">
-            <span style="font-size: 18px; line-height: 1;">⚠️</span>
-            <div style="font-size: 11.5px; line-height: 1.45; color: #ff8585;">
-              <strong style="color: #ff4757; text-transform: uppercase; font-size: 12px; display: block; margin-bottom: 2px;">
-                🚨 STRICT NOTICE: Double Check Your UPI / Bank Account Details!
+        <div style="background: rgba(239, 68, 68, 0.12); border: 1.5px solid #ef4444; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px;">
+          <div style="display: flex; align-items: flex-start; gap: 6px;">
+            <span style="font-size: 16px; line-height: 1;">⚠️</span>
+            <div style="font-size: 11px; line-height: 1.4; color: #ff8585;">
+              <strong style="color: #ff4757; text-transform: uppercase; font-size: 11.5px; display: block; margin-bottom: 1px;">
+                🚨 STRICT NOTICE: Double Check Your UPI / Account Details!
               </strong>
-              Please carefully verify and provide your <strong>authentic, correct UPI ID and Bank Account details</strong>. If an incorrect UPI ID or Account Number is provided and payout funds are transferred, <strong>NO REFUND OR COMPENSATION WILL BE ISSUED</strong>. Payouts cannot be reversed once dispatched.
+              Please carefully verify your <strong>authentic, correct UPI ID and Bank Account details</strong>. If incorrect details are given and payout is dispatched, <strong>NO REFUND OR REVERSAL WILL BE ISSUED</strong>.
             </div>
           </div>
         </div>
 
-        <!-- Save Account Checkbox -->
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 14px;">
-          <input type="checkbox" id="chkSaveWithdrawDetails" style="width:16px; height:16px; cursor:pointer;" checked>
-          <label for="chkSaveWithdrawDetails" style="font-size:12px; color: var(--text-secondary); cursor:pointer;">
-            💾 Save these account details for future instant 1-click payouts
-          </label>
-        </div>
-
         <!-- Done / Submit Withdrawal Action Button -->
-        <button type="button" id="btnSubmitWithdraw" class="btn-action-withdraw" style="height: 50px; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; width: 100%; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.45); border-radius: 10px;">
-          <span style="font-size: 18px;">✅</span>
+        <button type="button" id="btnSubmitWithdraw" class="btn-action-withdraw" style="height: 46px; font-size: 14px; font-weight: 900; letter-spacing: 0.5px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45); border-radius: 10px;" onclick="window.app && window.app.submitWithdrawRequest ? window.app.submitWithdrawRequest() : (window.submitWithdrawRequest && window.submitWithdrawRequest())">
+          <span style="font-size: 16px;">✅</span>
           <span>DONE & CONFIRM WITHDRAWAL</span>
         </button>
-
-        <!-- Guarantee Note & Direct Telegram Contact -->
-        <div style="margin-top: 12px; padding: 10px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.15); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: space-between;">
-          <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;">
-            ⚡ Average payout dispatch time: <strong>5 - 15 minutes</strong>.<br>
-            Any emergency or payout query?
-          </div>
-          <a href="https://t.me/viewpointios" target="_blank" class="btn-insta-follow" style="background: #0088cc; color: #fff; padding: 5px 10px; font-size: 11px;">
-            Telegram @viewpointios ↗
-          </a>
-        </div>
 
       </div>
 
       <!-- Tab 2: Withdrawal History -->
-      <div id="viewWithdrawHistory" class="deposit-tab-view">
+      <div id="viewWithdrawHistory" class="deposit-tab-view" style="display: none;">
         <table class="history-table">
           <thead>
             <tr>
