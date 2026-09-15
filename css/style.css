@@ -8487,49 +8487,217 @@ html, body, button, a, input, select, textarea, [role="button"],
   color: #07080d;
 }
 
-/* 8. Mobile Responsiveness */
+/* 8. Mobile Responsiveness & Gap Elimination */
 @media (max-width: 768px) {
+  .stake-app-container {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .stake-sidebar-rail {
+    display: none !important;
+  }
+
+  .stake-main-content {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    padding: 0 !important;
+  }
+
+  .compact-navbar {
+    padding: 0 10px !important;
+    height: 52px !important;
+  }
+  .nav-compact-container {
+    width: 100% !important;
+  }
+  .nav-center-links {
+    display: none !important;
+  }
+
+  .main-layout {
+    padding: 8px 8px 70px 8px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Home Screen on Mobile */
   .home-hero-banner {
     flex-direction: column;
-    padding: 16px;
-    gap: 12px;
+    padding: 14px;
+    gap: 10px;
+    text-align: center;
   }
   .home-hero-left {
     max-width: 100%;
-    text-align: center;
+  }
+  .home-hero-title {
+    font-size: 19px;
   }
   .home-hero-actions {
     justify-content: center;
+    gap: 8px;
+  }
+  .btn-join-now, .btn-explore-games {
+    padding: 8px 14px;
+    font-size: 11.5px;
   }
   .hero-3d-visual {
-    width: 160px;
-    height: 100px;
+    width: 130px;
+    height: 80px;
   }
   .value-props-bar {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 6px;
+  }
+  .value-prop-card {
+    padding: 8px 10px;
   }
   .featured-cards-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
+  .card-thumb-wrap {
+    height: 75px;
+  }
+  .card-thumb-emoji {
+    font-size: 26px;
+  }
+
+  /* Lobby Screen on Mobile (Fix Side Gaps & Tabs) */
   .lobby-layout-wrap {
-    grid-template-columns: 1fr;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
   }
+
+  .lobby-sidebar {
+    width: 100% !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .lobby-search-input {
+    font-size: 12px;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+  }
+
+  .lobby-categories-list {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 6px !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lobby-cat-item {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+  }
+
+  .lobby-main-grid-area {
+    width: 100% !important;
+  }
+
+  .lobby-top-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+
+  .lobby-filter-pills {
+    display: flex !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    gap: 6px !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lobby-pill-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+
   .lobby-cards-4col-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
   }
+
+  .poster-thumb-box {
+    height: 85px !important;
+  }
+  .poster-art-neon {
+    font-size: 26px !important;
+  }
+  .poster-title-overlay {
+    font-size: 11px !important;
+  }
+  .poster-card-footer {
+    padding: 6px 8px !important;
+  }
+
+  /* Game Screen on Mobile */
+  .game-arena {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 0 16px 0 !important;
+    gap: 8px !important;
+  }
+  .game-stage {
+    order: 1 !important;
+    width: 100% !important;
+  }
+  .controls-panel {
+    order: 2 !important;
+    width: 100% !important;
+  }
+  .game-history-sidebar {
+    order: 3 !important;
+    width: 100% !important;
+    max-height: 160px !important;
+  }
+
+  /* Wallet, Deposit, Withdraw, Promos on Mobile */
   .wallet-cards-2col {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
   .deposit-2col-layout {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
   .withdraw-3col-layout {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
   .promo-3cards-row {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .promo-hero-card {
+    padding: 16px;
+    flex-direction: column;
+    text-align: center;
+  }
+  .btn-promo-get-started {
+    margin: 0 auto;
   }
 }
+
 
 

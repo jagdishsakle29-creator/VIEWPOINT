@@ -729,78 +729,88 @@
     };
 
     window.filterCasinoCategory = function(category, activeBtn) {
-      if (window.app && window.app.filterCasinoCategory) return window.app.filterCasinoCategory(category, activeBtn);
       category = String(category || 'all').toLowerCase().trim();
-      if (category.includes('sport') || category.includes('cric')) {
-        return window.switchGame('sportsbook');
-      }
+
+      // Normalize category alias
       if (category.includes('all')) category = 'all';
       else if (category.includes('orig')) category = 'originals';
       else if (category.includes('live')) category = 'live';
       else if (category.includes('crash')) category = 'crash';
-      else if (category.includes('table') || category.includes('card')) category = 'table';
+      else if (category.includes('card')) category = 'card';
+      else if (category.includes('table')) category = 'table';
       else if (category.includes('slot')) category = 'slots';
       else if (category.includes('arc')) category = 'arcade';
-      else if (category.includes('prov')) category = 'providers';
+      else if (category.includes('fish')) category = 'fishing';
+      else if (category.includes('feat')) category = 'featured';
+      else if (category.includes('pop')) category = 'popular';
+      else if (category.includes('new')) category = 'new';
+      else if (category.includes('sport') || category.includes('cric')) category = 'sports';
 
-      var navButtons = document.querySelectorAll('.casino-cat-btn, .casino-category-btn');
-      navButtons.forEach(function(btn) {
-        var btnCat = (btn.getAttribute('data-cat') || btn.getAttribute('data-category') || btn.textContent || '').toLowerCase();
-        var isMatch = (category === 'all' && btnCat.includes('all')) || (category !== 'all' && btnCat.includes(category));
+      // 1. Sync Lobby Left Sidebar Category Items
+      var catItems = document.querySelectorAll('.lobby-categories-list .lobby-cat-item');
+      catItems.forEach(function(item) {
+        var c = (item.getAttribute('data-cat') || '').toLowerCase();
+        var isMatch = (category === 'all' && c === 'all') || (category !== 'all' && (c === category || c.includes(category)));
+        item.classList.toggle('active', item === activeBtn || isMatch);
+      });
+
+      // 2. Sync Lobby Top Filter Pills
+      var pillBtns = document.querySelectorAll('.lobby-filter-pills .lobby-pill-btn');
+      pillBtns.forEach(function(btn) {
+        var c = (btn.getAttribute('data-cat') || btn.textContent || '').toLowerCase().trim();
+        var isMatch = (category === 'all' && (c.includes('all') || c === 'all')) || 
+                      (category !== 'all' && (c === category || c.includes(category) || category.includes(c)));
         btn.classList.toggle('active', btn === activeBtn || isMatch);
       });
 
+      // 3. Category Game Mapping
       var categoryGameMap = {
-        'all': ['limbo', 'andarbahar', 'colortrading', 'dice', 'tower', 'pump', 'roulette', 'mines', 'aviator', 'dragontiger', 'crash', 'chicken', 'plinko', 'stock', 'moles', 'sportsbook'],
-        'featured': ['mines', 'aviator', 'roulette', 'dragontiger', 'chicken', 'plinko'],
-        'popular': ['mines', 'aviator', 'crash', 'roulette', 'colortrading'],
-        'originals': ['mines', 'limbo', 'dice', 'tower', 'pump', 'plinko', 'moles', 'chicken'],
-        'live': ['roulette', 'andarbahar', 'dragontiger', 'colortrading'],
-        'crash': ['crash', 'aviator', 'chicken', 'limbo', 'pump'],
-        'table': ['roulette', 'andarbahar', 'dragontiger', 'dice'],
-        'slots': ['colortrading', 'stock', 'pump', 'moles', 'tower'],
-        'arcade': ['colortrading', 'stock', 'moles', 'pump', 'tower'],
-        'providers': ['roulette', 'andarbahar', 'dragontiger', 'aviator', 'colortrading', 'mines', 'crash', 'limbo', 'plinko', 'stock', 'dice', 'tower']
+        'all': ['aviator', 'crash', 'dragontiger', 'andarbahar', 'roulette', 'dice', 'colortrading', 'limbo', 'mines', 'chicken', 'plinko', 'sportsbook', 'moles', 'tower', 'stock', 'pump'],
+        'crash': ['aviator', 'crash', 'chicken', 'limbo', 'pump'],
+        'slots': ['colortrading', 'stock', 'tower', 'pump'],
+        'live': ['roulette', 'dragontiger', 'andarbahar', 'sportsbook'],
+        'card': ['andarbahar', 'dice', 'dragontiger', 'limbo'],
+        'table': ['roulette', 'dice', 'dragontiger', 'andarbahar', 'limbo'],
+        'sports': ['sportsbook'],
+        'fishing': ['moles', 'chicken'],
+        'arcade': ['chicken', 'moles', 'plinko', 'tower', 'pump'],
+        'new': ['mines', 'aviator', 'dragontiger', 'plinko', 'chicken'],
+        'featured': ['mines', 'aviator', 'roulette', 'dragontiger', 'crash', 'chicken', 'plinko'],
+        'popular': ['aviator', 'crash', 'dragontiger', 'roulette', 'colortrading', 'mines']
       };
 
       var allowedGames = categoryGameMap[category] || categoryGameMap['all'];
-      var cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
-      cards.forEach(function(card) {
+
+      // 4. Filter 4-Column Lobby Cards
+      var lobbyCards = document.querySelectorAll('.lobby-cards-4col-grid .lobby-poster-card');
+      lobbyCards.forEach(function(card) {
         var g = (card.getAttribute('data-game') || '').toLowerCase();
         var c = (card.getAttribute('data-category') || '').toLowerCase();
-        var match = (category === 'all') || allowedGames.indexOf(g) !== -1 || c.indexOf(category) !== -1;
+        var match = (category === 'all') || (allowedGames.indexOf(g) !== -1) || (c.indexOf(category) !== -1);
         card.style.display = match ? 'flex' : 'none';
       });
 
-      var track = document.getElementById('featuredCarouselTrack');
-      if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
-
-      var dots = document.querySelectorAll('#featuredCarouselDots .carousel-dot');
-      dots.forEach(function(d, i) { d.classList.toggle('active', i === 0); });
-
-      var tabBtns = document.querySelectorAll('.tab-btn[data-game]');
-      tabBtns.forEach(function(tab) {
-        var g = (tab.getAttribute('data-game') || '').toLowerCase();
-        tab.style.display = (category === 'all' || allowedGames.indexOf(g) !== -1) ? 'inline-flex' : 'none';
+      // 5. Filter other game cards on page if any
+      var otherCards = document.querySelectorAll('.game-poster-card, .compact-game-card');
+      otherCards.forEach(function(card) {
+        var g = (card.getAttribute('data-game') || '').toLowerCase();
+        var c = (card.getAttribute('data-category') || '').toLowerCase();
+        var match = (category === 'all') || (allowedGames.indexOf(g) !== -1) || (c.indexOf(category) !== -1);
+        card.style.display = match ? 'flex' : 'none';
       });
-
-      if (category !== 'all' && allowedGames.length > 0 && window.switchGame) {
-        window.switchGame(allowedGames[0]);
-      }
     };
 
     window.searchCasinoGames = function(query) {
-      if (window.app && window.app.searchCasinoGames) return window.app.searchCasinoGames(query);
       var q = String(query || '').toLowerCase().trim();
-      var cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
-      cards.forEach(function(card) {
-        var title = ((card.querySelector('.game-poster-name, .card-game-title') || {}).textContent || '').toLowerCase();
-        var cat = ((card.querySelector('.game-poster-provider, .card-cat-label') || {}).textContent || '').toLowerCase();
+      var lobbyCards = document.querySelectorAll('.lobby-cards-4col-grid .lobby-poster-card, .compact-game-card, .game-poster-card');
+      lobbyCards.forEach(function(card) {
+        var title = ((card.querySelector('.poster-title-overlay, .card-game-title, .game-poster-name') || {}).textContent || '').toLowerCase();
+        var cat = ((card.querySelector('.poster-cat-badge, .card-cat-label, .game-poster-provider') || {}).textContent || '').toLowerCase();
         var gameAttr = (card.getAttribute('data-game') || '').toLowerCase();
-        card.style.display = (!q || title.indexOf(q) !== -1 || cat.indexOf(q) !== -1 || gameAttr.indexOf(q) !== -1) ? 'flex' : 'none';
+        var catAttr = (card.getAttribute('data-category') || '').toLowerCase();
+        var match = !q || title.indexOf(q) !== -1 || cat.indexOf(q) !== -1 || gameAttr.indexOf(q) !== -1 || catAttr.indexOf(q) !== -1;
+        card.style.display = match ? 'flex' : 'none';
       });
-      var track = document.getElementById('featuredCarouselTrack');
-      if (track) track.scrollTo({ left: 0, behavior: 'smooth' });
     };
 
     window.placeColorBet = function(type, choice, amt) {
@@ -984,7 +994,10 @@
       </button>
     </aside>
 
-          <!-- Main Top Navigation Bar (Fixed 62px Height) -->
+    <!-- Master Main Column Content Wrapper (Prevents Horizontal Flex Column Bug) -->
+    <div class="stake-main-content" id="stakeMainContent">
+
+      <!-- Main Top Navigation Bar (Fixed 62px Height) -->
       <header class="navbar compact-navbar" id="viewpointHeader">
         <div class="nav-compact-container">
           <!-- Left: Golden Winged Logo & 7-Tap Secret Trigger -->
@@ -1253,7 +1266,7 @@
                   <div style="display:flex; align-items:center; gap:8px;"><span>🔴</span> <span>Live Casino</span></div>
                   <span class="lobby-cat-badge">24</span>
                 </div>
-                <div class="lobby-cat-item" data-cat="table" onclick="window.filterCasinoCategory('table', this)">
+                <div class="lobby-cat-item" data-cat="card" onclick="window.filterCasinoCategory('card', this)">
                   <div style="display:flex; align-items:center; gap:8px;"><span>🃏</span> <span>Card Games</span></div>
                   <span class="lobby-cat-badge">16</span>
                 </div>
@@ -1265,11 +1278,11 @@
                   <div style="display:flex; align-items:center; gap:8px;"><span>⚽</span> <span>Sports</span></div>
                   <span class="lobby-cat-badge">8</span>
                 </div>
-                <div class="lobby-cat-item" data-cat="arcade" onclick="window.filterCasinoCategory('arcade', this)">
+                <div class="lobby-cat-item" data-cat="fishing" onclick="window.filterCasinoCategory('fishing', this)">
                   <div style="display:flex; align-items:center; gap:8px;"><span>🎣</span> <span>Fishing</span></div>
                   <span class="lobby-cat-badge">6</span>
                 </div>
-                <div class="lobby-cat-item" data-cat="featured" onclick="window.filterCasinoCategory('featured', this)">
+                <div class="lobby-cat-item" data-cat="new" onclick="window.filterCasinoCategory('new', this)">
                   <div style="display:flex; align-items:center; gap:8px;"><span>⭐</span> <span>New Games</span></div>
                   <span class="lobby-cat-badge">4</span>
                 </div>
@@ -1287,7 +1300,7 @@
                 <div class="lobby-filter-pills">
                   <button type="button" class="lobby-pill-btn active" onclick="window.filterCasinoCategory('featured', this)">Featured</button>
                   <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('popular', this)">Popular</button>
-                  <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('originals', this)">New</button>
+                  <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('new', this)">New</button>
                   <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('live', this)">Live</button>
                   <button type="button" class="lobby-pill-btn" onclick="window.filterCasinoCategory('all', this)">All Games</button>
                 </div>
@@ -1296,7 +1309,7 @@
               <!-- 4-Column Game Grid -->
               <div class="lobby-cards-4col-grid" id="lobbyCards4ColGrid">
                 <!-- 1. Aviator -->
-                <div class="lobby-poster-card" data-game="aviator" data-category="crash popular all" onclick="window.switchGame('aviator')">
+                <div class="lobby-poster-card" data-game="aviator" data-category="crash popular new featured all" onclick="window.switchGame('aviator')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #581c87, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">✈️</div>
@@ -1309,7 +1322,7 @@
                 </div>
 
                 <!-- 2. Crash -->
-                <div class="lobby-poster-card" data-game="crash" data-category="crash originals all" onclick="window.switchGame('crash')">
+                <div class="lobby-poster-card" data-game="crash" data-category="crash originals popular all" onclick="window.switchGame('crash')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #0e7490, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">🚀</div>
@@ -1322,7 +1335,7 @@
                 </div>
 
                 <!-- 3. Dragon Tiger -->
-                <div class="lobby-poster-card" data-game="dragontiger" data-category="live table popular all" onclick="window.switchGame('dragontiger')">
+                <div class="lobby-poster-card" data-game="dragontiger" data-category="live table card popular featured new all" onclick="window.switchGame('dragontiger')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #831843, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">🐉</div>
@@ -1335,7 +1348,7 @@
                 </div>
 
                 <!-- 4. Teen Patti -->
-                <div class="lobby-poster-card" data-game="andarbahar" data-category="table live all" onclick="window.switchGame('andarbahar')">
+                <div class="lobby-poster-card" data-game="andarbahar" data-category="table card live all" onclick="window.switchGame('andarbahar')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #1e3a8a, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">🃏</div>
@@ -1348,7 +1361,7 @@
                 </div>
 
                 <!-- 5. Roulette -->
-                <div class="lobby-poster-card" data-game="roulette" data-category="live table all" onclick="window.switchGame('roulette')">
+                <div class="lobby-poster-card" data-game="roulette" data-category="live table popular featured all" onclick="window.switchGame('roulette')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #14532d, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">🎡</div>
@@ -1361,7 +1374,7 @@
                 </div>
 
                 <!-- 6. Blackjack / Dice -->
-                <div class="lobby-poster-card" data-game="dice" data-category="table originals all" onclick="window.switchGame('dice')">
+                <div class="lobby-poster-card" data-game="dice" data-category="table card originals all" onclick="window.switchGame('dice')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #334155, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">🎲</div>
@@ -1374,7 +1387,7 @@
                 </div>
 
                 <!-- 7. Slots 777 -->
-                <div class="lobby-poster-card" data-game="colortrading" data-category="slots arcade all" onclick="window.switchGame('colortrading')">
+                <div class="lobby-poster-card" data-game="colortrading" data-category="slots arcade popular all" onclick="window.switchGame('colortrading')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #78350f, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">🎰</div>
@@ -1387,7 +1400,7 @@
                 </div>
 
                 <!-- 8. Baccarat / Limbo -->
-                <div class="lobby-poster-card" data-game="limbo" data-category="table originals all" onclick="window.switchGame('limbo')">
+                <div class="lobby-poster-card" data-game="limbo" data-category="table card originals crash all" onclick="window.switchGame('limbo')">
                   <div class="poster-thumb-box" style="background: radial-gradient(circle, #1e293b, #090d16);">
                     <span class="card-fav-icon">♥</span>
                     <div class="poster-art-neon">🎯</div>
@@ -1395,6 +1408,84 @@
                   </div>
                   <div class="poster-card-footer">
                     <span class="poster-cat-badge">Card Game</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 9. Mines -->
+                <div class="lobby-poster-card" data-game="mines" data-category="originals popular featured new all" onclick="window.switchGame('mines')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #065f46, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">💣</div>
+                    <div class="poster-title-overlay">Mines</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge" style="color:#00e701;">Originals</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 10. Chicken Road -->
+                <div class="lobby-poster-card" data-game="chicken" data-category="crash originals arcade new all" onclick="window.switchGame('chicken')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #9a3412, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🍗</div>
+                    <div class="poster-title-overlay">Chicken Road</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Crash</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 11. Plinko -->
+                <div class="lobby-poster-card" data-game="plinko" data-category="originals arcade featured new all" onclick="window.switchGame('plinko')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #4338ca, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">⚪</div>
+                    <div class="poster-title-overlay">Plinko</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Arcade</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 12. Cricket Bet / Sports -->
+                <div class="lobby-poster-card" data-game="sportsbook" data-category="sports live popular all" onclick="window.switchGame('sportsbook')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #15803d, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🏏</div>
+                    <div class="poster-title-overlay">Cricket Bet</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge" style="color:#00e701;">Sports</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 13. Fishing Master -->
+                <div class="lobby-poster-card" data-game="moles" data-category="fishing arcade all" onclick="window.switchGame('moles')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #0369a1, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🎣</div>
+                    <div class="poster-title-overlay">Fishing Master</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Fishing</span>
+                    <button type="button" class="poster-play-btn">Play</button>
+                  </div>
+                </div>
+
+                <!-- 14. Tower Legend -->
+                <div class="lobby-poster-card" data-game="tower" data-category="slots arcade originals all" onclick="window.switchGame('tower')">
+                  <div class="poster-thumb-box" style="background: radial-gradient(circle, #701a75, #090d16);">
+                    <span class="card-fav-icon">♥</span>
+                    <div class="poster-art-neon">🏰</div>
+                    <div class="poster-title-overlay">Tower Legend</div>
+                  </div>
+                  <div class="poster-card-footer">
+                    <span class="poster-cat-badge">Slots</span>
                     <button type="button" class="poster-play-btn">Play</button>
                   </div>
                 </div>
@@ -4140,6 +4231,7 @@
     </div>
 
   </main>
+  </div><!-- .stake-main-content -->
 
   <!-- Auth Modal: Login / Register / Guest Access -->
   <div id="modalAuth" class="modal-backdrop">
