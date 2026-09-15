@@ -8554,12 +8554,21 @@ html, body, button, a, input, select, textarea, [role="button"],
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
   }
-  .value-prop-card {
-    padding: 8px 10px;
-  }
   .featured-cards-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 8px !important;
+    padding-bottom: 6px !important;
+  }
+  .compact-game-card {
+    flex: 0 0 115px !important;
+    scroll-snap-align: start !important;
+  }
+  .card-quick-play-btn {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
   }
   .card-thumb-wrap {
     height: 75px;

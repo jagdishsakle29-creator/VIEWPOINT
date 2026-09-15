@@ -5201,6 +5201,19 @@ class AppController {
 
   switchGame(gameType) {
     if (this._switchingGame) return;
+
+    // Switch view to Game Screen so game arena is visible immediately
+    if (window.switchAppView) {
+      window.switchAppView('game');
+    } else {
+      const vHome = document.getElementById('viewHome');
+      const vLobby = document.getElementById('viewLobby');
+      const vGame = document.getElementById('viewGameScreen');
+      if (vHome) vHome.style.display = 'none';
+      if (vLobby) vLobby.style.display = 'none';
+      if (vGame) vGame.style.display = 'block';
+    }
+
     if (this.currentGame === gameType && this.activeInstance) {
       window.soundEngine && window.soundEngine.playClick && window.soundEngine.playClick();
       this.scrollToGameArena();

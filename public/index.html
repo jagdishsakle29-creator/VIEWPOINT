@@ -309,6 +309,32 @@
         d.classList.toggle('active', i === window._currentHeroIndex);
       });
     };
+
+    // Touch Swipe Support for Hero Banner & Carousels
+    if (typeof document !== 'undefined') {
+      document.addEventListener('DOMContentLoaded', function() {
+        var hero = document.querySelector('.home-hero-banner, #compactHeroCarousel');
+        if (hero) {
+          var startX = 0;
+          hero.addEventListener('touchstart', function(e) {
+            if (e.touches && e.touches.length > 0) startX = e.touches[0].clientX;
+          }, { passive: true });
+          hero.addEventListener('touchend', function(e) {
+            if (e.changedTouches && e.changedTouches.length > 0) {
+              var diffX = e.changedTouches[0].clientX - startX;
+              if (Math.abs(diffX) > 35) {
+                if (diffX < 0) {
+                  window.switchHeroSlide(((window._currentHeroIndex || 0) + 1));
+                } else {
+                  window.switchHeroSlide(((window._currentHeroIndex || 0) - 1 + 3) % 3);
+                }
+              }
+            }
+          }, { passive: true });
+        }
+      });
+    }
+
     // Helper functions for Screens 4, 5, 6, 7
     window.switchWalletTabCurrency = function(curr) {
       var isUsdt = (curr === 'USDT');
@@ -650,8 +676,31 @@
     };
 
     window.switchGame = function(g) {
-      if (window.app && window.app.switchGame) return window.app.switchGame(g);
-      // Standalone Instant DOM Fallback
+      g = String(g || 'mines').toLowerCase().trim();
+
+      // 1. Always switch view to Game Screen so user actually sees and plays the game
+      var viewIds = ['viewHome', 'viewLobby', 'viewWallet', 'viewDeposit', 'viewWithdraw', 'viewPromotions'];
+      viewIds.forEach(function(vId) {
+        var el = document.getElementById(vId);
+        if (el) el.style.display = 'none';
+      });
+      var vGame = document.getElementById('viewGameScreen');
+      if (vGame) {
+        vGame.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // 2. Play game background sound
+      if (window.soundEngine && window.soundEngine.setGameBgm) {
+        window.soundEngine.setGameBgm(g);
+      }
+
+      // 3. Delegate to window.app if available
+      if (window.app && window.app.switchGame) {
+        window.app.switchGame(g);
+      }
+
+      // Standalone Instant DOM Activation
       var views = ['minesView', 'chickenView', 'chickenMinesView', 'crashView', 'plinkoView', 'diceView', 'limboView', 'dragontigerView', 'colortradingView', 'stockView', 'towerView', 'molesView', 'pumpView', 'aviatorView', 'andarbaharView', 'rouletteView', 'sportsbookView'];
       views.forEach(function(vId) {
         var el = document.getElementById(vId);
@@ -689,6 +738,13 @@
       var targetTab = document.getElementById(activeTabId);
       if (targetTab) targetTab.classList.add('active');
 
+      // Sync ViewPoint Game Tabs bar
+      var vTabs = document.querySelectorAll('.v-game-tab');
+      vTabs.forEach(function(t) {
+        var tg = t.getAttribute('data-game');
+        t.classList.toggle('active', tg === g);
+      });
+
       if (g === 'aviator' && !window.aviatorGame && window.AviatorGame) {
         window.aviatorGame = new window.AviatorGame();
       }
@@ -717,33 +773,17 @@
           ga.style.gridTemplateColumns = '1fr';
         } else {
           ga.style.display = window.innerWidth > 900 ? 'grid' : 'flex';
-          ga.style.gridTemplateColumns = window.innerWidth > 900 ? '310px 1fr' : '1fr';
+          ga.style.gridTemplateColumns = window.innerWidth > 900 ? '190px 1fr 290px' : '1fr';
         }
-        try {
-          var headerOffset = 70;
-          var arenaRect = ga.getBoundingClientRect();
-          if (arenaRect.top < 10 || arenaRect.top > 250) {
-            var targetY = arenaRect.top + (window.pageYOffset || document.documentElement.scrollTop || 0) - headerOffset;
-            window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-          }
-          ga.classList.remove('arena-focus-pulse');
-          void ga.offsetWidth;
-          ga.classList.add('arena-focus-pulse');
-        } catch(e) {}
       }
 
       // Sync active card highlight in lobby and carousel
       try {
-        var cards = document.querySelectorAll('.game-poster-card, .compact-game-card');
+        var cards = document.querySelectorAll('.game-poster-card, .compact-game-card, .lobby-poster-card');
         cards.forEach(function(c) {
           c.classList.toggle('active', c.getAttribute('data-game') === g);
         });
       } catch(e) {}
-
-      // Trigger isolated background sound for only this active game
-      if (window.soundEngine && window.soundEngine.setGameBgm) {
-        window.soundEngine.setGameBgm(g);
-      }
     };
 
     window.filterCasinoCategory = function(category, activeBtn) {
